@@ -1,5 +1,7 @@
 # next-ai-ready
 
+[中文文档](./README.zh-CN.md) | English
+
 > Traditional websites are built for browsers.
 > **next-ai-ready** makes your Next.js site **readable** by AI and **callable** by agents.
 >

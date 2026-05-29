@@ -16,7 +16,7 @@ export function Sidebar({ locale, groups, sectionLabels }: SidebarProps) {
 
   return (
     <aside className="hidden md:block w-56 shrink-0">
-      <nav className="sticky top-16 h-[calc(100vh-4rem)] overflow-y-auto py-10 pl-6 pr-4">
+      <nav className="sticky top-[60px] h-[calc(100vh-60px)] overflow-y-auto py-10 pl-6 pr-4">
         {Object.entries(groups).map(([section, docs]) => (
           <div key={section} className="mb-8">
             <h4 className="mb-3 px-3 text-[11px] font-medium uppercase tracking-[0.12em] text-text-tertiary/80">

@@ -65,15 +65,19 @@ export async function MdxContent({ content }: MdxContentProps) {
       if (!line.trim()) continue;
 
       if (line.startsWith("### ")) {
+        const text = line.slice(4);
+        const id = text.toLowerCase().replace(/[^a-z0-9\u4e00-\u9fff]+/g, "-").replace(/(^-|-$)/g, "");
         rendered.push(
-          <h3 key={j} className="text-[17px] font-semibold mt-12 mb-4 text-text tracking-tight">
-            {line.slice(4)}
+          <h3 key={j} id={id} className="text-[17px] font-semibold mt-12 mb-4 text-text tracking-tight scroll-mt-20">
+            {text}
           </h3>,
         );
       } else if (line.startsWith("## ")) {
+        const text = line.slice(3);
+        const id = text.toLowerCase().replace(/[^a-z0-9\u4e00-\u9fff]+/g, "-").replace(/(^-|-$)/g, "");
         rendered.push(
-          <h2 key={j} className="group text-2xl font-semibold tracking-tight mt-16 mb-5 pt-8 text-text border-t border-border/50 first:border-0 first:pt-0 first:mt-0">
-            {line.slice(3)}
+          <h2 key={j} id={id} className="group text-2xl font-semibold tracking-tight mt-16 mb-5 pt-8 text-text border-t border-white/[0.04] first:border-0 first:pt-0 first:mt-0 scroll-mt-20">
+            {text}
           </h2>,
         );
       } else if (line.startsWith("# ")) {

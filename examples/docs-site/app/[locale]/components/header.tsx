@@ -17,61 +17,78 @@ export function Header({ locale, messages }: HeaderProps) {
   const switchPath = pathname.replace(`/${locale}`, `/${switchLocale}`);
 
   return (
-    <header className="fixed top-0 z-50 w-full border-b border-border/50 bg-bg/60 backdrop-blur-xl">
-      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6">
-        <div className="flex items-center gap-8">
-          <Link
-            href={`/${locale}`}
-            className="group flex items-center gap-0"
-          >
-            <span className="text-[15px] font-light tracking-tight text-text-secondary group-hover:text-text transition-colors">
-              next
-            </span>
-            <span className="text-[15px] font-light tracking-tight text-text-tertiary mx-px">/</span>
-            <span className="text-[15px] font-medium tracking-tight text-text group-hover:text-white transition-colors">
-              ai-ready
-            </span>
-          </Link>
-          <nav className="hidden md:flex items-center gap-6">
-            <Link
-              href={`/${locale}/docs/introduction`}
-              className="text-sm text-text-secondary hover:text-text transition-colors"
-            >
-              {messages.docs}
-            </Link>
-            <Link
-              href={`/${locale}/docs/guides/quickstart`}
-              className="text-sm text-text-secondary hover:text-text transition-colors"
-            >
-              {messages.quickstart}
-            </Link>
-            <Link
-              href={`/${locale}/docs/api/config`}
-              className="text-sm text-text-secondary hover:text-text transition-colors"
-            >
-              {messages.api}
-            </Link>
-          </nav>
-        </div>
-        <div className="flex items-center gap-4">
-          <Link
-            href={switchPath}
-            className="text-xs font-medium text-text-tertiary hover:text-text border border-border rounded-md px-2 py-1 transition-colors"
-          >
-            {locale === "en" ? "中文" : "EN"}
-          </Link>
+    <header className="fixed top-0 z-50 w-full bg-bg/80 backdrop-blur-2xl backdrop-saturate-150 border-b border-white/[0.06]">
+      <div className="mx-auto flex h-[60px] max-w-[1400px] items-center px-8">
+        {/* Logo */}
+        <Link
+          href={`/${locale}`}
+          className="group flex items-center mr-10"
+        >
+          <span className="text-[17px] tracking-[-0.02em] text-text/90 group-hover:text-white transition-colors">
+            <span className="font-normal">next</span>
+            <span className="text-text-tertiary/50 mx-[2px]">/</span>
+            <span className="font-semibold">ai-ready</span>
+          </span>
+        </Link>
+
+        {/* Nav */}
+        <nav className="hidden md:flex items-center gap-1">
+          <NavLink href={`/${locale}/docs/introduction`} active={pathname.includes("/docs")}>
+            {messages.docs}
+          </NavLink>
+          <NavLink href={`/${locale}/docs/guides/quickstart`} active={pathname.includes("/guides")}>
+            {messages.quickstart}
+          </NavLink>
+          <NavLink href={`/${locale}/docs/api/config`} active={pathname.includes("/api")}>
+            {messages.api}
+          </NavLink>
           <a
             href="https://github.com/mustcanbedo/next-ai-ready"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-text-tertiary hover:text-text transition-colors"
+            className="flex items-center h-9 px-3 text-[13px] text-text-tertiary hover:text-text rounded-lg hover:bg-white/[0.03] transition-all"
           >
-            <svg viewBox="0 0 16 16" fill="currentColor" className="h-4 w-4">
-              <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z" />
-            </svg>
+            GitHub
           </a>
+        </nav>
+
+        {/* Spacer */}
+        <div className="flex-1" />
+
+        {/* Search placeholder */}
+        <div className="hidden lg:flex items-center gap-2 h-9 px-3.5 rounded-lg bg-white/[0.04] border border-white/[0.06] text-text-tertiary/60 text-[13px] mr-4 cursor-pointer hover:bg-white/[0.06] hover:border-white/[0.08] transition-all w-56">
+          <svg className="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+          </svg>
+          <span>{locale === "en" ? "Search docs..." : "搜索文档..."}</span>
+          <kbd className="ml-auto text-[11px] font-mono text-text-tertiary/40 border border-white/[0.06] rounded px-1.5 py-0.5">⌘K</kbd>
+        </div>
+
+        {/* Actions */}
+        <div className="flex items-center gap-1">
+          <Link
+            href={switchPath}
+            className="flex items-center h-9 px-3 text-[13px] font-medium text-text-tertiary hover:text-text rounded-lg hover:bg-white/[0.04] transition-all"
+          >
+            {locale === "en" ? "中文" : "EN"}
+          </Link>
         </div>
       </div>
     </header>
+  );
+}
+
+function NavLink({ href, active, children }: { href: string; active: boolean; children: React.ReactNode }) {
+  return (
+    <Link
+      href={href}
+      className={`relative flex items-center h-9 px-3.5 text-[14px] rounded-lg transition-all ${
+        active
+          ? "text-text font-medium bg-white/[0.05]"
+          : "text-text-tertiary hover:text-text hover:bg-white/[0.03]"
+      }`}
+    >
+      {children}
+    </Link>
   );
 }

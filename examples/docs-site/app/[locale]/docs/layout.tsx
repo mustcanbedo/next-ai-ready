@@ -18,7 +18,7 @@ export default async function DocsLayout({ children, params }: DocsLayoutProps) 
   return (
     <div className="min-h-screen">
       <Header locale={locale as Locale} messages={t.nav} />
-      <div className="mx-auto flex max-w-[1400px] pt-16">
+      <div className="mx-auto flex max-w-[1400px] pt-[60px]">
         <Sidebar
           locale={locale as Locale}
           groups={groups}

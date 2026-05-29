@@ -35,16 +35,16 @@ export default async function DocPage({ params }: PageProps) {
   if (!doc) notFound();
 
   return (
-    <article className="max-w-[720px]">
-      <header className="mb-10">
-        <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-accent">
+    <article className="max-w-[740px]">
+      <header className="mb-14 pb-8 border-b border-border/40">
+        <p className="mb-4 text-[11px] font-medium uppercase tracking-[0.15em] text-accent/80">
           {doc.section.replace("-", " ")}
         </p>
-        <h1 className="text-3xl font-bold tracking-tight text-text sm:text-4xl">
+        <h1 className="text-[2.5rem] font-bold tracking-tight text-text leading-[1.15]">
           {doc.title}
         </h1>
         {doc.summary && (
-          <p className="mt-4 text-base text-text-secondary leading-relaxed">
+          <p className="mt-5 text-[17px] text-text-secondary leading-relaxed">
             {doc.summary}
           </p>
         )}

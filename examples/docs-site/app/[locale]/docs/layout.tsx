@@ -18,13 +18,13 @@ export default async function DocsLayout({ children, params }: DocsLayoutProps) 
   return (
     <div className="min-h-screen">
       <Header locale={locale as Locale} messages={t.nav} />
-      <div className="mx-auto flex max-w-7xl pt-16">
+      <div className="mx-auto flex max-w-[1400px] pt-16">
         <Sidebar
           locale={locale as Locale}
           groups={groups}
           sectionLabels={t.docs.sidebar}
         />
-        <main className="flex-1 min-w-0 border-l border-border px-12 py-10">
+        <main className="flex-1 min-w-0 border-l border-border/50 px-16 py-14 lg:px-20">
           {children}
         </main>
       </div>

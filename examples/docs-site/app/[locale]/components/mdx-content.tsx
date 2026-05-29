@@ -8,7 +8,7 @@ interface MdxContentProps {
 async function highlight(code: string, lang: string): Promise<string> {
   return codeToHtml(code, {
     lang: lang || "text",
-    theme: "github-dark-default",
+    theme: "vitesse-dark",
   });
 }
 
@@ -43,20 +43,22 @@ export async function MdxContent({ content }: MdxContentProps) {
       const lang = block.lang || "text";
       const html = await highlight(block.content, lang);
       rendered.push(
-        <div key={j} className="my-6 rounded-xl border border-border overflow-hidden bg-[#0d1117]">
-          <div className="flex items-center justify-between px-4 py-2 border-b border-white/[0.06]">
-            <span className="text-[11px] font-mono text-text-tertiary">{lang}</span>
-            <div className="flex gap-1.5">
-              <span className="h-2.5 w-2.5 rounded-full bg-white/[0.06]" />
-              <span className="h-2.5 w-2.5 rounded-full bg-white/[0.06]" />
-              <span className="h-2.5 w-2.5 rounded-full bg-white/[0.06]" />
+        <figure key={j} className="my-8 group">
+          <div className="rounded-2xl bg-[#121212] ring-1 ring-white/[0.08] overflow-hidden shadow-2xl shadow-black/20">
+            <div className="flex items-center gap-2 px-4 h-10 border-b border-white/[0.04]">
+              <div className="flex gap-1.5 mr-3">
+                <span className="h-3 w-3 rounded-full bg-white/[0.08]" />
+                <span className="h-3 w-3 rounded-full bg-white/[0.08]" />
+                <span className="h-3 w-3 rounded-full bg-white/[0.08]" />
+              </div>
+              <span className="text-[11px] font-mono text-white/30 tracking-wide">{lang}</span>
             </div>
+            <div
+              className="overflow-x-auto px-5 py-4 text-[13.5px] leading-7 [&_pre]:!bg-transparent [&_pre]:!m-0 [&_pre]:!p-0 [&_code]:!text-[13.5px] [&_code]:!leading-7"
+              dangerouslySetInnerHTML={{ __html: html }}
+            />
           </div>
-          <div
-            className="overflow-x-auto p-4 text-[13px] leading-6 [&_pre]:!bg-transparent [&_pre]:!p-0 [&_code]:!text-[13px]"
-            dangerouslySetInnerHTML={{ __html: html }}
-          />
-        </div>,
+        </figure>,
       );
     } else {
       const line = block.content;
@@ -64,18 +66,18 @@ export async function MdxContent({ content }: MdxContentProps) {
 
       if (line.startsWith("### ")) {
         rendered.push(
-          <h3 key={j} className="text-base font-semibold mt-10 mb-3 text-text">
+          <h3 key={j} className="text-[17px] font-semibold mt-12 mb-4 text-text tracking-tight">
             {line.slice(4)}
           </h3>,
         );
       } else if (line.startsWith("## ")) {
         rendered.push(
-          <h2 key={j} className="text-xl font-semibold tracking-tight mt-14 mb-4 text-text">
+          <h2 key={j} className="group text-2xl font-semibold tracking-tight mt-16 mb-5 pt-8 text-text border-t border-border/50 first:border-0 first:pt-0 first:mt-0">
             {line.slice(3)}
           </h2>,
         );
       } else if (line.startsWith("# ")) {
-        // Skip — rendered from metadata
+        // Skip — rendered from page header
       } else if (line.startsWith("- ")) {
         const items: string[] = [line.slice(2)];
         while (
@@ -87,17 +89,18 @@ export async function MdxContent({ content }: MdxContentProps) {
           items.push(blocks[j].content.slice(2));
         }
         rendered.push(
-          <ul key={j} className="list-disc pl-6 mb-5 space-y-1.5">
+          <ul key={j} className="my-6 space-y-3">
             {items.map((item, k) => (
-              <li key={k} className="text-text-secondary text-[15px] leading-7">
-                <Inline text={item} />
+              <li key={k} className="flex gap-3 text-[15px] leading-7 text-text-secondary">
+                <span className="mt-[11px] h-1.5 w-1.5 shrink-0 rounded-full bg-accent/60" />
+                <span><Inline text={item} /></span>
               </li>
             ))}
           </ul>,
         );
       } else if (line.startsWith("> ")) {
         rendered.push(
-          <blockquote key={j} className="border-l-2 border-accent/40 pl-4 text-text-secondary my-5 italic">
+          <blockquote key={j} className="my-8 rounded-xl bg-accent/[0.04] border border-accent/10 px-5 py-4 text-[15px] text-text-secondary leading-7">
             <Inline text={line.slice(2)} />
           </blockquote>,
         );
@@ -116,12 +119,12 @@ export async function MdxContent({ content }: MdxContentProps) {
           row.split("|").filter(Boolean).map((c) => c.trim()),
         );
         rendered.push(
-          <div key={j} className="my-6 overflow-x-auto rounded-xl border border-border">
-            <table className="w-full text-sm">
+          <div key={j} className="my-8 overflow-x-auto rounded-2xl ring-1 ring-white/[0.08] bg-[#121212]">
+            <table className="w-full text-[14px]">
               <thead>
-                <tr className="border-b border-border bg-bg-elevated/50">
+                <tr className="border-b border-white/[0.06]">
                   {headerCells.map((cell, k) => (
-                    <th key={k} className="text-left font-medium text-text-secondary px-4 py-2.5">
+                    <th key={k} className="text-left font-medium text-text px-5 py-3.5">
                       {cell}
                     </th>
                   ))}
@@ -129,9 +132,9 @@ export async function MdxContent({ content }: MdxContentProps) {
               </thead>
               <tbody>
                 {bodyRows.map((row, ri) => (
-                  <tr key={ri} className="border-b border-border last:border-0">
+                  <tr key={ri} className="border-b border-white/[0.04] last:border-0">
                     {row.map((cell, ci) => (
-                      <td key={ci} className="px-4 py-2.5 text-text-secondary">
+                      <td key={ci} className="px-5 py-3 text-text-secondary">
                         <Inline text={cell} />
                       </td>
                     ))}
@@ -143,7 +146,7 @@ export async function MdxContent({ content }: MdxContentProps) {
         );
       } else {
         rendered.push(
-          <p key={j} className="mb-5 text-text-secondary text-[15px] leading-7">
+          <p key={j} className="mb-6 text-[16px] text-text-secondary leading-[1.85]">
             <Inline text={line} />
           </p>,
         );
@@ -151,7 +154,7 @@ export async function MdxContent({ content }: MdxContentProps) {
     }
   }
 
-  return <div>{rendered}</div>;
+  return <div className="prose-custom">{rendered}</div>;
 }
 
 function Inline({ text }: { text: string }) {
@@ -181,16 +184,16 @@ function Inline({ text }: { text: string }) {
     if (first.index > 0) parts.push(remaining.slice(0, first.index));
 
     if (first.type === "bold") {
-      parts.push(<strong key={k++} className="font-semibold text-text">{first.match[1]}</strong>);
+      parts.push(<strong key={k++} className="font-medium text-text">{first.match[1]}</strong>);
     } else if (first.type === "code") {
       parts.push(
-        <code key={k++} className="text-[13px] font-mono bg-bg-elevated px-1.5 py-0.5 rounded-md text-accent border border-border">
+        <code key={k++} className="text-[0.9em] font-mono bg-white/[0.06] px-[5px] py-[2px] rounded text-text/90">
           {first.match[1]}
         </code>,
       );
     } else if (first.type === "link") {
       parts.push(
-        <a key={k++} href={first.match[2]} className="text-accent hover:underline">
+        <a key={k++} href={first.match[2]} className="text-accent underline underline-offset-[3px] decoration-accent/30 hover:decoration-accent transition-colors">
           {first.match[1]}
         </a>,
       );

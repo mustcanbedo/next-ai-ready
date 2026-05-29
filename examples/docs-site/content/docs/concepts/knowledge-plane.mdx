@@ -1,0 +1,40 @@
+---
+title: Knowledge Plane
+summary: How next-ai-ready makes your content readable by AI.
+order: 1
+---
+
+# Knowledge Plane
+
+The Knowledge Plane is responsible for making your content **citable** by AI search engines. It transforms your MDX pages into structured formats that AI systems understand.
+
+## How it works
+
+1. **Scan** — the build CLI finds all MDX files matching your `content` globs
+2. **Parse** — frontmatter and headings are extracted into semantic metadata
+3. **Compile** — each page becomes a `SemanticNode` in a graph
+4. **Emit** — the graph is serialized into multiple AI-consumable formats
+
+## Artifacts
+
+- **`llms.txt`** — a site-wide index listing every page with its summary, following the [llms.txt proposal](https://llmstxt.org)
+- **`llms-full.txt`** — the full body of every page concatenated, for deep ingestion
+- **`/<page>.md`** — each page rendered as clean Markdown with YAML header
+- **`/<page>.ai.json`** — structured JSON with the semantic node and all descendants
+- **JSON-LD** — `Article`, `FAQPage`, `WebPage` markup embedded in your pages
+
+## Semantic metadata
+
+Add a `semantic` export to your MDX pages to enrich the graph:
+
+```ts
+export const semantic = {
+  summary: "How to install the CLI tool.",
+  topics: ["installation", "cli"],
+  questions: [
+    { q: "How do I install?", a: "Run pnpm add next-ai-ready." }
+  ],
+};
+```
+
+Questions become `FAQPage` JSON-LD automatically — giving your pages a chance to appear in AI-generated FAQ results.

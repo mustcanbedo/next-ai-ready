@@ -1,0 +1,65 @@
+---
+title: Configuration
+summary: Full reference for ai-ready.config.mjs options.
+order: 1
+---
+
+# Configuration
+
+The `ai-ready.config.mjs` file is the single entry point for configuring `next-ai-ready`. It lives in your project root.
+
+## defineConfig
+
+```js
+import { defineConfig } from "@next-ai-ready/core";
+
+export default defineConfig({
+  site: { ... },
+  content: [ ... ],
+  actions: "./actions/index.mjs",
+  emit: { ... },
+});
+```
+
+## site
+
+Site-level metadata used in `llms.txt`, OpenAPI, and JSON-LD.
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `name` | `string` | Yes | Your site or product name |
+| `baseUrl` | `string` | Yes | Production URL (used in canonical links) |
+| `description` | `string` | Yes | Short description for AI consumers |
+
+## content
+
+An array of glob patterns pointing to your MDX content files:
+
+```js
+content: ["app/**/*.mdx", "content/**/*.mdx"]
+```
+
+These files are scanned during `next-ai-ready build` to produce the semantic graph, `llms.txt`, and per-page Markdown/JSON.
+
+## actions
+
+Path to your actions module, resolved relative to the config file:
+
+```js
+actions: "./actions/index.mjs"
+```
+
+The module should export an array of `defineAction(...)` calls wrapped in `defineActions(...)`:
+
+```js
+import { defineActions, defineAction } from "@next-ai-ready/actions";
+export default defineActions([ ... ]);
+```
+
+## emit
+
+Control which artifacts are generated:
+
+| Field | Type | Default | Description |
+| --- | --- | --- | --- |
+| `openapi` | `boolean` | `true` | Generate `/openapi.json`, `/tools.json`, `/ai-plugin.json` |

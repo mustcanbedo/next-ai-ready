@@ -1,0 +1,69 @@
+---
+title: Installation
+summary: Install next-ai-ready and scaffold your first config.
+order: 2
+---
+
+# Installation
+
+## Prerequisites
+
+- **Node.js** 20 or later
+- **Next.js** 14.2+ with App Router
+- **pnpm**, npm, or yarn
+
+## Install
+
+```bash
+pnpm add next-ai-ready
+```
+
+This installs the meta package which re-exports everything you need and provides the CLI.
+
+## Initialize
+
+```bash
+npx next-ai-ready init
+```
+
+This creates:
+
+- `ai-ready.config.mjs` — your site config
+- `app/_ai-ready/` — route handlers for `llms.txt`, `openapi.json`, etc.
+- `app/api/actions/` — the action execution endpoint
+- `app/api/mcp/` — the MCP server endpoint
+- `actions/index.mjs` — a starter action file with a `ping` health check
+
+## Configure
+
+Edit `ai-ready.config.mjs` to match your site:
+
+```js
+import { defineConfig } from "@next-ai-ready/core";
+
+export default defineConfig({
+  site: {
+    name: "My Site",
+    baseUrl: "https://example.com",
+    description: "A short description for AI.",
+  },
+  content: ["app/**/*.mdx", "content/**/*.mdx"],
+  actions: "./actions/index.mjs",
+});
+```
+
+## Build
+
+```bash
+npx next-ai-ready build
+```
+
+This scans your content, compiles the semantic graph, and writes all AI artifacts to `public/` and `.next-ai-ready/`.
+
+## Verify
+
+```bash
+npx next-ai-ready doctor
+```
+
+Doctor checks your config, validates action exposure rules, and confirms route wiring. Use it in CI.

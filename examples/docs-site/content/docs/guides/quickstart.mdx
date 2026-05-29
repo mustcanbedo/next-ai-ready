@@ -1,0 +1,80 @@
+---
+title: Quickstart
+summary: Get up and running with next-ai-ready in 5 minutes.
+order: 1
+---
+
+# Quickstart
+
+This guide takes you from zero to a fully AI-ready Next.js site in under 5 minutes.
+
+## 1. Create a Next.js app
+
+```bash
+npx create-next-app@latest my-site --typescript --app --tailwind
+cd my-site
+```
+
+## 2. Install next-ai-ready
+
+```bash
+pnpm add next-ai-ready
+```
+
+## 3. Initialize
+
+```bash
+npx next-ai-ready init
+```
+
+This scaffolds your config, route handlers, and a sample action.
+
+## 4. Add content
+
+Create an MDX page with semantic metadata:
+
+```markdown
+---
+title: Getting Started
+summary: Learn how to use our product.
+---
+
+# Getting Started
+
+Welcome to our product. Here's how to get started.
+```
+
+## 5. Build
+
+```bash
+npx next-ai-ready build
+```
+
+You should see output like:
+
+```
+[next-ai-ready] scanning content
+[next-ai-ready] compiling 1 files
+[next-ai-ready] loading actions from ./actions/index.mjs
+[next-ai-ready] compiled 1 actions
+[next-ai-ready] wrote 8 files
+[next-ai-ready] build complete — 1 routes, 1 actions, 8 files written
+```
+
+## 6. Verify
+
+```bash
+npx next-ai-ready doctor
+```
+
+All checks should pass. Then start your dev server and visit:
+
+- `http://localhost:3000/_ai-ready/llms-txt` — your llms.txt
+- `http://localhost:3000/_ai-ready/openapi` — your OpenAPI spec
+- `http://localhost:3000/_ai-ready/tools` — your tools manifest
+
+## Next steps
+
+- Read about the [Knowledge Plane](/docs/concepts/knowledge-plane) to understand content compilation
+- Read about the [Capability Plane](/docs/concepts/capability-plane) to define custom actions
+- Check the [API Reference](/docs/api/config) for full configuration options

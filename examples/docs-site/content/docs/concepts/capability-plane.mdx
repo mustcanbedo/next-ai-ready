@@ -1,0 +1,47 @@
+---
+title: Capability Plane
+summary: How next-ai-ready exposes your features as AI-callable tools.
+order: 2
+---
+
+# Capability Plane
+
+The Capability Plane turns your application features into **tools that AI agents can invoke**. Define an action once, and it's automatically exposed through multiple protocols.
+
+## defineAction
+
+```js
+import { defineAction } from "@next-ai-ready/actions";
+import { z } from "zod";
+
+defineAction({
+  name: "search_product",
+  description: "Search products by keyword.",
+  whenToUse: "When the user wants to find a product.",
+  input: z.object({ keyword: z.string() }),
+  output: z.object({ items: z.array(z.object({ id: z.string(), title: z.string() })) }),
+  public: true,
+  handler: async ({ keyword }) => {
+    return { items: await db.products.search(keyword) };
+  },
+});
+```
+
+## What gets generated
+
+From each action definition, the build CLI generates:
+
+- **`POST /api/actions/<name>`** — a REST endpoint with input validation
+- **`/openapi.json`** — OpenAPI 3.1 spec with the action as an operation
+- **`/tools.json`** — OpenAI-compatible tool manifest
+- **`/.well-known/ai-plugin.json`** — ChatGPT plugin descriptor
+- **MCP tool** — exposed via the `/api/mcp` endpoint and stdio server
+
+## Visibility control
+
+Actions are **private by default**. Set `public: true` to expose them to AI:
+
+- **`public: true`** — the action appears in all generated manifests and is callable by any agent
+- **`public: false`** (default) — the action exists in the registry but is not exposed externally
+
+The `whenToUse` field is critical for AI tool selection — it tells the model *when* this action is appropriate. The `doctor` CLI warns if a public action lacks `whenToUse`.

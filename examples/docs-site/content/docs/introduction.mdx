@@ -1,0 +1,45 @@
+---
+title: Introduction
+summary: What next-ai-ready is and why it exists.
+order: 1
+---
+
+# Introduction
+
+Traditional websites are built for browsers. `next-ai-ready` makes your Next.js site **readable by AI** and **callable by agents**.
+
+## The problem
+
+Search is changing. Users increasingly get answers from AI — ChatGPT, Perplexity, Claude, Gemini, Google AI Overviews. If your content isn't structured for AI consumption, you're invisible to this new traffic.
+
+At the same time, AI agents are emerging. They need to **call your features** — not just read your pages. But there's no standard way to expose Next.js functionality to agents.
+
+## The solution
+
+`next-ai-ready` is the **AEO + Agent-API layer** for Next.js. One config file, zero changes to your UI:
+
+- **Knowledge Plane** — your content becomes AI-readable via `llms.txt`, per-page Markdown, JSON-LD
+- **Capability Plane** — your features become AI-callable via OpenAPI, MCP, `tools.json`
+
+## How it works
+
+```bash
+pnpm add next-ai-ready
+npx next-ai-ready init
+npx next-ai-ready build
+```
+
+The `init` command scaffolds route handlers and a config file. The `build` command scans your MDX content and compiles everything into the artifacts AI consumers need.
+
+Your existing UI is untouched. The framework adds **new routes** that serve AI-optimized representations of your content and capabilities.
+
+## What you get
+
+| Artifact | Consumer |
+| --- | --- |
+| `/llms.txt` | AI search crawlers |
+| `/openapi.json` | Agent frameworks |
+| `/api/mcp` | Claude Desktop, Cursor |
+| `/<page>.md` | RAG pipelines |
+| `JSON-LD` | Search engines |
+| `/tools.json` | OpenAI tool format |

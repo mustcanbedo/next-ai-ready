@@ -1,0 +1,11 @@
+node_modules
+dist
+.turbo
+.next
+.next-ai-ready
+coverage
+*.log
+.DS_Store
+.env
+.env.*
+!.env.example

@@ -1,0 +1,140 @@
+next-ai-ready — progress log
+=============================
+
+Phase 0 — Repo bootstrap                              [done]
+  ✅ docs/{goals,research,architecture,decisions,roadmap}.md
+  ✅ Root configs + 8 packages + meta scaffold
+  ✅ core types.ts type contract
+  ✅ pnpm install + pnpm -r run build + typecheck all green
+
+Phase 1 — Knowledge plane core                        [done]
+  ✅ core:
+     - id.ts          stableId() sha256 → 16-hex
+     - scanner.ts     scanContent(), fileToRoute() (App Router aware)
+  ✅ mdx:
+     - parse.ts       gray-matter + unified + remark-{parse,gfm,mdx}
+     - headings.ts    sectionize() — nested section tree + github-slugger
+     - summary.ts     deriveSummary() — frontmatter → semantic → first paragraph
+     - faq.ts         extractFaq() — explicit + heading heuristic
+     - to-markdown.ts renderMarkdown() — strips JSX, ComponentMap override
+     - chunks.ts      chunkSections() — token-aware, overlap, breadcrumb
+     - compile.ts     orchestrator: file → { page, children }
+  ✅ semantic:
+     - semantic.ts    defineSemantic() authoring helper
+     - graph.ts       buildGraph(), getPageNodes()
+     - jsonld.ts      pageJsonLd() WebPage/Article/FAQPage/Breadcrumb + siteJsonLd()
+  ✅ Tests: 12 passing
+     - mdx/test/compile.test.ts        7 ✓
+     - semantic/test/graph.test.ts     5 ✓
+
+Phase 2 — llms.txt + Next integration                 [done]
+  ✅ llms:
+     - llms-txt.ts         renderLlmsTxt() + section curation + glob
+     - llms-full-txt.ts    renderLlmsFullTxt() with BEGIN/END markers
+     - page-md.ts          renderPageMarkdown() YAML header + body
+     - page-ai-json.ts     renderPageAiJson() page + descendants
+  ✅ next:
+     - paths.ts            .next-ai-ready/ + public/ paths (ADR-006/011)
+     - with-ai-ready.ts    rewrites + outputFileTracingIncludes
+     - runtime/graph-loader.ts  per-process cached read of graph.json
+     - handlers/{llms-txt,llms-full,page-md,page-ai-json}.ts
+     - cli/load-config.ts  ai-ready.config.mjs/.js loader
+     - cli/build.ts        runBuild() orchestrator (deterministic)
+     - cli/init.ts         runInit() codemod (config + 4 handler stubs)
+     - cli/index.ts        runCli() dispatcher
+     - cli-bin.ts          bin entry, wired in package.json
+     - Subpath exports for /handlers/* and /cli
+  ✅ meta package: cli forwards to @next-ai-ready/next/cli
+  ✅ CLI smoke test in sample-app: build → llms.txt + graph.json correct
+  ✅ Tests: 24 total
+     - mdx 7, semantic 5, llms 7, next 5 (build + init)
+Phase 3 — Capability plane (actions/openapi)          [done]
+  ✅ actions:
+     - define-action.ts    defineAction() + snake_case name guard
+     - registry.ts         AnyAction registry, defineActions(), register/get/list/clear
+     - schema.ts           schemaToJsonSchema() via zod v4 z.toJSONSchema()
+                           (dropped zod-to-json-schema: v3-only, silent-empty on v4)
+     - manifest.ts         buildActionsManifest() — functions stripped, JSON Schema kept
+     - invoke.ts           invokeAction() + buildActionContext(); ADR-010 security:
+                           private=404, auth gate=401, bad input=400, throw=500
+  ✅ openapi:
+     - openapi.ts          buildOpenApi() → OpenAPI 3.1 + x-ai-when-to-use
+     - tools.ts            buildToolsJson() → OpenAI/Claude/Gemini tool format
+     - ai-plugin.ts        buildAiPlugin() → ChatGPT ai-plugin.json v1
+  ✅ next integration:
+     - paths.ts            openapi/tools/ai-plugin output paths
+     - cli/build.ts        loads actions (inline or module path) → emits manifest
+                           + openapi.json + tools.json + .well-known/ai-plugin.json
+     - runtime/manifest-loader.ts  cached actions.manifest.json reader
+     - handlers/{openapi,tools,action}.ts  + 3 subpath exports
+     - with-ai-ready.ts    /api/openapi.json + /api/tools.json rewrites
+     - cli/init.ts         +3 route stubs +actions/index.ts starter (ping action)
+  ✅ CLI smoke test: init scaffolds 9 files correctly
+  ✅ Tests: 44 total (actions 11, openapi 7, semantic 5, mdx 7, llms 7, next 7)
+     - next: build.test 3, init.test 2, actions.test 2 (build emit + runtime invoke)
+Phase 4 — MCP server                                  [done]
+  ✅ mcp package (thin adapter, ADR-008):
+     - tools.ts      toMcpToolDefinitions() — public actions → MCP tools;
+                     execute() reuses invokeAction (zero dup security);
+                     folds whenToUse/whenNotToUse into description;
+                     keeps both JSON Schema + Zod raw shape for SDK.
+     - resources.ts  toMcpResourceDefinitions()/readMcpResource() —
+                     graph pages → airead://page/<route> markdown resources.
+     - server.ts     registerAiReady(server, {graph}) — binds tools+resources
+                     onto a structural McpServerLike (SDK-version agnostic).
+  ✅ next integration:
+     - handlers/mcp.ts  createAiReadyMcpHandler() — Streamable HTTP via
+                        dynamic-import'd mcp-handler (optional peer dep);
+                        clear error if not installed. Mounted at /api/mcp.
+     - cli/mcp-stdio.ts runMcpStdio() — long-lived stdio server for Claude
+                        Desktop/Cursor; dynamic-imports @modelcontextprotocol/sdk.
+     - cli/index.ts     `mcp` subcommand (+ --no-resources flag) & help text.
+     - init.ts          + app/api/mcp/[transport]/route.ts stub (10 files now).
+     - package.json     optional peerDeps: mcp-handler, @mcp/sdk, next.
+  ✅ BUG FIX: removed `import "server-only"` from graph-loader.ts +
+     manifest-loader.ts (shared Node utils). It crashed the CLI in plain Node
+     (no react-server export condition). Guard stays in handler entry files.
+  ✅ CLI smoke test: help lists mcp; `mcp` dispatches & errors gracefully
+     when SDK/deps absent (no more server-only crash).
+  ✅ Tests: 50 total (actions 11, openapi 7, semantic 5, mdx 7, llms 7,
+     mcp 6, next 7). mcp.test: tools filter+execute, resources list/read,
+     registerAiReady counts + includeTool filter.
+Phase 5 — Doctor CLI + robots + hooks + docs site     [framework done; docs site pending]
+  ✅ robots.txt builder (core/robots.ts):
+     - buildRobotsTxt(site, config) — explicit per-AI-bot Allow/Disallow
+       blocks (from AI_BOTS), advertises /llms.txt entrypoints, optional
+       Sitemap line, extra raw lines. Deterministic.
+     - RobotsConfig + EmitConfig.robots types in core.
+     - build CLI emits public/robots.txt (publicRobotsTxtPath).
+  ✅ analytics hooks (next/runtime/observability.ts):
+     - registerAiHooks()/clearAiHooks() process-global registry.
+     - emitAiRequest(req, artifact) — bot inferred via identifyAiBot; wired
+       into llms-txt/llms-full/page-md/page-ai-json handlers.
+     - emitInvoke(info) — wired into action handler (action/latency/ok/caller).
+     - Hooks never throw through to the response (swallowed).
+     - Exported from @next-ai-ready/next.
+  ✅ doctor CLI (next/cli/doctor.ts + `doctor` subcommand):
+     - validates config presence + site.name/baseUrl (absolute URL check),
+       loads actions & flags public-without-whenToUse (ADR-010), checks
+       graph.json + route stubs. Structured diagnostics, CI exit code.
+  ✅ BUG FIX: knowledge handler GET() now takes (req) for UA; updated
+     build.test llmsTxtGET call accordingly.
+  ✅ CLI smoke test: `doctor` on sample-app → 0 errors, 4 warnings, exit 0.
+  ✅ Tests: 61 total (core 5, actions 11, openapi 7, mdx 7, semantic 5,
+     llms 7, mcp 6, next 13). New: core/robots 5, next/phase5 8
+     (doctor 3 + robots emit 1 + observability 2 + throwing-hook safety).
+  ⏳ Remaining: docs site (separate Next.js app — dogfoods the framework).
+
+
+Key references checked:
+  • vercel/mcp-handler        — to be used for MCP transport (ADR-008)
+  • TurboDocx/next-plugin-llms — reference for llms.txt slice
+  • multivmlabs/aeo.js        — closest competitor (Knowledge plane only)
+  • fumadocs                  — MDX → Markdown quality benchmark
+  • AnswerDotAI/llms-txt      — spec we comply with
+  • Next 16 /_next/mcp        — dev-only; our /api/mcp is production (ADR-009)
+
+Open follow-ups:
+  • Decide final Zod adapter strategy (Zod 3 vs 4) when Phase 3 starts.
+  • Schema warnings in IDE for turbo.json / changeset config.json are harmless
+    (untrusted external URLs); leave as-is.

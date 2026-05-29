@@ -1,0 +1,43 @@
+{
+  "name": "next-ai-ready",
+  "version": "0.1.0-alpha.2",
+  "description": "AEO + Agent-API layer for Next.js. Make your site readable by AI and callable by agents.",
+  "license": "MIT",
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "bin": {
+    "next-ai-ready": "./dist/cli.js"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "typecheck": "tsc --noEmit",
+    "clean": "rm -rf dist .turbo"
+  },
+  "dependencies": {
+    "@next-ai-ready/core": "workspace:*",
+    "@next-ai-ready/semantic": "workspace:*",
+    "@next-ai-ready/mdx": "workspace:*",
+    "@next-ai-ready/actions": "workspace:*",
+    "@next-ai-ready/llms": "workspace:*",
+    "@next-ai-ready/openapi": "workspace:*",
+    "@next-ai-ready/mcp": "workspace:*",
+    "@next-ai-ready/next": "workspace:*"
+  },
+  "devDependencies": {
+    "tsup": "^8.3.0",
+    "typescript": "^5.6.0"
+  }
+}

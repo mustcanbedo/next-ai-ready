@@ -4,19 +4,18 @@
   --font-sans: "Geist", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "Geist Mono", ui-monospace, monospace;
 
-  --color-bg: #fafafa;
-  --color-bg-alt: #f4f4f5;
-  --color-bg-code: #18181b;
-  --color-surface: #ffffff;
-  --color-border: #e4e4e7;
-  --color-border-subtle: #f4f4f5;
-  --color-text: #18181b;
-  --color-text-secondary: #71717a;
-  --color-text-tertiary: #a1a1aa;
-  --color-accent: #18181b;
-  --color-accent-hover: #27272a;
-  --color-link: #2563eb;
-  --color-link-hover: #1d4ed8;
+  --color-bg: #09090b;
+  --color-bg-elevated: #18181b;
+  --color-bg-card: #0f0f11;
+  --color-surface: #18181b;
+  --color-border: #27272a;
+  --color-border-subtle: #1f1f23;
+  --color-text: #fafafa;
+  --color-text-secondary: #a1a1aa;
+  --color-text-tertiary: #71717a;
+  --color-accent: #3b82f6;
+  --color-accent-hover: #2563eb;
+  --color-glow: rgba(59, 130, 246, 0.15);
 }
 
 @layer base {
@@ -35,85 +34,6 @@
   }
 
   ::selection {
-    @apply bg-accent text-white;
+    @apply bg-accent/30 text-white;
   }
-}
-
-/* Prose styles for documentation content */
-.prose {
-  @apply text-text leading-7;
-  max-width: 680px;
-}
-
-.prose h1 {
-  @apply text-3xl font-semibold tracking-tight mt-0 mb-4 text-text;
-  letter-spacing: -0.025em;
-}
-
-.prose h2 {
-  @apply text-xl font-semibold tracking-tight mt-12 mb-4 text-text pb-2 border-b border-border-subtle;
-}
-
-.prose h3 {
-  @apply text-base font-semibold mt-8 mb-3 text-text;
-}
-
-.prose p {
-  @apply mb-4 text-text-secondary;
-}
-
-.prose a {
-  @apply text-text underline decoration-border hover:decoration-text transition-colors;
-}
-
-.prose strong {
-  @apply font-semibold text-text;
-}
-
-.prose code:not(pre code) {
-  @apply text-sm font-mono bg-bg-alt px-1.5 py-0.5 rounded text-text;
-}
-
-.prose pre {
-  @apply bg-bg-code text-zinc-100 rounded-lg p-4 my-6 overflow-x-auto text-sm leading-6;
-}
-
-.prose pre code {
-  @apply bg-transparent p-0 rounded-none text-inherit;
-}
-
-.prose ul {
-  @apply list-disc pl-6 mb-4 space-y-1;
-}
-
-.prose ol {
-  @apply list-decimal pl-6 mb-4 space-y-1;
-}
-
-.prose li {
-  @apply text-text-secondary;
-}
-
-.prose blockquote {
-  @apply border-l-2 border-border pl-4 italic text-text-secondary my-4;
-}
-
-.prose table {
-  @apply w-full text-sm my-6;
-}
-
-.prose thead th {
-  @apply text-left font-medium text-text-secondary pb-2 border-b border-border;
-}
-
-.prose tbody td {
-  @apply py-2 border-b border-border-subtle text-text-secondary;
-}
-
-.prose hr {
-  @apply border-border my-8;
-}
-
-.prose img {
-  @apply rounded-lg my-6;
 }

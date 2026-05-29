@@ -3,26 +3,28 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { DocMeta } from "@/lib/docs";
+import type { Locale } from "@/lib/i18n";
 
 interface SidebarProps {
+  locale: Locale;
   groups: Record<string, DocMeta[]>;
   sectionLabels: Record<string, string>;
 }
 
-export function Sidebar({ groups, sectionLabels }: SidebarProps) {
+export function Sidebar({ locale, groups, sectionLabels }: SidebarProps) {
   const pathname = usePathname();
 
   return (
-    <aside className="w-56 shrink-0 border-r border-border">
-      <nav className="sticky top-14 h-[calc(100vh-3.5rem)] overflow-y-auto py-6 pr-4">
+    <aside className="w-60 shrink-0">
+      <nav className="sticky top-16 h-[calc(100vh-4rem)] overflow-y-auto py-8 pr-6">
         {Object.entries(groups).map(([section, docs]) => (
-          <div key={section} className="mb-6">
-            <h4 className="mb-2 px-3 text-[11px] font-semibold uppercase tracking-wider text-text-tertiary">
+          <div key={section} className="mb-7">
+            <h4 className="mb-2.5 px-3 text-[11px] font-semibold uppercase tracking-widest text-text-tertiary">
               {sectionLabels[section] ?? section}
             </h4>
             <ul className="space-y-0.5">
               {docs.map((doc) => {
-                const href = `/docs/${doc.slug}`;
+                const href = `/${locale}/docs/${doc.slug}`;
                 const isActive = pathname === href;
                 return (
                   <li key={doc.slug}>
@@ -30,8 +32,8 @@ export function Sidebar({ groups, sectionLabels }: SidebarProps) {
                       href={href}
                       className={`block rounded-md px-3 py-1.5 text-[13px] transition-colors ${
                         isActive
-                          ? "bg-bg-alt font-medium text-text"
-                          : "text-text-secondary hover:text-text hover:bg-bg-alt/50"
+                          ? "bg-bg-elevated text-text font-medium"
+                          : "text-text-secondary hover:text-text hover:bg-bg-elevated/50"
                       }`}
                     >
                       {doc.title}

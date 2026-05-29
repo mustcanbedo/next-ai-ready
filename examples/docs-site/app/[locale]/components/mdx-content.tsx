@@ -40,13 +40,23 @@ export async function MdxContent({ content }: MdxContentProps) {
   for (let j = 0; j < blocks.length; j++) {
     const block = blocks[j];
     if (block.type === "code") {
-      const html = await highlight(block.content, block.lang || "text");
+      const lang = block.lang || "text";
+      const html = await highlight(block.content, lang);
       rendered.push(
-        <div
-          key={j}
-          className="my-6 overflow-hidden rounded-xl border border-border"
-          dangerouslySetInnerHTML={{ __html: html }}
-        />,
+        <div key={j} className="my-6 rounded-xl border border-border overflow-hidden bg-[#0d1117]">
+          <div className="flex items-center justify-between px-4 py-2 border-b border-white/[0.06]">
+            <span className="text-[11px] font-mono text-text-tertiary">{lang}</span>
+            <div className="flex gap-1.5">
+              <span className="h-2.5 w-2.5 rounded-full bg-white/[0.06]" />
+              <span className="h-2.5 w-2.5 rounded-full bg-white/[0.06]" />
+              <span className="h-2.5 w-2.5 rounded-full bg-white/[0.06]" />
+            </div>
+          </div>
+          <div
+            className="overflow-x-auto p-4 text-[13px] leading-6 [&_pre]:!bg-transparent [&_pre]:!p-0 [&_code]:!text-[13px]"
+            dangerouslySetInnerHTML={{ __html: html }}
+          />
+        </div>,
       );
     } else {
       const line = block.content;

@@ -1,0 +1,40 @@
+---
+title: 知识平面
+summary: next-ai-ready 如何让你的内容被 AI 可读。
+order: 1
+---
+
+# 知识平面
+
+知识平面负责让你的内容被 AI 搜索引擎**可引用**。它将 MDX 页面转化为 AI 系统理解的结构化格式。
+
+## 工作流程
+
+1. **扫描** — 构建 CLI 查找所有匹配 `content` glob 的 MDX 文件
+2. **解析** — 提取 frontmatter 和标题为语义元数据
+3. **编译** — 每个页面成为图谱中的一个 `SemanticNode`
+4. **输出** — 图谱被序列化为多种 AI 可消费的格式
+
+## 产出物
+
+- **`llms.txt`** — 站点级索引，列出每个页面及其摘要，遵循 [llms.txt 提案](https://llmstxt.org)
+- **`llms-full.txt`** — 每个页面的完整正文拼接，用于深度摄取
+- **`/<page>.md`** — 每个页面渲染为干净的 Markdown（含 YAML header）
+- **`/<page>.ai.json`** — 结构化 JSON，包含语义节点和所有后代
+- **JSON-LD** — `Article`、`FAQPage`、`WebPage` 标记嵌入你的页面
+
+## 语义元数据
+
+在 MDX 页面中添加 `semantic` export 来丰富图谱：
+
+```ts
+export const semantic = {
+  summary: "如何安装 CLI 工具。",
+  topics: ["安装", "cli"],
+  questions: [
+    { q: "如何安装？", a: "运行 pnpm add next-ai-ready。" }
+  ],
+};
+```
+
+Questions 会自动成为 `FAQPage` JSON-LD —— 让你的页面有机会出现在 AI 生成的 FAQ 结果中。

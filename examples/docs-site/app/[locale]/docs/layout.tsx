@@ -12,7 +12,7 @@ interface DocsLayoutProps {
 export default async function DocsLayout({ children, params }: DocsLayoutProps) {
   const { locale } = await params;
   const t = getMessages(locale as Locale);
-  const docs = await getAllDocs();
+  const docs = await getAllDocs(locale as Locale);
   const groups = groupBySection(docs);
 
   return (

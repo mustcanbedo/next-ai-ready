@@ -22,13 +22,14 @@ export function Header({ locale, messages }: HeaderProps) {
         <div className="flex items-center gap-8">
           <Link
             href={`/${locale}`}
-            className="flex items-center gap-2.5 group"
+            className="group flex items-center gap-0"
           >
-            <span className="inline-flex h-7 w-7 items-center justify-center rounded-md bg-accent text-[11px] font-bold text-white group-hover:shadow-[0_0_12px_rgba(59,130,246,0.4)] transition-shadow">
-              ai
+            <span className="text-[15px] font-light tracking-tight text-text-secondary group-hover:text-text transition-colors">
+              next
             </span>
-            <span className="text-sm font-semibold text-text">
-              next-ai-ready
+            <span className="text-[15px] font-light tracking-tight text-text-tertiary mx-px">/</span>
+            <span className="text-[15px] font-medium tracking-tight text-text group-hover:text-white transition-colors">
+              ai-ready
             </span>
           </Link>
           <nav className="hidden md:flex items-center gap-6">

@@ -1,0 +1,45 @@
+---
+title: 简介
+summary: next-ai-ready 是什么，为什么需要它。
+order: 1
+---
+
+# 简介
+
+传统网站为浏览器而生。`next-ai-ready` 让你的 Next.js 站点被 **AI 可读**、被 **Agent 可调用**。
+
+## 问题
+
+搜索正在变革。用户越来越多地从 AI 获取答案 —— ChatGPT、Perplexity、Claude、Gemini、Google AI Overviews。如果你的内容没有为 AI 消费做好结构化，你就对这些新流量隐身了。
+
+与此同时，AI Agent 正在兴起。它们需要**调用你的功能** —— 而不只是阅读你的页面。但目前没有标准方式将 Next.js 功能暴露给 Agent。
+
+## 解决方案
+
+`next-ai-ready` 是 Next.js 的 **AEO + Agent-API 层**。一个配置文件，UI 零改动：
+
+- **知识平面** — 你的内容通过 `llms.txt`、逐页 Markdown、JSON-LD 变得 AI 可读
+- **能力平面** — 你的功能通过 OpenAPI、MCP、`tools.json` 变得 AI 可调用
+
+## 工作原理
+
+```bash
+pnpm add next-ai-ready
+npx next-ai-ready init
+npx next-ai-ready build
+```
+
+`init` 命令生成路由处理器和配置文件。`build` 命令扫描你的 MDX 内容，将一切编译为 AI 消费者所需的产出物。
+
+你现有的 UI 不受影响。框架添加**新路由**来提供内容和能力的 AI 优化表示。
+
+## 产出物一览
+
+| 产出物 | 消费者 |
+| --- | --- |
+| `/llms.txt` | AI 搜索爬虫 |
+| `/openapi.json` | Agent 框架 |
+| `/api/mcp` | Claude Desktop、Cursor |
+| `/<page>.md` | RAG 管道 |
+| `JSON-LD` | 搜索引擎 |
+| `/tools.json` | OpenAI 工具格式 |

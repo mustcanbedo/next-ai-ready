@@ -1,0 +1,47 @@
+---
+title: 能力平面
+summary: next-ai-ready 如何将你的功能暴露为 AI 可调用的工具。
+order: 2
+---
+
+# 能力平面
+
+能力平面将你的应用功能转化为 **AI Agent 可以调用的工具**。定义一次 Action，自动通过多种协议暴露。
+
+## defineAction
+
+```js
+import { defineAction } from "@next-ai-ready/actions";
+import { z } from "zod";
+
+defineAction({
+  name: "search_product",
+  description: "按关键词搜索产品。",
+  whenToUse: "当用户想查找产品时使用。",
+  input: z.object({ keyword: z.string() }),
+  output: z.object({ items: z.array(z.object({ id: z.string(), title: z.string() })) }),
+  public: true,
+  handler: async ({ keyword }) => {
+    return { items: await db.products.search(keyword) };
+  },
+});
+```
+
+## 生成内容
+
+每个 Action 定义会生成：
+
+- **`POST /api/actions/<name>`** — 带输入验证的 REST 端点
+- **`/openapi.json`** — OpenAPI 3.1 规范，Action 作为 operation
+- **`/tools.json`** — OpenAI 兼容的工具清单
+- **`/.well-known/ai-plugin.json`** — ChatGPT 插件描述符
+- **MCP tool** — 通过 `/api/mcp` 端点和 stdio 服务器暴露
+
+## 可见性控制
+
+Action **默认私有**。设置 `public: true` 将其暴露给 AI：
+
+- **`public: true`** — Action 出现在所有生成的清单中，任何 Agent 可调用
+- **`public: false`**（默认） — Action 存在于注册表中但不对外暴露
+
+`whenToUse` 字段对 AI 工具选择至关重要 —— 它告诉模型*何时*该 Action 是合适的。`doctor` CLI 会在公开 Action 缺少 `whenToUse` 时发出警告。

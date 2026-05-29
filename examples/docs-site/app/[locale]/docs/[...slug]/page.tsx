@@ -1,16 +1,16 @@
 import { notFound } from "next/navigation";
 import { getDoc, getAllDocs } from "@/lib/docs";
 import { MdxContent } from "../../components/mdx-content";
-import { locales } from "@/lib/i18n";
+import { locales, type Locale } from "@/lib/i18n";
 
 interface PageProps {
   params: Promise<{ locale: string; slug: string[] }>;
 }
 
 export async function generateStaticParams() {
-  const docs = await getAllDocs();
   const params: { locale: string; slug: string[] }[] = [];
   for (const locale of locales) {
+    const docs = await getAllDocs(locale);
     for (const doc of docs) {
       params.push({ locale, slug: doc.slug.split("/") });
     }
@@ -19,8 +19,8 @@ export async function generateStaticParams() {
 }
 
 export async function generateMetadata({ params }: PageProps) {
-  const { slug } = await params;
-  const doc = await getDoc(slug.join("/"));
+  const { locale, slug } = await params;
+  const doc = await getDoc(slug.join("/"), locale as Locale);
   if (!doc) return {};
   return {
     title: doc.title,
@@ -29,8 +29,8 @@ export async function generateMetadata({ params }: PageProps) {
 }
 
 export default async function DocPage({ params }: PageProps) {
-  const { slug } = await params;
-  const doc = await getDoc(slug.join("/"));
+  const { locale, slug } = await params;
+  const doc = await getDoc(slug.join("/"), locale as Locale);
 
   if (!doc) notFound();
 

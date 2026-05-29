@@ -1,0 +1,65 @@
+---
+title: 配置
+summary: ai-ready.config.mjs 的完整参考。
+order: 1
+---
+
+# 配置
+
+`ai-ready.config.mjs` 是配置 `next-ai-ready` 的唯一入口文件，位于项目根目录。
+
+## defineConfig
+
+```js
+import { defineConfig } from "@next-ai-ready/core";
+
+export default defineConfig({
+  site: { ... },
+  content: [ ... ],
+  actions: "./actions/index.mjs",
+  emit: { ... },
+});
+```
+
+## site
+
+站点级元数据，用于 `llms.txt`、OpenAPI 和 JSON-LD。
+
+| 字段 | 类型 | 必填 | 描述 |
+| --- | --- | --- | --- |
+| `name` | `string` | 是 | 站点或产品名称 |
+| `baseUrl` | `string` | 是 | 生产环境 URL（用于 canonical 链接） |
+| `description` | `string` | 是 | 面向 AI 消费者的简短描述 |
+
+## content
+
+指向 MDX 内容文件的 glob 模式数组：
+
+```js
+content: ["app/**/*.mdx", "content/**/*.mdx"]
+```
+
+这些文件在 `next-ai-ready build` 时被扫描，生成语义图谱、`llms.txt` 和逐页 Markdown/JSON。
+
+## actions
+
+Action 模块路径，相对于配置文件解析：
+
+```js
+actions: "./actions/index.mjs"
+```
+
+该模块应导出一个 `defineActions(...)` 包裹的 `defineAction(...)` 调用数组：
+
+```js
+import { defineActions, defineAction } from "@next-ai-ready/actions";
+export default defineActions([ ... ]);
+```
+
+## emit
+
+控制生成哪些产出物：
+
+| 字段 | 类型 | 默认值 | 描述 |
+| --- | --- | --- | --- |
+| `openapi` | `boolean` | `true` | 生成 `/openapi.json`、`/tools.json`、`/ai-plugin.json` |

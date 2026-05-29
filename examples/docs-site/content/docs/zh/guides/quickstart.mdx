@@ -1,0 +1,80 @@
+---
+title: 快速开始
+summary: 5 分钟内让 next-ai-ready 跑起来。
+order: 1
+---
+
+# 快速开始
+
+本指南带你从零开始，在 5 分钟内搭建一个完整的 AI-Ready Next.js 站点。
+
+## 1. 创建 Next.js 应用
+
+```bash
+npx create-next-app@latest my-site --typescript --app --tailwind
+cd my-site
+```
+
+## 2. 安装 next-ai-ready
+
+```bash
+pnpm add next-ai-ready
+```
+
+## 3. 初始化
+
+```bash
+npx next-ai-ready init
+```
+
+生成配置、路由处理器和示例 Action。
+
+## 4. 添加内容
+
+创建包含语义元数据的 MDX 页面：
+
+```markdown
+---
+title: 快速上手
+summary: 了解如何使用我们的产品。
+---
+
+# 快速上手
+
+欢迎使用我们的产品，以下是开始步骤。
+```
+
+## 5. 构建
+
+```bash
+npx next-ai-ready build
+```
+
+你会看到类似输出：
+
+```text
+[next-ai-ready] scanning content
+[next-ai-ready] compiling 1 files
+[next-ai-ready] loading actions from ./actions/index.mjs
+[next-ai-ready] compiled 1 actions
+[next-ai-ready] wrote 8 files
+[next-ai-ready] build complete — 1 routes, 1 actions, 8 files written
+```
+
+## 6. 验证
+
+```bash
+npx next-ai-ready doctor
+```
+
+所有检查应通过。然后启动开发服务器并访问：
+
+- `http://localhost:3000/_ai-ready/llms-txt` — 你的 llms.txt
+- `http://localhost:3000/_ai-ready/openapi` — 你的 OpenAPI 规范
+- `http://localhost:3000/_ai-ready/tools` — 你的工具清单
+
+## 下一步
+
+- 阅读[知识平面](/zh/docs/concepts/knowledge-plane)了解内容编译
+- 阅读[能力平面](/zh/docs/concepts/capability-plane)了解自定义 Action
+- 查看 [API 参考](/zh/docs/api/config)了解完整配置选项

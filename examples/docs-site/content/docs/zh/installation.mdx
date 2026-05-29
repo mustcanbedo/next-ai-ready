@@ -1,0 +1,69 @@
+---
+title: 安装
+summary: 安装 next-ai-ready 并生成你的第一份配置。
+order: 2
+---
+
+# 安装
+
+## 前置条件
+
+- **Node.js** 20 或更高版本
+- **Next.js** 14.2+ 且使用 App Router
+- **pnpm**、npm 或 yarn
+
+## 安装
+
+```bash
+pnpm add next-ai-ready
+```
+
+安装 meta 包，包含所有你需要的 API 和 CLI 工具。
+
+## 初始化
+
+```bash
+npx next-ai-ready init
+```
+
+这会创建：
+
+- `ai-ready.config.mjs` — 站点配置
+- `app/_ai-ready/` — 路由处理器（llms.txt、openapi.json 等）
+- `app/api/actions/` — Action 执行端点
+- `app/api/mcp/` — MCP 服务器端点
+- `actions/index.mjs` — 包含 `ping` 健康检查的示例 Action 文件
+
+## 配置
+
+编辑 `ai-ready.config.mjs`：
+
+```js
+import { defineConfig } from "@next-ai-ready/core";
+
+export default defineConfig({
+  site: {
+    name: "我的站点",
+    baseUrl: "https://example.com",
+    description: "面向 AI 的简短描述。",
+  },
+  content: ["app/**/*.mdx", "content/**/*.mdx"],
+  actions: "./actions/index.mjs",
+});
+```
+
+## 构建
+
+```bash
+npx next-ai-ready build
+```
+
+扫描内容、编译语义图谱、将所有 AI 产出物写入 `public/` 和 `.next-ai-ready/`。
+
+## 验证
+
+```bash
+npx next-ai-ready doctor
+```
+
+Doctor 检查配置、验证 Action 暴露规则、确认路由接线。适合在 CI 中使用。

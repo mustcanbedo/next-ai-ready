@@ -1,6 +1,7 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import matter from "gray-matter";
+import type { Locale } from "./i18n";
 
 export interface DocMeta {
   title: string;
@@ -14,7 +15,9 @@ export interface DocPage extends DocMeta {
   content: string;
 }
 
-const CONTENT_DIR = path.join(process.cwd(), "content/docs");
+function contentDir(locale: Locale) {
+  return path.join(process.cwd(), "content/docs", locale);
+}
 
 const SECTION_ORDER: Record<string, number> = {
   "getting-started": 0,
@@ -23,14 +26,15 @@ const SECTION_ORDER: Record<string, number> = {
   api: 3,
 };
 
-export async function getAllDocs(): Promise<DocMeta[]> {
+export async function getAllDocs(locale: Locale = "en"): Promise<DocMeta[]> {
   const docs: DocMeta[] = [];
+  const dir = contentDir(locale);
 
   // Root-level docs
-  const rootFiles = await fs.readdir(CONTENT_DIR);
+  const rootFiles = await fs.readdir(dir);
   for (const file of rootFiles) {
     if (!file.endsWith(".mdx")) continue;
-    const raw = await fs.readFile(path.join(CONTENT_DIR, file), "utf8");
+    const raw = await fs.readFile(path.join(dir, file), "utf8");
     const { data } = matter(raw);
     docs.push({
       title: data.title ?? file.replace(".mdx", ""),
@@ -43,7 +47,7 @@ export async function getAllDocs(): Promise<DocMeta[]> {
 
   // Section docs
   for (const section of Object.keys(SECTION_ORDER)) {
-    const sectionDir = path.join(CONTENT_DIR, section);
+    const sectionDir = path.join(dir, section);
     try {
       const files = await fs.readdir(sectionDir);
       for (const file of files) {
@@ -74,8 +78,8 @@ export async function getAllDocs(): Promise<DocMeta[]> {
   });
 }
 
-export async function getDoc(slug: string): Promise<DocPage | null> {
-  const filePath = path.join(CONTENT_DIR, `${slug}.mdx`);
+export async function getDoc(slug: string, locale: Locale = "en"): Promise<DocPage | null> {
+  const filePath = path.join(contentDir(locale), `${slug}.mdx`);
   try {
     const raw = await fs.readFile(filePath, "utf8");
     const { data, content } = matter(raw);
@@ -102,10 +106,3 @@ export function groupBySection(docs: DocMeta[]): Record<string, DocMeta[]> {
   }
   return groups;
 }
-
-export const SECTION_LABELS: Record<string, string> = {
-  "getting-started": "Getting Started",
-  concepts: "Concepts",
-  guides: "Guides",
-  api: "API Reference",
-};

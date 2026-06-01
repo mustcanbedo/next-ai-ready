@@ -15,7 +15,10 @@ describe("withAiReady()", () => {
     const sources = (rewrites as Array<{ source: string }>).map((r) => r.source);
     expect(sources).toContain("/llms.txt");
     expect(sources).toContain("/:path*.md");
+    expect(sources).toContain("/openapi.json");
+    expect(sources).toContain("/tools.json");
     expect(sources).toContain("/api/openapi.json");
+    expect(sources).toContain("/api/tools.json");
   });
 
   it("merges with flat-array user rewrites", async () => {

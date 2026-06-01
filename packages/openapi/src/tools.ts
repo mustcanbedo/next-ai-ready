@@ -1,4 +1,4 @@
-import type { ActionsManifest, SiteInfo } from "@next-ai-ready/core";
+import type { ActionsManifest } from "@next-ai-ready/core";
 
 /**
  * Build `tools.json` in OpenAI's function-calling format (also widely
@@ -20,11 +20,10 @@ import type { ActionsManifest, SiteInfo } from "@next-ai-ready/core";
  * We fold `whenToUse` into the description because most clients don't
  * understand extra metadata — the description is the only field models
  * actually read for tool selection.
+ *
+ * @since 0.1.0-alpha.6 — Removed unused `_site` parameter (breaking change).
  */
-export function buildToolsJson(
-  manifest: ActionsManifest,
-  _site: SiteInfo,
-): { tools: Array<Record<string, unknown>> } {
+export function buildToolsJson(manifest: ActionsManifest): { tools: Array<Record<string, unknown>> } {
   const tools = manifest.actions
     .filter((a) => a.public)
     .map((a) => ({

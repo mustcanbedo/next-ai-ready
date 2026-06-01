@@ -1,3 +1,4 @@
+import { z } from "zod";
 import type { ActionContext } from "@next-ai-ready/core";
 import { getAction } from "./registry.js";
 
@@ -105,6 +106,7 @@ export async function invokeAction(
 }
 
 function extractZodIssues(err: unknown): unknown {
+  if (err instanceof z.ZodError) return err.issues;
   if (err && typeof err === "object" && "issues" in err) {
     return (err as { issues: unknown }).issues;
   }

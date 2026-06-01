@@ -1,6 +1,6 @@
 {
   "name": "@next-ai-ready/openapi",
-  "version": "0.1.0-alpha.2",
+  "version": "0.1.0-alpha.7",
   "description": "ActionRegistry to OpenAPI 3.1, tools.json, ai-plugin.json.",
   "license": "MIT",
   "type": "module",

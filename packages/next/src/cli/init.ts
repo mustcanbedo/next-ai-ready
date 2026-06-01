@@ -1,4 +1,4 @@
-import { mkdir, writeFile, access } from "node:fs/promises";
+import { mkdir, writeFile, readFile, access } from "node:fs/promises";
 import { dirname, join, resolve } from "node:path";
 
 /**
@@ -18,10 +18,18 @@ interface FileSpec {
   contents: string;
 }
 
-const FILES: FileSpec[] = [
-  {
-    relPath: "ai-ready.config.mjs",
-    contents: `import { defineConfig } from "@next-ai-ready/core";
+const ACTIONS_REGISTER = "../../../../actions/index";
+
+function buildFileSpecs(useTypeScript: boolean): FileSpec[] {
+  const actionsExt = useTypeScript ? "ts" : "mjs";
+  const actionsRel = `actions/index.${actionsExt}`;
+  const configRel = useTypeScript ? "ai-ready.config.ts" : "ai-ready.config.mjs";
+  const registerImport = `import "${ACTIONS_REGISTER}.${actionsExt}";\n`;
+
+  return [
+    {
+      relPath: configRel,
+      contents: `import { defineConfig } from "next-ai-ready";
 
 export default defineConfig({
   site: {
@@ -30,84 +38,90 @@ export default defineConfig({
     description: "Replace this with a short description for AI search.",
   },
   content: ["app/**/*.{md,mdx}", "content/**/*.mdx"],
-  // Path resolved relative to this config file. The default export of the
-  // referenced module should be an array of \`defineAction(...)\` entries.
-  actions: "./actions/index.mjs",
+  actions: "./${actionsRel}",
+  // Robots: build emits public/robots.txt. For dynamic rules use app/robots.ts + aiRobots().
 });
 `,
-  },
-  {
-    relPath: "app/_ai-ready/llms-txt/route.ts",
-    contents: `export { GET } from "@next-ai-ready/next/handlers/llms-txt";
+    },
+    {
+      relPath: "app/_ai-ready/llms-txt/route.ts",
+      contents: `export { GET } from "next-ai-ready/handlers/llms-txt";
 export const runtime = "nodejs";
 `,
-  },
-  {
-    relPath: "app/_ai-ready/llms-full/route.ts",
-    contents: `export { GET } from "@next-ai-ready/next/handlers/llms-full";
+    },
+    {
+      relPath: "app/_ai-ready/llms-full/route.ts",
+      contents: `export { GET } from "next-ai-ready/handlers/llms-full";
 export const runtime = "nodejs";
 `,
-  },
-  {
-    relPath: "app/_ai-ready/md/[...path]/route.ts",
-    contents: `export { GET } from "@next-ai-ready/next/handlers/page-md";
+    },
+    {
+      relPath: "app/_ai-ready/md/[...path]/route.ts",
+      contents: `export { GET } from "next-ai-ready/handlers/page-md";
 export const runtime = "nodejs";
 `,
-  },
-  {
-    relPath: "app/_ai-ready/ai-json/[...path]/route.ts",
-    contents: `export { GET } from "@next-ai-ready/next/handlers/page-ai-json";
+    },
+    {
+      relPath: "app/_ai-ready/ai-json/[...path]/route.ts",
+      contents: `export { GET } from "next-ai-ready/handlers/page-ai-json";
 export const runtime = "nodejs";
 `,
-  },
-  {
-    relPath: "app/_ai-ready/openapi/route.ts",
-    contents: `export { GET } from "@next-ai-ready/next/handlers/openapi";
+    },
+    {
+      relPath: "app/_ai-ready/openapi/route.ts",
+      contents: `export { GET } from "next-ai-ready/handlers/openapi";
 export const runtime = "nodejs";
 `,
-  },
-  {
-    relPath: "app/_ai-ready/tools/route.ts",
-    contents: `export { GET } from "@next-ai-ready/next/handlers/tools";
+    },
+    {
+      relPath: "app/_ai-ready/tools/route.ts",
+      contents: `export { GET } from "next-ai-ready/handlers/tools";
 export const runtime = "nodejs";
 `,
-  },
-  {
-    relPath: "app/api/actions/[name]/route.ts",
-    // The side-effect import populates the action registry from userland.
-    // Authors edit \`actions/index.ts\` and never touch this file.
-    contents: `import "@/actions";
-export { POST } from "@next-ai-ready/next/handlers/action";
+    },
+    {
+      relPath: "app/_ai-ready/ai-plugin/route.ts",
+      contents: `export { GET } from "next-ai-ready/handlers/ai-plugin";
 export const runtime = "nodejs";
 `,
-  },
-  {
-    relPath: "app/api/mcp/[transport]/route.ts",
-    // Production MCP server (Streamable HTTP) at /api/mcp. Requires the
-    // optional peer deps \`mcp-handler\` + \`@modelcontextprotocol/sdk\`.
-    // See ADR-009 for why this is /api/mcp and not /_next/mcp.
-    contents: `import "@/actions";
-import { createAiReadyMcpHandler } from "@next-ai-ready/next/handlers/mcp";
+    },
+    {
+      relPath: "app/api/actions/[name]/route.ts",
+      contents: `${registerImport}export { POST } from "next-ai-ready/handlers/action";
+export const runtime = "nodejs";
+`,
+    },
+    {
+      relPath: "app/api/mcp/[transport]/route.ts",
+      contents: `${registerImport}import { createAiReadyMcpHandler } from "next-ai-ready/handlers/mcp";
 
 const handler = await createAiReadyMcpHandler();
 
 export { handler as GET, handler as POST, handler as DELETE };
 export const runtime = "nodejs";
 `,
-  },
-  {
-    relPath: "actions/index.mjs",
-    contents: `import { defineActions, defineAction } from "@next-ai-ready/actions";
+    },
+    {
+      relPath: "instrumentation.ts",
+      contents: `export async function register() {
+  const { registerAiHooks } = await import("next-ai-ready");
+
+  registerAiHooks({
+    onAiRequest(info) {
+      console.log("[ai-request]", { bot: info.bot, artifact: info.artifact, path: info.path });
+    },
+    onInvoke(info) {
+      console.log("[ai-invoke]", { action: info.action, ok: info.ok, latencyMs: info.latencyMs });
+    },
+  });
+}
+`,
+    },
+    {
+      relPath: actionsRel,
+      contents: `import { defineActions, defineAction } from "next-ai-ready";
 import { z } from "zod";
 
-/**
- * AI-callable actions. Each entry is also exposed at
- *   POST /api/actions/<name>
- * and surfaced in /api/openapi.json + /api/tools.json.
- *
- * Set \`public: true\` to expose. \`defineActions\` registers them into the
- * per-process registry; the array export is also used by the build CLI.
- */
 export default defineActions([
   defineAction({
     name: "ping",
@@ -120,12 +134,26 @@ export default defineActions([
   }),
 ]);
 `,
-  },
-];
+    },
+  ];
+}
+
+async function prefersTypeScript(cwd: string): Promise<boolean> {
+  for (const name of ["next.config.ts", "tsconfig.json"]) {
+    try {
+      await access(join(cwd, name));
+      return true;
+    } catch {
+      /* continue */
+    }
+  }
+  return false;
+}
 
 export interface InitResult {
   written: string[];
   skipped: string[];
+  patched: string[];
 }
 
 export async function runInit(opts: InitOptions = {}): Promise<InitResult> {
@@ -136,8 +164,12 @@ export async function runInit(opts: InitOptions = {}): Promise<InitResult> {
 
   const written: string[] = [];
   const skipped: string[] = [];
+  const patched: string[] = [];
 
-  for (const file of FILES) {
+  const useTypeScript = await prefersTypeScript(cwd);
+  const files = buildFileSpecs(useTypeScript);
+
+  for (const file of files) {
     const path = join(cwd, file.relPath);
     if (!opts.force && (await exists(path))) {
       skipped.push(file.relPath);
@@ -148,9 +180,16 @@ export async function runInit(opts: InitOptions = {}): Promise<InitResult> {
     written.push(file.relPath);
   }
 
+  // Patch existing project files (N-01, N-02).
+  const configPatch = await patchNextConfig(cwd);
+  if (configPatch) patched.push(configPatch);
+  const pkgPatch = await patchPackageJson(cwd);
+  if (pkgPatch) patched.push(pkgPatch);
+
   log(`wrote ${written.length} files, skipped ${skipped.length} existing`);
   if (skipped.length > 0) log(`(use --force to overwrite)`);
-  return { written, skipped };
+  if (patched.length > 0) log(`patched: ${patched.join(", ")}`);
+  return { written, skipped, patched };
 }
 
 async function exists(p: string): Promise<boolean> {
@@ -160,4 +199,86 @@ async function exists(p: string): Promise<boolean> {
   } catch {
     return false;
   }
+}
+
+// ---------------------------------------------------------------------------
+// N-01: Patch next.config to include withAiReady()
+// ---------------------------------------------------------------------------
+
+const CONFIG_CANDIDATES = ["next.config.mjs", "next.config.ts", "next.config.js"];
+
+async function patchNextConfig(cwd: string): Promise<string | null> {
+  // Find existing config file.
+  for (const name of CONFIG_CANDIDATES) {
+    const filePath = join(cwd, name);
+    if (await exists(filePath)) {
+      const src = await readFile(filePath, "utf8");
+      if (src.includes("withAiReady")) return null; // already configured
+
+      const importLine = `import { withAiReady } from "next-ai-ready";\n`;
+
+      let updated = importLine + src;
+      // Pattern 1: export default <wrapper>({  or  export default ({
+      updated = updated.replace(
+        /export\s+default\s+(defineNextConfig\s*\(|defineConfig\s*\(|\()?\s*\{/g,
+        (match, fn) => fn
+          ? `export default withAiReady()(${fn}{`
+          : `export default withAiReady()({`,
+      );
+      // Pattern 2: export default <identifier>;  (e.g. "export default config;")
+      if (updated === importLine + src) {
+        updated = updated.replace(
+          /export\s+default\s+(\w+)\s*;/g,
+          (match, id) => id === "withAiReady" ? match : `export default withAiReady()(${id});`,
+        );
+      }
+      if (updated === importLine + src) return null; // no match, skip
+
+      await writeFile(filePath, updated, "utf8");
+      return name;
+    }
+  }
+
+  // No config file found — create a minimal one.
+  const newConfig = `import { withAiReady } from "next-ai-ready";
+
+export default withAiReady()({
+  // Your Next.js config here.
+});
+`;
+  await writeFile(join(cwd, "next.config.mjs"), newConfig, "utf8");
+  return "next.config.mjs (created)";
+}
+
+// ---------------------------------------------------------------------------
+// N-02: Patch package.json build scripts
+// ---------------------------------------------------------------------------
+
+async function patchPackageJson(cwd: string): Promise<string | null> {
+  const pkgPath = join(cwd, "package.json");
+  if (!(await exists(pkgPath))) return null;
+
+  const raw = await readFile(pkgPath, "utf8");
+  const pkg = JSON.parse(raw) as Record<string, unknown>;
+  const scripts = (pkg.scripts ?? {}) as Record<string, string>;
+  let changed = false;
+
+  // Ensure `next-ai-ready build` runs before `next build`.
+  const build = scripts.build ?? "";
+  if (!build.includes("next-ai-ready build")) {
+    scripts.build = `next-ai-ready build && ${build || "next build"}`.trim();
+    changed = true;
+  }
+
+  // Add typecheck if missing.
+  if (!scripts.typecheck) {
+    scripts.typecheck = "tsc --noEmit";
+    changed = true;
+  }
+
+  if (!changed) return null;
+
+  pkg.scripts = scripts;
+  await writeFile(pkgPath, JSON.stringify(pkg, null, 2) + "\n", "utf8");
+  return "package.json";
 }

@@ -1,6 +1,6 @@
 {
   "name": "@next-ai-ready/next",
-  "version": "0.1.0-alpha.2",
+  "version": "0.1.0-alpha.7",
   "description": "Next.js plugin, route handlers, build CLI.",
   "license": "MIT",
   "type": "module",
@@ -47,6 +47,10 @@
     "./handlers/mcp": {
       "types": "./dist/handlers/mcp.d.ts",
       "import": "./dist/handlers/mcp.js"
+    },
+    "./handlers/ai-plugin": {
+      "types": "./dist/handlers/ai-plugin.d.ts",
+      "import": "./dist/handlers/ai-plugin.js"
     }
   },
   "files": [
@@ -68,6 +72,7 @@
     "@next-ai-ready/mdx": "workspace:*",
     "@next-ai-ready/openapi": "workspace:*",
     "@next-ai-ready/semantic": "workspace:*",
+    "chokidar": "^4.0.3",
     "server-only": "^0.0.1",
     "zod": "^4.4.3"
   },
@@ -78,11 +83,15 @@
   },
   "peerDependencies": {
     "@modelcontextprotocol/sdk": "^1.0.0",
+    "jiti": "^2.4.2",
     "mcp-handler": "^1.0.0",
     "next": ">=14.2.0"
   },
   "peerDependenciesMeta": {
     "@modelcontextprotocol/sdk": {
+      "optional": true
+    },
+    "jiti": {
       "optional": true
     },
     "mcp-handler": {

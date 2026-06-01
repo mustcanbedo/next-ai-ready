@@ -2,6 +2,7 @@ import "server-only";
 import { renderPageMarkdown } from "@next-ai-ready/llms";
 import { loadGraph } from "../runtime/graph-loader.js";
 import { emitAiRequest } from "../runtime/observability.js";
+import { resolveParams } from "../runtime/params.js";
 
 /**
  * Handler for `/<route>.md`. Expects `params.path` to be the route
@@ -12,7 +13,7 @@ import { emitAiRequest } from "../runtime/observability.js";
  */
 export async function GET(req: Request, ctx: { params: Promise<{ path?: string[] }> | { path?: string[] } }) {
   await emitAiRequest(req, "page.md");
-  const { path = [] } = await Promise.resolve(ctx.params);
+  const { path = [] } = await resolveParams(ctx.params);
   const route = path.length === 0 ? "/" : "/" + path.join("/");
   const graph = await loadGraph();
   const body = renderPageMarkdown(graph, route);

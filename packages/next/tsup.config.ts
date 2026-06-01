@@ -13,6 +13,7 @@ export default defineConfig({
     "src/handlers/tools.ts",
     "src/handlers/action.ts",
     "src/handlers/mcp.ts",
+    "src/handlers/ai-plugin.ts",
   ],
   format: ["esm"],
   dts: true,

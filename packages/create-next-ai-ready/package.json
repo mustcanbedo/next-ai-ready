@@ -1,0 +1,12 @@
+{
+  "name": "create-next-ai-ready",
+  "version": "0.1.0-alpha.7",
+  "description": "Scaffold a Next.js app with next-ai-ready pre-wired.",
+  "license": "MIT",
+  "type": "module",
+  "bin": {
+    "create-next-ai-ready": "./index.js"
+  },
+  "files": ["index.js", "README.md"],
+  "engines": { "node": ">=20" }
+}

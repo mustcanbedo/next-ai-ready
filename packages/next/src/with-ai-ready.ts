@@ -11,7 +11,6 @@
  *      so user-friendly URLs work without the user touching their routes.
  *   2. Ensuring `.next-ai-ready/*.json` ships with serverless function
  *      bundles via `outputFileTracingIncludes`.
- *   3. Setting CORS-friendly headers for AI consumer endpoints (configurable).
  *
  * Usage:
  *   // next.config.mjs
@@ -57,8 +56,11 @@ export function withAiReady(opts: WithAiReadyOptions = {}) {
           { source: "/llms-full.txt", destination: "/_ai-ready/llms-full" },
           { source: "/:path*.md", destination: "/_ai-ready/md/:path*" },
           { source: "/:path*.ai.json", destination: "/_ai-ready/ai-json/:path*" },
-          // Capability plane endpoints — `/api/...` paths are the canonical
-          // surface that OpenAPI / tools.json reference internally.
+          // Capability plane — canonical paths match static `public/` output.
+          { source: "/openapi.json", destination: "/_ai-ready/openapi" },
+          { source: "/tools.json", destination: "/_ai-ready/tools" },
+          { source: "/.well-known/ai-plugin.json", destination: "/_ai-ready/ai-plugin" },
+          // Backward-compatible aliases under /api/.
           { source: "/api/openapi.json", destination: "/_ai-ready/openapi" },
           { source: "/api/tools.json", destination: "/_ai-ready/tools" },
         ];

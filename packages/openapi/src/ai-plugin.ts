@@ -1,7 +1,7 @@
 import type { SiteInfo } from "@next-ai-ready/core";
 
 export interface BuildAiPluginOptions {
-  /** Where the OpenAPI document is served. Default: "/api/openapi.json". */
+  /** Where the OpenAPI document is served. Default: "/openapi.json". */
   openapiPath?: string;
   /** Where the logo file is served, relative to site.baseUrl or absolute. */
   logoUrl?: string;
@@ -22,7 +22,7 @@ export interface BuildAiPluginOptions {
  */
 export function buildAiPlugin(site: SiteInfo, opts: BuildAiPluginOptions = {}): Record<string, unknown> {
   const baseUrl = site.baseUrl.replace(/\/+$/, "");
-  const openapiPath = opts.openapiPath ?? "/api/openapi.json";
+  const openapiPath = opts.openapiPath ?? "/openapi.json";
 
   return {
     schema_version: "v1",
@@ -38,7 +38,7 @@ export function buildAiPlugin(site: SiteInfo, opts: BuildAiPluginOptions = {}): 
       url: `${baseUrl}${openapiPath}`,
     },
     logo_url: opts.logoUrl ?? `${baseUrl}/icon.png`,
-    contact_email: opts.contactEmail ?? "",
+    ...(opts.contactEmail ? { contact_email: opts.contactEmail } : {}),
     legal_info_url: opts.legalInfoUrl ?? baseUrl,
   };
 }

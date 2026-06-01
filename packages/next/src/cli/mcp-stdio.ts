@@ -75,6 +75,13 @@ async function importSdkServer(): Promise<{ McpServer: any }> {
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function importSdkStdio(): Promise<{ StdioServerTransport: any }> {
-  const spec = "@modelcontextprotocol/sdk/server/stdio.js";
-  return (await import(/* @vite-ignore */ spec)) as never;
+  try {
+    const spec = "@modelcontextprotocol/sdk/server/stdio.js";
+    return (await import(/* @vite-ignore */ spec)) as never;
+  } catch {
+    throw new Error(
+      "[next-ai-ready] The MCP stdio server requires `@modelcontextprotocol/sdk`. " +
+        "Install it: `npm i @modelcontextprotocol/sdk`.",
+    );
+  }
 }

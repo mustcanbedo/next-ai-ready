@@ -1,5 +1,5 @@
 # @next-ai-ready/llms
 
-llms.txt / llms-full.txt / per-route Markdown generators.
+Renders `llms.txt`, `llms-full.txt`, per-route `.md` and `.ai.json` from a SemanticGraph.
 
-Part of [next-ai-ready](../../README.md). 🚧 Pre-alpha.
+Part of [next-ai-ready](../../README.md). Pre-alpha.

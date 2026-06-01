@@ -10,7 +10,7 @@ import { runDoctor } from "../src/cli/doctor.js";
 import { runBuild } from "../src/cli/build.js";
 import { POST as actionPOST } from "../src/handlers/action.js";
 import { registerAiHooks, clearAiHooks } from "../src/runtime/observability.js";
-import { publicRobotsTxtPath } from "../src/paths.js";
+import { publicRobotsTxtPath, publicOpenApiPath } from "../src/paths.js";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const SAMPLE = join(here, "fixtures", "sample-app");
@@ -18,6 +18,24 @@ const SAMPLE = join(here, "fixtures", "sample-app");
 const CONFIG = `export default {
   site: { name: "Doc", baseUrl: "https://doc.test", description: "x" },
   content: ["content/**/*.mdx"],
+};
+`;
+
+const CONFIG_WITH_ACTIONS = `import { defineAction } from "@next-ai-ready/actions";
+import { z } from "zod";
+export default {
+  site: { name: "Doc", baseUrl: "https://doc.test", description: "x" },
+  content: ["content/**/*.mdx"],
+  actions: [
+    defineAction({
+      name: "test_action",
+      description: "A test action.",
+      whenToUse: "For testing.",
+      public: true,
+      input: z.object({ q: z.string() }),
+      handler: async ({ q }) => ({ answer: q }),
+    }),
+  ],
 };
 `;
 
@@ -61,6 +79,141 @@ describe("runDoctor()", () => {
       const r = await runDoctor({ cwd: dir });
       expect(r.errors).toBeGreaterThan(0);
       expect(r.diagnostics.some((d) => d.message.includes("absolute URL"))).toBe(true);
+    } finally {
+      await cleanup();
+    }
+  });
+
+  it("warns when next.config does not include withAiReady (U-05)", async () => {
+    const { dir, cleanup } = await makeProject();
+    await writeFile(join(dir, "next.config.mjs"), `export default {};\n`, "utf8");
+    try {
+      const r = await runDoctor({ cwd: dir });
+      const msgs = r.diagnostics.map((d) => d.message).join("\n");
+      expect(msgs).toContain("withAiReady");
+      expect(r.diagnostics.some((d) => d.level === "warn" && d.message.includes("withAiReady"))).toBe(true);
+    } finally {
+      await cleanup();
+    }
+  });
+
+  it("passes next.config check when withAiReady is present", async () => {
+    const { dir, cleanup } = await makeProject();
+    await writeFile(
+      join(dir, "next.config.mjs"),
+      `import { withAiReady } from "next-ai-ready";\nexport default withAiReady()({});\n`,
+      "utf8",
+    );
+    try {
+      const r = await runDoctor({ cwd: dir });
+      expect(r.diagnostics.some((d) => d.level === "ok" && d.message.includes("withAiReady"))).toBe(true);
+    } finally {
+      await cleanup();
+    }
+  });
+
+  it("warns when package.json build script lacks next-ai-ready build", async () => {
+    const { dir, cleanup } = await makeProject();
+    await writeFile(join(dir, "package.json"), JSON.stringify({ scripts: { build: "next build" } }), "utf8");
+    try {
+      const r = await runDoctor({ cwd: dir });
+      expect(r.diagnostics.some((d) => d.level === "warn" && d.message.includes("next-ai-ready build"))).toBe(true);
+    } finally {
+      await cleanup();
+    }
+  });
+
+  it("passes build script check when prebuild has next-ai-ready build", async () => {
+    const { dir, cleanup } = await makeProject();
+    await writeFile(
+      join(dir, "package.json"),
+      JSON.stringify({ scripts: { build: "next build", prebuild: "next-ai-ready build" } }),
+      "utf8",
+    );
+    try {
+      const r = await runDoctor({ cwd: dir });
+      expect(r.diagnostics.some((d) => d.level === "ok" && d.message.includes("next-ai-ready build"))).toBe(true);
+    } finally {
+      await cleanup();
+    }
+  });
+
+  it("includes score when --score flag is set", async () => {
+    const { dir, cleanup } = await makeProject();
+    try {
+      const r = await runDoctor({ cwd: dir, score: true });
+      expect(r.score).toBeDefined();
+      expect(r.score).toBeGreaterThanOrEqual(0);
+      expect(r.score).toBeLessThanOrEqual(100);
+    } finally {
+      await cleanup();
+    }
+  });
+
+  it("emits JSON report when --json flag is set", async () => {
+    const { dir, cleanup } = await makeProject();
+    try {
+      const r = await runDoctor({ cwd: dir, json: true });
+      expect(r.report).toBeDefined();
+      expect(r.report!.version).toBe("1");
+      expect(r.report!.checks.length).toBeGreaterThan(0);
+      expect(r.report!.summary.total).toBe(r.report!.checks.length);
+      expect(r.report!.score).toBeGreaterThanOrEqual(0);
+    } finally {
+      await cleanup();
+    }
+  });
+
+  it("warns about missing updatedAt in graph (T-01)", async () => {
+    const { dir, cleanup } = await makeProject(CONFIG_WITH_ACTIONS);
+    // Create a content file without updatedAt/author to trigger warnings.
+    await mkdir(join(dir, "content"), { recursive: true });
+    await writeFile(
+      join(dir, "content", "test.mdx"),
+      `---\ntitle: Test\nsummary: A test page.\n---\n\n# Test\n\nHello world.\n`,
+      "utf8",
+    );
+    try {
+      await runBuild({ cwd: dir, silent: true });
+      const r = await runDoctor({ cwd: dir, score: true });
+      const msgs = r.diagnostics.map((d) => d.message).join("\n");
+      // The content has no updatedAt/author in frontmatter, so doctor warns.
+      expect(msgs).toMatch(/updatedAt|author/);
+    } finally {
+      await cleanup();
+    }
+  });
+
+  it("warns when content declares noai (T-02)", async () => {
+    const { dir, cleanup } = await makeProject();
+    await mkdir(join(dir, "content"), { recursive: true });
+    await writeFile(
+      join(dir, "content", "secret.mdx"),
+      `---\ntitle: Secret\nnoai: true\n---\n\n# Secret\n`,
+      "utf8",
+    );
+    try {
+      const r = await runDoctor({ cwd: dir });
+      expect(r.diagnostics.some((d) => d.message.includes("noai"))).toBe(true);
+    } finally {
+      await cleanup();
+    }
+  });
+
+  it("warns when graph pages lack JSON-LD helpers (T-02)", async () => {
+    const { dir, cleanup } = await makeProject(CONFIG_WITH_ACTIONS);
+    await mkdir(join(dir, "content"), { recursive: true });
+    await writeFile(
+      join(dir, "content", "test.mdx"),
+      `---\ntitle: Test\nsummary: A test page.\n---\n\n# Test\n`,
+      "utf8",
+    );
+    try {
+      await runBuild({ cwd: dir, silent: true });
+      const r = await runDoctor({ cwd: dir });
+      expect(r.diagnostics.some((d) => d.message.includes("JSON-LD") || d.message.includes("getPageJsonLd"))).toBe(
+        true,
+      );
     } finally {
       await cleanup();
     }

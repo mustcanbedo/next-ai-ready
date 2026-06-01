@@ -2,6 +2,7 @@ import "server-only";
 import { invokeAction } from "@next-ai-ready/actions";
 import { identifyAiBot } from "@next-ai-ready/core";
 import { emitInvoke } from "../runtime/observability.js";
+import { resolveParams } from "../runtime/params.js";
 
 /**
  * `POST /<basePath>/[name]` — execute one action by name.
@@ -16,7 +17,7 @@ import { emitInvoke } from "../runtime/observability.js";
  * decoupled — we never reach into the user's project to find their actions.
  */
 export async function POST(req: Request, ctx: { params: Promise<{ name?: string }> | { name?: string } }) {
-  const { name } = await Promise.resolve(ctx.params);
+  const { name } = await resolveParams(ctx.params);
   if (!name) return jsonResponse({ ok: false, code: "not_found", message: "Missing action name." }, 404);
 
   let input: unknown = {};

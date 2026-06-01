@@ -35,6 +35,7 @@ describe("renderLlmsTxt()", () => {
   it("zero-config produces a single Pages section listing every route", async () => {
     const graph = await makeGraph();
     const out = renderLlmsTxt(graph);
+    expect(out).toMatchSnapshot();
     expect(out.startsWith("# Acme")).toBe(true);
     expect(out).toContain("> AI-ready website framework");
     expect(out).toContain("## Pages");

@@ -1,6 +1,6 @@
 {
   "name": "@next-ai-ready/llms",
-  "version": "0.1.0-alpha.2",
+  "version": "0.1.0-alpha.7",
   "description": "llms.txt / llms-full.txt / per-route Markdown generators.",
   "license": "MIT",
   "type": "module",

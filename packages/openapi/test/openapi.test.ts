@@ -83,7 +83,7 @@ describe("buildOpenApi()", () => {
 
 describe("buildToolsJson()", () => {
   it("folds whenToUse + whenNotToUse into description for OpenAI tool format", () => {
-    const tools = buildToolsJson(seed(), SITE).tools;
+    const tools = buildToolsJson(seed()).tools;
     expect(tools).toHaveLength(1); // private action excluded
     const t = tools[0] as { type: string; function: { name: string; description: string; parameters: Record<string, unknown> } };
     expect(t.type).toBe("function");
@@ -96,12 +96,12 @@ describe("buildToolsJson()", () => {
 });
 
 describe("buildAiPlugin()", () => {
-  it("produces a v1 ai-plugin.json pointing to /api/openapi.json by default", () => {
+  it("produces a v1 ai-plugin.json pointing to /openapi.json by default", () => {
     const plugin = buildAiPlugin(SITE) as Record<string, unknown>;
     expect(plugin.schema_version).toBe("v1");
     expect(plugin.name_for_human).toBe("Acme");
     expect(plugin.name_for_model).toBe("acme");
-    expect((plugin.api as Record<string, string>).url).toBe("https://acme.com/api/openapi.json");
+    expect((plugin.api as Record<string, string>).url).toBe("https://acme.com/openapi.json");
   });
 
   it("respects custom openapiPath + logoUrl", () => {
@@ -111,5 +111,26 @@ describe("buildAiPlugin()", () => {
     }) as Record<string, unknown>;
     expect((plugin.api as Record<string, string>).url).toBe("https://acme.com/well-known/openapi.json");
     expect(plugin.logo_url).toBe("https://cdn.acme.com/logo.png");
+    expect(plugin.contact_email).toBeUndefined();
+  });
+
+  it("includes contact_email when provided", () => {
+    const plugin = buildAiPlugin(SITE, { contactEmail: "ops@acme.com" }) as Record<string, unknown>;
+    expect(plugin.contact_email).toBe("ops@acme.com");
+  });
+});
+
+describe("artifact snapshots (X-05)", () => {
+  it("matches OpenAPI document snapshot", () => {
+    const doc = buildOpenApi(seed(), SITE);
+    expect(doc).toMatchSnapshot();
+  });
+
+  it("matches tools.json snapshot", () => {
+    expect(buildToolsJson(seed())).toMatchSnapshot();
+  });
+
+  it("matches ai-plugin.json snapshot", () => {
+    expect(buildAiPlugin(SITE)).toMatchSnapshot();
   });
 });

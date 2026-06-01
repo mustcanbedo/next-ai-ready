@@ -1,5 +1,5 @@
 # @next-ai-ready/openapi
 
-ActionRegistry to OpenAPI 3.1, tools.json, ai-plugin.json.
+OpenAPI 3.1, `tools.json`, and `ai-plugin.json` builders from the action manifest.
 
-Part of [next-ai-ready](../../README.md). 🚧 Pre-alpha.
+Part of [next-ai-ready](../../README.md). Pre-alpha.

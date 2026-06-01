@@ -2,6 +2,8 @@ import { runBuild } from "./build.js";
 import { runInit } from "./init.js";
 import { runMcpStdio } from "./mcp-stdio.js";
 import { runDoctor } from "./doctor.js";
+import { runDev } from "./dev.js";
+import { AiReadyError, formatCliError } from "./errors.js";
 
 const HELP = `next-ai-ready — AEO + Agent-API layer for Next.js
 
@@ -10,15 +12,19 @@ Usage:
 
 Commands:
   build       Scan content, compile graph, emit llms.txt and graph.json.
-  init        Write handler stubs into app/ and an ai-ready.config.mjs.
+  dev         Watch content globs and rebuild artifacts on change.
+  init        Write handler stubs into app/ and ai-ready.config.
   doctor      Validate config, action exposure, and route wiring (CI-friendly).
+              --score   Include AI-readiness score (0–100).
+              --json    Emit machine-readable JSON report (includes 24 tactics).
   mcp         Start an MCP server over stdio (for Claude Desktop, Cursor, etc.).
   help        Show this help.
 
 Examples:
   npx next-ai-ready init
   npx next-ai-ready build
-  npx next-ai-ready doctor
+  npx next-ai-ready dev
+  npx next-ai-ready doctor --score
   npx next-ai-ready mcp
 `;
 
@@ -47,6 +53,11 @@ export async function runCli(argv: string[]): Promise<number> {
         return 0;
       }
 
+      case "dev": {
+        await runDev({ silent: flags.has("--silent") });
+        return 0;
+      }
+
       case "init": {
         await runInit({ force: flags.has("--force") });
         console.log("[next-ai-ready] ✓ init complete");
@@ -54,15 +65,23 @@ export async function runCli(argv: string[]): Promise<number> {
       }
 
       case "doctor": {
-        const result = await runDoctor();
-        for (const d of result.diagnostics) {
-          const icon = d.level === "error" ? "✗" : d.level === "warn" ? "!" : "✓";
-          const stream = d.level === "error" ? process.stderr : process.stdout;
-          stream.write(`  ${icon} ${d.message}\n`);
+        const wantScore = flags.has("--score") || flags.has("--json");
+        const wantJson = flags.has("--json");
+        const result = await runDoctor({ score: wantScore, json: wantJson });
+
+        if (wantJson && result.report) {
+          process.stdout.write(JSON.stringify(result.report, null, 2) + "\n");
+        } else {
+          for (const d of result.diagnostics) {
+            const icon = d.level === "error" ? "✗" : d.level === "warn" ? "!" : "✓";
+            const stream = d.level === "error" ? process.stderr : process.stdout;
+            stream.write(`  ${icon} ${d.message}\n`);
+          }
+          const scoreStr = result.score !== undefined ? ` — score ${result.score}/100` : "";
+          console.log(
+            `[next-ai-ready] doctor: ${result.errors} error(s), ${result.warnings} warning(s)${scoreStr}`,
+          );
         }
-        console.log(
-          `[next-ai-ready] doctor: ${result.errors} error(s), ${result.warnings} warning(s)`,
-        );
         return result.errors > 0 ? 1 : 0;
       }
 
@@ -78,13 +97,14 @@ export async function runCli(argv: string[]): Promise<number> {
         return 2;
     }
   } catch (err) {
-    const message = err instanceof Error ? err.message : String(err);
-    process.stderr.write(`[next-ai-ready] error: ${message}\n`);
-    return 1;
+    process.stderr.write(formatCliError(err) + "\n");
+    return err instanceof AiReadyError ? 1 : 1;
   }
 }
 
 /** Entry point used by the bin shim. */
+export { AiReadyError, formatCliError } from "./errors.js";
+
 export async function main(): Promise<void> {
   const code = await runCli(process.argv.slice(2));
   process.exit(code);

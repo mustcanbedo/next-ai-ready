@@ -2,6 +2,18 @@ import { z } from "zod";
 import type { SchemaLike } from "@next-ai-ready/core";
 
 /**
+ * Returns true when `schema` looks like a Zod v4 schema (C-50).
+ * Uses structural checks instead of relying solely on `_def`.
+ * Zod v3 has `_def`, Zod v4 has `_zod`.
+ */
+export function isZodSchema(schema: SchemaLike): boolean {
+  if (typeof schema !== "object" || schema === null) return false;
+  if (typeof schema.safeParse !== "function" || typeof schema.parse !== "function") return false;
+  // Zod v4 uses `_zod`, v3 uses `_def` — only v4 is supported.
+  return "_zod" in schema;
+}
+
+/**
  * Convert a Zod schema to JSON Schema 2020-12.
  *
  * Implementation note: we use Zod v4's built-in `z.toJSONSchema()`. We do
@@ -16,15 +28,11 @@ import type { SchemaLike } from "@next-ai-ready/core";
 export function schemaToJsonSchema(schema: SchemaLike): Record<string, unknown> {
   if (!isZodSchema(schema)) {
     throw new Error(
-      "[next-ai-ready] Only Zod schemas are currently supported for action input/output. " +
-        "If you need another validator, please open an issue.",
+      "[next-ai-ready] Only Zod v4 schemas are supported for action input/output. " +
+        "Install `zod@^4` and define actions with `z.object(...)` etc. Zod v3 is not supported.",
     );
   }
   const json = z.toJSONSchema(schema as unknown as Parameters<typeof z.toJSONSchema>[0]);
   if ("$schema" in json) delete (json as Record<string, unknown>).$schema;
   return json as Record<string, unknown>;
-}
-
-function isZodSchema(s: SchemaLike): boolean {
-  return typeof s === "object" && s !== null && "_def" in s;
 }

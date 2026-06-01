@@ -139,7 +139,7 @@ export async function evaluateTactics(ctx: TacticsContext): Promise<TacticResult
   if (await fileExists(join(cwd, "instrumentation.ts"))) {
     results.push(pass("K11", "K", "AI analytics hooks", "instrumentation.ts present."));
   } else {
-    results.push(warn("K11", "K", "AI analytics hooks", "Add instrumentation.ts + registerAiHooks()."));
+    results.push(warn("K11", "K", "AI analytics hooks", "Add instrumentation.ts + instrumentation-node.ts with registerAiHooks() from next-ai-ready/hooks."));
   }
 
   // K12 MDX pipeline

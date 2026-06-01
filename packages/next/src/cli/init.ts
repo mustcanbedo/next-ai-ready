@@ -104,17 +104,25 @@ export const runtime = "nodejs";
     {
       relPath: "instrumentation.ts",
       contents: `export async function register() {
-  const { registerAiHooks } = await import("next-ai-ready");
-
-  registerAiHooks({
-    onAiRequest(info) {
-      console.log("[ai-request]", { bot: info.bot, artifact: info.artifact, path: info.path });
-    },
-    onInvoke(info) {
-      console.log("[ai-invoke]", { action: info.action, ok: info.ok, latencyMs: info.latencyMs });
-    },
-  });
+  if (process.env.NEXT_RUNTIME === "nodejs") {
+    await import("./instrumentation-node");
+  }
 }
+`,
+    },
+    {
+      relPath: "instrumentation-node.ts",
+      contents: `import "server-only";
+import { registerAiHooks } from "next-ai-ready/hooks";
+
+registerAiHooks({
+  onAiRequest(info) {
+    console.log("[ai-request]", { bot: info.bot, artifact: info.artifact, path: info.path });
+  },
+  onInvoke(info) {
+    console.log("[ai-invoke]", { action: info.action, ok: info.ok, latencyMs: info.latencyMs });
+  },
+});
 `,
     },
     {

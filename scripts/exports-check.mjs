@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 /**
- * E-07 — Verify handler subpath exports resolve after build (next + meta).
+ * E-07 — Verify handler subpath exports resolve after build (next + meta + core).
  *
  * Usage (from repo root, after `pnpm build`):
  *   node scripts/exports-check.mjs
@@ -25,9 +25,15 @@ const HANDLERS = [
   "ai-plugin",
 ];
 
-const PACKAGES = [
+const HANDLER_PACKAGES = [
   { name: "@next-ai-ready/next", dir: join(ROOT, "packages", "next") },
   { name: "next-ai-ready", dir: join(ROOT, "packages", "meta") },
+];
+
+const EXTRA_EXPORTS = [
+  { name: "@next-ai-ready/next", dir: join(ROOT, "packages", "next"), key: "./hooks", js: "runtime/observability.js", dts: "runtime/observability.d.ts" },
+  { name: "next-ai-ready", dir: join(ROOT, "packages", "meta"), key: "./hooks", js: "hooks.js", dts: "hooks.d.ts" },
+  { name: "@next-ai-ready/core", dir: join(ROOT, "packages", "core"), key: "./bots", js: "bots-entry.js", dts: "bots-entry.d.ts" },
 ];
 
 async function exists(p) {
@@ -39,7 +45,7 @@ async function exists(p) {
   }
 }
 
-async function checkPackage({ name, dir }) {
+async function checkHandlerPackage({ name, dir }) {
   let failures = 0;
   const dist = join(dir, "dist", "handlers");
 
@@ -66,10 +72,33 @@ async function checkPackage({ name, dir }) {
   return failures;
 }
 
+async function checkExtraExport({ name, dir, key, js, dts }) {
+  let failures = 0;
+  const jsPath = join(dir, "dist", js);
+  const dtsPath = join(dir, "dist", dts);
+  if ((await exists(jsPath)) && (await exists(dtsPath))) {
+    console.log(`  ✓ ${name} ${key.replace("./", "")}`);
+  } else {
+    console.error(`  ✗ ${name} ${key} — missing ${jsPath} or ${dtsPath}`);
+    failures++;
+  }
+
+  const pkg = JSON.parse(await readFile(join(dir, "package.json"), "utf8"));
+  if (!pkg.exports?.[key]) {
+    console.error(`  ✗ ${name} package.json missing export "${key}"`);
+    failures++;
+  }
+
+  return failures;
+}
+
 async function main() {
   let failures = 0;
-  for (const pkg of PACKAGES) {
-    failures += await checkPackage(pkg);
+  for (const pkg of HANDLER_PACKAGES) {
+    failures += await checkHandlerPackage(pkg);
+  }
+  for (const exp of EXTRA_EXPORTS) {
+    failures += await checkExtraExport(exp);
   }
 
   if (failures > 0) {

@@ -14,6 +14,7 @@ export default defineConfig({
     "src/handlers/action.ts",
     "src/handlers/mcp.ts",
     "src/handlers/ai-plugin.ts",
+    "src/runtime/observability.ts",
   ],
   format: ["esm"],
   dts: true,

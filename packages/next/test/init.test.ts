@@ -24,6 +24,7 @@ describe("runInit()", () => {
       expect(result.written).toContain("app/api/mcp/[transport]/route.ts");
       expect(result.written).toContain("actions/index.mjs");
       expect(result.written).toContain("instrumentation.ts");
+      expect(result.written).toContain("instrumentation-node.ts");
 
       const actionRoute = await readFile(join(dir, "app/api/actions/[name]/route.ts"), "utf8");
       expect(actionRoute).toContain('../../../../actions/index.mjs');

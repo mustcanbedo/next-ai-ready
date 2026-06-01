@@ -1,4 +1,4 @@
-import { identifyAiBot } from "@next-ai-ready/core";
+import { identifyAiBot } from "@next-ai-ready/core/bots";
 import type { AiReadyHooks, AiRequestInfo, InvokeInfo } from "@next-ai-ready/core";
 
 /**
@@ -6,10 +6,13 @@ import type { AiReadyHooks, AiRequestInfo, InvokeInfo } from "@next-ai-ready/cor
  *
  * Hooks are *functions*, so unlike the graph/manifest they can't be
  * serialized to a build artifact — they must be registered in-process at
- * runtime. Users do this once (e.g. from Next's `instrumentation.ts`, or any
- * module imported by their route files):
+ * runtime. Users do this once from a **Node-only** module (e.g.
+ * `instrumentation-node.ts`, imported by Next's `instrumentation.ts` when
+ * `NEXT_RUNTIME === "nodejs"`):
  *
- *   import { registerAiHooks } from "@next-ai-ready/next";
+ *   // instrumentation-node.ts
+ *   import "server-only";
+ *   import { registerAiHooks } from "@next-ai-ready/next/hooks";
  *   registerAiHooks({
  *     onAiRequest: (info) => analytics.track("ai_request", info),
  *     onInvoke:    (info) => analytics.track("ai_invoke", info),

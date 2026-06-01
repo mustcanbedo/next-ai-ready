@@ -47,6 +47,10 @@
     "./handlers/ai-plugin": {
       "types": "./dist/handlers/ai-plugin.d.ts",
       "import": "./dist/handlers/ai-plugin.js"
+    },
+    "./hooks": {
+      "types": "./dist/hooks.d.ts",
+      "import": "./dist/hooks.js"
     }
   },
   "bin": {

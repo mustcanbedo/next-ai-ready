@@ -51,6 +51,10 @@
     "./handlers/ai-plugin": {
       "types": "./dist/handlers/ai-plugin.d.ts",
       "import": "./dist/handlers/ai-plugin.js"
+    },
+    "./hooks": {
+      "types": "./dist/runtime/observability.d.ts",
+      "import": "./dist/runtime/observability.js"
     }
   },
   "files": [

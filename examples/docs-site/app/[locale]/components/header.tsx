@@ -39,7 +39,7 @@ export function Header({ locale, messages }: HeaderProps) {
           <NavLink href={`/${locale}/docs/guides/quickstart`} active={pathname.includes("/guides")}>
             {messages.quickstart}
           </NavLink>
-          <NavLink href={`/${locale}/docs/api/config`} active={pathname.includes("/api")}>
+          <NavLink href={`/${locale}/docs/api-reference/config`} active={pathname.includes("/api-reference")}>
             {messages.api}
           </NavLink>
           <a

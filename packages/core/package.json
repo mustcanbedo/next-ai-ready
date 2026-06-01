@@ -15,6 +15,10 @@
     "./scanner": {
       "types": "./dist/scanner-entry.d.ts",
       "import": "./dist/scanner-entry.js"
+    },
+    "./bots": {
+      "types": "./dist/bots-entry.d.ts",
+      "import": "./dist/bots-entry.js"
     }
   },
   "files": [

@@ -1,15 +1,10 @@
 #!/usr/bin/env bash
-# Publish all @next-ai-ready/* packages + next-ai-ready meta to npm @alpha.
+# Publish all packages to npm @alpha using pnpm (rewrites workspace:* → semver).
 #
-# Why not `pnpm -r publish`? pnpm packs to a temp dir and invokes npm without
-# an interactive 2FA / WebAuthn prompt — publish fails with E403 when the account
-# has auth-and-writes 2FA (Security Key / Touch ID).
+# Do NOT use bare `npm publish` from package dirs — it leaks workspace:* and
+# breaks `pnpm add next-ai-ready@alpha` for external users.
 #
-# This script runs `npm publish` from each package directory so macOS can prompt
-# for Touch ID. Expect up to 9 prompts (one per package).
-#
-# Alternative: Granular Access Token with bypass 2FA → set NPM_TOKEN / .npmrc
-# then use: pnpm --filter "./packages/*" publish --tag alpha --access public --no-git-checks --force
+# Skips packages whose version already exists on the registry.
 
 set -euo pipefail
 
@@ -22,13 +17,23 @@ echo "Building first…"
 pnpm build
 
 for pkg in "${PACKAGES[@]}"; do
+  dir="packages/$pkg"
+  name=$(node -p "require('./${dir}/package.json').name")
+  version=$(node -p "require('./${dir}/package.json').version")
+
+  if npm view "${name}@${version}" version &>/dev/null; then
+    echo "⏭  ${name}@${version} already on npm — skip"
+    continue
+  fi
+
   echo ""
   echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-  echo "Publishing packages/$pkg …"
+  echo "Publishing ${name}@${version} …"
   echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-  (cd "packages/$pkg" && npm publish --tag alpha --access public)
+  (cd "$dir" && pnpm publish --tag alpha --access public --no-git-checks)
 done
 
 echo ""
 echo "Done. Verify:"
 echo "  npm view next-ai-ready dist-tags"
+echo "  npm view next-ai-ready@alpha dependencies"

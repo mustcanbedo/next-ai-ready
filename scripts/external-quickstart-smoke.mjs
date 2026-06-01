@@ -30,12 +30,18 @@ async function exists(p) {
 }
 
 async function run(cwd, cmd, args, opts = {}) {
-  const { stdout, stderr } = await execFileAsync(cmd, args, {
-    cwd,
-    env: { ...process.env, NODE_NO_WARNINGS: "1" },
-    timeout: opts.timeout ?? 120_000,
-  });
-  return { stdout, stderr };
+  try {
+    const { stdout, stderr } = await execFileAsync(cmd, args, {
+      cwd,
+      env: { ...process.env, NODE_NO_WARNINGS: "1" },
+      timeout: opts.timeout ?? 120_000,
+    });
+    return { stdout, stderr };
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    const stderr = err && typeof err === "object" && "stderr" in err ? String(err.stderr) : "";
+    throw new Error([msg, stderr].filter(Boolean).join("\n"));
+  }
 }
 
 async function main() {
@@ -60,7 +66,7 @@ async function main() {
 
     if (process.env.USE_NPM === "1") {
       console.log("[external] installing next-ai-ready@alpha from npm …");
-      await run(dir, "pnpm", ["add", "next-ai-ready@alpha", "zod@^4", "-D", "next@^15"], {
+      await run(dir, "pnpm", ["add", "-D", "next-ai-ready@alpha", "zod@^4", "next@^15"], {
         timeout: 180_000,
       });
     } else {
@@ -68,7 +74,7 @@ async function main() {
       await run(
         dir,
         "pnpm",
-        ["add", `link:${META_DIR}`, "zod@^4", "-D", "next@^15"],
+        ["add", "-D", `link:${META_DIR}`, "zod@^4", "next@^15"],
         { timeout: 180_000 },
       );
     }

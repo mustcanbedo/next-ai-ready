@@ -1,5 +1,20 @@
 # next-ai-ready
 
+## 0.1.0-alpha.9
+
+### Patch Changes
+
+- Fix npm publish: use pnpm publish so workspace:\* resolves to semver (alpha.8 was broken on registry).
+- Updated dependencies
+  - @next-ai-ready/core@0.1.0-alpha.9
+  - @next-ai-ready/next@0.1.0-alpha.9
+  - @next-ai-ready/actions@0.1.0-alpha.9
+  - @next-ai-ready/semantic@0.1.0-alpha.9
+  - @next-ai-ready/mdx@0.1.0-alpha.9
+  - @next-ai-ready/llms@0.1.0-alpha.9
+  - @next-ai-ready/openapi@0.1.0-alpha.9
+  - @next-ai-ready/mcp@0.1.0-alpha.9
+
 ## 0.1.0-alpha.8
 
 ### Patch Changes

@@ -1,6 +1,6 @@
 {
   "name": "next-ai-ready",
-  "version": "0.1.0-alpha.8",
+  "version": "0.1.0-alpha.9",
   "description": "AEO + Agent-API layer for Next.js. Make your site readable by AI and callable by agents.",
   "license": "MIT",
   "type": "module",

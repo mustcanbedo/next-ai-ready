@@ -1,0 +1,98 @@
+---
+title: 安装
+summary: 安装 next-ai-ready 并生成首个配置。
+order: 2
+---
+
+# 安装
+
+## 前置要求
+
+- **Node.js** 20 或更高版本
+- **Next.js** 15+ 且使用 App Router（必需 — 路由 handler 使用异步 `params`；不支持 Next 14）
+- **pnpm**、npm 或 yarn
+- **Zod v4**（`zod@^4`）— actions 必需（使用 `z.toJSONSchema()`）
+
+## 安装
+
+```bash
+pnpm add next-ai-ready@alpha zod@^4
+```
+
+这会安装 meta 包，重新导出全部 API 并提供 CLI。
+
+## 包导出说明（N-14）
+
+| 导入 | 需要 Next.js？ | 用途 |
+|------|----------------|------|
+| `next-ai-ready` | 否（CLI + 配置） | `init`、`build`、`doctor`、`defineConfig`、`defineAction` |
+| `next-ai-ready/handlers/*` | 是（`server-only`） | `app/_ai-ready/` 路由 stub |
+| `@next-ai-ready/next` | 是 | Monorepo / 高级用法 |
+
+典型应用只需：`pnpm add next-ai-ready@alpha`。`@next-ai-ready/*` 为内部包，无需单独安装。
+
+**可选 peer 依赖：**
+
+| 包 | 场景 |
+|----|------|
+| `zod@^4` | Actions（实际项目必需） |
+| `jiti` | `ai-ready.config.ts` |
+| `mcp-handler`、`@modelcontextprotocol/sdk` | MCP |
+| `next` | 仅 route handler — CLI 不需要 |
+
+消费者应用请只使用 **`next-ai-ready`** 的 CLI；`@next-ai-ready/next` 的 bin 供 monorepo 开发（C-01）。
+
+## 初始化
+
+```bash
+npx next-ai-ready init
+```
+
+将创建：
+
+- `ai-ready.config.mjs` — 站点配置（含 robots 策略说明）
+- `instrumentation.ts` — 可选的 `registerAiHooks()` 观测钩子
+- `app/_ai-ready/` — `llms.txt`、`openapi.json` 等路由 handler
+- `app/api/actions/` — action 执行端点
+- `app/api/mcp/` — MCP 服务端点
+- `actions/index.mjs` — 含 `ping` 健康检查的 starter action
+
+`init` 还会为 `next.config` 注入 `withAiReady()`，并在缺失时将 `next-ai-ready build` 加入 build 脚本。
+
+## 配置
+
+编辑 `ai-ready.config.mjs`：
+
+```js
+import { defineConfig } from "@next-ai-ready/core";
+
+export default defineConfig({
+  site: {
+    name: "My Site",
+    baseUrl: "https://example.com",
+    description: "供 AI 使用的简短站点描述。",
+  },
+  content: ["app/**/*.mdx", "content/**/*.mdx"],
+  actions: "./actions/index.mjs",
+});
+```
+
+### Robots 策略
+
+`next-ai-ready build` 会生成带 AI 爬虫规则的 `public/robots.txt`。若需动态策略，添加 `app/robots.ts` 并使用 `@next-ai-ready/core` 的 `aiRobots()` — Next.js 运行时优先使用 `app/robots.ts`。
+
+## 构建
+
+```bash
+npx next-ai-ready build
+```
+
+扫描内容、编译语义图，并将 AI 产物写入 `public/` 与 `.next-ai-ready/`。
+
+## 验证
+
+```bash
+npx next-ai-ready doctor --score
+```
+
+Doctor 检查配置、action 暴露规则、`noai` meta、robots 冲突及路由接线。可在 CI 中使用 — exit 0 表示无 error（warning 可接受）。

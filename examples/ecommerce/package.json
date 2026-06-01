@@ -1,0 +1,13 @@
+{
+  "name": "@next-ai-ready/example-ecommerce",
+  "version": "0.0.0",
+  "private": true,
+  "description": "E-commerce demo — Capability plane with product search action (R-09).",
+  "scripts": {
+    "build": "next-ai-ready build"
+  },
+  "dependencies": {
+    "next-ai-ready": "workspace:*",
+    "zod": "^4.4.3"
+  }
+}

@@ -1,6 +1,6 @@
 {
   "name": "@next-ai-ready/mdx",
-  "version": "0.1.0-alpha.2",
+  "version": "0.1.0-alpha.7",
   "description": "MDX to semantic compiler (unified pipeline).",
   "license": "MIT",
   "type": "module",

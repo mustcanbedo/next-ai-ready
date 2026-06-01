@@ -94,7 +94,8 @@ const zh = {
       "getting-started": "快速上手",
       concepts: "核心概念",
       guides: "指南",
-      api: "API 参考",
+      "api-reference": "API 参考",
+      decisions: "架构决策",
     },
   },
 };

@@ -95,7 +95,8 @@ const en = {
       "getting-started": "Getting Started",
       concepts: "Concepts",
       guides: "Guides",
-      api: "API Reference",
+      "api-reference": "API Reference",
+      decisions: "Decisions",
     },
   },
 };

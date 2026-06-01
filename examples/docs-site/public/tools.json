@@ -1,0 +1,64 @@
+{
+  "tools": [
+    {
+      "function": {
+        "description": "Get the markdown content of a documentation page by its route. Use when: When you know which page the user needs and want to read its full content. Do not use when: When you need to search for pages first (use search_docs instead).",
+        "name": "get_page_content",
+        "parameters": {
+          "additionalProperties": false,
+          "properties": {
+            "route": {
+              "description": "Page route, e.g. '/en/introduction' or '/zh/guides/quickstart'",
+              "minLength": 1,
+              "type": "string"
+            }
+          },
+          "required": [
+            "route"
+          ],
+          "type": "object"
+        }
+      },
+      "type": "function"
+    },
+    {
+      "function": {
+        "description": "List all available API methods (actions) with their names and descriptions. Use when: When you need to discover what tools are available before calling them. Do not use when: When you already know which action to call.",
+        "name": "list_api_methods",
+        "parameters": {
+          "additionalProperties": false,
+          "properties": {},
+          "type": "object"
+        }
+      },
+      "type": "function"
+    },
+    {
+      "function": {
+        "description": "Search documentation pages by keyword. Returns matching pages with title, summary, and route. Use when: When the user asks about a topic and you need to find relevant documentation pages. Do not use when: When the user asks for the full content of a specific page (use get_page_content instead).",
+        "name": "search_docs",
+        "parameters": {
+          "additionalProperties": false,
+          "properties": {
+            "limit": {
+              "description": "Max results to return (default 5)",
+              "maximum": 20,
+              "minimum": 1,
+              "type": "integer"
+            },
+            "query": {
+              "description": "Search keyword or phrase",
+              "minLength": 1,
+              "type": "string"
+            }
+          },
+          "required": [
+            "query"
+          ],
+          "type": "object"
+        }
+      },
+      "type": "function"
+    }
+  ]
+}

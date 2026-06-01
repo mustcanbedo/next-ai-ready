@@ -1,5 +1,8 @@
 # next-ai-ready — Project Review
 
+> **⚠️ Superseded:** 本文档为 2025-07-15 快照，已不再维护。  
+> 当前请以 **[`docs/completion-audit.md`](./docs/completion-audit.md)**（完成度审视）和 **[`docs/backlog.md`](./docs/backlog.md)**（完整待办）为准。
+
 > Reviewer role: project author  
 > Date: 2025-07-15  
 > Scope: full codebase audit — architecture, code quality, tests, docs  

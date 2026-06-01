@@ -7,11 +7,11 @@ Phased delivery. Each phase produces a usable, shippable slice.
 **Goal:** Empty monorepo skeleton that `pnpm install && pnpm build` works on.
 
 - [x] `docs/` — research, goals, architecture, decisions, roadmap (this doc)
-- [ ] `package.json`, `pnpm-workspace.yaml`, `turbo.json`, `tsconfig.base.json`
-- [ ] 8 packages + meta package skeletons (just `package.json` + empty `src/index.ts`)
-- [ ] `.changeset/`, `.gitignore`, MIT `LICENSE`
-- [ ] CI: GitHub Actions for `pnpm install && pnpm typecheck && pnpm test`
-- [ ] `core/src/types.ts` — the **type contract** for the whole system
+- [x] `package.json`, `pnpm-workspace.yaml`, `turbo.json`, `tsconfig.base.json`
+- [x] 8 packages + meta package skeletons (just `package.json` + empty `src/index.ts`)
+- [x] `.changeset/`, `.gitignore`, MIT `LICENSE`
+- [x] CI: GitHub Actions for `pnpm install && pnpm typecheck && pnpm test`
+- [x] `core/src/types.ts` — the **type contract** for the whole system
 
 **Exit criteria:**
 - `pnpm install` clean.
@@ -113,16 +113,16 @@ Phased delivery. Each phase produces a usable, shippable slice.
 **Goal:** Production readiness for early adopters.
 
 ### Deliverables
-- `next-ai-ready doctor` — audits a site against the 24 tactics in [`goals.md`](./goals.md). Outputs JSON + colored CLI report.
+- [x] `next-ai-ready doctor` — audits a site against the 24 tactics in [`goals.md`](./goals.md). Outputs JSON + colored CLI report.
   - Checks: `llms.txt` present, JSON-LD valid, `robots.txt` allows GPTBot, action schemas have `whenToUse`, etc.
-- `aiRobots()` helper for `app/robots.ts`.
-- Dev watcher CLI (`next-ai-ready dev`).
-- Error messages with action items.
-- Docs site (built with `next-ai-ready` itself — dogfood).
-- `npm create next-ai-ready` scaffold (optional, defer if tight).
+- [x] `aiRobots()` helper for `app/robots.ts`.
+- [x] Dev watcher CLI (`next-ai-ready dev`).
+- [ ] Error messages with action items. *(R-08 — optional for 0.1)*
+- [x] Docs site (built with `next-ai-ready` itself — dogfood).
+- [x] `npm create next-ai-ready` scaffold.
 
 ### Exit criteria
-- A new user can go from `npx create-next-app` to `next-ai-ready doctor` score >80 in <10 minutes.
+- [ ] A new user can go from `npx create-next-app` to `next-ai-ready doctor` score >80 in <10 minutes. *(optional UX validation)*
 - **🚀 0.1 release.**
 
 ---

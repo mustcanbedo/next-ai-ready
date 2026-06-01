@@ -4,16 +4,18 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "prebuild": "next-ai-ready build",
     "build": "next build",
     "start": "next start"
   },
   "dependencies": {
-    "@next-ai-ready/actions": "workspace:0.1.0-alpha.2",
-    "@next-ai-ready/core": "workspace:0.1.0-alpha.2",
+    "@next-ai-ready/actions": "workspace:*",
+    "@next-ai-ready/core": "workspace:*",
+    "@next-ai-ready/next": "workspace:*",
     "gray-matter": "^4.0.3",
     "lucide-react": "^1.17.0",
     "next": "16.2.6",
-    "next-ai-ready": "workspace:0.1.0-alpha.2",
+    "next-ai-ready": "workspace:*",
     "react": "19.2.4",
     "react-dom": "19.2.4",
     "shiki": "^4.1.0",

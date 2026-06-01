@@ -1,0 +1,79 @@
+---
+title: 语义元数据
+summary: 如何为 MDX 内容添加结构化元数据以获得更丰富的 AI 提取。
+order: 3
+---
+
+# 语义元数据
+
+知识平面从你的 MDX 文件中提取结构化数据。你可以通过从内容中导出 `semantic` 对象来引导这个提取。
+
+## `semantic` 导出
+
+在任何 MDX 文件中添加：
+
+```ts
+export const semantic = {
+  topics: ["install", "quickstart", "pnpm"],
+  questions: [
+    { q: "如何安装 next-ai-ready？", a: "运行 `pnpm add next-ai-ready`。" },
+    { q: "需要 Zod 吗？", a: "是的，action 需要 Zod v4。" },
+  ],
+  entities: [
+    { name: "pnpm", type: "tool", url: "https://pnpm.io" },
+    { name: "Next.js", type: "framework", url: "https://nextjs.org" },
+  ],
+}
+```
+
+## 字段
+
+| 字段 | 类型 | 说明 |
+|---|---|---|
+| `topics` | `string[]` | 关键词，用于搜索和分类。出现在 `ai.json` 中，帮助 AI 消费者理解页面内容。 |
+| `questions` | `{ q: string; a: string }[]` | FAQ 条目。提取为 `FAQPage` JSON-LD 和 `ai.json` 中的 `questions`。 |
+| `entities` | `{ name: string; type: string; url?: string }[]` | 页面中提到的命名实体。出现在 `ai.json` 的 `entities` 中。 |
+
+## Frontmatter 字段
+
+编译器还读取以下 frontmatter 字段：
+
+```yaml
+---
+title: 快速开始
+summary: 60 秒内安装并运行。
+updatedAt: 2026-05-28
+author:
+  name: Jair
+  url: https://github.com/jair
+reviewedBy:
+  name: Alex
+  url: https://github.com/alex
+---
+```
+
+| 字段 | 类型 | 说明 |
+|---|---|---|
+| `title` | `string` | 页面标题。用于 `llms.txt`、JSON-LD 和搜索结果。 |
+| `summary` | `string` | 一句话描述。用于摘要和 AI 工具描述。 |
+| `updatedAt` | `string`（ISO 日期） | 发布/更新日期。向 AI 消费者传递新鲜度信号。 |
+| `author` | `{ name: string; url?: string }` | 作者信息。用于 JSON-LD 的 `author` 字段。 |
+| `reviewedBy` | `{ name: string; url?: string }` | 审阅者信息。AI 搜索的 E-E-A-T 信号。 |
+
+## 提取结果
+
+从每个 MDX 文件，编译器产出一棵 `SemanticNode` 树：
+
+- **页面节点**（`kind: "page"`）— 根节点，包含标题、摘要、主题、问题、实体和 body。
+- **章节节点**（`kind: "section"`）— 每个 `##` 标题一个，有自己的 body 和锚点 URL。
+- **FAQ 节点**（`kind: "faq"`）— 来自 `questions` 导出。
+- **实体节点**（`kind: "entity"`）— 来自 `entities` 导出。
+- **分块节点**（`kind: "chunk"`）— body 文本的 token 感知分割。
+
+每个节点有稳定的 `id`（route + section path 的哈希）和 `citeUrl` 用于直接链接。
+
+## 确定性提取
+
+所有提取都是**确定性的**。相同的 MDX 文件加相同的配置总是产出字节级一致的输出。无 LLM 调用，无 API 密钥，无随机性。
+
+存在可插拔的 `SemanticProvider` 接口用于 LLM 增强提取，但 MVP 中不提供任何实现。

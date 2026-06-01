@@ -1,0 +1,56 @@
+---
+title: 工作原理
+summary: 构建管线、运行时数据流和底层机制。
+order: 4
+---
+
+# 工作原理
+
+本页介绍从 `next-ai-ready build` 到 AI 就绪端点上线的完整流程。
+
+## 构建管线
+
+运行 `npx next-ai-ready build` 时：
+
+1. **加载配置** — 读取 `ai-ready.config.mjs` 中的站点元数据、内容 glob 和 action 路径。
+2. **扫描内容** — 使用 `fast-glob` 查找匹配 `content` glob 的所有 MDX/MD 文件。
+3. **编译** — 每个文件经过 unified 管线：解析 MDX、提取标题/FAQ/实体/摘要、剥离 JSX 为干净 Markdown、按 token 预算分块。
+4. **构建图谱** — 将所有编译后的页面组装为 `SemanticGraph`，包含稳定的节点 ID 和路由映射。
+5. **产出 Knowledge 产物** — 写入 `graph.json`、`llms.txt`、`llms-full.txt` 和 `robots.txt`。
+6. **产出 Capability 产物** — 加载 action，构建清单，写入 `actions.manifest.json`、`openapi.json`、`tools.json` 和 `ai-plugin.json`。
+
+所有 JSON 输出都是确定性的：稳定的键顺序、payload 中无时间戳（除了 header 字段的 `generatedAt`）、稳定的节点 ID。
+
+## 运行时数据流
+
+运行时，每个 AI 端点读取缓存的 JSON 文件：
+
+| 端点 | 读取 | 响应 |
+|---|---|---|
+| `/llms.txt` | `public/` 中的静态文件 | `text/plain` |
+| `/<route>.md` | `graph.json` → 节点 body | `text/markdown` |
+| `/<route>.ai.json` | `graph.json` → 节点树 | `application/json` |
+| `/openapi.json` | `actions.manifest.json` | `application/json` |
+| `POST /api/actions/:name` | 导入 handler，Zod 验证 | 结果 JSON |
+| `/api/mcp` | `vercel/mcp-handler` + registry | MCP 流 |
+
+每个 handler 在每个进程中读取一次 JSON 源并缓存在内存中。失效发生在下一次部署（生产环境）或通过 `next-ai-ready dev` 的文件变更（开发环境）。
+
+## 为什么是独立的构建步骤？
+
+构建 CLI 运行在 bundler **之外**。这是刻意的设计（[ADR-006](/docs/decisions/adr-006)）：
+
+- Turbopack 不接受自定义插件。仅 webpack 的插件会破坏 Next 15+ 默认配置。
+- 与 bundler 解耦使管线可移植——可以在 CI 中在 `next build` 之前运行。
+- Contentlayer、Velite 和 fumadocs-mdx 都采用了相同的模式。
+
+代价是构建脚本多一行：`next-ai-ready build && next build`。好处是 AI 层在 Webpack 和 Turbopack 下行为完全一致。
+
+## `withAiReady()` 的作用
+
+`next.config.mjs` 中的 `withAiReady()` 包装器做两件事：
+
+1. **添加 rewrite** — 将干净 URL（`/llms.txt`、`/<route>.md`、`/openapi.json`）映射到内部 handler 路由。
+2. **启用 file tracing** — 确保 `.next-ai-ready/*.json` 随 serverless 函数 bundle 一起部署。
+
+它**不**注册 bundler 插件、不注入路由、不使用虚拟模块。这保证了 Turbopack 兼容性。

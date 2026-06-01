@@ -1,0 +1,23 @@
+# Demo Shop — full content
+
+> Example e-commerce catalog for next-ai-ready agents.
+
+<!-- BEGIN /products/hoodie -->
+# AI Hoodie
+URL: https://shop.example.com/products/hoodie
+
+# AI Hoodie
+
+Comfortable cotton hoodie with an embroidered `llms.txt` logo.
+
+<!-- END /products/hoodie -->
+
+<!-- BEGIN /products/mug -->
+# LLM Mug
+URL: https://shop.example.com/products/mug
+
+# LLM Mug
+
+12oz mug — keeps embeddings warm.
+
+<!-- END /products/mug -->

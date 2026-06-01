@@ -16,14 +16,15 @@ export interface DocPage extends DocMeta {
 }
 
 function contentDir(locale: Locale) {
-  return path.join(process.cwd(), "content/docs", locale);
+  return path.join(process.cwd(), "content", locale);
 }
 
 const SECTION_ORDER: Record<string, number> = {
   "getting-started": 0,
   concepts: 1,
   guides: 2,
-  api: 3,
+  "api-reference": 3,
+  decisions: 4,
 };
 
 export async function getAllDocs(locale: Locale = "en"): Promise<DocMeta[]> {

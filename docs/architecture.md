@@ -237,7 +237,6 @@ It:
 1. Loads `ai-ready.config.ts`.
 2. Appends `rewrites()` for `/:path*.md` and `/:path*.ai.json` → internal handler.
 3. Sets `experimental.outputFileTracingIncludes` so `.next-ai-ready/*.json` ships with the serverless bundle.
-4. Optionally augments `headers()` for AI bot CORS (configurable).
 
 It **does not** register webpack/turbopack plugins, **does not** inject routes, **does not** use virtual modules. All these would break under Turbopack.
 
@@ -301,7 +300,6 @@ Cache strategy: each handler reads JSON once per process, holds in memory. Inval
 ## 8. Security model
 
 - **`defineAction` is private by default.** `public: true` required to expose via HTTP/MCP. Compile-time check warns on actions exposed without explicit opt-in.
-- **CORS:** same-origin by default. Per-action override possible.
 - **Auth hook:** `defineAction({ auth: (req) => boolean })` runs before handler.
 - **MCP endpoint:** requires `NEXT_AI_READY_MCP_TOKEN` env var in production. Open in dev only.
 - **No rate limit baked in.** Provide `onInvoke` hook; users wire in their own (Upstash, etc.).

@@ -1,0 +1,82 @@
+---
+title: 分析
+summary: 追踪哪些 AI 爬虫读取了你的内容，哪些 agent 调用了你的 action。
+order: 5
+---
+
+# 分析
+
+`next-ai-ready` 提供两个 hook 来追踪 AI 消费者活动，无需添加外部依赖。
+
+## 设置
+
+在项目根目录创建 `instrumentation.ts` 文件（Next.js 约定）：
+
+```ts
+import { registerAiHooks } from "@next-ai-ready/next"
+
+registerAiHooks({
+  onAiRequest: (info) => {
+    console.log("AI 请求:", info.bot, info.artifact, info.path)
+  },
+  onInvoke: (info) => {
+    console.log("Action 调用:", info.action, info.ok, info.latencyMs)
+  },
+})
+```
+
+## `onAiRequest`
+
+当 AI 爬虫读取知识平面产物时触发。回调接收：
+
+| 字段 | 类型 | 说明 |
+|---|---|---|
+| `bot` | `string?` | 检测到的爬虫名称（如 `"GPTBot"`、`"ClaudeBot"`）。未识别时为 `undefined`。 |
+| `path` | `string` | 请求路径（如 `/llms.txt`、`/docs/intro.md`）。 |
+| `artifact` | `string` | 产物类型：`"llms-txt"`、`"page-md"`、`"page-ai-json"`、`"openapi"`、`"tools"`。 |
+| `ua` | `string` | 原始 `User-Agent` 头。 |
+| `method` | `string` | HTTP 方法。 |
+
+爬虫检测匹配以下 user agent：`GPTBot`、`OAI-SearchBot`、`ChatGPT-User`、`PerplexityBot`、`ClaudeBot`、`anthropic-ai`、`Google-Extended`、`CCBot`、`Bytespider`、`Applebot-Extended`。
+
+## `onInvoke`
+
+当通过 HTTP 或 MCP 调用 action 时触发。回调接收：
+
+| 字段 | 类型 | 说明 |
+|---|---|---|
+| `action` | `string` | Action 名称（如 `"search_products"`）。 |
+| `ok` | `boolean` | 调用是否成功。 |
+| `latencyMs` | `number` | Handler 执行时间（毫秒）。 |
+| `error` | `string?` | `ok` 为 `false` 时的错误信息。 |
+| `caller` | `string?` | `"http"` 或 `"mcp"`。 |
+
+## 示例：发送到分析服务
+
+```ts
+import { registerAiHooks } from "@next-ai-ready/next"
+
+registerAiHooks({
+  onAiRequest: (info) => {
+    analytics.track("ai_request", {
+      bot: info.bot,
+      artifact: info.artifact,
+      path: info.path,
+    })
+  },
+  onInvoke: (info) => {
+    analytics.track("ai_invoke", {
+      action: info.action,
+      ok: info.ok,
+      latencyMs: info.latencyMs,
+      caller: info.caller,
+    })
+  },
+})
+```
+
+## Hook 机制
+
+Hook 全局注册，由 route handler 在请求时调用。它们在 handler 执行上下文中同步运行——如果 hook 抛出异常，请求仍然正常完成（错误被吞掉）。
+
+不需要外部依赖。Hook 被设计为薄集成点——自行引入你的分析 SDK。

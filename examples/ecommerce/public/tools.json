@@ -1,0 +1,43 @@
+{
+  "tools": [
+    {
+      "function": {
+        "description": "Load Markdown content for a product page by route id. Use when: Agent needs full product detail from the knowledge plane.",
+        "name": "get_product_page",
+        "parameters": {
+          "additionalProperties": false,
+          "properties": {
+            "id": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "id"
+          ],
+          "type": "object"
+        }
+      },
+      "type": "function"
+    },
+    {
+      "function": {
+        "description": "Search the product catalog by keyword. Use when: User asks about products, pricing, or availability.",
+        "name": "search_products",
+        "parameters": {
+          "additionalProperties": false,
+          "properties": {
+            "q": {
+              "minLength": 1,
+              "type": "string"
+            }
+          },
+          "required": [
+            "q"
+          ],
+          "type": "object"
+        }
+      },
+      "type": "function"
+    }
+  ]
+}

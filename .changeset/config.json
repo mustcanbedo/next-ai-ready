@@ -7,5 +7,5 @@
   "access": "public",
   "baseBranch": "main",
   "updateInternalDependencies": "patch",
-  "ignore": ["@next-ai-ready/example-docs-site", "@next-ai-ready/example-ecommerce"]
+  "ignore": ["docs-site", "@next-ai-ready/example-ecommerce", "create-next-ai-ready"]
 }

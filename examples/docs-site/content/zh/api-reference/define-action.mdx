@@ -1,0 +1,99 @@
+---
+title: defineAction
+summary: defineAction() 和 defineActions() 的 API 参考。
+order: 2
+---
+
+# defineAction
+
+`defineAction()` 创建一个带类型的、AI 可调用的 action。它是能力平面的主要 API。
+
+## 导入
+
+```ts
+import { defineAction, defineActions } from "@next-ai-ready/actions"
+```
+
+## `defineAction<I, O>(def)`
+
+创建单个 action 定义。返回相同的对象（恒等函数）。
+
+```ts
+const search = defineAction({
+  name: "search_products",
+  description: "搜索产品目录。",
+  whenToUse: "当用户想要查找产品时。",
+  public: true,
+  input: z.object({ query: z.string() }),
+  output: z.object({ items: z.array(z.object({ id: z.string(), title: z.string() })) }),
+  handler: async ({ query }) => {
+    return { items: await db.search(query) }
+  },
+})
+```
+
+### 参数
+
+| 字段 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `name` | `string` | 是 | 唯一标识符。必须匹配 `^[a-z][a-z0-9_]*$`（snake_case）。 |
+| `description` | `string` | 是 | 人类可读的描述。显示在 OpenAPI 和 MCP 工具列表中。 |
+| `whenToUse` | `string` | 推荐 | 指导 AI agent 何时调用此 action。 |
+| `whenNotToUse` | `string` | 否 | 反面指导——何时不应调用此 action。 |
+| `input` | `ZodSchema` | 是 | 输入的 Zod schema。构建时转换为 JSON Schema。 |
+| `output` | `ZodSchema` | 否 | 输出的 Zod schema。包含在 OpenAPI 规范中。 |
+| `tags` | `string[]` | 否 | 分类标签。出现在 OpenAPI `tags` 字段中。 |
+| `examples` | `{ input, output? }[]` | 否 | 示例调用。供 AI agent 参考。 |
+| `public` | `boolean` | 否 | 默认 `false`。必须为 `true` 才能通过 HTTP/MCP 暴露。 |
+| `auth` | `(req: Request) => boolean \| Promise<boolean>` | 否 | 每个 action 的认证门控。在 handler 之前运行。 |
+| `handler` | `(input, ctx) => Promise<O> \| O` | 是 | Action 的实现。 |
+
+### ActionContext
+
+`handler` 的第二个参数：
+
+| 字段 | 类型 | 说明 |
+|---|---|---|
+| `request` | `Request` | 原始 HTTP 请求。 |
+| `headers` | `Headers` | 请求头。 |
+| `cookies` | `object` | `cookies.get(name)` 返回 `{ value }` 或 `undefined`。 |
+| `caller` | `string?` | `"http"` 或 `"mcp"`。 |
+
+## `defineActions(actions)`
+
+注册 action 数组。返回相同的数组。用作 actions 模块的默认导出：
+
+```js
+import { defineActions } from "@next-ai-ready/actions"
+import search from "./search.js"
+import getOrder from "./get-order.js"
+
+export default defineActions([search, getOrder])
+```
+
+调用 `defineActions()` 有副作用：它填充全局 action 注册表。这是有意的——构建 CLI 和运行时 handler 都依赖于模块导入时注册表被填充。
+
+## `invokeAction(name, input, ctx)`
+
+编程式调用 action。返回判别联合类型：
+
+```ts
+const result = await invokeAction("search_products", { query: "shoes" }, ctx)
+if (result.ok) {
+  console.log(result.data)      // 带类型的输出
+} else {
+  console.error(result.code)    // "not_found" | "not_public" | "unauthorized" | "invalid_input" | "handler_error"
+  console.error(result.message)
+}
+```
+
+| 字段 | 类型 | 说明 |
+|---|---|---|
+| `ok` | `boolean` | 调用是否成功。 |
+| `data` | `O` | 输出（仅当 `ok` 为 `true`）。 |
+| `action` | `string` | Action 名称。 |
+| `latencyMs` | `number` | Handler 执行时间。 |
+| `status` | `number` | HTTP 状态码（仅当 `ok` 为 `false`）。 |
+| `code` | `string` | 错误码（仅当 `ok` 为 `false`）。 |
+| `message` | `string` | 错误信息（仅当 `ok` 为 `false`）。 |
+| `details` | `unknown` | Zod issues（仅当 `code` 为 `"invalid_input"`）。 |

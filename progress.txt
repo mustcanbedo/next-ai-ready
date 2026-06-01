@@ -1,6 +1,8 @@
 next-ai-ready — progress log
 =============================
 
+> **Note (2026-06-01):** This file is a historical phase log. For current status and remaining work, see [`docs/completion-audit.md`](docs/completion-audit.md) and [`docs/backlog.md`](docs/backlog.md).
+
 Phase 0 — Repo bootstrap                              [done]
   ✅ docs/{goals,research,architecture,decisions,roadmap}.md
   ✅ Root configs + 8 packages + meta scaffold
@@ -99,31 +101,14 @@ Phase 4 — MCP server                                  [done]
   ✅ Tests: 50 total (actions 11, openapi 7, semantic 5, mdx 7, llms 7,
      mcp 6, next 7). mcp.test: tools filter+execute, resources list/read,
      registerAiReady counts + includeTool filter.
-Phase 5 — Doctor CLI + robots + hooks + docs site     [framework done; docs site pending]
-  ✅ robots.txt builder (core/robots.ts):
-     - buildRobotsTxt(site, config) — explicit per-AI-bot Allow/Disallow
-       blocks (from AI_BOTS), advertises /llms.txt entrypoints, optional
-       Sitemap line, extra raw lines. Deterministic.
-     - RobotsConfig + EmitConfig.robots types in core.
-     - build CLI emits public/robots.txt (publicRobotsTxtPath).
-  ✅ analytics hooks (next/runtime/observability.ts):
-     - registerAiHooks()/clearAiHooks() process-global registry.
-     - emitAiRequest(req, artifact) — bot inferred via identifyAiBot; wired
-       into llms-txt/llms-full/page-md/page-ai-json handlers.
-     - emitInvoke(info) — wired into action handler (action/latency/ok/caller).
-     - Hooks never throw through to the response (swallowed).
-     - Exported from @next-ai-ready/next.
-  ✅ doctor CLI (next/cli/doctor.ts + `doctor` subcommand):
-     - validates config presence + site.name/baseUrl (absolute URL check),
-       loads actions & flags public-without-whenToUse (ADR-010), checks
-       graph.json + route stubs. Structured diagnostics, CI exit code.
-  ✅ BUG FIX: knowledge handler GET() now takes (req) for UA; updated
-     build.test llmsTxtGET call accordingly.
-  ✅ CLI smoke test: `doctor` on sample-app → 0 errors, 4 warnings, exit 0.
-  ✅ Tests: 61 total (core 5, actions 11, openapi 7, mdx 7, semantic 5,
-     llms 7, mcp 6, next 13). New: core/robots 5, next/phase5 8
-     (doctor 3 + robots emit 1 + observability 2 + throwing-hook safety).
-  ⏳ Remaining: docs site (separate Next.js app — dogfoods the framework).
+Phase 5 — Doctor CLI + robots + hooks + docs site     [done]
+  ✅ PR-5/6: doctor T-02, MCP auth, aiRobots, JSON-LD helpers
+  ✅ PR-7/8: CONTRIBUTING, pack/exports/bin smoke, e2e, alpha.4–alpha.5
+  ✅ P2 batch (alpha.6): dev watch, 24 tactics, TS config, init polish,
+     create-next-ai-ready, examples/ecommerce, ESLint CI, llms snapshot
+  ✅ 124 tests; npm @alpha → 0.1.0-alpha.6; USE_NPM=1 external:smoke 通过
+
+Phase 6+ — See docs/backlog.md (i18n graph, Edge runtime, LLM adapter, etc.)
 
 
 Key references checked:
@@ -135,6 +120,7 @@ Key references checked:
   • Next 16 /_next/mcp        — dev-only; our /api/mcp is production (ADR-009)
 
 Open follow-ups:
-  • Decide final Zod adapter strategy (Zod 3 vs 4) when Phase 3 starts.
+  • 0.1 GA: optional create-next-app + dev + curl UX validation
+  • R-08 friendly errors; N-08/N-12/N-14; Phase 6 (see backlog.md)
   • Schema warnings in IDE for turbo.json / changeset config.json are harmless
     (untrusted external URLs); leave as-is.

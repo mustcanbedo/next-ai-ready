@@ -112,13 +112,13 @@ registerAiHooks({
 
 ## 状态
 
-🚧 **Pre-alpha**，但核心功能已实现并测试（8 个包共 85 个测试）：
+🚧 **Pre-alpha**（`0.1.0-alpha.6`），但核心功能已实现并测试（9 个包共 146 个测试）：
 
 - ✅ **知识平面** — MDX → 语义图 → `llms.txt` / `*.md` / `*.ai.json` / JSON-LD
 - ✅ **能力平面** — `defineAction` → `/api/actions/<name>` + OpenAPI 3.1 / `tools.json` / `ai-plugin.json`
 - ✅ **MCP 服务器** — action 作为 MCP 工具 + 页面作为资源（HTTP + stdio）
 - ✅ **开发工具** — `build` / `init` / `doctor` / `mcp` CLI，`robots.txt`，分析钩子
-- ⏳ **文档站** — 进行中
+- ✅ **文档站** — 在 [`examples/docs-site`](./examples/docs-site) 使用框架 dogfood
 
 详见 [`docs/`](./docs)：
 
@@ -127,6 +127,15 @@ registerAiHooks({
 - [`docs/architecture.md`](./docs/architecture.md) — 完整架构
 - [`docs/decisions.md`](./docs/decisions.md) — 架构决策记录
 - [`docs/roadmap.md`](./docs/roadmap.md) — 分阶段交付计划
+
+### 已知限制
+
+- **需要 Zod v4** — action 使用 `z.toJSONSchema()`，仅 Zod v4 支持。请安装 `zod@^4`。
+- **仅 Node.js 运行时** — 所有 handler 导出 `runtime = "nodejs"`。不支持 Edge Runtime。
+- **不支持静态导出** — Next.js 的 `output: 'export'` 不兼容（handler 需要服务端运行时）。
+- **不支持 Pages Router** — 仅支持 App Router。`withAiReady()` 和路由 handler 基于 App Router 约定。
+- **推荐 Next.js 15+** — handler 使用 `params: Promise<>`（异步 params）。Next.js 14 可通过 `Promise.resolve()` 兼容但未官方测试。
+- **无 i18n 图** — SemanticGraph 没有 locale 维度。多语言站点通过扫描 `content/{locale}/*.mdx` 工作，但 graph 路由包含 locale 前缀。
 
 ## 许可证
 

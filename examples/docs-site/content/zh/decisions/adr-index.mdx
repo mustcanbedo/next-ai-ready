@@ -1,0 +1,51 @@
+---
+title: 架构决策
+summary: next-ai-ready 所有架构决策记录（ADR）的索引。
+order: 1
+---
+
+# 架构决策
+
+本页索引所有架构决策记录。每个 ADR 一旦接受就不可修改——通过新 ADR 来取代。
+
+## 索引
+
+| # | 标题 | 状态 | 日期 |
+|---|---|---|---|
+| ADR-001 | 工具链：pnpm + turbo + tsup + vitest + changesets | 已接受 | 2026-05-28 |
+| ADR-002 | 作用域名称 `@next-ai-ready/*` + meta 包 | 已接受 | 2026-05-28 |
+| ADR-003 | 内容层：MVP 仅 MDX/MD | 已接受 | 2026-05-28 |
+| ADR-004 | 语义提取：仅确定性 | 已接受 | 2026-05-28 |
+| ADR-005 | Action 发现：显式清单 | 已接受 | 2026-05-28 |
+| ADR-006 | 无 bundler 插件；构建 CLI 产出 JSON | 已接受 | 2026-05-28 |
+| ADR-007 | Route handler 是用户拥有的文件 | 已接受 | 2026-05-28 |
+| ADR-008 | 通过 `vercel/mcp-handler` 实现 MCP | 已接受 | 2026-05-28 |
+| ADR-009 | 默认端点 `/api/mcp` | 已接受 | 2026-05-28 |
+| ADR-010 | Action 暴露默认拒绝 | 已接受 | 2026-05-28 |
+| ADR-011 | 静态优先、handler 回退的产物服务 | 已接受 | 2026-05-28 |
+| ADR-012 | 默认 Node 运行时 | 已接受 | 2026-05-28 |
+| ADR-013 | Zod peer 依赖：`^3.23 \|\| ^4` | 已接受 | 2026-05-28 |
+| ADR-014 | `Next ≥ 14.2`，仅 App Router | 已接受 | 2026-05-28 |
+| ADR-015 | 可复现的 JSON 产物 | 已接受 | 2026-05-28 |
+
+## 关键决策说明
+
+### 无 bundler 插件（ADR-006）
+
+构建 CLI 运行在 bundler 之外。这意味着 `next-ai-ready build && next build`——构建脚本多一行。好处：在 Webpack 和 Turbopack 下行为完全一致，且管线可在 CI 中在 `next build` 之前运行。
+
+### 默认拒绝（ADR-010）
+
+Action 默认私有。必须设置 `public: true` 才能通过 HTTP 或 MCP 暴露。这防止了内部逻辑意外暴露给 AI agent。
+
+### 静态优先服务（ADR-011）
+
+不依赖请求状态的产物（`llms.txt`、`openapi.json`、`tools.json`）在构建时写入 `public/`。运行时 handler 作为回退存在。按路由的产物（`*.md`、`*.ai.json`）由 handler 读取缓存图谱提供。
+
+### 确定性提取（ADR-004）
+
+所有语义提取都是基于启发式的。无 LLM 调用。相同输入 + 相同配置 = 字节级一致的输出。这使得 `git diff` 审查、CI 缓存和可复现构建成为可能。
+
+### 显式 action 清单（ADR-005）
+
+用户编写导出数组的 `actions/index.ts`。无文件系统扫描。这避免了 `"use server"` 冲突，对 tree-shaking 友好，并给用户提供所有 action 的联合类型。

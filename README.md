@@ -112,13 +112,13 @@ registerAiHooks({
 
 ## Status
 
-🚧 **Pre-alpha**, but the core stack is implemented and tested (85 tests across 8 packages):
+🚧 **Pre-alpha** (`0.1.0-alpha.6`), core stack implemented and tested (146 tests across 9 packages):
 
 - ✅ **Knowledge plane** — MDX → semantic graph → `llms.txt` / `*.md` / `*.ai.json` / JSON-LD
 - ✅ **Capability plane** — `defineAction` → `/api/actions/<name>` + OpenAPI 3.1 / `tools.json` / `ai-plugin.json`
 - ✅ **MCP server** — actions as MCP tools + pages as resources (HTTP + stdio)
 - ✅ **Dev tooling** — `build` / `init` / `doctor` / `mcp` CLIs, `robots.txt`, analytics hooks
-- ⏳ **Docs site** — in progress
+- ✅ **Docs site** — dogfooding the framework at [`examples/docs-site`](./examples/docs-site)
 
 See [`docs/`](./docs):
 
@@ -127,6 +127,21 @@ See [`docs/`](./docs):
 - [`docs/architecture.md`](./docs/architecture.md) — Full architecture
 - [`docs/decisions.md`](./docs/decisions.md) — Architecture decision records
 - [`docs/roadmap.md`](./docs/roadmap.md) — Phased delivery plan
+
+### Known limitations
+
+- **Zod v4 required** — actions use `z.toJSONSchema()` which only exists in Zod v4. Install `zod@^4`.
+- **Node.js runtime only** — all handlers export `runtime = "nodejs"`. Edge Runtime is not supported.
+- **No static export** — `output: 'export'` in Next.js config is not compatible (handlers need server runtime).
+- **No Pages Router** — App Router only. The `withAiReady()` wrapper and route handlers target App Router conventions.
+- **Next.js 15+ recommended** — handlers use async `params`; Next 14 sync params supported via `resolveParams()` helper.
+- **No i18n graph** — routes include locale prefixes when content is organized that way. See [i18n guide](./examples/docs-site/content/en/guides/i18n-ai-urls.mdx) and [Phase 6 design](./docs/phase6-design.md).
+
+### Package layout (C-01)
+
+Consumer apps should install **`next-ai-ready`** (meta package) only. It re-exports APIs, handler subpaths, and the CLI. The `@next-ai-ready/next` scoped package duplicates the CLI bin for monorepo development — do not install both in the same app.
+
+See [installation — package exports](./examples/docs-site/content/en/installation.mdx#package-exports-n-14).
 
 ## License
 

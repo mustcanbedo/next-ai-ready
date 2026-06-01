@@ -1,0 +1,51 @@
+---
+title: Architecture Decisions
+summary: Index of all Architecture Decision Records (ADRs) for next-ai-ready.
+order: 1
+---
+
+# Architecture Decisions
+
+This page indexes all Architecture Decision Records. Each ADR is dated and immutable once accepted — supersede via a new ADR.
+
+## Index
+
+| # | Title | Status | Date |
+|---|---|---|---|
+| ADR-001 | Toolchain: pnpm + turbo + tsup + vitest + changesets | Accepted | 2026-05-28 |
+| ADR-002 | Scope name `@next-ai-ready/*` + meta package | Accepted | 2026-05-28 |
+| ADR-003 | Content layer: MDX/MD only in MVP | Accepted | 2026-05-28 |
+| ADR-004 | Semantic extraction: deterministic only | Accepted | 2026-05-28 |
+| ADR-005 | Action discovery: explicit manifest | Accepted | 2026-05-28 |
+| ADR-006 | No bundler plugin; build CLI emits JSON | Accepted | 2026-05-28 |
+| ADR-007 | Route handlers are user-owned files | Accepted | 2026-05-28 |
+| ADR-008 | MCP via `vercel/mcp-handler` | Accepted | 2026-05-28 |
+| ADR-009 | Default endpoint `/api/mcp` | Accepted | 2026-05-28 |
+| ADR-010 | Default deny for action exposure | Accepted | 2026-05-28 |
+| ADR-011 | Static-first, handler-fallback serving | Accepted | 2026-05-28 |
+| ADR-012 | Node runtime by default | Accepted | 2026-05-28 |
+| ADR-013 | Zod peer dependency: `^3.23 \|\| ^4` | Accepted | 2026-05-28 |
+| ADR-014 | `Next ≥ 14.2`, App Router only | Accepted | 2026-05-28 |
+| ADR-015 | Reproducible JSON artifacts | Accepted | 2026-05-28 |
+
+## Key decisions explained
+
+### No bundler plugin (ADR-006)
+
+The build CLI runs outside the bundler. This means `next-ai-ready build && next build` — one extra line in your build script. The benefit: identical behavior under Webpack and Turbopack, and the pipeline can run in CI before `next build`.
+
+### Default deny (ADR-010)
+
+Actions are private by default. You must set `public: true` to expose an action via HTTP or MCP. This prevents accidental exposure of internal logic to AI agents.
+
+### Static-first serving (ADR-011)
+
+Artifacts that don't depend on request state (`llms.txt`, `openapi.json`, `tools.json`) are written to `public/` at build time. Runtime handlers exist as fallback. Per-route artifacts (`*.md`, `*.ai.json`) are served by handlers reading the cached graph.
+
+### Deterministic extraction (ADR-004)
+
+All semantic extraction is heuristic-based. No LLM calls. Same input + same config = byte-identical output. This enables `git diff` review, CI caching, and reproducible builds.
+
+### Explicit action manifest (ADR-005)
+
+Users author `actions/index.ts` that exports an array. No file-system scanning. This avoids `"use server"` collisions, is tree-shaking friendly, and gives users a union type of all actions.

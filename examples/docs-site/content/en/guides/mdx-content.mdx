@@ -1,0 +1,107 @@
+---
+title: Writing MDX Content
+summary: How to write MDX files that the semantic compiler can extract meaning from.
+order: 2
+---
+
+# Writing MDX Content
+
+The Knowledge Plane reads your MDX files and extracts structured metadata. This guide covers how to write content that produces the best results.
+
+## File location
+
+Place MDX files in the directories matched by your `content` globs in `ai-ready.config.mjs`. The default globs are:
+
+```js
+content: ["app/**/*.{md,mdx}", "content/**/*.mdx"]
+```
+
+The file path determines the route. For example, `content/docs/getting-started.mdx` maps to `/docs/getting-started`.
+
+## Frontmatter
+
+Every MDX file should have YAML frontmatter with at least a `title`:
+
+```yaml
+---
+title: Getting Started
+summary: Install and run in under 60 seconds.
+updatedAt: 2026-05-28
+author:
+  name: Jair
+  url: https://github.com/jair
+---
+```
+
+| Field | Type | Required | Description |
+|---|---|---|---|
+| `title` | string | yes | Page title. Used in `llms.txt`, JSON-LD, and `<title>` tags. |
+| `summary` | string | recommended | One-sentence description. Used in search results and AI summaries. |
+| `updatedAt` | ISO date | no | Publication date. Signals freshness to AI consumers. |
+| `author` | object | no | `{ name, url? }`. Used in JSON-LD `author` field. |
+| `reviewedBy` | object | no | `{ name, url? }`. E-E-A-T signal for AI search. |
+
+## Semantic metadata export
+
+For richer extraction, export a `semantic` object from your MDX:
+
+```ts
+export const semantic = {
+  topics: ["install", "quickstart", "pnpm"],
+  questions: [
+    { q: "How do I install next-ai-ready?", a: "Run `pnpm add next-ai-ready`." },
+    { q: "Do I need Zod?", a: "Yes, Zod v4 is required for actions." },
+  ],
+  entities: [
+    { name: "pnpm", type: "tool", url: "https://pnpm.io" },
+  ],
+}
+```
+
+| Field | Type | Description |
+|---|---|---|
+| `topics` | `string[]` | Keywords for search and categorization. |
+| `questions` | `{ q, a }[]` | FAQ entries. Extracted into `FAQPage` JSON-LD. |
+| `entities` | `{ name, type, url? }[]` | Named entities (people, tools, companies). |
+
+## Headings
+
+Use `##` headings to break your page into sections. Each heading becomes a separate `SemanticNode(kind="section")` with its own anchor URL:
+
+```text
+## Installation
+
+Run `pnpm add next-ai-ready`.
+
+## Configuration
+
+Edit `ai-ready.config.mjs`...
+```
+
+The compiler preserves heading IDs for stable anchor links. AI consumers can cite specific sections via `citeUrl`.
+
+## Code blocks
+
+Use fenced code blocks with language tags. Wrap your code in triple backticks with a language identifier:
+
+    ```bash
+    pnpm add next-ai-ready
+    ```
+
+The compiler strips code blocks to plain text in the Markdown body but preserves them in the HTML output.
+
+Supported tags: `bash`, `ts`, `js`, `json`, `text` (and others recognized by your syntax highlighter).
+
+## What gets extracted
+
+From each MDX file, the compiler produces:
+
+- **Title** — from frontmatter `title` or first `#` heading.
+- **Summary** — from frontmatter `summary` or first paragraph.
+- **Sections** — one per `##` heading, with body text.
+- **FAQ** — from the `semantic.questions` export.
+- **Entities** — from the `semantic.entities` export.
+- **Chunks** — token-aware splits that respect heading boundaries.
+- **JSON-LD** — `WebPage`, `Article`, `FAQPage`, and `BreadcrumbList` blocks.
+
+All extraction is deterministic. No LLM calls.

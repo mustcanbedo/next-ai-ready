@@ -1,0 +1,77 @@
+---
+title: MCP 集成
+summary: 将你的 action 连接到 Claude Desktop、Cursor 和其他 MCP 客户端。
+order: 4
+---
+
+# MCP 集成
+
+模型上下文协议（MCP）让 Claude Desktop 和 Cursor 等 AI 客户端将你的 action 作为工具发现和调用。`next-ai-ready` 在 `/api/mcp` 提供 MCP 服务器。
+
+## MCP 能做什么
+
+- **工具发现** — MCP 客户端将你的公开 action 视为可调用的工具。
+- **资源访问** — 你的页面作为 MCP 资源暴露（Markdown 内容）。
+- **两种传输方式** — Streamable HTTP（生产环境）和 stdio（本地桌面客户端）。
+
+## HTTP 端点（生产环境）
+
+运行 `next-ai-ready init` 后，MCP 服务器在 `/api/mcp` 可用。它通过 `vercel/mcp-handler` 处理 Streamable HTTP、SSE 和会话管理。
+
+将任何 MCP 兼容客户端连接到 `https://your-site.com/api/mcp`。
+
+## Stdio（本地客户端）
+
+对于 Claude Desktop 等桌面客户端，运行 stdio 服务器：
+
+```bash
+npx next-ai-ready mcp
+```
+
+这会启动通过 stdin/stdout 的 MCP 服务器。添加到 Claude Desktop 配置：
+
+```json
+{
+  "mcpServers": {
+    "my-site": {
+      "command": "npx",
+      "args": ["next-ai-ready", "mcp"]
+    }
+  }
+}
+```
+
+使用 `--no-resources` 跳过页面资源注册（启动更快）：
+
+```bash
+npx next-ai-ready mcp --no-resources
+```
+
+## 工作原理
+
+MCP 包（`@next-ai-ready/mcp`）是一个薄适配器：
+
+1. 读取 action 注册表（由 `defineActions()` 填充）。
+2. 每个公开 action 成为一个 MCP 工具，包含名称、描述和输入 schema。
+3. SemanticGraph 中的每个页面成为 MCP 资源，URI 为 `airead://page/<route>`。
+4. 工具调用通过 `invokeAction()` —— 与 HTTP 端点相同的验证、认证和错误处理。
+
+## 前置条件
+
+MCP 需要两个可选的 peer 依赖：
+
+```bash
+pnpm add @modelcontextprotocol/sdk mcp-handler
+```
+
+这些在 `@next-ai-ready/next` 中声明为可选。如果未安装，MCP route handler 返回 501。
+
+## 安全
+
+- 仅 `public: true` 的 action 作为 MCP 工具暴露。
+- 每个 action 的 `auth` hook 在 handler 之前运行。
+- **Token 认证（生产环境）：** 当 `NODE_ENV === "production"` 时，HTTP 端点需要 `NEXT_AI_READY_MCP_TOKEN` 环境变量。客户端必须发送 `Authorization: Bearer <token>`。缺少有效 token 的请求将收到 401。开发环境中，所有请求均被允许。
+- stdio 服务器在本地运行，不需要 token 认证。
+- **Stdio 与 auth action：** stdio 使用合成 `Request`，无浏览器 cookie/会话。依赖 HTTP 上下文的 `auth` 钩子在 stdio 下可能返回 401 — 本地测试请用 HTTP MCP 或将 demo action 设为 `public: true`（C-70）。
+- 可通过 `createAiReadyMcpHandler({ auth: false })` 关闭 HTTP 鉴权，生产环境不推荐。
+- 可以通过传递 `auth: false` 给 `createAiReadyMcpHandler()` 完全禁用认证，但不建议在生产环境中这样做。

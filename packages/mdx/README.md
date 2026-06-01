@@ -1,5 +1,7 @@
 # @next-ai-ready/mdx
 
-MDX to semantic compiler (unified pipeline).
+MDX → Markdown compiler: headings, FAQ, chunking, semantic extraction.
 
-Part of [next-ai-ready](../../README.md). 🚧 Pre-alpha.
+Used by `next-ai-ready build` to populate the SemanticGraph.
+
+Part of [next-ai-ready](../../README.md). Pre-alpha.

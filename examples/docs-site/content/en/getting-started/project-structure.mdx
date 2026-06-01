@@ -1,0 +1,52 @@
+---
+title: Project Structure
+summary: Understanding the files next-ai-ready creates and where they live.
+order: 3
+---
+
+# Project Structure
+
+After running `npx next-ai-ready init`, your project gains a few files and directories. Here is what each one does.
+
+## Config file
+
+- `ai-ready.config.mjs` — your site-wide configuration. Defines `site` metadata, content globs, action module path, and emit toggles. See [Configuration](/docs/api-reference/config) for the full reference.
+
+## Build artifacts
+
+These are created by `npx next-ai-ready build` and should be gitignored:
+
+- `.next-ai-ready/graph.json` — the SemanticGraph. All routes, sections, chunks, FAQ entries, and JSON-LD blocks. Runtime handlers read this file.
+- `.next-ai-ready/actions.manifest.json` — registered actions with their JSON Schemas (handlers stripped). Used by OpenAPI, tools.json, and MCP emitters.
+
+## Static output
+
+Written to `public/` at build time:
+
+- `public/llms.txt` — site-wide index for LLMs and AI crawlers.
+- `public/llms-full.txt` — full content dump for RAG pipelines.
+- `public/openapi.json` — OpenAPI 3.1 spec for your public actions.
+- `public/tools.json` — tool definitions in OpenAI function-calling format.
+- `public/.well-known/ai-plugin.json` — plugin manifest for AI gateways.
+- `public/robots.txt` — explicit AI-bot policy.
+
+## Route handlers
+
+Created by `init` in `app/`. Each file is a one-line re-export — readable, auditable, customisable:
+
+- `app/_ai-ready/llms-txt/route.ts` — serves `/llms.txt`
+- `app/_ai-ready/llms-full/route.ts` — serves `/llms-full.txt`
+- `app/_ai-ready/md/[...path]/route.ts` — serves `/<route>.md`
+- `app/_ai-ready/ai-json/[...path]/route.ts` — serves `/<route>.ai.json`
+- `app/_ai-ready/openapi/route.ts` — serves `/openapi.json`
+- `app/_ai-ready/tools/route.ts` — serves `/tools.json`
+- `app/api/actions/[name]/route.ts` — action execution endpoint
+- `app/api/mcp/[transport]/route.ts` — MCP server endpoint
+
+## Actions
+
+- `actions/index.mjs` — your action definitions. Exports an array of `defineAction()` entries. See [Actions](/docs/guides/actions) for how to write them.
+
+## Optional files
+
+- `instrumentation.ts` — Next.js instrumentation hook. Use `registerAiHooks()` here to track AI bot requests and action invocations. See [Analytics](/docs/guides/analytics).

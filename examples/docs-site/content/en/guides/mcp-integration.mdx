@@ -1,0 +1,76 @@
+---
+title: MCP Integration
+summary: Connect your actions to Claude Desktop, Cursor, and other MCP clients.
+order: 4
+---
+
+# MCP Integration
+
+The Model Context Protocol (MCP) lets AI clients like Claude Desktop and Cursor discover and call your actions as tools. `next-ai-ready` exposes an MCP server at `/api/mcp`.
+
+## What MCP gives you
+
+- **Tool discovery** — MCP clients see your public actions as callable tools.
+- **Resource access** — your pages are exposed as MCP resources (Markdown content).
+- **Two transports** — Streamable HTTP (production) and stdio (local desktop clients).
+
+## HTTP endpoint (production)
+
+After `next-ai-ready init`, the MCP server is available at `/api/mcp`. It handles Streamable HTTP, SSE, and session management via `vercel/mcp-handler`.
+
+Connect any MCP-compatible client to `https://your-site.com/api/mcp`.
+
+## Stdio (local clients)
+
+For desktop clients like Claude Desktop, run the stdio server:
+
+```bash
+npx next-ai-ready mcp
+```
+
+This starts an MCP server over stdin/stdout. Add it to your Claude Desktop config:
+
+```json
+{
+  "mcpServers": {
+    "my-site": {
+      "command": "npx",
+      "args": ["next-ai-ready", "mcp"]
+    }
+  }
+}
+```
+
+Use `--no-resources` to skip page resource registration (faster startup):
+
+```bash
+npx next-ai-ready mcp --no-resources
+```
+
+## How it works
+
+The MCP package (`@next-ai-ready/mcp`) is a thin adapter:
+
+1. It reads the action registry (populated by `defineActions()`).
+2. Each public action becomes an MCP tool with its name, description, and input schema.
+3. Each page in the SemanticGraph becomes an MCP resource with `airead://page/<route>` URI.
+4. Tool invocations go through `invokeAction()` — same validation, auth, and error handling as the HTTP endpoint.
+
+## Prerequisites
+
+MCP requires two optional peer dependencies:
+
+```bash
+pnpm add @modelcontextprotocol/sdk mcp-handler
+```
+
+These are declared as optional in `@next-ai-ready/next`. If they are not installed, the MCP route handler returns a 501.
+
+## Security
+
+- Only `public: true` actions are exposed as MCP tools.
+- The `auth` hook on each action runs before the handler.
+- **Token auth (production):** When `NODE_ENV === "production"`, the HTTP endpoint requires a `NEXT_AI_READY_MCP_TOKEN` environment variable. Clients must send `Authorization: Bearer <token>`. Requests without a valid token receive a 401. In development, all requests are allowed.
+- The stdio server runs locally and does not require token auth.
+- **Stdio + auth-gated actions:** MCP stdio uses a synthetic `Request` without browser cookies or session headers. Actions with `auth: (ctx) => ...` that expect real HTTP context may return 401 over stdio — use HTTP MCP or mark demo actions `public: true` for local testing (C-70).
+- You can disable auth entirely by passing `auth: false` to `createAiReadyMcpHandler()`, but this is not recommended in production.

@@ -28,6 +28,8 @@ export interface CompileInput {
     chunk?: { maxTokens?: number; overlap?: number };
     components?: ComponentMap;
   };
+  /** BCP-47 or short locale from route prefix (P6-06). */
+  locale?: string;
 }
 
 export interface CompileOutput {
@@ -47,7 +49,7 @@ export interface CompileOutput {
  *   • sorted, heuristic-only extractors
  */
 export function compile(input: CompileInput): CompileOutput {
-  const { source, route, file, site, semantic } = input;
+  const { source, route, file, site, semantic, locale } = input;
   const { frontmatter, tree } = parseMdx(source);
 
   const rootSection = sectionize(tree);
@@ -76,6 +78,7 @@ export function compile(input: CompileInput): CompileOutput {
       title: faq.q,
       body: faq.a,
       citeUrl: `${citeUrl}#${slugifyForAnchor(faq.q)}`,
+      locale,
       source: { file },
     });
   }
@@ -89,6 +92,7 @@ export function compile(input: CompileInput): CompileOutput {
       kind: "section",
       title: section.title,
       citeUrl: `${citeUrl}#${section.slug}`,
+      locale,
       source: { file },
     });
   }
@@ -108,6 +112,7 @@ export function compile(input: CompileInput): CompileOutput {
       body: chunk.body,
       citeUrl: chunk.slug ? `${citeUrl}#${chunk.slug}` : citeUrl,
       embeddingHint: chunk.breadcrumb ? `${chunk.breadcrumb}\n\n${chunk.body}` : chunk.body,
+      locale,
       source: { file },
     });
   }
@@ -127,6 +132,7 @@ export function compile(input: CompileInput): CompileOutput {
     author,
     reviewedBy,
     embeddingHint: summary ? `${title}\n\n${summary}` : title,
+    locale,
     children: children.map((c) => c.id),
     source: { file },
   };

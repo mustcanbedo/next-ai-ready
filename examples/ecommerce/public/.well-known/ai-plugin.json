@@ -1,0 +1,16 @@
+{
+  "api": {
+    "type": "openapi",
+    "url": "https://shop.example.com/openapi.json"
+  },
+  "auth": {
+    "type": "none"
+  },
+  "description_for_human": "Example e-commerce catalog for next-ai-ready agents.",
+  "description_for_model": "Example e-commerce catalog for next-ai-ready agents.",
+  "legal_info_url": "https://shop.example.com",
+  "logo_url": "https://shop.example.com/icon.png",
+  "name_for_human": "Demo Shop",
+  "name_for_model": "demo_shop",
+  "schema_version": "v1"
+}

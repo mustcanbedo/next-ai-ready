@@ -1,6 +1,6 @@
 {
   "name": "next-ai-ready",
-  "version": "0.1.0-alpha.2",
+  "version": "0.1.0-alpha.7",
   "description": "AEO + Agent-API layer for Next.js. Make your site readable by AI and callable by agents.",
   "license": "MIT",
   "type": "module",
@@ -11,6 +11,42 @@
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
+    },
+    "./handlers/llms-txt": {
+      "types": "./dist/handlers/llms-txt.d.ts",
+      "import": "./dist/handlers/llms-txt.js"
+    },
+    "./handlers/llms-full": {
+      "types": "./dist/handlers/llms-full.d.ts",
+      "import": "./dist/handlers/llms-full.js"
+    },
+    "./handlers/page-md": {
+      "types": "./dist/handlers/page-md.d.ts",
+      "import": "./dist/handlers/page-md.js"
+    },
+    "./handlers/page-ai-json": {
+      "types": "./dist/handlers/page-ai-json.d.ts",
+      "import": "./dist/handlers/page-ai-json.js"
+    },
+    "./handlers/openapi": {
+      "types": "./dist/handlers/openapi.d.ts",
+      "import": "./dist/handlers/openapi.js"
+    },
+    "./handlers/tools": {
+      "types": "./dist/handlers/tools.d.ts",
+      "import": "./dist/handlers/tools.js"
+    },
+    "./handlers/action": {
+      "types": "./dist/handlers/action.d.ts",
+      "import": "./dist/handlers/action.js"
+    },
+    "./handlers/mcp": {
+      "types": "./dist/handlers/mcp.d.ts",
+      "import": "./dist/handlers/mcp.js"
+    },
+    "./handlers/ai-plugin": {
+      "types": "./dist/handlers/ai-plugin.d.ts",
+      "import": "./dist/handlers/ai-plugin.js"
     }
   },
   "bin": {
@@ -24,6 +60,7 @@
     "build": "tsup",
     "dev": "tsup --watch",
     "typecheck": "tsc --noEmit",
+    "test": "vitest run --passWithNoTests",
     "clean": "rm -rf dist .turbo"
   },
   "dependencies": {
@@ -38,6 +75,7 @@
   },
   "devDependencies": {
     "tsup": "^8.3.0",
-    "typescript": "^5.6.0"
+    "typescript": "^5.6.0",
+    "vitest": "^2.1.9"
   }
 }

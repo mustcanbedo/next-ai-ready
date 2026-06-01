@@ -1,0 +1,51 @@
+---
+title: 国际化与 AI 友好 URL
+summary: 多语言站点的 middleware、locale 前缀与 SemanticGraph 路由策略。
+order: 8
+---
+
+# 国际化与 AI 友好 URL
+
+`next-ai-ready` 按 `content` glob 扫描 MDX，并将文件路径映射为路由。多语言站点请在路由中包含 locale（例如 `/zh/docs/install`）。
+
+## 推荐目录结构
+
+```text
+content/
+  en/
+    docs/install.mdx
+  zh/
+    docs/install.mdx
+```
+
+```js
+export default defineConfig({
+  content: ["content/{en,zh}/**/*.mdx"],
+});
+```
+
+各 locale 在 SemanticGraph 中是独立路由。节点尚无内置 `locale` 字段（Phase 6 P6-06）——将 `/en/...` 与 `/zh/...` 视为不同页面。
+
+## Middleware
+
+若将 `/docs` 重定向到 `/en/docs`，请在 matcher 中排除 AI 产物路径，避免 agent 被重定向：
+
+```ts
+export const config = {
+  matcher: ["/((?!_next|_ai-ready|api|.*\\..*).*)"],
+};
+```
+
+需保持可访问的路径：
+
+- `/_ai-ready/*`
+- `*.md`、`*.ai.json`（由 `withAiReady()` rewrite）
+- `/llms.txt`、`/openapi.json`、`/tools.json`、`/.well-known/ai-plugin.json`
+
+## llms.txt
+
+可用 config `sections` 在 `llms.txt` 中优先展示某一语言，或为每种语言单独部署。
+
+## 后续（Phase 6）
+
+见 [`docs/phase6-design.md`](../../../../docs/phase6-design.md)。

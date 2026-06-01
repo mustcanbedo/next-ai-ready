@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>next-ai-ready — tool preview</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+      body { font-family: system-ui, sans-serif; margin: 2rem; max-width: 960px; }
+      pre { background: #f4f4f5; padding: 1rem; overflow: auto; border-radius: 8px; }
+      h2 { margin-top: 2rem; }
+    </style>
+  </head>
+  <body>
+    <h1>Tool manifest preview</h1>
+    <p>Loads <code>/openapi.json</code> and <code>/tools.json</code> from the same origin.</p>
+    <h2>OpenAPI</h2>
+    <pre id="openapi">Loading…</pre>
+    <h2>tools.json</h2>
+    <pre id="tools">Loading…</pre>
+    <script>
+      async function load(path, elId) {
+        const el = document.getElementById(elId);
+        try {
+          const res = await fetch(path);
+          const data = await res.json();
+          el.textContent = JSON.stringify(data, null, 2);
+        } catch (e) {
+          el.textContent = String(e);
+        }
+      }
+      load("/openapi.json", "openapi");
+      load("/tools.json", "tools");
+    </script>
+  </body>
+</html>

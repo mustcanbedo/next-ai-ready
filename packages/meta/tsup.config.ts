@@ -1,9 +1,21 @@
 import { defineConfig } from 'tsup'
 
+const handlers = [
+  'llms-txt',
+  'llms-full',
+  'page-md',
+  'page-ai-json',
+  'openapi',
+  'tools',
+  'action',
+  'mcp',
+  'ai-plugin',
+]
+
 export default defineConfig({
-  entry: ['src/index.ts', 'src/cli.ts'],
+  entry: ['src/index.ts', 'src/cli.ts', ...handlers.map((h) => `src/handlers/${h}.ts`)],
   format: ['esm'],
-  dts: { entry: 'src/index.ts' },
+  dts: true,
   clean: true,
   sourcemap: true,
   target: 'node20',

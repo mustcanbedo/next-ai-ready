@@ -1,0 +1,79 @@
+---
+title: Semantic Metadata
+summary: How to add structured metadata to your MDX content for richer AI extraction.
+order: 3
+---
+
+# Semantic Metadata
+
+The Knowledge Plane extracts structured data from your MDX files. You can guide this extraction by exporting a `semantic` object from your content.
+
+## The `semantic` export
+
+Add this to any MDX file:
+
+```ts
+export const semantic = {
+  topics: ["install", "quickstart", "pnpm"],
+  questions: [
+    { q: "How do I install next-ai-ready?", a: "Run `pnpm add next-ai-ready`." },
+    { q: "Do I need Zod?", a: "Yes, Zod v4 is required for actions." },
+  ],
+  entities: [
+    { name: "pnpm", type: "tool", url: "https://pnpm.io" },
+    { name: "Next.js", type: "framework", url: "https://nextjs.org" },
+  ],
+}
+```
+
+## Fields
+
+| Field | Type | Description |
+|---|---|---|
+| `topics` | `string[]` | Keywords for search and categorization. Appear in `ai.json` and help AI consumers understand what the page covers. |
+| `questions` | `{ q: string; a: string }[]` | FAQ entries. Extracted into `FAQPage` JSON-LD and `questions` in `ai.json`. |
+| `entities` | `{ name: string; type: string; url?: string }[]` | Named entities mentioned in the page. Appear in `entities` in `ai.json`. |
+
+## Frontmatter fields
+
+The compiler also reads these frontmatter fields:
+
+```yaml
+---
+title: Getting Started
+summary: Install and run in under 60 seconds.
+updatedAt: 2026-05-28
+author:
+  name: Jair
+  url: https://github.com/jair
+reviewedBy:
+  name: Alex
+  url: https://github.com/alex
+---
+```
+
+| Field | Type | Description |
+|---|---|---|
+| `title` | `string` | Page title. Used in `llms.txt`, JSON-LD, and search results. |
+| `summary` | `string` | One-sentence description. Used in summaries and AI tool descriptions. |
+| `updatedAt` | `string` (ISO date) | Publication/update date. Signals freshness to AI consumers. |
+| `author` | `{ name: string; url?: string }` | Author info. Used in JSON-LD `author` field. |
+| `reviewedBy` | `{ name: string; url?: string }` | Reviewer info. E-E-A-T signal for AI search. |
+
+## What gets extracted
+
+From each MDX file, the compiler produces a `SemanticNode` tree:
+
+- **Page node** (`kind: "page"`) — root node with title, summary, topics, questions, entities, and body.
+- **Section nodes** (`kind: "section"") — one per `##` heading, with its own body and anchor URL.
+- **FAQ nodes** (`kind: "faq"`) — from the `questions` export.
+- **Entity nodes** (`kind: "entity"`) — from the `entities` export.
+- **Chunk nodes** (`kind: "chunk"`) — token-aware splits of the body text.
+
+Each node has a stable `id` (hash of route + section path) and a `citeUrl` for direct linking.
+
+## Deterministic extraction
+
+All extraction is **deterministic**. The same MDX file with the same config always produces byte-identical output. No LLM calls, no API keys, no randomness.
+
+A pluggable `SemanticProvider` interface exists for LLM-augmented extraction, but no implementations ship in the MVP.

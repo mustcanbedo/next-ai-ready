@@ -47,3 +47,15 @@ export function publicToolsJsonPath(projectRoot: string): string {
 export function publicAiPluginPath(projectRoot: string): string {
   return join(projectRoot, "public", ".well-known", "ai-plugin.json");
 }
+
+// Route stub paths (relative to project root).
+export const ROUTE_STUBS = {
+  LLMS_TXT: "app/_ai-ready/llms-txt/route.ts",
+  LLMS_FULL: "app/_ai-ready/llms-full/route.ts",
+  PAGE_MD: "app/_ai-ready/md/[...path]/route.ts",
+  PAGE_AI_JSON: "app/_ai-ready/ai-json/[...path]/route.ts",
+  OPENAPI: "app/_ai-ready/openapi/route.ts",
+  TOOLS: "app/_ai-ready/tools/route.ts",
+  ACTION: "app/api/actions/[name]/route.ts",
+  MCP: "app/api/mcp/[transport]/route.ts",
+} as const;

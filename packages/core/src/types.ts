@@ -82,6 +82,10 @@ export interface SemanticNode {
   reviewedBy?: SemanticAuthor;
   /** Text optimized for embedding (typically `title + summary + body`). */
   embeddingHint?: string;
+  /** Optional precomputed embedding vector (P6-03). Set at build time when configured. */
+  embedding?: number[];
+  /** BCP-47 or short locale code when route is locale-prefixed (P6-06), e.g. `"en"`. */
+  locale?: string;
   /** Child node ids. The graph stores nodes flat in `SemanticGraph.nodes`. */
   children?: string[];
   source: SemanticSource;
@@ -92,6 +96,8 @@ export interface SemanticGraph {
   nodes: Record<string, SemanticNode>;
   /** Route → root node id. */
   routes: Record<string, string>;
+  /** Locale → (route → root node id). Built when routes use a locale prefix (P6-06). */
+  routesByLocale?: Record<string, Record<string, string>>;
   site: SiteInfo;
   /** ISO-8601 build timestamp (only metadata field — not used for diffing). */
   generatedAt: string;
@@ -222,6 +228,48 @@ export interface SemanticProvider {
     title?: string;
     route: string;
   }) => Promise<string>;
+  /** Optional full-page enrichment (P6-01). Merged into the page node at build time. */
+  enrich?: (input: {
+    body: string;
+    title?: string;
+    route: string;
+  }) => Promise<Partial<Pick<SemanticNode, "summary" | "topics" | "embeddingHint">>>;
+}
+
+/** Relative module path to an actions entry file (C-11). */
+export type ActionsModulePath = string & { readonly __actionsModulePath: true };
+
+/** Brand a relative actions module path for typed configs. */
+export function actionsModulePath(path: string): ActionsModulePath {
+  if (!path.startsWith("./") && !path.startsWith("../")) {
+    throw new Error(`actions module path must be relative (got "${path}")`);
+  }
+  return path as ActionsModulePath;
+}
+
+export interface EmbeddingsProvider {
+  /** Compute an embedding vector for the given text (P6-03). */
+  embed(text: string): Promise<number[]>;
+}
+
+export interface EmbeddingsConfig {
+  /** When set, chunk nodes receive `embedding` at build time. Off by default. */
+  provider?: EmbeddingsProvider;
+}
+
+export interface ContentScanEntry {
+  route: string;
+  /** Raw MDX/MD source. */
+  source: string;
+  /** Traceability path (file path or adapter id). */
+  file: string;
+  locale?: string;
+}
+
+/** Pluggable content discovery (P6-02). Default: filesystem via `scanContent()`. */
+export interface ContentSource {
+  readonly id: string;
+  scan(options: { cwd: string; patterns: string[]; ignore?: string[] }): Promise<ContentScanEntry[]>;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -279,6 +327,13 @@ export interface ChunkConfig {
   overlap?: number;
 }
 
+export interface SemanticConfig {
+  chunk?: ChunkConfig;
+  extract?: SemanticExtractConfig;
+  /** Optional embedding provider for chunk nodes (P6-03). */
+  embeddings?: EmbeddingsConfig;
+}
+
 export interface AiReadyHooks {
   /** Fired when an AI bot fetches an AI artifact. */
   onAiRequest?: (info: AiRequestInfo) => void | Promise<void>;
@@ -301,16 +356,15 @@ export interface AiReadyConfig {
    * heterogeneous array.
    */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  actions?: ActionDefinition<any, any>[] | string;
+  actions?: ActionDefinition<any, any>[] | ActionsModulePath | string;
+  /** Override default filesystem scanner (P6-02). */
+  contentSource?: ContentSource;
   emit?: EmitConfig;
   llms?: {
     sections?: LlmsSectionConfig[];
     exclude?: string[];
   };
-  semantic?: {
-    chunk?: ChunkConfig;
-    extract?: SemanticExtractConfig;
-  };
+  semantic?: SemanticConfig;
   mdx?: {
     /** Map JSX component name → Markdown text renderer. */
     components?: Record<string, (props: Record<string, unknown>) => string>;

@@ -1,4 +1,5 @@
 import type { SemanticGraph, SemanticNode, SiteInfo } from "@next-ai-ready/core";
+import { buildRoutesByLocale, parseLocaleFromRoute } from "@next-ai-ready/core";
 
 export interface BuildGraphInput {
   site: SiteInfo;
@@ -22,6 +23,11 @@ export function buildGraph(input: BuildGraphInput): SemanticGraph {
 
   const sorted = [...input.pages].sort((a, b) => a.page.route.localeCompare(b.page.route));
   for (const { page, children } of sorted) {
+    const locale = parseLocaleFromRoute(page.route);
+    if (locale) page.locale = locale;
+    for (const child of children) {
+      if (locale) child.locale = locale;
+    }
     nodes[page.id] = page;
     routes[page.route] = page.id;
     for (const child of children) nodes[child.id] = child;
@@ -30,21 +36,36 @@ export function buildGraph(input: BuildGraphInput): SemanticGraph {
   return {
     nodes,
     routes,
+    routesByLocale: buildRoutesByLocale(routes),
     site: input.site,
     generatedAt: input.generatedAt ?? new Date().toISOString(),
   };
 }
 
-/** Collect the page node + all its descendant nodes for a given route. */
+/** Collect the page node + all descendant nodes for a given route. */
 export function getPageNodes(graph: SemanticGraph, route: string): SemanticNode[] {
   const rootId = graph.routes[route];
   if (!rootId) return [];
   const root = graph.nodes[rootId];
   if (!root) return [];
   const out: SemanticNode[] = [root];
-  for (const childId of root.children ?? []) {
-    const child = graph.nodes[childId];
-    if (child) out.push(child);
+  const seen = new Set<string>([rootId]);
+
+  function walk(nodeId: string, depth: number) {
+    if (depth > 100) return; // Prevent stack overflow on malformed graphs.
+    const node = graph.nodes[nodeId];
+    if (!node) return;
+    for (const childId of node.children ?? []) {
+      if (seen.has(childId)) continue;
+      seen.add(childId);
+      const child = graph.nodes[childId];
+      if (child) {
+        out.push(child);
+        walk(childId, depth + 1);
+      }
+    }
   }
+
+  walk(rootId, 0);
   return out;
 }

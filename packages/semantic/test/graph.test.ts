@@ -89,6 +89,35 @@ describe("buildGraph()", () => {
     expect(graph.generatedAt).toBe("2026-01-01T00:00:00Z");
   });
 
+  it("getPageNodes collects nested descendants", () => {
+    const grandchild: SemanticNode = {
+      id: "gc",
+      route: "/nested",
+      kind: "chunk",
+      source: { file: "f.mdx" },
+    };
+    const child: SemanticNode = {
+      id: "c",
+      route: "/nested",
+      kind: "section",
+      source: { file: "f.mdx" },
+      children: ["gc"],
+    };
+    const page: SemanticNode = {
+      id: "p",
+      route: "/nested",
+      kind: "page",
+      source: { file: "f.mdx" },
+      children: ["c"],
+    };
+    const graph = buildGraph({
+      site: SITE,
+      pages: [{ page, children: [child, grandchild] }],
+      generatedAt: "x",
+    });
+    expect(getPageNodes(graph, "/nested").map((n) => n.id)).toEqual(["p", "c", "gc"]);
+  });
+
   it("getPageNodes returns page + descendants", () => {
     const a = makeInstallPage();
     const graph = buildGraph({ site: SITE, pages: [a], generatedAt: "x" });

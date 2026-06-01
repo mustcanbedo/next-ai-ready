@@ -14,6 +14,7 @@ export interface McpServerLike {
   tool(
     name: string,
     description: string,
+    /** JSON Schema object passed to MCP SDK (named `paramsSchema` in SDK; actions use Zod `inputShape` internally). */
     paramsSchema: Record<string, unknown>,
     handler: (args: unknown) => Promise<McpToolResult>,
   ): void;

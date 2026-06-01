@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { buildRobotsTxt } from "../src/robots.js";
+import { buildRobotsTxt, aiRobots } from "../src/robots.js";
 import { AI_BOTS } from "../src/bots.js";
 
 const SITE = { name: "Acme", baseUrl: "https://acme.com" };
@@ -48,5 +48,50 @@ describe("buildRobotsTxt()", () => {
 
   it("is deterministic", () => {
     expect(buildRobotsTxt(SITE)).toBe(buildRobotsTxt(SITE));
+  });
+});
+
+describe("aiRobots()", () => {
+  it("returns a catch-all allow rule plus per-AI-bot rules", () => {
+    const result = aiRobots(SITE);
+    expect(result.rules.length).toBeGreaterThan(AI_BOTS.length);
+    // First rule is catch-all.
+    expect(result.rules[0]).toEqual({ userAgent: "*", allow: "/" });
+    // Every known AI bot gets its own rule.
+    const aiUserAgents = result.rules.slice(1).map((r) => r.userAgent);
+    for (const bot of AI_BOTS) {
+      expect(aiUserAgents).toContain(bot.id);
+    }
+    // Each AI rule allows by default.
+    for (const rule of result.rules.slice(1)) {
+      expect(rule).toHaveProperty("allow", "/");
+    }
+  });
+
+  it("disallows AI bots when aiBots = 'disallow'", () => {
+    const result = aiRobots(SITE, { aiBots: "disallow" });
+    // Catch-all stays allow.
+    expect(result.rules[0]).toEqual({ userAgent: "*", allow: "/" });
+    // AI bots get disallow.
+    for (const rule of result.rules.slice(1)) {
+      expect(rule).toHaveProperty("disallow", "/");
+    }
+  });
+
+  it("includes sitemap when configured", () => {
+    expect(aiRobots(SITE, { sitemap: true }).sitemap).toBe("https://acme.com/sitemap.xml");
+    expect(aiRobots(SITE, { sitemap: "https://cdn.acme.com/sm.xml" }).sitemap).toBe(
+      "https://cdn.acme.com/sm.xml",
+    );
+    expect(aiRobots(SITE).sitemap).toBeUndefined();
+  });
+
+  it("strips trailing baseUrl slash for sitemap", () => {
+    const result = aiRobots({ name: "Acme", baseUrl: "https://acme.com/" }, { sitemap: true });
+    expect(result.sitemap).toBe("https://acme.com/sitemap.xml");
+  });
+
+  it("is deterministic", () => {
+    expect(aiRobots(SITE)).toEqual(aiRobots(SITE));
   });
 });

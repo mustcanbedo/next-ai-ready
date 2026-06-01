@@ -7,4 +7,6 @@ export * from "./config.js";
 export * from "./id.js";
 export * from "./scanner.js";
 export * from "./url.js";
+export * from "./locale.js";
+export * from "./content-source.js";
 

@@ -1,12 +1,13 @@
-import { readFile, writeFile, mkdir } from "node:fs/promises";
+import { writeFile, mkdir } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import {
   buildRobotsTxt,
-  scanContent,
+  filesystemContentSource,
   serializeStable,
   type AiReadyConfig,
   type ActionsManifest,
+  type SemanticProvider,
 } from "@next-ai-ready/core";
 import { compile } from "@next-ai-ready/mdx";
 import { buildGraph } from "@next-ai-ready/semantic";
@@ -69,27 +70,29 @@ export async function runBuild(opts: BuildOptions = {}): Promise<BuildResult> {
   }
 
   log(`scanning content (cwd=${cwd})`);
-  const files = await scanContent({
-    cwd,
-    patterns: config.content,
-  });
-  log(`compiling ${files.length} files`);
+  const source = config.contentSource ?? filesystemContentSource();
+  const entries = await source.scan({ cwd, patterns: config.content ?? ["app/**/*.{md,mdx}", "content/**/*.mdx"] });
+  log(`compiling ${entries.length} files`);
 
   const pages = await Promise.all(
-    files.map(async (f) => {
-      const source = await readFile(f.absPath, "utf8");
-      return compile({
-        source,
-        route: f.route,
-        file: f.absPath,
+    entries.map(async (entry) => {
+      const compiled = compile({
+        source: entry.source,
+        route: entry.route,
+        file: entry.file,
         site: config.site,
+        locale: entry.locale,
         options: {
           ...(config.semantic?.chunk ? { chunk: config.semantic.chunk } : {}),
           ...(config.mdx?.components ? { components: config.mdx.components } : {}),
         },
       });
+      return compiled;
     }),
   );
+
+  await applySemanticProvider(pages, config.semantic?.extract?.summary);
+  await applyEmbeddings(pages, config.semantic?.embeddings?.provider);
 
   const graph = buildGraph({ site: config.site, pages });
 
@@ -158,7 +161,7 @@ export async function runBuild(opts: BuildOptions = {}): Promise<BuildResult> {
       written.push(oPath);
 
       const tPath = publicToolsJsonPath(cwd);
-      await writeJson(tPath, buildToolsJson(manifest, config.site));
+      await writeJson(tPath, buildToolsJson(manifest));
       written.push(tPath);
 
       const pPath = publicAiPluginPath(cwd);
@@ -183,4 +186,38 @@ async function writeJson(path: string, data: unknown): Promise<void> {
 async function writeText(path: string, data: string): Promise<void> {
   await mkdir(dirname(path), { recursive: true });
   await writeFile(path, data, "utf8");
+}
+
+async function applySemanticProvider(
+  pages: Awaited<ReturnType<typeof compile>>[],
+  summaryConfig: "auto" | SemanticProvider | undefined,
+): Promise<void> {
+  if (!summaryConfig || summaryConfig === "auto") return;
+  const provider = summaryConfig;
+  for (const { page } of pages) {
+    if (!page.body) continue;
+    const input = { body: page.body, title: page.title, route: page.route };
+    if (provider.summarize) {
+      const s = await provider.summarize(input);
+      if (s) page.summary = s;
+    }
+    if (provider.enrich) {
+      const patch = await provider.enrich(input);
+      Object.assign(page, patch);
+    }
+  }
+}
+
+async function applyEmbeddings(
+  pages: Awaited<ReturnType<typeof compile>>[],
+  provider: { embed(text: string): Promise<number[]> } | undefined,
+): Promise<void> {
+  if (!provider) return;
+  for (const { children } of pages) {
+    for (const node of children) {
+      if (node.kind === "chunk" && node.embeddingHint) {
+        node.embedding = await provider.embed(node.embeddingHint);
+      }
+    }
+  }
 }

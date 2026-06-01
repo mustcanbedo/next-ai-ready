@@ -1,6 +1,6 @@
 {
   "name": "@next-ai-ready/mcp",
-  "version": "0.1.0-alpha.2",
+  "version": "0.1.0-alpha.7",
   "description": "MCP bridge over vercel/mcp-handler.",
   "license": "MIT",
   "type": "module",

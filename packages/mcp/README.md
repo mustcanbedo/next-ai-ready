@@ -1,5 +1,7 @@
 # @next-ai-ready/mcp
 
-MCP bridge over vercel/mcp-handler.
+MCP adapter: actions → tools, graph pages → `airead://page/*` resources.
 
-Part of [next-ai-ready](../../README.md). 🚧 Pre-alpha.
+Transport (HTTP/stdio) lives in `@next-ai-ready/next`. Peer deps: `mcp-handler`, `@modelcontextprotocol/sdk`.
+
+Part of [next-ai-ready](../../README.md). Pre-alpha.

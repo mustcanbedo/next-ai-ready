@@ -12,7 +12,20 @@ export interface McpResourceDefinition {
   read(): { uri: string; mimeType: string; text: string };
 }
 
-const URI_PREFIX = "airead://page";
+export const MCP_PAGE_URI_PREFIX = "airead://page";
+
+/** Build MCP resource URI for a site route (C-72). */
+export function mcpPageUri(route: string): string {
+  return `${MCP_PAGE_URI_PREFIX}${route === "/" ? "/index" : route}`;
+}
+
+/** Parse MCP page URI back to a site route, or `null` if not a page resource. */
+export function routeFromMcpPageUri(uri: string): string | null {
+  if (!uri.startsWith(MCP_PAGE_URI_PREFIX)) return null;
+  let route = uri.slice(MCP_PAGE_URI_PREFIX.length);
+  if (route === "/index") route = "/";
+  return route;
+}
 
 /**
  * Expose every page in the graph as an MCP resource. Clients (Claude
@@ -25,7 +38,7 @@ export function toMcpResourceDefinitions(graph: SemanticGraph): McpResourceDefin
     .map((route) => {
       const rootId = graph.routes[route];
       const node = rootId ? graph.nodes[rootId] : undefined;
-      const uri = `${URI_PREFIX}${route === "/" ? "/index" : route}`;
+      const uri = mcpPageUri(route);
       return {
         uri,
         name: node?.title ?? route,
@@ -41,9 +54,8 @@ export function toMcpResourceDefinitions(graph: SemanticGraph): McpResourceDefin
 
 /** Resolve a previously-listed resource URI back to its rendered body. */
 export function readMcpResource(graph: SemanticGraph, uri: string): { uri: string; mimeType: string; text: string } | null {
-  if (!uri.startsWith(URI_PREFIX)) return null;
-  let route = uri.slice(URI_PREFIX.length);
-  if (route === "/index") route = "/";
+  const route = routeFromMcpPageUri(uri);
+  if (route === null) return null;
   const text = renderPageMarkdown(graph, route);
   if (text === null) return null;
   return { uri, mimeType: "text/markdown", text };

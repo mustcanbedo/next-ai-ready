@@ -1,6 +1,6 @@
 {
   "name": "@next-ai-ready/core",
-  "version": "0.1.0-alpha.2",
+  "version": "0.1.0-alpha.7",
   "description": "Shared types, config, scanner, IO for next-ai-ready.",
   "license": "MIT",
   "type": "module",
@@ -11,6 +11,10 @@
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
+    },
+    "./scanner": {
+      "types": "./dist/scanner-entry.d.ts",
+      "import": "./dist/scanner-entry.js"
     }
   },
   "files": [

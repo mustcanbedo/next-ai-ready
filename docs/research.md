@@ -1,8 +1,8 @@
 # Research — Competitive Landscape & Prior Art
 
-Snapshot taken at project kickoff, updated 2026-06-01 for alpha.6. Helps us **stand on shoulders, not reinvent**, and sharpen our positioning.
+Snapshot taken at project kickoff, updated 2026-06-01 for alpha.7. Helps us **stand on shoulders, not reinvent**, and sharpen our positioning.
 
-**next-ai-ready alpha.6** now ships: full Knowledge + Capability planes, MCP (HTTP + stdio), Doctor with 24 tactics, `dev` watch, and npm `@alpha` single-package install.
+**next-ai-ready alpha.7** (monorepo; npm `@alpha` at alpha.6 pending publish) ships: full Knowledge + Capability planes, MCP (HTTP + stdio), Doctor with 24 tactics, `dev` watch, Edge-safe `next-ai-ready/hooks`, and npm `@alpha` single-package install.
 
 ## Direct competitors (overlapping scope)
 

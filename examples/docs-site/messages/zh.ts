@@ -6,7 +6,7 @@ const zh = {
     github: "GitHub",
   },
   hero: {
-    badge: "v0.1.0-alpha — 已发布至 npm",
+    badge: "v0.1.0-alpha.7 — 已发布至 npm",
     title: "Next.js 的\nAI 基础设施层",
     subtitle:
       "让你的网站被 AI 搜索引擎收录、被 AI Agent 调用。一个配置文件，UI 零改动。",

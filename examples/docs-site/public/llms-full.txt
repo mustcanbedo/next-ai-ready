@@ -750,7 +750,7 @@ Created by `init` in `app/`. Each file is a one-line re-export — readable, aud
 
 ## Optional files
 
-- `instrumentation.ts` — Next.js instrumentation hook. Use `registerAiHooks()` here to track AI bot requests and action invocations. See [Analytics](/docs/guides/analytics).
+- `instrumentation.ts` + `instrumentation-node.ts` — Next.js instrumentation (Node-only hooks via `next-ai-ready/hooks`). See [Analytics](/docs/guides/analytics).
 
 <!-- END /en/getting-started/project-structure -->
 
@@ -882,20 +882,35 @@ URL: https://next-ai-ready.dev/en/guides/analytics
 
 ## Setup
 
-Create an `instrumentation.ts` file in your project root (Next.js convention):
+Next.js runs `instrumentation.ts` in **both** Node.js and Edge. Register hooks from a Node-only file via the **`next-ai-ready/hooks`** subpath (not the main package entry) so Turbopack does not pull build-time Node modules into the Edge bundle.
+
+**`instrumentation.ts`**
 
 ```ts
-import { registerAiHooks } from "@next-ai-ready/next"
+export async function register() {
+  if (process.env.NEXT_RUNTIME === "nodejs") {
+    await import("./instrumentation-node");
+  }
+}
+```
+
+**`instrumentation-node.ts`**
+
+```ts
+import "server-only";
+import { registerAiHooks } from "next-ai-ready/hooks";
 
 registerAiHooks({
   onAiRequest: (info) => {
-    console.log("AI request:", info.bot, info.artifact, info.path)
+    console.log("AI request:", info.bot, info.artifact, info.path);
   },
   onInvoke: (info) => {
-    console.log("Action invoked:", info.action, info.ok, info.latencyMs)
+    console.log("Action invoked:", info.action, info.ok, info.latencyMs);
   },
-})
+});
 ```
+
+`npx next-ai-ready init` scaffolds both files for you.
 
 ## `onAiRequest`
 
@@ -925,16 +940,19 @@ Fires when an action is called via HTTP or MCP. The callback receives:
 
 ## Example: sending to an analytics service
 
-```ts
-import { registerAiHooks } from "@next-ai-ready/next"
+Put your SDK calls in `instrumentation-node.ts`:
 
-registerAiRequests({
+```ts
+import "server-only";
+import { registerAiHooks } from "next-ai-ready/hooks";
+
+registerAiHooks({
   onAiRequest: (info) => {
     analytics.track("ai_request", {
       bot: info.bot,
       artifact: info.artifact,
       path: info.path,
-    })
+    });
   },
   onInvoke: (info) => {
     analytics.track("ai_invoke", {
@@ -942,9 +960,9 @@ registerAiRequests({
       ok: info.ok,
       latencyMs: info.latencyMs,
       caller: info.caller,
-    })
+    });
   },
-})
+});
 ```
 
 ## How hooks are wired
@@ -1421,7 +1439,7 @@ npx next-ai-ready init
 This creates:
 
 - `ai-ready.config.mjs` — your site config (includes robots strategy notes)
-- `instrumentation.ts` — optional `registerAiHooks()` observability wiring
+- `instrumentation.ts` + `instrumentation-node.ts` — optional observability hooks (`next-ai-ready/hooks`, Edge-safe split)
 - `app/_ai-ready/` — route handlers for `llms.txt`, `openapi.json`, etc.
 - `app/api/actions/` — the action execution endpoint
 - `app/api/mcp/` — the MCP server endpoint
@@ -2263,7 +2281,7 @@ URL: https://next-ai-ready.dev/zh/getting-started/project-structure
 
 ## 可选文件
 
-- `instrumentation.ts` — Next.js instrumentation hook。使用 `registerAiHooks()` 追踪 AI 爬虫请求和 action 调用。详见 [分析](/docs/guides/analytics)。
+- `instrumentation.ts` + `instrumentation-node.ts` — Next.js instrumentation（通过 `next-ai-ready/hooks` 注册 Node 专用 hook）。详见 [分析](/docs/guides/analytics)。
 
 <!-- END /zh/getting-started/project-structure -->
 
@@ -2395,20 +2413,35 @@ URL: https://next-ai-ready.dev/zh/guides/analytics
 
 ## 设置
 
-在项目根目录创建 `instrumentation.ts` 文件（Next.js 约定）：
+Next.js 会在 **Node.js 和 Edge** 两种运行时加载 `instrumentation.ts`。请通过 **`next-ai-ready/hooks`** 子路径（不要用主包入口）在 Node 专用文件中注册 hook，避免 Turbopack 把构建期的 Node 模块打进 Edge bundle。
+
+**`instrumentation.ts`**
 
 ```ts
-import { registerAiHooks } from "@next-ai-ready/next"
+export async function register() {
+  if (process.env.NEXT_RUNTIME === "nodejs") {
+    await import("./instrumentation-node");
+  }
+}
+```
+
+**`instrumentation-node.ts`**
+
+```ts
+import "server-only";
+import { registerAiHooks } from "next-ai-ready/hooks";
 
 registerAiHooks({
   onAiRequest: (info) => {
-    console.log("AI 请求:", info.bot, info.artifact, info.path)
+    console.log("AI 请求:", info.bot, info.artifact, info.path);
   },
   onInvoke: (info) => {
-    console.log("Action 调用:", info.action, info.ok, info.latencyMs)
+    console.log("Action 调用:", info.action, info.ok, info.latencyMs);
   },
-})
+});
 ```
+
+`npx next-ai-ready init` 会自动生成这两个文件。
 
 ## `onAiRequest`
 
@@ -2438,8 +2471,11 @@ registerAiHooks({
 
 ## 示例：发送到分析服务
 
+在 `instrumentation-node.ts` 中接入你的 SDK：
+
 ```ts
-import { registerAiHooks } from "@next-ai-ready/next"
+import "server-only";
+import { registerAiHooks } from "next-ai-ready/hooks";
 
 registerAiHooks({
   onAiRequest: (info) => {
@@ -2447,7 +2483,7 @@ registerAiHooks({
       bot: info.bot,
       artifact: info.artifact,
       path: info.path,
-    })
+    });
   },
   onInvoke: (info) => {
     analytics.track("ai_invoke", {
@@ -2455,9 +2491,9 @@ registerAiHooks({
       ok: info.ok,
       latencyMs: info.latencyMs,
       caller: info.caller,
-    })
+    });
   },
-})
+});
 ```
 
 ## Hook 机制
@@ -2932,7 +2968,7 @@ npx next-ai-ready init
 将创建：
 
 - `ai-ready.config.mjs` — 站点配置（含 robots 策略说明）
-- `instrumentation.ts` — 可选的 `registerAiHooks()` 观测钩子
+- `instrumentation.ts` + `instrumentation-node.ts` — 可选观测 hook（`next-ai-ready/hooks`，Edge 安全拆分）
 - `app/_ai-ready/` — `llms.txt`、`openapi.json` 等路由 handler
 - `app/api/actions/` — action 执行端点
 - `app/api/mcp/` — MCP 服务端点

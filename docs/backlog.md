@@ -98,7 +98,7 @@
 | D-03 | ~~🔴~~ ✅ | `app/_ai-ready/**` route stubs | [x] 2026-05-31 — 7 handler stubs + action + MCP routes |
 | D-04 | ~~🔴~~ ✅ | `actions/` + demo actions | [x] 2026-05-31 — search_docs, get_page_content, list_api_methods |
 | D-05 | ~~🔴~~ ✅ | `next-ai-ready build` 产出 graph + llms.txt | [x] 2026-05-31 — 12 routes, 3 actions, 8 files; prebuild script |
-| D-06 | ~~🟡~~ ✅ | `instrumentation.ts` + `registerAiHooks` 示例 | [x] 2026-06-01 — `examples/docs-site/instrumentation.ts` |
+| D-06 | ~~🟡~~ ✅ | `instrumentation.ts` + `instrumentation-node.ts` + hooks subpath | [x] 2026-06-01 — Edge-safe dogfood |
 | D-07 | ~~🟡~~ ✅ | 双轨 `lib/docs.ts` | [x] 2026-05-31 — UI 读 MDX 直接，framework 提供 AI 端点 |
 | D-08 | ~~🟡~~ ✅ | 验证双语 scanner route 映射 | [x] 2026-05-31 — content 移至 `content/{locale}/`，routes = `/en/introduction` |
 
@@ -148,7 +148,7 @@
 |----|--------|-----|------|
 | E-01 | ~~🔴~~ ✅ | GitHub Actions CI | [x] 2026-05-31 — `.github/workflows/ci.yml`：install → build → test → typecheck + e2e |
 | E-02 | ~~🔴~~ ✅ | 外部 e2e 脚本（monorepo 外 create-next-app） | [x] 2026-05-31 — `scripts/e2e-smoke.mjs`：temp dir → init → build → 验证 artifacts |
-| E-03 | ~~🟡~~ ✅ | npm publish `@alpha` 并验证可安装 | [x] 2026-06-01 — `@alpha` → `0.1.0-alpha.6` |
+| E-03 | ~~🟡~~ ✅ | npm publish `@alpha` 并验证可安装 | [x] 2026-06-01 — `@alpha` → `0.1.0-alpha.6`；alpha.7 待发 |
 | E-04 | ~~🟡~~ ✅ | Changeset release 流程走通 | [x] 2026-06-01 — `changeset:status` + CONTRIBUTING.md |
 | E-05 | ~~🟡~~ ✅ | `pnpm pack --dry-run` 自动化检查 | [x] 2026-06-01 — `scripts/pack-check.mjs` + `pnpm pack:check` |
 | E-06 | ~~🟡~~ ✅ | bin 入口 smoke test（meta + next） | [x] 2026-06-01 — `scripts/bin-smoke.mjs` + `pnpm bin:smoke` |

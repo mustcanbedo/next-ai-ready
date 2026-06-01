@@ -10,20 +10,35 @@ order: 5
 
 ## Setup
 
-Create an `instrumentation.ts` file in your project root (Next.js convention):
+Next.js runs `instrumentation.ts` in **both** Node.js and Edge. Register hooks from a Node-only file via the **`next-ai-ready/hooks`** subpath (not the main package entry) so Turbopack does not pull build-time Node modules into the Edge bundle.
+
+**`instrumentation.ts`**
 
 ```ts
-import { registerAiHooks } from "@next-ai-ready/next"
+export async function register() {
+  if (process.env.NEXT_RUNTIME === "nodejs") {
+    await import("./instrumentation-node");
+  }
+}
+```
+
+**`instrumentation-node.ts`**
+
+```ts
+import "server-only";
+import { registerAiHooks } from "next-ai-ready/hooks";
 
 registerAiHooks({
   onAiRequest: (info) => {
-    console.log("AI request:", info.bot, info.artifact, info.path)
+    console.log("AI request:", info.bot, info.artifact, info.path);
   },
   onInvoke: (info) => {
-    console.log("Action invoked:", info.action, info.ok, info.latencyMs)
+    console.log("Action invoked:", info.action, info.ok, info.latencyMs);
   },
-})
+});
 ```
+
+`npx next-ai-ready init` scaffolds both files for you.
 
 ## `onAiRequest`
 
@@ -53,16 +68,19 @@ Fires when an action is called via HTTP or MCP. The callback receives:
 
 ## Example: sending to an analytics service
 
-```ts
-import { registerAiHooks } from "@next-ai-ready/next"
+Put your SDK calls in `instrumentation-node.ts`:
 
-registerAiRequests({
+```ts
+import "server-only";
+import { registerAiHooks } from "next-ai-ready/hooks";
+
+registerAiHooks({
   onAiRequest: (info) => {
     analytics.track("ai_request", {
       bot: info.bot,
       artifact: info.artifact,
       path: info.path,
-    })
+    });
   },
   onInvoke: (info) => {
     analytics.track("ai_invoke", {
@@ -70,9 +88,9 @@ registerAiRequests({
       ok: info.ok,
       latencyMs: info.latencyMs,
       caller: info.caller,
-    })
+    });
   },
-})
+});
 ```
 
 ## How hooks are wired

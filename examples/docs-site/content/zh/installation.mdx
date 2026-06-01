@@ -51,7 +51,7 @@ npx next-ai-ready init
 将创建：
 
 - `ai-ready.config.mjs` — 站点配置（含 robots 策略说明）
-- `instrumentation.ts` — 可选的 `registerAiHooks()` 观测钩子
+- `instrumentation.ts` + `instrumentation-node.ts` — 可选观测 hook（`next-ai-ready/hooks`，Edge 安全拆分）
 - `app/_ai-ready/` — `llms.txt`、`openapi.json` 等路由 handler
 - `app/api/actions/` — action 执行端点
 - `app/api/mcp/` — MCP 服务端点

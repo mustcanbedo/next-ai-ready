@@ -2,8 +2,8 @@
 
 > **审查视角：** 以 Next.js 生态作者的标准审视——不仅看「功能有没有写」，更看「Next 开发者能否在 10 分钟内跑通、部署后不踩坑、与 App Router / Turbopack / Serverless 部署模型是否一致」。
 >
-> **审查日期：** 2026-06-01（alpha.7 backlog 清零后更新）  
-> **当前版本：** `0.1.0-alpha.6`（pre-alpha，`@alpha` 已发布；alpha.7 changeset 待发）  
+> **审查日期：** 2026-06-01（alpha.7 + docs-site dogfood 同步）  
+> **当前版本：** 仓库 `0.1.0-alpha.7`；npm `@alpha` 最新为 `0.1.0-alpha.6`（alpha.7/8 待发）  
 > **测试状态：** 146 tests / 9 packages
 
 ### 相关文档（分工）
@@ -211,7 +211,7 @@ canonical = `/openapi.json`、`/tools.json`；`buildAiPlugin()` 默认已改。D
 
 **框架集成：**
 
-- [x] `instrumentation.ts` + `registerAiHooks` 示例（D-06）— `examples/docs-site/instrumentation.ts` + `init` scaffolds
+- [x] `instrumentation.ts` + `instrumentation-node.ts` + `next-ai-ready/hooks`（D-06）— docs-site dogfood + init scaffold
 
 **清理 / 元信息（🟢）：**
 
@@ -232,9 +232,9 @@ canonical = `/openapi.json`、`/tools.json`；`buildAiPlugin()` 默认已改。D
 
 | 项 | 状态 | 说明 |
 |----|------|------|
-| 版本号 | ✅ | 全包 `0.1.0-alpha.6` |
-| Changesets | ✅ | `.changeset/alpha6-p2-batch.md` + `pnpm changeset:status` |
-| npm publish | ✅ | registry `@alpha` → `0.1.0-alpha.6`；`USE_NPM=1 external:smoke` 通过 |
+| 版本号 | ✅ | 全包 `0.1.0-alpha.7`（monorepo）；npm `@alpha` 待 publish |
+| Changesets | ✅ | `.changeset/alpha8-phase6-foundation.md` + `pnpm changeset:status` |
+| npm publish | 🟡 | registry `@alpha` → `0.1.0-alpha.6`；alpha.7 代码已就绪，待 `verify:release` + publish |
 | GitHub Actions CI | ✅ | `.github/workflows/ci.yml` |
 | 外部 e2e 验证 | ✅ | `scripts/e2e-smoke.mjs` |
 | CONTRIBUTING.md | ✅ | 2026-06-01 |
@@ -364,7 +364,7 @@ canonical = `/openapi.json`、`/tools.json`；`buildAiPlugin()` 默认已改。D
 
 ## 11. 建议的下一步（最短路径 → 0.1）
 
-P0、P1、P2 与 alpha.6 发布均已完成（2026-06-01）。
+P0、P1、P2 与 alpha.6 发布均已完成（2026-06-01）。**alpha.7**（hooks subpath、Edge-safe instrumentation、docs-site 同步）代码已合并，待发 npm。
 
 **下一步（→ 0.1 GA）：**
 

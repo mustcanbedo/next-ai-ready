@@ -102,17 +102,27 @@ npx next-ai-ready mcp      # 通过 stdio 运行 MCP 服务器（Claude Desktop 
 
 ```ts
 // instrumentation.ts
-import { registerAiHooks } from "@next-ai-ready/next"
+export async function register() {
+  if (process.env.NEXT_RUNTIME === "nodejs") {
+    await import("./instrumentation-node");
+  }
+}
+
+// instrumentation-node.ts
+import "server-only";
+import { registerAiHooks } from "next-ai-ready/hooks";
 
 registerAiHooks({
-  onAiRequest: (info) => analytics.track("ai_request", info),  // bot, ua, path, artifact
-  onInvoke:    (info) => analytics.track("ai_invoke", info),   // action, latency, ok, caller
+  onAiRequest: (info) => analytics.track("ai_request", info),
+  onInvoke:    (info) => analytics.track("ai_invoke", info),
 })
 ```
 
+请使用 `next-ai-ready/hooks` 子路径，避免在 Edge instrumentation 中加载 Node 专用模块。
+
 ## 状态
 
-🚧 **Pre-alpha**（`0.1.0-alpha.6`），但核心功能已实现并测试（9 个包共 146 个测试）：
+🚧 **Pre-alpha**（`0.1.0-alpha.7`），但核心功能已实现并测试（9 个包共 146 个测试）：
 
 - ✅ **知识平面** — MDX → 语义图 → `llms.txt` / `*.md` / `*.ai.json` / JSON-LD
 - ✅ **能力平面** — `defineAction` → `/api/actions/<name>` + OpenAPI 3.1 / `tools.json` / `ai-plugin.json`

@@ -51,7 +51,7 @@ npx next-ai-ready init
 This creates:
 
 - `ai-ready.config.mjs` — your site config (includes robots strategy notes)
-- `instrumentation.ts` — optional `registerAiHooks()` observability wiring
+- `instrumentation.ts` + `instrumentation-node.ts` — optional observability hooks (`next-ai-ready/hooks`, Edge-safe split)
 - `app/_ai-ready/` — route handlers for `llms.txt`, `openapi.json`, etc.
 - `app/api/actions/` — the action execution endpoint
 - `app/api/mcp/` — the MCP server endpoint

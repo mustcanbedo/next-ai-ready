@@ -101,8 +101,16 @@ Then `next build` and you're discoverable + callable by AI.
 Know which AI bots read your content and which actions agents invoke:
 
 ```ts
-// instrumentation.ts
-import { registerAiHooks } from "@next-ai-ready/next"
+// instrumentation.ts — runs in Node.js and Edge; keep Node-only imports in a separate file
+export async function register() {
+  if (process.env.NEXT_RUNTIME === "nodejs") {
+    await import("./instrumentation-node");
+  }
+}
+
+// instrumentation-node.ts
+import "server-only";
+import { registerAiHooks } from "next-ai-ready/hooks";
 
 registerAiHooks({
   onAiRequest: (info) => analytics.track("ai_request", info),  // bot, ua, path, artifact
@@ -110,9 +118,11 @@ registerAiHooks({
 })
 ```
 
+Use `next-ai-ready/hooks` (or `@next-ai-ready/next/hooks`) — not the main package entry — so Turbopack does not pull Node-only build code into the Edge instrumentation bundle.
+
 ## Status
 
-🚧 **Pre-alpha** (`0.1.0-alpha.6`), core stack implemented and tested (146 tests across 9 packages):
+🚧 **Pre-alpha** (`0.1.0-alpha.7`), core stack implemented and tested (146 tests across 9 packages):
 
 - ✅ **Knowledge plane** — MDX → semantic graph → `llms.txt` / `*.md` / `*.ai.json` / JSON-LD
 - ✅ **Capability plane** — `defineAction` → `/api/actions/<name>` + OpenAPI 3.1 / `tools.json` / `ai-plugin.json`

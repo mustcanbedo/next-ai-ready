@@ -27,7 +27,8 @@ AI endpoints (after `next-ai-ready build` / prebuild):
 | `ai-ready.config.mjs` | Framework config |
 | `app/_ai-ready/**` | Thin handler re-exports |
 | `actions/` | Demo Capability-plane actions |
-| `instrumentation.ts` | `registerAiHooks` example |
+| `instrumentation.ts` | Edge-safe entry — loads Node hooks when `NEXT_RUNTIME === "nodejs"` |
+| `instrumentation-node.ts` | `registerAiHooks` via `next-ai-ready/hooks` |
 
 Site UI reads MDX via `lib/docs.ts` (dual-track); AI artifacts come from the framework build pipeline.
 

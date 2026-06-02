@@ -4,8 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "prebuild": "next-ai-ready build",
-    "build": "next build",
+    "build": "pnpm exec next-ai-ready build && next build",
     "start": "next start"
   },
   "dependencies": {

@@ -2,9 +2,10 @@
 
 > AEO + Agent-API layer for Next.js App Router. Make your site readable by AI and callable by agents.
 
-<!-- BEGIN /en/api-reference/cli -->
+<!-- BEGIN /en/docs/api-reference/cli -->
 # CLI
-URL: https://next-ai-ready.dev/en/api-reference/cli
+URL: https://next-ai-ready.vercel.app/en/docs/api-reference/cli
+Updated: 2026-06-02
 
 # CLI
 
@@ -120,11 +121,12 @@ Use with Claude Desktop:
 | `1`  | Error (missing config, invalid actions, build failure). |
 | `2`  | Unknown command.                                        |
 
-<!-- END /en/api-reference/cli -->
+<!-- END /en/docs/api-reference/cli -->
 
-<!-- BEGIN /en/api-reference/config -->
+<!-- BEGIN /en/docs/api-reference/config -->
 # Configuration
-URL: https://next-ai-ready.dev/en/api-reference/config
+URL: https://next-ai-ready.vercel.app/en/docs/api-reference/config
+Updated: 2026-06-02
 
 # Configuration
 
@@ -186,11 +188,12 @@ Control which artifacts are generated:
 | --------- | --------- | ------- | ---------------------------------------------------------- |
 | `openapi` | `boolean` | `true`  | Generate `/openapi.json`, `/tools.json`, `/ai-plugin.json` |
 
-<!-- END /en/api-reference/config -->
+<!-- END /en/docs/api-reference/config -->
 
-<!-- BEGIN /en/api-reference/define-action -->
+<!-- BEGIN /en/docs/api-reference/define-action -->
 # defineAction
-URL: https://next-ai-ready.dev/en/api-reference/define-action
+URL: https://next-ai-ready.vercel.app/en/docs/api-reference/define-action
+Updated: 2026-06-02
 
 # defineAction
 
@@ -286,11 +289,12 @@ if (result.ok) {
 | `message`   | `string`  | Error message (only when `ok` is `false`).          |
 | `details`   | `unknown` | Zod issues (only when `code` is `"invalid_input"`). |
 
-<!-- END /en/api-reference/define-action -->
+<!-- END /en/docs/api-reference/define-action -->
 
-<!-- BEGIN /en/api-reference/define-semantic -->
+<!-- BEGIN /en/docs/api-reference/define-semantic -->
 # Semantic Metadata
-URL: https://next-ai-ready.dev/en/api-reference/define-semantic
+URL: https://next-ai-ready.vercel.app/en/docs/api-reference/define-semantic
+Updated: 2026-06-02
 
 # Semantic Metadata
 
@@ -366,11 +370,12 @@ All extraction is **deterministic**. The same MDX file with the same config alwa
 
 A pluggable `SemanticProvider` interface exists for LLM-augmented extraction, but no implementations ship in the MVP.
 
-<!-- END /en/api-reference/define-semantic -->
+<!-- END /en/docs/api-reference/define-semantic -->
 
-<!-- BEGIN /en/api-reference/with-ai-ready -->
+<!-- BEGIN /en/docs/api-reference/with-ai-ready -->
 # withAiReady
-URL: https://next-ai-ready.dev/en/api-reference/with-ai-ready
+URL: https://next-ai-ready.vercel.app/en/docs/api-reference/with-ai-ready
+Updated: 2026-06-02
 
 # withAiReady
 
@@ -455,11 +460,12 @@ export default withAiReady({ rewrites: false })({
 
 You still need the route handler files in `app/_ai-ready/` — the rewrites just map clean URLs to them.
 
-<!-- END /en/api-reference/with-ai-ready -->
+<!-- END /en/docs/api-reference/with-ai-ready -->
 
-<!-- BEGIN /en/concepts/capability-plane -->
+<!-- BEGIN /en/docs/concepts/capability-plane -->
 # Capability Plane
-URL: https://next-ai-ready.dev/en/concepts/capability-plane
+URL: https://next-ai-ready.vercel.app/en/docs/concepts/capability-plane
+Updated: 2026-06-02
 
 # Capability Plane
 
@@ -503,11 +509,12 @@ Actions are **private by default**. Set `public: true` to expose them to AI:
 
 The `whenToUse` field is critical for AI tool selection — it tells the model *when* this action is appropriate. The `doctor` CLI warns if a public action lacks `whenToUse`.
 
-<!-- END /en/concepts/capability-plane -->
+<!-- END /en/docs/concepts/capability-plane -->
 
-<!-- BEGIN /en/concepts/how-it-works -->
+<!-- BEGIN /en/docs/concepts/how-it-works -->
 # How It Works
-URL: https://next-ai-ready.dev/en/concepts/how-it-works
+URL: https://next-ai-ready.vercel.app/en/docs/concepts/how-it-works
+Updated: 2026-06-02
 
 # How It Works
 
@@ -560,11 +567,12 @@ The `withAiReady()` wrapper in `next.config.mjs` does two things:
 
 It does **not** register bundler plugins, inject routes, or use virtual modules. This keeps it Turbopack-safe.
 
-<!-- END /en/concepts/how-it-works -->
+<!-- END /en/docs/concepts/how-it-works -->
 
-<!-- BEGIN /en/concepts/knowledge-plane -->
+<!-- BEGIN /en/docs/concepts/knowledge-plane -->
 # Knowledge Plane
-URL: https://next-ai-ready.dev/en/concepts/knowledge-plane
+URL: https://next-ai-ready.vercel.app/en/docs/concepts/knowledge-plane
+Updated: 2026-06-02
 
 # Knowledge Plane
 
@@ -601,11 +609,12 @@ export const semantic = {
 
 Questions become `FAQPage` JSON-LD automatically — giving your pages a chance to appear in AI-generated FAQ results.
 
-<!-- END /en/concepts/knowledge-plane -->
+<!-- END /en/docs/concepts/knowledge-plane -->
 
-<!-- BEGIN /en/concepts/two-planes -->
+<!-- BEGIN /en/docs/concepts/two-planes -->
 # Two Planes
-URL: https://next-ai-ready.dev/en/concepts/two-planes
+URL: https://next-ai-ready.vercel.app/en/docs/concepts/two-planes
+Updated: 2026-06-02
 
 # Two Planes
 
@@ -647,11 +656,12 @@ The split reflects two fundamentally different problems:
 
 Keeping them separate means you can adopt one without the other. A docs-only site uses just the Knowledge Plane. An API-only site uses just the Capability Plane. Most sites use both.
 
-<!-- END /en/concepts/two-planes -->
+<!-- END /en/docs/concepts/two-planes -->
 
-<!-- BEGIN /en/decisions/adr-index -->
+<!-- BEGIN /en/docs/decisions/adr-index -->
 # Architecture Decisions
-URL: https://next-ai-ready.dev/en/decisions/adr-index
+URL: https://next-ai-ready.vercel.app/en/docs/decisions/adr-index
+Updated: 2026-06-02
 
 # Architecture Decisions
 
@@ -699,11 +709,12 @@ All semantic extraction is heuristic-based. No LLM calls. Same input + same conf
 
 Users author `actions/index.ts` that exports an array. No file-system scanning. This avoids `"use server"` collisions, is tree-shaking friendly, and gives users a union type of all actions.
 
-<!-- END /en/decisions/adr-index -->
+<!-- END /en/docs/decisions/adr-index -->
 
-<!-- BEGIN /en/getting-started/project-structure -->
+<!-- BEGIN /en/docs/getting-started/project-structure -->
 # Project Structure
-URL: https://next-ai-ready.dev/en/getting-started/project-structure
+URL: https://next-ai-ready.vercel.app/en/docs/getting-started/project-structure
+Updated: 2026-06-02
 
 # Project Structure
 
@@ -752,11 +763,12 @@ Created by `init` in `app/`. Each file is a one-line re-export — readable, aud
 
 - `instrumentation.ts` + `instrumentation-node.ts` — Next.js instrumentation (Node-only hooks via `next-ai-ready/hooks`). See [Analytics](/docs/guides/analytics).
 
-<!-- END /en/getting-started/project-structure -->
+<!-- END /en/docs/getting-started/project-structure -->
 
-<!-- BEGIN /en/guides/actions -->
+<!-- BEGIN /en/docs/guides/actions -->
 # Actions
-URL: https://next-ai-ready.dev/en/guides/actions
+URL: https://next-ai-ready.vercel.app/en/docs/guides/actions
+Updated: 2026-06-02
 
 # Actions
 
@@ -870,11 +882,12 @@ For each public action, the build produces:
 - A `POST /api/actions/<name>` HTTP endpoint.
 - An MCP tool definition in `/api/mcp`.
 
-<!-- END /en/guides/actions -->
+<!-- END /en/docs/guides/actions -->
 
-<!-- BEGIN /en/guides/analytics -->
+<!-- BEGIN /en/docs/guides/analytics -->
 # Analytics
-URL: https://next-ai-ready.dev/en/guides/analytics
+URL: https://next-ai-ready.vercel.app/en/docs/guides/analytics
+Updated: 2026-06-02
 
 # Analytics
 
@@ -971,11 +984,12 @@ The hooks are registered globally and called by the route handlers at request ti
 
 No external dependencies are required. The hooks are designed to be a thin integration point — bring your own analytics SDK.
 
-<!-- END /en/guides/analytics -->
+<!-- END /en/docs/guides/analytics -->
 
-<!-- BEGIN /en/guides/i18n-ai-urls -->
+<!-- BEGIN /en/docs/guides/i18n-ai-urls -->
 # i18n and AI-friendly URLs
-URL: https://next-ai-ready.dev/en/guides/i18n-ai-urls
+URL: https://next-ai-ready.vercel.app/en/docs/guides/i18n-ai-urls
+Updated: 2026-06-02
 
 # i18n and AI-friendly URLs
 
@@ -986,9 +1000,13 @@ URL: https://next-ai-ready.dev/en/guides/i18n-ai-urls
 ```text
 content/
   en/
-    docs/install.mdx
+    docs/
+      introduction.mdx
+      installation.mdx
+      guides/quickstart.mdx
   zh/
-    docs/install.mdx
+    docs/
+      introduction.mdx
 ```
 
 ```js
@@ -1026,11 +1044,12 @@ Use `sections` in config to prioritize one locale in `llms.txt`, or emit separat
 
 See [`docs/phase6-design.md`](../../../../docs/phase6-design.md) for planned `locale` metadata and cross-locale linking.
 
-<!-- END /en/guides/i18n-ai-urls -->
+<!-- END /en/docs/guides/i18n-ai-urls -->
 
-<!-- BEGIN /en/guides/mcp-integration -->
+<!-- BEGIN /en/docs/guides/mcp-integration -->
 # MCP Integration
-URL: https://next-ai-ready.dev/en/guides/mcp-integration
+URL: https://next-ai-ready.vercel.app/en/docs/guides/mcp-integration
+Updated: 2026-06-02
 
 # MCP Integration
 
@@ -1103,15 +1122,18 @@ These are declared as optional in `@next-ai-ready/next`. If they are not install
 - **Stdio + auth-gated actions:** MCP stdio uses a synthetic `Request` without browser cookies or session headers. Actions with `auth: (ctx) => ...` that expect real HTTP context may return 401 over stdio — use HTTP MCP or mark demo actions `public: true` for local testing (C-70).
 - You can disable auth entirely by passing `auth: false` to `createAiReadyMcpHandler()`, but this is not recommended in production.
 
-<!-- END /en/guides/mcp-integration -->
+<!-- END /en/docs/guides/mcp-integration -->
 
-<!-- BEGIN /en/guides/mdx-content -->
+<!-- BEGIN /en/docs/guides/mdx-content -->
 # Writing MDX Content
-URL: https://next-ai-ready.dev/en/guides/mdx-content
+URL: https://next-ai-ready.vercel.app/en/docs/guides/mdx-content
+Updated: 2026-06-02
 
 # Writing MDX Content
 
 The Knowledge Plane reads your MDX files and extracts structured metadata. This guide covers how to write content that produces the best results.
+
+> **Note (docs-site):** This documentation site uses a **dual-track** setup. The browser UI renders a simplified Markdown subset via `MdxContent`; the AI build pipeline runs the full `@next-ai-ready/mdx` compiler. Author frontmatter (`summary`, `questions`, `tags`) for the AI track even when the UI does not execute MDX exports.
 
 ## File location
 
@@ -1211,11 +1233,12 @@ From each MDX file, the compiler produces:
 
 All extraction is deterministic. No LLM calls.
 
-<!-- END /en/guides/mdx-content -->
+<!-- END /en/docs/guides/mdx-content -->
 
-<!-- BEGIN /en/guides/quickstart -->
+<!-- BEGIN /en/docs/guides/quickstart -->
 # Quickstart
-URL: https://next-ai-ready.dev/en/guides/quickstart
+URL: https://next-ai-ready.vercel.app/en/docs/guides/quickstart
+Updated: 2026-06-02
 
 # Quickstart
 
@@ -1292,11 +1315,12 @@ All checks should pass. Then start your dev server and visit:
 - Read about the [Capability Plane](/docs/concepts/capability-plane) to define custom actions
 - Check the [API Reference](/docs/api-reference/config) for full configuration options
 
-<!-- END /en/guides/quickstart -->
+<!-- END /en/docs/guides/quickstart -->
 
-<!-- BEGIN /en/guides/robots-txt -->
+<!-- BEGIN /en/docs/guides/robots-txt -->
 # Robots.txt
-URL: https://next-ai-ready.dev/en/guides/robots-txt
+URL: https://next-ai-ready.vercel.app/en/docs/guides/robots-txt
+Updated: 2026-06-02
 
 # Robots.txt
 
@@ -1386,11 +1410,12 @@ The framework detects these user agents:
 - `Bytespider` — ByteDance
 - `Applebot-Extended` — Apple
 
-<!-- END /en/guides/robots-txt -->
+<!-- END /en/docs/guides/robots-txt -->
 
-<!-- BEGIN /en/installation -->
+<!-- BEGIN /en/docs/installation -->
 # Installation
-URL: https://next-ai-ready.dev/en/installation
+URL: https://next-ai-ready.vercel.app/en/docs/installation
+Updated: 2026-06-02
 
 # Installation
 
@@ -1485,11 +1510,12 @@ npx next-ai-ready doctor --score
 
 Doctor checks your config, validates action exposure rules, detects `noai` meta, robots conflicts, and confirms route wiring. Use it in CI — exit 0 means no errors (warnings are OK).
 
-<!-- END /en/installation -->
+<!-- END /en/docs/installation -->
 
-<!-- BEGIN /en/introduction -->
+<!-- BEGIN /en/docs/introduction -->
 # Introduction
-URL: https://next-ai-ready.dev/en/introduction
+URL: https://next-ai-ready.vercel.app/en/docs/introduction
+Updated: 2026-06-02
 
 # Introduction
 
@@ -1531,11 +1557,12 @@ Your existing UI is untouched. The framework adds **new routes** that serve AI-o
 | `JSON-LD`       | Search engines         |
 | `/tools.json`   | OpenAI tool format     |
 
-<!-- END /en/introduction -->
+<!-- END /en/docs/introduction -->
 
-<!-- BEGIN /zh/api-reference/cli -->
+<!-- BEGIN /zh/docs/api-reference/cli -->
 # CLI
-URL: https://next-ai-ready.dev/zh/api-reference/cli
+URL: https://next-ai-ready.vercel.app/zh/docs/api-reference/cli
+Updated: 2026-06-02
 
 # CLI
 
@@ -1651,11 +1678,12 @@ npx next-ai-ready mcp
 | `1` | 错误（缺少配置、无效 action、构建失败）。 |
 | `2` | 未知命令。                    |
 
-<!-- END /zh/api-reference/cli -->
+<!-- END /zh/docs/api-reference/cli -->
 
-<!-- BEGIN /zh/api-reference/config -->
+<!-- BEGIN /zh/docs/api-reference/config -->
 # 配置
-URL: https://next-ai-ready.dev/zh/api-reference/config
+URL: https://next-ai-ready.vercel.app/zh/docs/api-reference/config
+Updated: 2026-06-02
 
 # 配置
 
@@ -1717,11 +1745,12 @@ export default defineActions([ ... ]);
 | --------- | --------- | ------ | -------------------------------------------------- |
 | `openapi` | `boolean` | `true` | 生成 `/openapi.json`、`/tools.json`、`/ai-plugin.json` |
 
-<!-- END /zh/api-reference/config -->
+<!-- END /zh/docs/api-reference/config -->
 
-<!-- BEGIN /zh/api-reference/define-action -->
+<!-- BEGIN /zh/docs/api-reference/define-action -->
 # defineAction
-URL: https://next-ai-ready.dev/zh/api-reference/define-action
+URL: https://next-ai-ready.vercel.app/zh/docs/api-reference/define-action
+Updated: 2026-06-02
 
 # defineAction
 
@@ -1817,11 +1846,12 @@ if (result.ok) {
 | `message`   | `string`  | 错误信息（仅当 `ok` 为 `false`）。                   |
 | `details`   | `unknown` | Zod issues（仅当 `code` 为 `"invalid_input"`）。 |
 
-<!-- END /zh/api-reference/define-action -->
+<!-- END /zh/docs/api-reference/define-action -->
 
-<!-- BEGIN /zh/api-reference/define-semantic -->
+<!-- BEGIN /zh/docs/api-reference/define-semantic -->
 # 语义元数据
-URL: https://next-ai-ready.dev/zh/api-reference/define-semantic
+URL: https://next-ai-ready.vercel.app/zh/docs/api-reference/define-semantic
+Updated: 2026-06-02
 
 # 语义元数据
 
@@ -1897,11 +1927,12 @@ reviewedBy:
 
 存在可插拔的 `SemanticProvider` 接口用于 LLM 增强提取，但 MVP 中不提供任何实现。
 
-<!-- END /zh/api-reference/define-semantic -->
+<!-- END /zh/docs/api-reference/define-semantic -->
 
-<!-- BEGIN /zh/api-reference/with-ai-ready -->
+<!-- BEGIN /zh/docs/api-reference/with-ai-ready -->
 # withAiReady
-URL: https://next-ai-ready.dev/zh/api-reference/with-ai-ready
+URL: https://next-ai-ready.vercel.app/zh/docs/api-reference/with-ai-ready
+Updated: 2026-06-02
 
 # withAiReady
 
@@ -1986,11 +2017,12 @@ export default withAiReady({ rewrites: false })({
 
 你仍然需要 `app/_ai-ready/` 中的 route handler 文件——rewrite 只是将干净 URL 映射到它们。
 
-<!-- END /zh/api-reference/with-ai-ready -->
+<!-- END /zh/docs/api-reference/with-ai-ready -->
 
-<!-- BEGIN /zh/concepts/capability-plane -->
+<!-- BEGIN /zh/docs/concepts/capability-plane -->
 # 能力平面
-URL: https://next-ai-ready.dev/zh/concepts/capability-plane
+URL: https://next-ai-ready.vercel.app/zh/docs/concepts/capability-plane
+Updated: 2026-06-02
 
 # 能力平面
 
@@ -2034,11 +2066,12 @@ Action **默认私有**。设置 `public: true` 将其暴露给 AI：
 
 `whenToUse` 字段对 AI 工具选择至关重要 —— 它告诉模型*何时*该 Action 是合适的。`doctor` CLI 会在公开 Action 缺少 `whenToUse` 时发出警告。
 
-<!-- END /zh/concepts/capability-plane -->
+<!-- END /zh/docs/concepts/capability-plane -->
 
-<!-- BEGIN /zh/concepts/how-it-works -->
+<!-- BEGIN /zh/docs/concepts/how-it-works -->
 # 工作原理
-URL: https://next-ai-ready.dev/zh/concepts/how-it-works
+URL: https://next-ai-ready.vercel.app/zh/docs/concepts/how-it-works
+Updated: 2026-06-02
 
 # 工作原理
 
@@ -2091,11 +2124,12 @@ URL: https://next-ai-ready.dev/zh/concepts/how-it-works
 
 它**不**注册 bundler 插件、不注入路由、不使用虚拟模块。这保证了 Turbopack 兼容性。
 
-<!-- END /zh/concepts/how-it-works -->
+<!-- END /zh/docs/concepts/how-it-works -->
 
-<!-- BEGIN /zh/concepts/knowledge-plane -->
+<!-- BEGIN /zh/docs/concepts/knowledge-plane -->
 # 知识平面
-URL: https://next-ai-ready.dev/zh/concepts/knowledge-plane
+URL: https://next-ai-ready.vercel.app/zh/docs/concepts/knowledge-plane
+Updated: 2026-06-02
 
 # 知识平面
 
@@ -2132,11 +2166,12 @@ export const semantic = {
 
 Questions 会自动成为 `FAQPage` JSON-LD —— 让你的页面有机会出现在 AI 生成的 FAQ 结果中。
 
-<!-- END /zh/concepts/knowledge-plane -->
+<!-- END /zh/docs/concepts/knowledge-plane -->
 
-<!-- BEGIN /zh/concepts/two-planes -->
+<!-- BEGIN /zh/docs/concepts/two-planes -->
 # 双平面
-URL: https://next-ai-ready.dev/zh/concepts/two-planes
+URL: https://next-ai-ready.vercel.app/zh/docs/concepts/two-planes
+Updated: 2026-06-02
 
 # 双平面
 
@@ -2178,11 +2213,12 @@ URL: https://next-ai-ready.dev/zh/concepts/two-planes
 
 分开意味着你可以只采用其中一个。纯文档站只用知识平面。纯 API 站只用能力平面。大多数站点两者都用。
 
-<!-- END /zh/concepts/two-planes -->
+<!-- END /zh/docs/concepts/two-planes -->
 
-<!-- BEGIN /zh/decisions/adr-index -->
+<!-- BEGIN /zh/docs/decisions/adr-index -->
 # 架构决策
-URL: https://next-ai-ready.dev/zh/decisions/adr-index
+URL: https://next-ai-ready.vercel.app/zh/docs/decisions/adr-index
+Updated: 2026-06-02
 
 # 架构决策
 
@@ -2230,11 +2266,12 @@ Action 默认私有。必须设置 `public: true` 才能通过 HTTP 或 MCP 暴�
 
 用户编写导出数组的 `actions/index.ts`。无文件系统扫描。这避免了 `"use server"` 冲突，对 tree-shaking 友好，并给用户提供所有 action 的联合类型。
 
-<!-- END /zh/decisions/adr-index -->
+<!-- END /zh/docs/decisions/adr-index -->
 
-<!-- BEGIN /zh/getting-started/project-structure -->
+<!-- BEGIN /zh/docs/getting-started/project-structure -->
 # 项目结构
-URL: https://next-ai-ready.dev/zh/getting-started/project-structure
+URL: https://next-ai-ready.vercel.app/zh/docs/getting-started/project-structure
+Updated: 2026-06-02
 
 # 项目结构
 
@@ -2283,11 +2320,12 @@ URL: https://next-ai-ready.dev/zh/getting-started/project-structure
 
 - `instrumentation.ts` + `instrumentation-node.ts` — Next.js instrumentation（通过 `next-ai-ready/hooks` 注册 Node 专用 hook）。详见 [分析](/docs/guides/analytics)。
 
-<!-- END /zh/getting-started/project-structure -->
+<!-- END /zh/docs/getting-started/project-structure -->
 
-<!-- BEGIN /zh/guides/actions -->
+<!-- BEGIN /zh/docs/guides/actions -->
 # Actions
-URL: https://next-ai-ready.dev/zh/guides/actions
+URL: https://next-ai-ready.vercel.app/zh/docs/guides/actions
+Updated: 2026-06-02
 
 # Actions
 
@@ -2401,11 +2439,12 @@ defineAction({
 - `POST /api/actions/<name>` HTTP 端点。
 - `/api/mcp` 中的 MCP 工具定义。
 
-<!-- END /zh/guides/actions -->
+<!-- END /zh/docs/guides/actions -->
 
-<!-- BEGIN /zh/guides/analytics -->
+<!-- BEGIN /zh/docs/guides/analytics -->
 # 分析
-URL: https://next-ai-ready.dev/zh/guides/analytics
+URL: https://next-ai-ready.vercel.app/zh/docs/guides/analytics
+Updated: 2026-06-02
 
 # 分析
 
@@ -2502,11 +2541,12 @@ Hook 全局注册，由 route handler 在请求时调用。它们在 handler 执
 
 不需要外部依赖。Hook 被设计为薄集成点——自行引入你的分析 SDK。
 
-<!-- END /zh/guides/analytics -->
+<!-- END /zh/docs/guides/analytics -->
 
-<!-- BEGIN /zh/guides/i18n-ai-urls -->
+<!-- BEGIN /zh/docs/guides/i18n-ai-urls -->
 # 国际化与 AI 友好 URL
-URL: https://next-ai-ready.dev/zh/guides/i18n-ai-urls
+URL: https://next-ai-ready.vercel.app/zh/docs/guides/i18n-ai-urls
+Updated: 2026-06-02
 
 # 国际化与 AI 友好 URL
 
@@ -2517,9 +2557,13 @@ URL: https://next-ai-ready.dev/zh/guides/i18n-ai-urls
 ```text
 content/
   en/
-    docs/install.mdx
+    docs/
+      introduction.mdx
+      installation.mdx
+      guides/quickstart.mdx
   zh/
-    docs/install.mdx
+    docs/
+      introduction.mdx
 ```
 
 ```js
@@ -2554,11 +2598,12 @@ export const config = {
 
 见 [`docs/phase6-design.md`](../../../../docs/phase6-design.md)。
 
-<!-- END /zh/guides/i18n-ai-urls -->
+<!-- END /zh/docs/guides/i18n-ai-urls -->
 
-<!-- BEGIN /zh/guides/mcp-integration -->
+<!-- BEGIN /zh/docs/guides/mcp-integration -->
 # MCP 集成
-URL: https://next-ai-ready.dev/zh/guides/mcp-integration
+URL: https://next-ai-ready.vercel.app/zh/docs/guides/mcp-integration
+Updated: 2026-06-02
 
 # MCP 集成
 
@@ -2632,15 +2677,18 @@ pnpm add @modelcontextprotocol/sdk mcp-handler
 - 可通过 `createAiReadyMcpHandler({ auth: false })` 关闭 HTTP 鉴权，生产环境不推荐。
 - 可以通过传递 `auth: false` 给 `createAiReadyMcpHandler()` 完全禁用认证，但不建议在生产环境中这样做。
 
-<!-- END /zh/guides/mcp-integration -->
+<!-- END /zh/docs/guides/mcp-integration -->
 
-<!-- BEGIN /zh/guides/mdx-content -->
+<!-- BEGIN /zh/docs/guides/mdx-content -->
 # 编写 MDX 内容
-URL: https://next-ai-ready.dev/zh/guides/mdx-content
+URL: https://next-ai-ready.vercel.app/zh/docs/guides/mdx-content
+Updated: 2026-06-02
 
 # 编写 MDX 内容
 
 知识平面读取你的 MDX 文件并提取结构化元数据。本指南介绍如何编写产出最佳结果的内容。
+
+> **说明（docs-site）：** 本站采用**双轨**架构。浏览器 UI 通过 `MdxContent` 渲染简化 Markdown；AI 构建管线使用完整的 `@next-ai-ready/mdx` 编译器。请为 AI 轨编写 frontmatter（`summary`、`questions`、`tags`），即使 UI 轨不执行 MDX export。
 
 ## 文件位置
 
@@ -2740,11 +2788,12 @@ pnpm add next-ai-ready
 
 所有提取都是确定性的，无 LLM 调用。
 
-<!-- END /zh/guides/mdx-content -->
+<!-- END /zh/docs/guides/mdx-content -->
 
-<!-- BEGIN /zh/guides/quickstart -->
+<!-- BEGIN /zh/docs/guides/quickstart -->
 # 快速开始
-URL: https://next-ai-ready.dev/zh/guides/quickstart
+URL: https://next-ai-ready.vercel.app/zh/docs/guides/quickstart
+Updated: 2026-06-02
 
 # 快速开始
 
@@ -2821,11 +2870,12 @@ npx next-ai-ready doctor
 - 阅读[能力平面](/zh/docs/concepts/capability-plane)了解自定义 Action
 - 查看 [API 参考](/docs/api-reference/config)了解完整配置选项
 
-<!-- END /zh/guides/quickstart -->
+<!-- END /zh/docs/guides/quickstart -->
 
-<!-- BEGIN /zh/guides/robots-txt -->
+<!-- BEGIN /zh/docs/guides/robots-txt -->
 # Robots.txt
-URL: https://next-ai-ready.dev/zh/guides/robots-txt
+URL: https://next-ai-ready.vercel.app/zh/docs/guides/robots-txt
+Updated: 2026-06-02
 
 # Robots.txt
 
@@ -2915,11 +2965,12 @@ robots: {
 - `Bytespider` — ByteDance
 - `Applebot-Extended` — Apple
 
-<!-- END /zh/guides/robots-txt -->
+<!-- END /zh/docs/guides/robots-txt -->
 
-<!-- BEGIN /zh/installation -->
+<!-- BEGIN /zh/docs/installation -->
 # 安装
-URL: https://next-ai-ready.dev/zh/installation
+URL: https://next-ai-ready.vercel.app/zh/docs/installation
+Updated: 2026-06-02
 
 # 安装
 
@@ -3014,11 +3065,12 @@ npx next-ai-ready doctor --score
 
 Doctor 检查配置、action 暴露规则、`noai` meta、robots 冲突及路由接线。可在 CI 中使用 — exit 0 表示无 error（warning 可接受）。
 
-<!-- END /zh/installation -->
+<!-- END /zh/docs/installation -->
 
-<!-- BEGIN /zh/introduction -->
+<!-- BEGIN /zh/docs/introduction -->
 # 简介
-URL: https://next-ai-ready.dev/zh/introduction
+URL: https://next-ai-ready.vercel.app/zh/docs/introduction
+Updated: 2026-06-02
 
 # 简介
 
@@ -3060,4 +3112,4 @@ npx next-ai-ready build
 | `JSON-LD`       | 搜索引擎                  |
 | `/tools.json`   | OpenAI 工具格式           |
 
-<!-- END /zh/introduction -->
+<!-- END /zh/docs/introduction -->

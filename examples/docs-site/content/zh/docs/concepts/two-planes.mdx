@@ -1,0 +1,56 @@
+---
+title: 双平面
+summary: 知识平面和能力平面——各自的作用及分离的原因。
+order: 3
+questions:
+  - q: 双平面 是什么？
+    a: 知识平面和能力平面——各自的作用及分离的原因。
+  - q: 阅读「双平面」能解决什么问题？
+    a: 知识平面和能力平面——各自的作用及分离的原因。
+tags:
+  - architecture
+  - knowledge-plane
+  - capability-plane
+updatedAt: '2026-06-02'
+author: next-ai-ready 团队
+---
+
+# 双平面
+
+`next-ai-ready` 将 AI 就绪性分为两个独立平面。理解这个划分是有效使用框架的关键。
+
+## 知识平面
+
+知识平面让你的**内容**被 AI 可读。它读取 MDX 文件，生成 LLM、AI 搜索引擎和 RAG 管线可消费的产物：
+
+- `llms.txt` — 遵循 [llmstxt.org](https://llmstxt.org) 提案的全站索引。
+- `/<route>.md` — 每个页面的干净 Markdown（JSX 已剥离）。
+- `/<route>.ai.json` — 结构化 JSON，包含标题、摘要、主题、FAQ、实体和分块。
+- JSON-LD — `Article`、`FAQPage`、`WebPage` 和 `BreadcrumbList` 块，供搜索引擎使用。
+
+管线是**确定性的**：相同的输入文件加相同的配置产出字节级一致的输出。无 LLM 调用，无 API 密钥，无随机性。
+
+详见 [知识平面](/docs/concepts/knowledge-plane)。
+
+## 能力平面
+
+能力平面让你的**功能**被 AI agent 调用。它读取 `defineAction()` 定义，生成：
+
+- `/openapi.json` — 所有公开 action 的 OpenAPI 3.1 规范。
+- `/tools.json` — OpenAI function-calling 格式的工具定义。
+- `/.well-known/ai-plugin.json` — AI 网关的插件清单。
+- `POST /api/actions/<name>` — 每个 action 的 HTTP 端点。
+- `/api/mcp` — MCP 服务器（HTTP + stdio），供 Claude Desktop、Cursor 等 MCP 客户端使用。
+
+每个 action 都有 Zod schema 进行输入验证、显式可见性控制（需设置 `public: true`）和可选的 auth hook。
+
+详见 [能力平面](/docs/concepts/capability-plane)。
+
+## 为什么分两个平面？
+
+这个划分反映了两个根本不同的问题：
+
+1. **内容是只读的。** AI 消费者摄取你的文档，不会修改它们。管线是静态的、可缓存的、确定性的。
+2. **功能是交互式的。** AI agent 代表用户调用你的 action；结果取决于运行时状态。管线需要验证、认证和错误处理。
+
+分开意味着你可以只采用其中一个。纯文档站只用知识平面。纯 API 站只用能力平面。大多数站点两者都用。

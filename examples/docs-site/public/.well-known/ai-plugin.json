@@ -1,15 +1,15 @@
 {
   "api": {
     "type": "openapi",
-    "url": "https://next-ai-ready.dev/openapi.json"
+    "url": "https://next-ai-ready.vercel.app/openapi.json"
   },
   "auth": {
     "type": "none"
   },
   "description_for_human": "AEO + Agent-API layer for Next.js App Router. Make your site readable by AI and callable by agents.",
   "description_for_model": "AEO + Agent-API layer for Next.js App Router. Make your site readable by AI and callable by agents.",
-  "legal_info_url": "https://next-ai-ready.dev",
-  "logo_url": "https://next-ai-ready.dev/icon.png",
+  "legal_info_url": "https://next-ai-ready.vercel.app",
+  "logo_url": "https://next-ai-ready.vercel.app/icon.png",
   "name_for_human": "next-ai-ready",
   "name_for_model": "next_ai_ready",
   "schema_version": "v1"

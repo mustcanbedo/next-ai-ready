@@ -1,0 +1,109 @@
+---
+title: defineAction
+summary: API reference for defineAction() and defineActions().
+order: 2
+questions:
+  - q: What is defineAction?
+    a: API reference for defineAction() and defineActions().
+  - q: What will I learn from defineAction?
+    a: API reference for defineAction() and defineActions().
+tags:
+  - api
+  - reference
+updatedAt: '2026-06-02'
+author: next-ai-ready team
+---
+
+# defineAction
+
+`defineAction()` creates a typed, AI-callable action. It is the primary API of the Capability Plane.
+
+## Import
+
+```ts
+import { defineAction, defineActions } from "@next-ai-ready/actions"
+```
+
+## `defineAction<I, O>(def)`
+
+Creates a single action definition. Returns the same object (identity function).
+
+```ts
+const search = defineAction({
+  name: "search_products",
+  description: "Search the product catalogue.",
+  whenToUse: "When the user wants to find products.",
+  public: true,
+  input: z.object({ query: z.string() }),
+  output: z.object({ items: z.array(z.object({ id: z.string(), title: z.string() })) }),
+  handler: async ({ query }) => {
+    return { items: await db.search(query) }
+  },
+})
+```
+
+### Parameters
+
+| Field | Type | Required | Description |
+|---|---|---|---|
+| `name` | `string` | yes | Unique identifier. Must match `^[a-z][a-z0-9_]*$` (snake_case). |
+| `description` | `string` | yes | Human-readable description. Shown in OpenAPI and MCP tool lists. |
+| `whenToUse` | `string` | recommended | Guidance for AI agents on when to call this action. |
+| `whenNotToUse` | `string` | no | Negative guidance — when NOT to call this action. |
+| `input` | `ZodSchema` | yes | Zod schema for the input. Converted to JSON Schema at build time. |
+| `output` | `ZodSchema` | no | Zod schema for the output. Included in OpenAPI spec. |
+| `tags` | `string[]` | no | Categorization tags. Appear in OpenAPI `tags` field. |
+| `examples` | `{ input, output? }[]` | no | Example invocations. Used by AI agents for context. |
+| `public` | `boolean` | no | Default `false`. Must be `true` for HTTP/MCP exposure. |
+| `auth` | `(req: Request) => boolean \| Promise<boolean>` | no | Per-action auth gate. Runs before handler. |
+| `handler` | `(input, ctx) => Promise<O> \| O` | yes | The action implementation. |
+
+### ActionContext
+
+The second argument to `handler`:
+
+| Field | Type | Description |
+|---|---|---|
+| `request` | `Request` | Original HTTP request. |
+| `headers` | `Headers` | Request headers. |
+| `cookies` | `object` | `cookies.get(name)` returns `{ value }` or `undefined`. |
+| `caller` | `string?` | `"http"` or `"mcp"`. |
+
+## `defineActions(actions)`
+
+Registers an array of actions. Returns the same array. Used as the default export of your actions module:
+
+```js
+import { defineActions } from "@next-ai-ready/actions"
+import search from "./search.js"
+import getOrder from "./get-order.js"
+
+export default defineActions([search, getOrder])
+```
+
+Calling `defineActions()` has a side effect: it populates the global action registry. This is intentional — the build CLI and runtime handlers both rely on the registry being populated when the module is imported.
+
+## `invokeAction(name, input, ctx)`
+
+Programmatically invoke an action. Returns a discriminated union:
+
+```ts
+const result = await invokeAction("search_products", { query: "shoes" }, ctx)
+if (result.ok) {
+  console.log(result.data)      // typed output
+} else {
+  console.error(result.code)    // "not_found" | "not_public" | "unauthorized" | "invalid_input" | "handler_error"
+  console.error(result.message)
+}
+```
+
+| Field | Type | Description |
+|---|---|---|
+| `ok` | `boolean` | Whether the invocation succeeded. |
+| `data` | `O` | Output (only when `ok` is `true`). |
+| `action` | `string` | Action name. |
+| `latencyMs` | `number` | Handler execution time. |
+| `status` | `number` | HTTP status code (only when `ok` is `false`). |
+| `code` | `string` | Error code (only when `ok` is `false`). |
+| `message` | `string` | Error message (only when `ok` is `false`). |
+| `details` | `unknown` | Zod issues (only when `code` is `"invalid_input"`). |

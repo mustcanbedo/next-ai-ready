@@ -1,0 +1,127 @@
+---
+title: Actions
+summary: 如何定义、暴露和保护 AI 可调用的 action。
+order: 3
+questions:
+  - q: Actions 是什么？
+    a: 如何定义、暴露和保护 AI 可调用的 action。
+  - q: 阅读「Actions」能解决什么问题？
+    a: 如何定义、暴露和保护 AI 可调用的 action。
+tags:
+  - how-to
+  - best-practices
+updatedAt: '2026-06-02'
+author: next-ai-ready 团队
+---
+
+# Actions
+
+Action 是能力平面的构建块。每个 action 是一个带类型的函数，AI agent 可以发现并调用。
+
+## 定义 action
+
+在 `actions/` 目录下创建文件，使用 `defineAction()`：
+
+```js
+import { defineAction } from "@next-ai-ready/actions"
+import { z } from "zod"
+
+export default defineAction({
+  name: "search_products",
+  description: "在产品目录中进行全文搜索。",
+  whenToUse: "当用户想要按名称或特性查找产品时。",
+  whenNotToUse: "当用户想要查看订单状态时。",
+  public: true,
+  tags: ["catalog"],
+  input: z.object({
+    query: z.string().min(1),
+    limit: z.number().int().optional(),
+  }),
+  output: z.object({
+    items: z.array(z.object({ id: z.string(), title: z.string() })),
+  }),
+  handler: async ({ query, limit }) => {
+    const results = await db.products.search(query, limit ?? 10)
+    return { items: results }
+  },
+})
+```
+
+## 注册 action
+
+在 `actions/index.mjs` 中使用 `defineActions()` 一次性注册多个 action：
+
+```js
+import { defineActions } from "@next-ai-ready/actions"
+import searchProducts from "./search-products.js"
+import getOrderStatus from "./get-order-status.js"
+
+export default defineActions([searchProducts, getOrderStatus])
+```
+
+模块路径在 `ai-ready.config.mjs` 中设置：
+
+```js
+actions: "./actions/index.mjs"
+```
+
+## 可见性
+
+action **默认私有**。设置 `public: true` 以通过 HTTP 和 MCP 暴露：
+
+- **私有**（`public: false`，默认）— 仅可通过 `invokeAction()` 从服务端代码调用。
+- **公开**（`public: true`）— 出现在 `/openapi.json`、`/tools.json` 和 `/api/mcp` 中。可通过 `POST /api/actions/<name>` 调用。
+
+构建 CLI 会在公开 action 缺少 `whenToUse` 时发出警告——此字段对 AI 工具选择至关重要。
+
+## 输入验证
+
+`input` 字段接受任何 Zod schema。运行时使用 `safeParse` 验证请求并返回结构化错误：
+
+```json
+{
+  "ok": false,
+  "code": "invalid_input",
+  "message": "Validation failed",
+  "details": [{ "path": ["query"], "message": "Required" }]
+}
+```
+
+## Auth hook
+
+添加 `auth` 函数来控制每个 action 的访问：
+
+```js
+defineAction({
+  name: "delete_user",
+  public: true,
+  auth: (req) => {
+    const token = req.headers.get("authorization")
+    return token === `Bearer ${process.env.ADMIN_TOKEN}`
+  },
+  input: z.object({ id: z.string() }),
+  handler: async ({ id }) => { /* ... */ },
+})
+```
+
+`auth` 函数在 handler 之前运行。返回 `false`（或 resolve 为 `false` 的 Promise）将拒绝请求并返回 401。
+
+## Action context
+
+`handler` 的第二个参数是 `ActionContext` 对象：
+
+| 字段 | 类型 | 说明 |
+|---|---|---|
+| `request` | `Request` | 原始 HTTP 请求。 |
+| `headers` | `Headers` | 请求头。 |
+| `cookies` | `object` | `cookies.get(name)` 返回 `{ value }` 或 `undefined`。 |
+| `caller` | `string?` | 调用者标识（如 `"mcp"`、`"http"`）。 |
+
+## 生成的产物
+
+每个公开 action 会生成：
+
+- `/openapi.json` 中的一个条目（OpenAPI 3.1 `POST` 操作）。
+- `/tools.json` 中的一个条目（OpenAI function-calling 格式）。
+- `POST /api/actions/<name>` HTTP 端点。
+- `/api/mcp` 中的 MCP 工具定义。

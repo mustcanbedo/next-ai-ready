@@ -1,0 +1,103 @@
+---
+title: Robots.txt
+summary: Configure your robots.txt to explicitly allow or block AI crawlers.
+order: 6
+questions:
+  - q: What is Robots.txt?
+    a: Configure your robots.txt to explicitly allow or block AI crawlers.
+  - q: What will I learn from Robots.txt?
+    a: Configure your robots.txt to explicitly allow or block AI crawlers.
+tags:
+  - how-to
+  - best-practices
+updatedAt: '2026-06-02'
+author: next-ai-ready team
+---
+
+# Robots.txt
+
+`next-ai-ready` generates a `robots.txt` that explicitly declares your AI-bot policy. This is important because AI crawlers need clear signals about what they can access.
+
+## Default behavior
+
+By default, `npx next-ai-ready build` writes `public/robots.txt` that **allows** all AI bots:
+
+```
+User-agent: *
+Allow: /
+
+# AI-specific rules
+User-agent: GPTBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+# ... (one block per known AI bot)
+
+# AI-readable content
+# llms.txt: https://your-site.com/llms.txt
+# llms-full.txt: https://your-site.com/llms-full.txt
+```
+
+Each known AI bot gets an explicit `Allow: /` block. Comments point to your `llms.txt` and `llms-full.txt` endpoints.
+
+## Configuration
+
+Control robots.txt behavior in `ai-ready.config.mjs`:
+
+```js
+export default defineConfig({
+  site: { /* ... */ },
+  robots: {
+    aiBots: "allow",       // "allow" (default) or "disallow"
+    sitemap: true,         // true = auto-generate, string = custom URL
+    extra: [
+      "Disallow: /admin/",
+    ],
+  },
+})
+```
+
+| Field | Type | Default | Description |
+|---|---|---|---|
+| `aiBots` | `"allow" \| "disallow"` | `"allow"` | Whether AI bots can crawl your site. |
+| `sitemap` | `boolean \| string` | `false` | `true` = auto-generate `Sitemap: <baseUrl>/sitemap.xml`. String = use as-is. |
+| `extra` | `string[]` | `[]` | Raw lines appended verbatim to the output. |
+
+## Disabling AI bots
+
+To block all AI crawlers:
+
+```js
+robots: {
+  aiBots: "disallow",
+}
+```
+
+This generates `Disallow: /` for every known AI bot user agent.
+
+## Static vs dynamic
+
+By default, `robots.txt` is written to `public/` as a static file. This is the simplest and cheapest approach — it works on any hosting provider.
+
+If you need dynamic robots.txt (e.g. per-request A/B testing), you can:
+
+1. Set `emit: { robots: false }` in config to skip static generation.
+2. Create `app/robots.ts` using Next.js built-in robots support.
+3. Use `buildRobotsTxt()` from `@next-ai-ready/core` to generate the content programmatically.
+
+## Known AI bots
+
+The framework detects these user agents:
+
+- `GPTBot` — OpenAI
+- `OAI-SearchBot` — OpenAI Search
+- `ChatGPT-User` — ChatGPT browsing
+- `PerplexityBot` — Perplexity
+- `ClaudeBot` — Anthropic
+- `anthropic-ai` — Anthropic
+- `Google-Extended` — Google AI
+- `CCBot` — Common Crawl
+- `Bytespider` — ByteDance
+- `Applebot-Extended` — Apple

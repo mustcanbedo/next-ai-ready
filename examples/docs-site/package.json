@@ -4,8 +4,10 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "node ../../packages/meta/dist/cli.js build && next build",
-    "start": "next start"
+    "prebuild": "node ../../packages/meta/dist/cli.js build # next-ai-ready build",
+    "build": "next build",
+    "start": "next start",
+    "smoke": "node scripts/docs-site-smoke.mjs"
   },
   "dependencies": {
     "@next-ai-ready/actions": "workspace:*",

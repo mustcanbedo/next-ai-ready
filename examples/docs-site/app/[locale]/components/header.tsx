@@ -55,14 +55,16 @@ export function Header({ locale, messages }: HeaderProps) {
         {/* Spacer */}
         <div className="flex-1" />
 
-        {/* Search placeholder */}
-        <div className="hidden lg:flex items-center gap-2 h-9 px-3.5 rounded-lg bg-white/[0.04] border border-white/[0.06] text-text-tertiary/60 text-[13px] mr-4 cursor-pointer hover:bg-white/[0.06] hover:border-white/[0.08] transition-all w-56">
+        {/* Docs entry — search UI is not wired yet; link to docs index */}
+        <Link
+          href={`/${locale}/docs/introduction`}
+          className="hidden lg:flex items-center gap-2 h-9 px-3.5 rounded-lg bg-white/[0.04] border border-white/[0.06] text-text-tertiary/60 text-[13px] mr-4 hover:bg-white/[0.06] hover:border-white/[0.08] hover:text-text-secondary transition-all w-56"
+        >
           <svg className="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
           </svg>
-          <span>{locale === "en" ? "Search docs..." : "搜索文档..."}</span>
-          <kbd className="ml-auto text-[11px] font-mono text-text-tertiary/40 border border-white/[0.06] rounded px-1.5 py-0.5">⌘K</kbd>
-        </div>
+          <span>{locale === "en" ? "Browse docs" : "浏览文档"}</span>
+        </Link>
 
         {/* Actions */}
         <div className="flex items-center gap-1">

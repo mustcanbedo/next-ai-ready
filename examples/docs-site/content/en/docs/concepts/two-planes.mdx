@@ -1,0 +1,62 @@
+---
+title: Two Planes
+summary: >-
+  The Knowledge plane and Capability plane — what each one does and why they are
+  separate.
+order: 3
+questions:
+  - q: What is Two Planes?
+    a: >-
+      The Knowledge plane and Capability plane — what each one does and why they
+      are separate.
+  - q: What will I learn from Two Planes?
+    a: >-
+      The Knowledge plane and Capability plane — what each one does and why they
+      are separate.
+tags:
+  - architecture
+  - knowledge-plane
+  - capability-plane
+updatedAt: '2026-06-02'
+author: next-ai-ready team
+---
+
+# Two Planes
+
+`next-ai-ready` organizes AI-readiness into two distinct planes. Understanding the split is key to using the framework effectively.
+
+## Knowledge Plane
+
+The Knowledge Plane makes your **content** readable by AI. It takes your MDX files and produces artifacts that LLMs, AI search engines, and RAG pipelines can consume:
+
+- `llms.txt` — a site-wide index following the [llmstxt.org](https://llmstxt.org) proposal.
+- `/<route>.md` — clean Markdown for each page (JSX stripped).
+- `/<route>.ai.json` — structured JSON with title, summary, topics, FAQ, entities, and chunks.
+- JSON-LD — `Article`, `FAQPage`, `WebPage`, and `BreadcrumbList` blocks for search engines.
+
+The pipeline is **deterministic**: same input files plus same config produce byte-identical output. No LLM calls, no API keys, no randomness.
+
+See [Knowledge Plane](/docs/concepts/knowledge-plane) for details.
+
+## Capability Plane
+
+The Capability Plane makes your **features** callable by AI agents. It takes your `defineAction()` definitions and produces:
+
+- `/openapi.json` — OpenAPI 3.1 spec for all public actions.
+- `/tools.json` — tool definitions in OpenAI function-calling format.
+- `/.well-known/ai-plugin.json` — plugin manifest for AI gateways.
+- `POST /api/actions/<name>` — HTTP endpoint for each action.
+- `/api/mcp` — MCP server (HTTP + stdio) for Claude Desktop, Cursor, and other MCP clients.
+
+Each action has a Zod schema for input validation, explicit visibility control (`public: true` required), and optional auth hooks.
+
+See [Capability Plane](/docs/concepts/capability-plane) for details.
+
+## Why two planes?
+
+The split reflects two fundamentally different problems:
+
+1. **Content is read-only.** AI consumers ingest your docs; they do not modify them. The pipeline is static, cacheable, and deterministic.
+2. **Features are interactive.** AI agents call your actions on behalf of users; the result depends on runtime state. The pipeline needs validation, auth, and error handling.
+
+Keeping them separate means you can adopt one without the other. A docs-only site uses just the Knowledge Plane. An API-only site uses just the Capability Plane. Most sites use both.

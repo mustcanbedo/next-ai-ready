@@ -56,7 +56,8 @@ export default defineActions([
         const summary = (node.summary ?? "").toLowerCase();
         const body = (node.body ?? "").toLowerCase();
         if (title.includes(q) || summary.includes(q) || body.includes(q)) {
-          const section = route.split("/").filter(Boolean).length > 1 ? route.split("/").filter(Boolean)[1] : "root";
+          const parts = route.split("/").filter(Boolean);
+          const section = parts.length >= 3 ? parts[2] : parts[1] ?? "root";
           matches.push({
             route,
             title: node.title ?? route,
@@ -79,7 +80,7 @@ export default defineActions([
     public: true,
     tags: ["docs", "content"],
     input: z.object({
-      route: z.string().min(1).describe("Page route, e.g. '/en/introduction' or '/zh/guides/quickstart'"),
+      route: z.string().min(1).describe("Page route, e.g. '/en/docs/introduction' or '/zh/docs/guides/quickstart'"),
     }),
     output: z.object({
       route: z.string(),

@@ -1,0 +1,129 @@
+---
+title: CLI
+summary: 命令行接口——init、build、doctor 和 mcp。
+order: 5
+questions:
+  - q: CLI 是什么？
+    a: 命令行接口——init、build、doctor 和 mcp。
+  - q: 阅读「CLI」能解决什么问题？
+    a: 命令行接口——init、build、doctor 和 mcp。
+tags:
+  - api
+  - reference
+updatedAt: '2026-06-02'
+author: next-ai-ready 团队
+---
+
+# CLI
+
+`next-ai-ready` 提供四个 CLI 命令，用于构建、验证和运行你的 AI 就绪站点。
+
+## 命令
+
+### `next-ai-ready init`
+
+在项目中脚手架化 handler 桩文件和配置。
+
+```bash
+npx next-ai-ready init
+```
+
+创建：
+
+- `ai-ready.config.mjs` — 带占位值的站点配置。
+- `app/_ai-ready/` — route handler 桩文件（一行 re-export）。
+- `app/api/actions/[name]/route.ts` — action 执行端点。
+- `app/api/mcp/[transport]/route.ts` — MCP 服务器端点。
+- `actions/index.mjs` — 带 `ping` 健康检查的 starter action 文件。
+
+使用 `--force` 覆盖已有文件。
+
+### `next-ai-ready build`
+
+扫描内容、编译语义图谱并产出所有产物。
+
+```bash
+npx next-ai-ready build
+```
+
+产出：
+
+- `.next-ai-ready/graph.json` — SemanticGraph。
+- `.next-ai-ready/actions.manifest.json` — 带 JSON Schema 的 action 清单。
+- `public/llms.txt` — 全站 LLM 索引。
+- `public/llms-full.txt` — 完整内容。
+- `public/openapi.json` — OpenAPI 3.1 规范。
+- `public/tools.json` — 工具定义。
+- `public/.well-known/ai-plugin.json` — 插件清单。
+- `public/robots.txt` — AI 爬虫策略。
+
+使用 `--silent` 抑制控制台输出（CI 中有用）。
+
+典型的 `package.json` 配置：
+
+```json
+{
+  "scripts": {
+    "build": "next-ai-ready build && next build"
+  }
+}
+```
+
+### `next-ai-ready doctor`
+
+验证你的配置、action 暴露规则和路由接线。
+
+```bash
+npx next-ai-ready doctor
+```
+
+检查项：
+
+1. **配置** — `ai-ready.config.mjs` 存在且包含必填的 `site.name`、`site.baseUrl` 和 `site.description`。
+2. **Actions** — 加载 action，统计公开 vs 私有，公开 action 缺少 `whenToUse` 时警告。
+3. **构建产物** — `.next-ai-ready/graph.json` 缺失时警告（先运行 `build`）。
+4. **路由桩文件** — `app/_ai-ready/llms-txt/route.ts` 或 `app/_ai-ready/md/[...path]/route.ts` 缺失时警告。
+
+发现错误时以代码 1 退出。警告不会导致非零退出。
+
+在 CI 中使用：
+
+```yaml
+# .github/workflows/ci.yml
+- run: npx next-ai-ready doctor
+```
+
+### `next-ai-ready mcp`
+
+通过 stdio 启动 MCP 服务器，供本地桌面客户端使用。
+
+```bash
+npx next-ai-ready mcp
+```
+
+选项：
+
+| 标志 | 说明 |
+|---|---|
+| `--no-resources` | 跳过页面资源注册（启动更快）。 |
+
+配合 Claude Desktop 使用：
+
+```json
+{
+  "mcpServers": {
+    "my-site": {
+      "command": "npx",
+      "args": ["next-ai-ready", "mcp"]
+    }
+  }
+}
+```
+
+## 退出码
+
+| 代码 | 含义 |
+|---|---|
+| `0` | 成功。 |
+| `1` | 错误（缺少配置、无效 action、构建失败）。 |
+| `2` | 未知命令。 |

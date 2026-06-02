@@ -2,9 +2,15 @@ import Link from "next/link";
 import { Header } from "./components/header";
 import { getMessages } from "@/messages";
 import type { Locale } from "@/lib/i18n";
+import { homeMetadata } from "@/lib/seo";
 
 interface PageProps {
   params: Promise<{ locale: string }>;
+}
+
+export async function generateMetadata({ params }: PageProps) {
+  const { locale } = await params;
+  return homeMetadata(locale as Locale);
 }
 
 export default async function HomePage({ params }: PageProps) {

@@ -1,9 +1,12 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { getPageJsonLd } from "@next-ai-ready/next";
+import { JsonLd } from "../../../components/json-ld";
 import { getDoc, getAllDocs } from "@/lib/docs";
 import { MdxContent } from "../../components/mdx-content";
 import { TableOfContents } from "../../components/toc";
 import { locales, type Locale } from "@/lib/i18n";
+import { docPageMetadata, graphRoute } from "@/lib/seo";
 
 interface PageProps {
   params: Promise<{ locale: string; slug: string[] }>;
@@ -24,10 +27,12 @@ export async function generateMetadata({ params }: PageProps) {
   const { locale, slug } = await params;
   const doc = await getDoc(slug.join("/"), locale as Locale);
   if (!doc) return {};
-  return {
+  return docPageMetadata({
+    locale: locale as Locale,
+    slug: slug.join("/"),
     title: doc.title,
-    description: doc.summary,
-  };
+    summary: doc.summary,
+  });
 }
 
 function extractHeadings(content: string): { id: string; text: string; level: number }[] {
@@ -49,6 +54,8 @@ export default async function DocPage({ params }: PageProps) {
 
   if (!doc) notFound();
 
+  const pageJsonLd = await getPageJsonLd(graphRoute(locale as Locale, doc.slug));
+
   const allDocs = await getAllDocs(locale as Locale);
   const currentIndex = allDocs.findIndex((d) => d.slug === doc.slug);
   const prev = currentIndex > 0 ? allDocs[currentIndex - 1] : null;
@@ -57,6 +64,7 @@ export default async function DocPage({ params }: PageProps) {
 
   return (
     <div className="flex gap-10">
+      <JsonLd data={pageJsonLd} />
       <article className="min-w-0 flex-1 max-w-[740px]">
         <header className="mb-14 pb-8 border-b border-white/[0.04]">
           <p className="mb-4 text-[11px] font-medium uppercase tracking-[0.15em] text-accent/70">

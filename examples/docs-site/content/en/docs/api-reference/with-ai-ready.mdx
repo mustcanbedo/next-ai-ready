@@ -1,0 +1,98 @@
+---
+title: withAiReady
+summary: API reference for the Next.js config wrapper.
+order: 4
+questions:
+  - q: What is withAiReady?
+    a: API reference for the Next.js config wrapper.
+  - q: What will I learn from withAiReady?
+    a: API reference for the Next.js config wrapper.
+tags:
+  - api
+  - reference
+updatedAt: '2026-06-02'
+author: next-ai-ready team
+---
+
+# withAiReady
+
+`withAiReady()` is a Next.js config wrapper that adds URL rewrites and file tracing for AI-ready routes.
+
+## Import
+
+```ts
+import { withAiReady } from "@next-ai-ready/next"
+```
+
+## Usage
+
+```ts
+// next.config.mjs
+import { withAiReady } from "@next-ai-ready/next"
+
+export default withAiReady()({
+  // your normal Next.js config
+  reactStrictMode: true,
+})
+```
+
+The function is curried: the first call accepts options, the second call accepts your Next.js config.
+
+## Options
+
+```ts
+interface WithAiReadyOptions {
+  rewrites?: boolean    // default: true
+  fileTracing?: boolean // default: true
+}
+```
+
+| Option | Type | Default | Description |
+|---|---|---|---|
+| `rewrites` | `boolean` | `true` | Add URL rewrites for AI routes. Disable if you want to mount routes yourself. |
+| `fileTracing` | `boolean` | `true` | Add `outputFileTracingIncludes` so `.next-ai-ready/*.json` ships with serverless bundles. Disable if your deployment adapter ships the whole project. |
+
+## What it does
+
+When `rewrites` is `true`, adds these rewrites:
+
+| Source | Destination | Purpose |
+|---|---|---|
+| `/llms.txt` | `/_ai-ready/llms-txt` | Site-wide LLM index |
+| `/llms-full.txt` | `/_ai-ready/llms-full` | Full content dump |
+| `/:path*.md` | `/_ai-ready/md/:path*` | Per-page Markdown |
+| `/:path*.ai.json` | `/_ai-ready/ai-json/:path*` | Per-page structured JSON |
+| `/openapi.json` | `/_ai-ready/openapi` | OpenAPI spec |
+| `/tools.json` | `/_ai-ready/tools` | Tool definitions |
+
+When `fileTracing` is `true`, adds:
+
+```json
+{
+  "outputFileTracingIncludes": {
+    "/_ai-ready/**/*": [".next-ai-ready/**/*"]
+  }
+}
+```
+
+This ensures the build artifacts are included in serverless function bundles (required for Vercel, AWS Lambda, etc.).
+
+## Merging with existing config
+
+`withAiReady()` merges with your existing config:
+
+- If your config has a `rewrites()` function, the AI rewrites are appended.
+- If your config has `outputFileTracingIncludes`, the AI entry is merged in.
+- All other config properties are preserved unchanged.
+
+## Disabling rewrites
+
+If you want to control URL routing yourself:
+
+```ts
+export default withAiReady({ rewrites: false })({
+  // rewrites are not added; you must mount /llms.txt etc. yourself
+})
+```
+
+You still need the route handler files in `app/_ai-ready/` — the rewrites just map clean URLs to them.

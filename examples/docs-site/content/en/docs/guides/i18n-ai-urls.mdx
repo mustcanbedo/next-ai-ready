@@ -1,0 +1,72 @@
+---
+title: i18n and AI-friendly URLs
+summary: 'Middleware, locale prefixes, and SemanticGraph routes for multilingual sites.'
+order: 8
+questions:
+  - q: What is i18n and AI-friendly URLs?
+    a: >-
+      Middleware, locale prefixes, and SemanticGraph routes for multilingual
+      sites.
+  - q: What will I learn from i18n and AI-friendly URLs?
+    a: >-
+      Middleware, locale prefixes, and SemanticGraph routes for multilingual
+      sites.
+tags:
+  - how-to
+  - best-practices
+updatedAt: '2026-06-02'
+author: next-ai-ready team
+---
+
+# i18n and AI-friendly URLs
+
+`next-ai-ready` scans MDX from your `content` globs and maps file paths to routes. For multilingual sites, include the locale in the route (for example `/en/docs/install`).
+
+## Recommended content layout
+
+```text
+content/
+  en/
+    docs/
+      introduction.mdx
+      installation.mdx
+      guides/quickstart.mdx
+  zh/
+    docs/
+      introduction.mdx
+```
+
+```js
+// ai-ready.config.mjs
+export default defineConfig({
+  content: ["content/{en,zh}/**/*.mdx"],
+});
+```
+
+Each locale becomes a separate route in the SemanticGraph. There is **no built-in locale dimension** on nodes yet (Phase 6 P6-06) — treat `/en/...` and `/zh/...` as distinct pages.
+
+## Middleware
+
+If you redirect `/docs` → `/en/docs`, exclude AI artifact paths from the matcher so crawlers and agents can fetch them without redirects:
+
+```ts
+export const config = {
+  matcher: [
+    "/((?!_next|_ai-ready|api|.*\\..*).*)",
+  ],
+};
+```
+
+Patterns to keep reachable:
+
+- `/_ai-ready/*` — framework handlers (`llms.txt`, `openapi.json`, …)
+- `*.md`, `*.ai.json` — rewritten by `withAiReady()` to `/_ai-ready/*`
+- `/llms.txt`, `/openapi.json`, `/tools.json`, `/.well-known/ai-plugin.json`
+
+## llms.txt curation
+
+Use `sections` in config to prioritize one locale in `llms.txt`, or emit separate configs per deployment.
+
+## Future (Phase 6)
+
+See [`docs/phase6-design.md`](../../../../docs/phase6-design.md) for planned `locale` metadata and cross-locale linking.

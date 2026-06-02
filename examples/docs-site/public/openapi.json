@@ -17,7 +17,7 @@
                 "additionalProperties": false,
                 "properties": {
                   "route": {
-                    "description": "Page route, e.g. '/en/introduction' or '/zh/guides/quickstart'",
+                    "description": "Page route, e.g. '/en/docs/introduction' or '/zh/docs/guides/quickstart'",
                     "minLength": 1,
                     "type": "string"
                   }
@@ -491,7 +491,7 @@
   "servers": [
     {
       "description": "next-ai-ready",
-      "url": "https://next-ai-ready.dev"
+      "url": "https://next-ai-ready.vercel.app"
     }
   ]
 }

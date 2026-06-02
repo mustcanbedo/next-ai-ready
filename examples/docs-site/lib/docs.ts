@@ -16,7 +16,7 @@ export interface DocPage extends DocMeta {
 }
 
 function contentDir(locale: Locale) {
-  return path.join(process.cwd(), "content", locale);
+  return path.join(process.cwd(), "content", locale, "docs");
 }
 
 const SECTION_ORDER: Record<string, number> = {

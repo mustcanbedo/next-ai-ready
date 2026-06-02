@@ -1,0 +1,111 @@
+---
+title: Installation
+summary: Install next-ai-ready and scaffold your first config.
+order: 2
+questions:
+  - q: What are the prerequisites for next-ai-ready?
+    a: Node.js 20+, Next.js 15+ with App Router, and Zod v4 for actions.
+  - q: Do I need to install @next-ai-ready/* packages separately?
+    a: No. Install only the next-ai-ready meta package; it re-exports handlers and the CLI.
+  - q: What does next-ai-ready init create?
+    a: ai-ready.config, route stubs under app/_ai-ready/, action and MCP endpoints, and optional instrumentation files.
+tags:
+  - installation
+  - next.js
+  - zod
+updatedAt: '2026-06-02'
+author: next-ai-ready team
+---
+
+# Installation
+
+## Prerequisites
+
+- **Node.js** 20 or later
+- **Next.js** 15+ with App Router (required — route handlers use async `params`; Next 14 is not supported)
+- **pnpm**, npm, or yarn
+- **Zod v4** (`zod@^4`) — required for actions (uses `z.toJSONSchema()`)
+
+## Install
+
+```bash
+pnpm add next-ai-ready@alpha zod@^4
+```
+
+This installs the meta package which re-exports everything you need and provides the CLI.
+
+## Package exports (N-14)
+
+| Import | Needs Next.js? | Use for |
+|--------|----------------|---------|
+| `next-ai-ready` | No (CLI + config) | `init`, `build`, `doctor`, `defineConfig`, `defineAction` |
+| `next-ai-ready/handlers/*` | Yes (`server-only`) | Route stubs in `app/_ai-ready/` |
+| `@next-ai-ready/next` | Yes | Monorepo / advanced: same handlers + `withAiReady()` |
+
+Install **one** meta package for typical apps: `pnpm add next-ai-ready@alpha`. The `@next-ai-ready/*` scoped packages are used internally; you do not need to add them separately.
+
+**Optional peers** (install only when needed):
+
+| Package | When |
+|---------|------|
+| `zod@^4` | Actions (required for real projects) |
+| `jiti` | `ai-ready.config.ts` (included as dependency of `@next-ai-ready/next`) |
+| `mcp-handler`, `@modelcontextprotocol/sdk` | MCP HTTP / stdio |
+| `next` | Route handlers only — not required for CLI |
+
+Only **`next-ai-ready`** exposes the `next-ai-ready` CLI binary. `@next-ai-ready/next` also ships a bin for monorepo dogfooding — use the meta package in consumer apps (C-01).
+
+## Initialize
+
+```bash
+npx next-ai-ready init
+```
+
+This creates:
+
+- `ai-ready.config.mjs` — your site config (includes robots strategy notes)
+- `instrumentation.ts` + `instrumentation-node.ts` — optional observability hooks (`next-ai-ready/hooks`, Edge-safe split)
+- `app/_ai-ready/` — route handlers for `llms.txt`, `openapi.json`, etc.
+- `app/api/actions/` — the action execution endpoint
+- `app/api/mcp/` — the MCP server endpoint
+- `actions/index.mjs` — a starter action file with a `ping` health check
+
+`init` also patches `next.config` with `withAiReady()` and adds `next-ai-ready build` to your build script when missing.
+
+## Configure
+
+Edit `ai-ready.config.mjs` to match your site:
+
+```js
+import { defineConfig } from "@next-ai-ready/core";
+
+export default defineConfig({
+  site: {
+    name: "My Site",
+    baseUrl: "https://example.com",
+    description: "A short description for AI.",
+  },
+  content: ["app/**/*.mdx", "content/**/*.mdx"],
+  actions: "./actions/index.mjs",
+});
+```
+
+### Robots policy
+
+`next-ai-ready build` emits `public/robots.txt` with explicit AI-bot rules. For dynamic policies, add `app/robots.ts` and use `aiRobots()` from `@next-ai-ready/core` — Next.js serves `app/robots.ts` at runtime.
+
+## Build
+
+```bash
+npx next-ai-ready build
+```
+
+This scans your content, compiles the semantic graph, and writes all AI artifacts to `public/` and `.next-ai-ready/`.
+
+## Verify
+
+```bash
+npx next-ai-ready doctor --score
+```
+
+Doctor checks your config, validates action exposure rules, detects `noai` meta, robots conflicts, and confirms route wiring. Use it in CI — exit 0 means no errors (warnings are OK).

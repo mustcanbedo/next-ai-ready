@@ -1,0 +1,127 @@
+---
+title: Actions
+summary: 'How to define, expose, and secure AI-callable actions.'
+order: 3
+questions:
+  - q: What is Actions?
+    a: 'How to define, expose, and secure AI-callable actions.'
+  - q: What will I learn from Actions?
+    a: 'How to define, expose, and secure AI-callable actions.'
+tags:
+  - how-to
+  - best-practices
+updatedAt: '2026-06-02'
+author: next-ai-ready team
+---
+
+# Actions
+
+Actions are the building blocks of the Capability Plane. Each action is a typed function that AI agents can discover and invoke.
+
+## Defining an action
+
+Create a file in `actions/` and use `defineAction()`:
+
+```js
+import { defineAction } from "@next-ai-ready/actions"
+import { z } from "zod"
+
+export default defineAction({
+  name: "search_products",
+  description: "Full-text search across the product catalogue.",
+  whenToUse: "When the user asks to find a product by name or feature.",
+  whenNotToUse: "When the user wants to check order status.",
+  public: true,
+  tags: ["catalog"],
+  input: z.object({
+    query: z.string().min(1),
+    limit: z.number().int().optional(),
+  }),
+  output: z.object({
+    items: z.array(z.object({ id: z.string(), title: z.string() })),
+  }),
+  handler: async ({ query, limit }) => {
+    const results = await db.products.search(query, limit ?? 10)
+    return { items: results }
+  },
+})
+```
+
+## Registering actions
+
+Use `defineActions()` in your `actions/index.mjs` to register multiple actions at once:
+
+```js
+import { defineActions } from "@next-ai-ready/actions"
+import searchProducts from "./search-products.js"
+import getOrderStatus from "./get-order-status.js"
+
+export default defineActions([searchProducts, getOrderStatus])
+```
+
+The module path is set in `ai-ready.config.mjs`:
+
+```js
+actions: "./actions/index.mjs"
+```
+
+## Visibility
+
+Actions are **private by default**. Set `public: true` to expose an action via HTTP and MCP:
+
+- **Private** (`public: false`, default) — callable only from your own server code via `invokeAction()`.
+- **Public** (`public: true`) — appears in `/openapi.json`, `/tools.json`, and `/api/mcp`. Callable via `POST /api/actions/<name>`.
+
+The build CLI warns if a public action is missing `whenToUse` — this field is critical for AI tool selection.
+
+## Input validation
+
+The `input` field accepts any Zod schema. The runtime validates incoming requests with `safeParse` and returns structured errors:
+
+```json
+{
+  "ok": false,
+  "code": "invalid_input",
+  "message": "Validation failed",
+  "details": [{ "path": ["query"], "message": "Required" }]
+}
+```
+
+## Auth hooks
+
+Add an `auth` function to gate access per-action:
+
+```js
+defineAction({
+  name: "delete_user",
+  public: true,
+  auth: (req) => {
+    const token = req.headers.get("authorization")
+    return token === `Bearer ${process.env.ADMIN_TOKEN}`
+  },
+  input: z.object({ id: z.string() }),
+  handler: async ({ id }) => { /* ... */ },
+})
+```
+
+The `auth` function runs before the handler. Return `false` (or a Promise that resolves to `false`) to reject the request with a 401.
+
+## Action context
+
+The second argument to `handler` is an `ActionContext` object:
+
+| Field | Type | Description |
+|---|---|---|
+| `request` | `Request` | The original HTTP request. |
+| `headers` | `Headers` | Request headers. |
+| `cookies` | object | `cookies.get(name)` returns `{ value }` or `undefined`. |
+| `caller` | `string?` | Identifier for the caller (e.g. `"mcp"`, `"http"`). |
+
+## What gets generated
+
+For each public action, the build produces:
+
+- An entry in `/openapi.json` (OpenAPI 3.1 `POST` operation).
+- An entry in `/tools.json` (OpenAI function-calling format).
+- A `POST /api/actions/<name>` HTTP endpoint.
+- An MCP tool definition in `/api/mcp`.

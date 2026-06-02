@@ -2,6 +2,8 @@
 
 [中文文档](./README.zh-CN.md) | English
 
+**Live docs:** [English](https://next-ai-ready.vercel.app/en) · [中文](https://next-ai-ready.vercel.app/zh)
+
 > Traditional websites are built for browsers.
 > **next-ai-ready** makes your Next.js site **readable** by AI and **callable** by agents.
 >
@@ -128,7 +130,7 @@ Use `next-ai-ready/hooks` (or `@next-ai-ready/next/hooks`) — not the main pack
 - ✅ **Capability plane** — `defineAction` → `/api/actions/<name>` + OpenAPI 3.1 / `tools.json` / `ai-plugin.json`
 - ✅ **MCP server** — actions as MCP tools + pages as resources (HTTP + stdio)
 - ✅ **Dev tooling** — `build` / `init` / `doctor` / `mcp` CLIs, `robots.txt`, analytics hooks
-- ✅ **Docs site** — dogfooding the framework at [`examples/docs-site`](./examples/docs-site)
+- ✅ **Docs site** — live at [next-ai-ready.vercel.app](https://next-ai-ready.vercel.app/en) ([source](./examples/docs-site))
 
 See [`docs/`](./docs):
 

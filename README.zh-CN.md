@@ -2,6 +2,8 @@
 
 English | [中文文档](./README.zh-CN.md)
 
+**在线文档：** [中文](https://next-ai-ready.vercel.app/zh) · [English](https://next-ai-ready.vercel.app/en)
+
 > 传统网站为浏览器而建。
 > **next-ai-ready** 让你的 Next.js 站点被 AI **可读**、被 Agent **可调用**。
 >
@@ -128,7 +130,7 @@ registerAiHooks({
 - ✅ **能力平面** — `defineAction` → `/api/actions/<name>` + OpenAPI 3.1 / `tools.json` / `ai-plugin.json`
 - ✅ **MCP 服务器** — action 作为 MCP 工具 + 页面作为资源（HTTP + stdio）
 - ✅ **开发工具** — `build` / `init` / `doctor` / `mcp` CLI，`robots.txt`，分析钩子
-- ✅ **文档站** — 在 [`examples/docs-site`](./examples/docs-site) 使用框架 dogfood
+- ✅ **文档站** — 线上 [next-ai-ready.vercel.app](https://next-ai-ready.vercel.app/zh)（[源码](./examples/docs-site)）
 
 详见 [`docs/`](./docs)：
 

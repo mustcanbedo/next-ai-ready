@@ -3,10 +3,14 @@ title: 项目结构
 summary: 了解 next-ai-ready 创建的文件及其作用。
 order: 3
 questions:
-  - q: 项目结构 是什么？
-    a: 了解 next-ai-ready 创建的文件及其作用。
-  - q: 阅读「项目结构」能解决什么问题？
-    a: 了解 next-ai-ready 创建的文件及其作用。
+  - q: next-ai-ready 会在项目里添加哪些文件？
+    a: >-
+      ai-ready.config、app/_ai-ready/ 路由桩、actions/、instrumentation，以及 public/ 与
+      .next-ai-ready/ 下的构建产物。
+  - q: 语义图谱保存在哪里？
+    a: >-
+      next-ai-ready build 写入 .next-ai-ready/graph.json，运行时由 handler 与 JSON-LD
+      助手读取。
 tags:
   - next.js
   - setup

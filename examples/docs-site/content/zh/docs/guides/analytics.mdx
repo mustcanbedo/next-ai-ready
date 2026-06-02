@@ -3,10 +3,12 @@ title: 分析
 summary: 追踪哪些 AI 爬虫读取了你的内容，哪些 agent 调用了你的 action。
 order: 5
 questions:
-  - q: 分析 是什么？
-    a: 追踪哪些 AI 爬虫读取了你的内容，哪些 agent 调用了你的 action。
-  - q: 阅读「分析」能解决什么问题？
-    a: 追踪哪些 AI 爬虫读取了你的内容，哪些 agent 调用了你的 action。
+  - q: 如何追踪 AI 爬虫访问？
+    a: >-
+      通过 next-ai-ready/hooks 的 registerAiHooks，用 onAiRequest 记录产物请求，onInvoke 记录
+      action 调用。
+  - q: 为什么要拆分 instrumentation 文件？
+    a: Next.js 在 Edge 也会加载 instrumentation；Node 专用 hooks 需在 nodejs 运行时动态 import。
 tags:
   - how-to
   - best-practices

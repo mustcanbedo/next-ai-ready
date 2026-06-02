@@ -22,7 +22,8 @@
     "bin:smoke": "node scripts/bin-smoke.mjs",
     "changeset:status": "node scripts/changeset-status.mjs",
     "external:smoke": "node scripts/external-quickstart-smoke.mjs",
-    "verify:release": "pnpm build && pnpm test && pnpm typecheck && node scripts/e2e-smoke.mjs && pnpm pack:check && pnpm exports:check && pnpm bin:smoke && pnpm changeset:status && pnpm external:smoke"
+    "docs-site:smoke": "pnpm --filter docs-site smoke",
+    "verify:release": "pnpm build && pnpm test && pnpm typecheck && node scripts/e2e-smoke.mjs && pnpm pack:check && pnpm exports:check && pnpm bin:smoke && pnpm docs-site:smoke && pnpm changeset:status && pnpm external:smoke"
   },
   "devDependencies": {
     "@changesets/cli": "^2.27.9",

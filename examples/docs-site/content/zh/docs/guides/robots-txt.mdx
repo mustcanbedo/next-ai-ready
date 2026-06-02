@@ -3,10 +3,12 @@ title: Robots.txt
 summary: 配置 robots.txt 以显式允许或阻止 AI 爬虫。
 order: 6
 questions:
-  - q: Robots.txt 是什么？
-    a: 配置 robots.txt 以显式允许或阻止 AI 爬虫。
-  - q: 阅读「Robots.txt」能解决什么问题？
-    a: 配置 robots.txt 以显式允许或阻止 AI 爬虫。
+  - q: 如何显式允许 AI 爬虫？
+    a: >-
+      build 可生成含 GPTBot、ClaudeBot 等规则的 robots.txt，或在 app/robots.ts 使用
+      aiRobots()。
+  - q: 是否应在 robots.txt 中声明 llms.txt？
+    a: 建议声明。构建时可通过注释指向 /llms.txt 与 /llms-full.txt。
 tags:
   - how-to
   - best-practices

@@ -3,10 +3,10 @@ title: 工作原理
 summary: 构建管线、运行时数据流和底层机制。
 order: 4
 questions:
-  - q: 工作原理 是什么？
-    a: 构建管线、运行时数据流和底层机制。
-  - q: 阅读「工作原理」能解决什么问题？
-    a: 构建管线、运行时数据流和底层机制。
+  - q: next-ai-ready build 做了什么？
+    a: 加载配置、扫描 MDX、编译语义节点、加载 action、组装 graph，并写入 public/ 与 .next-ai-ready/。
+  - q: 构建是确定性的吗？
+    a: 是。相同源码与配置会产生字节级一致的 graph 与 llms 输出，适合 CI diff。
 tags:
   - architecture
   - knowledge-plane

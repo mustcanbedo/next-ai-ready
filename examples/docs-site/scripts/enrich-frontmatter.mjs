@@ -8,6 +8,8 @@ import matter from "gray-matter";
 
 import { fileURLToPath } from "node:url";
 
+import { CURATED_FAQ } from "./faq-curated.mjs";
+
 const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
 const CONTENT = path.join(ROOT, "content");
 
@@ -52,7 +54,15 @@ async function main() {
       const data = parsed.data;
       let changed = false;
 
-      if (!data.questions) {
+      const rel = path.relative(localeDir, file).replace(/\.mdx$/, "");
+      const curated = CURATED_FAQ[locale]?.[rel];
+
+      if (curated) {
+        if (JSON.stringify(data.questions) !== JSON.stringify(curated)) {
+          data.questions = curated;
+          changed = true;
+        }
+      } else if (!data.questions) {
         data.questions = defaultQuestions(
           String(data.title ?? path.basename(file, ".mdx")),
           String(data.summary ?? ""),
@@ -62,7 +72,6 @@ async function main() {
       }
 
       if (!data.tags) {
-        const rel = path.relative(localeDir, file);
         const section = rel.includes("/") ? rel.split("/")[0] : "getting-started";
         data.tags = TAGS_BY_SECTION[section] ?? ["next-ai-ready", "documentation"];
         changed = true;

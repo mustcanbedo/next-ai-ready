@@ -3,10 +3,14 @@ title: Robots.txt
 summary: Configure your robots.txt to explicitly allow or block AI crawlers.
 order: 6
 questions:
-  - q: What is Robots.txt?
-    a: Configure your robots.txt to explicitly allow or block AI crawlers.
-  - q: What will I learn from Robots.txt?
-    a: Configure your robots.txt to explicitly allow or block AI crawlers.
+  - q: How do I allow AI crawlers explicitly?
+    a: >-
+      next-ai-ready build can emit robots.txt with GPTBot, ClaudeBot, and other
+      AI bots allowed, or use app/robots.ts with aiRobots().
+  - q: Should I advertise llms.txt in robots.txt?
+    a: >-
+      Yes. The build adds comments pointing crawlers to /llms.txt and
+      /llms-full.txt when configured.
 tags:
   - how-to
   - best-practices

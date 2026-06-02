@@ -73,3 +73,32 @@ jobs:
 
       - name: Release checks
         run: pnpm exports:check && pnpm pack:check && pnpm bin:smoke
+
+  docs-site-smoke:
+    name: Docs Site Smoke
+    runs-on: ubuntu-latest
+    needs: ci
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build packages (docs-site deps)
+        run: pnpm turbo run build --filter=docs-site^...
+
+      - name: Run docs-site smoke
+        working-directory: examples/docs-site
+        run: |
+          node ../../packages/meta/dist/cli.js build
+          node scripts/docs-site-smoke.mjs

@@ -3,14 +3,14 @@ title: i18n and AI-friendly URLs
 summary: 'Middleware, locale prefixes, and SemanticGraph routes for multilingual sites.'
 order: 8
 questions:
-  - q: What is i18n and AI-friendly URLs?
+  - q: How do locale prefixes affect AI routes?
     a: >-
-      Middleware, locale prefixes, and SemanticGraph routes for multilingual
-      sites.
-  - q: What will I learn from i18n and AI-friendly URLs?
+      Each locale path (e.g. /en/docs/page) becomes a separate route in the
+      semantic graph.
+  - q: Should middleware redirect AI artifact URLs?
     a: >-
-      Middleware, locale prefixes, and SemanticGraph routes for multilingual
-      sites.
+      No. Exclude paths with dots, /api, and _ai-ready from locale middleware so
+      crawlers fetch artifacts without redirects.
 tags:
   - how-to
   - best-practices

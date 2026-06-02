@@ -3,10 +3,12 @@ title: 能力平面
 summary: next-ai-ready 如何将你的功能暴露为 AI 可调用的工具。
 order: 2
 questions:
-  - q: 能力平面 是什么？
-    a: next-ai-ready 如何将你的功能暴露为 AI 可调用的工具。
-  - q: 阅读「能力平面」能解决什么问题？
-    a: next-ai-ready 如何将你的功能暴露为 AI 可调用的工具。
+  - q: 能力平面产出什么？
+    a: >-
+      OpenAPI 3.1、tools.json、ai-plugin.json、MCP 工具，以及 POST /api/actions/<name>
+      端点。
+  - q: 如何定义可被调用的功能？
+    a: 用 defineAction 声明 Zod schema，再运行 next-ai-ready build 暴露给 Agent。
 tags:
   - architecture
   - knowledge-plane

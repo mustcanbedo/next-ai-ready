@@ -3,10 +3,10 @@ title: 国际化与 AI 友好 URL
 summary: 多语言站点的 middleware、locale 前缀与 SemanticGraph 路由策略。
 order: 8
 questions:
-  - q: 国际化与 AI 友好 URL 是什么？
-    a: 多语言站点的 middleware、locale 前缀与 SemanticGraph 路由策略。
-  - q: 阅读「国际化与 AI 友好 URL」能解决什么问题？
-    a: 多语言站点的 middleware、locale 前缀与 SemanticGraph 路由策略。
+  - q: locale 前缀如何影响 AI 路由？
+    a: 每个 locale 路径（如 /zh/docs/page）在语义图谱中是独立路由。
+  - q: middleware 应 redirect AI 产物 URL 吗？
+    a: 不应。matcher 需排除带点路径、/api、_ai-ready，避免爬虫被重定向。
 tags:
   - how-to
   - best-practices

@@ -3,10 +3,14 @@ title: Analytics
 summary: Track which AI bots read your content and which actions agents invoke.
 order: 5
 questions:
-  - q: What is Analytics?
-    a: Track which AI bots read your content and which actions agents invoke.
-  - q: What will I learn from Analytics?
-    a: Track which AI bots read your content and which actions agents invoke.
+  - q: How do I track AI bot traffic?
+    a: >-
+      Use registerAiHooks from next-ai-ready/hooks with onAiRequest for artifact
+      fetches and onInvoke for action calls.
+  - q: Why split instrumentation.ts and instrumentation-node.ts?
+    a: >-
+      Next.js loads instrumentation on Edge; Node-only hooks must stay in a
+      separate file dynamically imported on nodejs runtime.
 tags:
   - how-to
   - best-practices

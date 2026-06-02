@@ -3,10 +3,14 @@ title: MCP Integration
 summary: 'Connect your actions to Claude Desktop, Cursor, and other MCP clients.'
 order: 4
 questions:
-  - q: What is MCP Integration?
-    a: 'Connect your actions to Claude Desktop, Cursor, and other MCP clients.'
-  - q: What will I learn from MCP Integration?
-    a: 'Connect your actions to Claude Desktop, Cursor, and other MCP clients.'
+  - q: How do MCP clients connect to my site?
+    a: >-
+      HTTP transport at /api/mcp when running Next.js, or stdio via npx
+      next-ai-ready mcp for Claude Desktop and Cursor.
+  - q: How do I secure MCP in production?
+    a: >-
+      Set NEXT_AI_READY_MCP_TOKEN and send Authorization: Bearer <token> on HTTP
+      requests.
 tags:
   - how-to
   - best-practices

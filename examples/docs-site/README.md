@@ -61,6 +61,12 @@ When editing docs, verify both:
 1. `pnpm dev` — page looks correct in the browser
 2. `node ../../packages/meta/dist/cli.js build && node ../../packages/meta/dist/cli.js doctor --score` — AI artifacts stay healthy
 
+Curated FAQ for all pages lives in `scripts/faq-curated.mjs`. Re-apply after adding pages:
+
+```bash
+pnpm faq:apply
+```
+
 ## Smoke test
 
 From `examples/docs-site`:

@@ -3,10 +3,12 @@ title: MCP 集成
 summary: 将你的 action 连接到 Claude Desktop、Cursor 和其他 MCP 客户端。
 order: 4
 questions:
-  - q: MCP 集成 是什么？
-    a: 将你的 action 连接到 Claude Desktop、Cursor 和其他 MCP 客户端。
-  - q: 阅读「MCP 集成」能解决什么问题？
-    a: 将你的 action 连接到 Claude Desktop、Cursor 和其他 MCP 客户端。
+  - q: MCP 客户端如何连接我的站点？
+    a: >-
+      Next.js 运行时走 /api/mcp HTTP 传输；Claude Desktop/Cursor 可用 npx next-ai-ready
+      mcp stdio。
+  - q: 生产环境如何保护 MCP？
+    a: '设置 NEXT_AI_READY_MCP_TOKEN，HTTP 请求需带 Authorization: Bearer <token>。'
 tags:
   - how-to
   - best-practices

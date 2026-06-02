@@ -3,10 +3,14 @@ title: How It Works
 summary: 'The build pipeline, runtime data flow, and what happens under the hood.'
 order: 4
 questions:
-  - q: What is How It Works?
-    a: 'The build pipeline, runtime data flow, and what happens under the hood.'
-  - q: What will I learn from How It Works?
-    a: 'The build pipeline, runtime data flow, and what happens under the hood.'
+  - q: What happens during next-ai-ready build?
+    a: >-
+      Load config, scan MDX, compile semantic nodes, load actions, assemble the
+      graph, and write public/ plus .next-ai-ready/ artifacts.
+  - q: Is the build deterministic?
+    a: >-
+      Yes. Same source tree and config produce byte-identical graph and llms
+      output, suitable for CI diffing.
 tags:
   - architecture
   - knowledge-plane

@@ -42,6 +42,17 @@ async function main() {
   if (llms.includes("next-ai-ready.dev")) fail("llms.txt still references next-ai-ready.dev");
   ok("llms.txt URLs and sections");
 
+  const graph = JSON.parse(
+    await readFile(join(ROOT, ".next-ai-ready/graph.json"), "utf8"),
+  );
+  const intro = Object.values(graph.nodes).find(
+    (n) => n.route === "/en/docs/introduction" && n.kind === "page",
+  );
+  if (!intro?.questions?.some((q) => q.q === "What is next-ai-ready?")) {
+    fail("graph.json missing curated FAQ on /en/docs/introduction");
+  }
+  ok("graph.json curated FAQ");
+
   const openapi = await readFile(join(ROOT, "public/openapi.json"), "utf8");
   if (openapi.includes("/en/introduction'") || openapi.includes('/en/introduction"')) {
     fail("openapi.json still uses stale /en/introduction route example");

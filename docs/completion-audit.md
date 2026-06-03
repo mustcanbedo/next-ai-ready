@@ -2,9 +2,9 @@
 
 > **审查视角：** 以 Next.js 生态作者的标准审视——不仅看「功能有没有写」，更看「Next 开发者能否在 10 分钟内跑通、部署后不踩坑、与 App Router / Turbopack / Serverless 部署模型是否一致」。
 >
-> **审查日期：** 2026-06-01（alpha.7 + docs-site dogfood 同步）  
-> **当前版本：** 仓库 `0.1.0-alpha.7`；npm `@alpha` 最新为 `0.1.0-alpha.6`（alpha.7/8 待发）  
-> **测试状态：** 146 tests / 9 packages
+> **审查日期：** 2026-06-02（alpha.9 + docs-site FAQ/smoke + adopter UX）  
+> **当前版本：** 仓库 `0.1.0-alpha.10`；npm `@alpha` 待 publish（当前线 alpha.9）  
+> **测试状态：** 145+ tests / 9 packages · CI 含 `docs-site-smoke`
 
 ### 相关文档（分工）
 
@@ -12,6 +12,9 @@
 |------|------|
 | **本文 `completion-audit.md`** | 完成度评估、P0–P2 **行动摘要**、0.1 DoD |
 | **[`backlog.md`](./backlog.md)** | **完整**待办 + 技术债 + Phase 6（~110+ 跟踪项，single source of truth） |
+| [`ga-readiness.md`](./ga-readiness.md) | **0.1 GA** 剩余步骤与 DoD |
+| [`post-ga.md`](./post-ga.md) | GA 之后优化（PG-xx） |
+| [`README.md`](./README.md) | 本仓库 `docs/` 目录索引 |
 | [`roadmap.md`](./roadmap.md) | 分阶段交付计划（Phase 0 checkbox 已同步） |
 | [`pre-docs-site-checklist.md`](./pre-docs-site-checklist.md) | 发布与文档站前置步骤 |
 | [`REVIEW.md`](../REVIEW.md) | 2025-07 代码审查（**已过时**，见附录 A） |
@@ -24,15 +27,15 @@
 
 `next-ai-ready` 的**核心架构已经成立**：Knowledge + Capability 双平面、build-time 产物 + runtime handler 分离、与 bundler 解耦——这是正确的 Next.js 集成方向，和 Turbopack / Webpack 都能共存。
 
-**框架代码本身约 95% 完成**；**作为可推荐给早期用户的产品约 93% 完成**。P0 + P1 + P2 均已完成。
+**框架代码本身约 96% 完成**；**作为可推荐给早期用户的产品约 95% 完成**。P0 + P1 + P2 均已完成；**adopter UX 批次**（doctor/robots、llms-full FAQ、quickstart、action-auth recipe）已合入，待 **npm alpha.10** 发布。
 
 **剩余差距**主要在：
 
-1. **0.1 GA** — 可选 10 分钟 UX 手验（见 CONTRIBUTING.md）
-2. **Phase 6 实现** — 设计见 `docs/phase6-design.md`
-3. **可选 refactor** — C-04/C-11/C-31/C-72 等 🟢 细项
+1. **0.1 GA 发布动作** — 见 [`ga-readiness.md`](./ga-readiness.md)（publish alpha.10、Vercel MCP token、可选 `v0.1.0` tag）
+2. **GA 后产品化** — 见 [`post-ga.md`](./post-ga.md)（PG-01～PG-17，非阻塞）
+3. **可选 refactor** — C-04/C-11/C-31/C-72 等 🟢 细项 → backlog
 
-**结论：** **可对外推荐 `next-ai-ready@alpha` 给早期 adopter**；下一里程碑：**0.1 GA** 或 Phase 6 首项（P6-06 i18n graph）。
+**结论：** **可对外推荐 `next-ai-ready@alpha` 给早期 adopter**；下一里程碑：**0.1 GA**（`0.1.0` 或 alpha.10 收口）。
 
 ---
 
@@ -342,8 +345,11 @@ canonical = `/openapi.json`、`/tools.json`；`buildAiPlugin()` 默认已改。D
 - [x] 文档站内容至 checklist 规划（2026-06-01 — D-10～D-22）
 - [x] OpenAPI / ai-plugin / tools URL **一致且可访问**（2026-05-31）
 - [ ] CI green on every PR（流程项）
-- [x] npm `@alpha` → **0.1.0-alpha.6**（2026-06-01，`USE_NPM=1 external:smoke` 通过）
-- [x] 已知限制 documented（2026-05-31）
+- [x] npm `@alpha` → **0.1.0-alpha.9**（2026-06-02；alpha.10 待 publish）
+- [x] 已知限制 documented（2026-05-31；i18n graph 表述 2026-06-02 修正）
+- [x] Adopter quickstart + doctor actionItems + llms-full FAQ（2026-06-02）
+- [ ] npm `@alpha` → **0.1.0-alpha.10**（maintainer: `pnpm publish:alpha`）
+- [ ] Vercel `NEXT_AI_READY_MCP_TOKEN`（ops）
 
 ---
 

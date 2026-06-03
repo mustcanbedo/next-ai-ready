@@ -41,12 +41,15 @@ packages/
   core/ semantic/ mdx/ llms/ actions/ openapi/ mcp/ next/ meta/
 examples/docs-site/   — dogfood documentation site
 scripts/              — e2e-smoke, publish-alpha, pack/exports checks
-docs/                 — architecture, backlog, completion-audit
+docs/                 — index: docs/README.md; ga-readiness, post-ga, backlog
+examples/recipes/     — action-auth, upstash-ratelimit
 ```
 
 ### Manual UX validation (0.1 DoD)
 
 Automated: `pnpm external:smoke` and `node scripts/e2e-smoke.mjs` cover init → build → doctor.
+
+Preferred path: [docs/quickstart-10min.md](./docs/quickstart-10min.md).
 
 Optional full 10-minute path (run **outside** the monorepo):
 

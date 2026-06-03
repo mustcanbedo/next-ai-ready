@@ -8,6 +8,7 @@
     "build": "next build",
     "start": "next start",
     "smoke": "node scripts/docs-site-smoke.mjs",
+    "check:artifacts": "node scripts/check-artifacts-drift.mjs",
     "faq:apply": "node scripts/apply-curated-faq.mjs"
   },
   "dependencies": {

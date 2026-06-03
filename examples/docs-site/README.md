@@ -67,6 +67,19 @@ Curated FAQ for all pages lives in `scripts/faq-curated.mjs`. Re-apply after add
 pnpm faq:apply
 ```
 
+## Build artifacts policy
+
+This example **commits** AI artifacts under `public/` and `.next-ai-ready/` so Vercel and clones see consistent files. After editing MDX or framework packages:
+
+```bash
+node ../../packages/meta/dist/cli.js build
+node scripts/check-artifacts-drift.mjs   # fails if git diff on tracked artifacts
+```
+
+Tracked paths (in git): `public/llms.txt`, `public/llms-full.txt`, `public/openapi.json`, `public/tools.json`, `public/.well-known/ai-plugin.json`. Graph lives in `.next-ai-ready/` (gitignored; checked by smoke).
+
+Alternative for new projects: gitignore these paths and rely on `prebuild` only — see [docs/ga-readiness.md](../../docs/ga-readiness.md).
+
 ## Smoke test
 
 From `examples/docs-site`:
@@ -75,6 +88,10 @@ From `examples/docs-site`:
 node scripts/docs-site-smoke.mjs
 ```
 
-Runs build artifact checks (URLs, OpenAPI route hints, curated llms sections) and prints doctor score.
+Runs build artifact checks (URLs, OpenAPI route hints, curated FAQ in graph + llms-full) and prints doctor score.
+
+```bash
+pnpm check:artifacts   # after build — no committed drift
+```
 
 See [`docs/pre-docs-site-checklist.md`](../../docs/pre-docs-site-checklist.md) for the full dogfood checklist.

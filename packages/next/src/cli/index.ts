@@ -81,6 +81,12 @@ export async function runCli(argv: string[]): Promise<number> {
           console.log(
             `[next-ai-ready] doctor: ${result.errors} error(s), ${result.warnings} warning(s)${scoreStr}`,
           );
+          if (result.actionItems?.length) {
+            console.log("[next-ai-ready] Top fixes to improve score:");
+            for (const item of result.actionItems) {
+              console.log(`  → ${item}`);
+            }
+          }
         }
         return result.errors > 0 ? 1 : 0;
       }

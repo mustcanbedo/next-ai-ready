@@ -121,6 +121,17 @@ Use with Claude Desktop:
 | `1`  | Error (missing config, invalid actions, build failure). |
 | `2`  | Unknown command.                                        |
 
+## FAQ
+
+### What CLI commands does next-ai-ready provide?
+
+init scaffolds a project; build compiles artifacts; doctor validates wiring; dev watches content; mcp runs stdio MCP.
+
+### Which package provides the CLI binary?
+
+The next-ai-ready meta package. Use npx next-ai-ready or pnpm exec next-ai-ready.
+
+
 <!-- END /en/docs/api-reference/cli -->
 
 <!-- BEGIN /en/docs/api-reference/config -->
@@ -187,6 +198,17 @@ Control which artifacts are generated:
 | Field     | Type      | Default | Description                                                |
 | --------- | --------- | ------- | ---------------------------------------------------------- |
 | `openapi` | `boolean` | `true`  | Generate `/openapi.json`, `/tools.json`, `/ai-plugin.json` |
+
+## FAQ
+
+### What is ai-ready.config.mjs?
+
+The central config for site metadata, content globs, actions path, llms curation, robots policy, and emit toggles.
+
+### Can I use TypeScript for config?
+
+Yes. ai-ready.config.ts is supported via jiti loading.
+
 
 <!-- END /en/docs/api-reference/config -->
 
@@ -289,6 +311,17 @@ if (result.ok) {
 | `message`   | `string`  | Error message (only when `ok` is `false`).          |
 | `details`   | `unknown` | Zod issues (only when `code` is `"invalid_input"`). |
 
+## FAQ
+
+### What is defineAction?
+
+A helper to declare type-safe, Zod-validated actions that become OpenAPI operations and MCP tools.
+
+### When should an action be public?
+
+Only when it is safe for unauthenticated agents. Otherwise use auth or keep it private.
+
+
 <!-- END /en/docs/api-reference/define-action -->
 
 <!-- BEGIN /en/docs/api-reference/define-semantic -->
@@ -369,6 +402,17 @@ Each node has a stable `id` (hash of route + section path) and a `citeUrl` for d
 All extraction is **deterministic**. The same MDX file with the same config always produces byte-identical output. No LLM calls, no API keys, no randomness.
 
 A pluggable `SemanticProvider` interface exists for LLM-augmented extraction, but no implementations ship in the MVP.
+
+## FAQ
+
+### What is the semantic export in MDX?
+
+An optional export or frontmatter block with summary, topics, questions, and entities for richer graph nodes.
+
+### Do I need semantic metadata on every page?
+
+No, but pages with questions and topics produce better FAQ JSON-LD and llms.txt entries.
+
 
 <!-- END /en/docs/api-reference/define-semantic -->
 
@@ -460,6 +504,17 @@ export default withAiReady({ rewrites: false })({
 
 You still need the route handler files in `app/_ai-ready/` — the rewrites just map clean URLs to them.
 
+## FAQ
+
+### What does withAiReady() do in next.config?
+
+Wraps your Next config to add rewrites for AI routes and optional monorepo outputFileTracingRoot defaults.
+
+### Can I disable automatic rewrites?
+
+Yes. Pass { rewrites: false } to mount AI routes manually under app/_ai-ready/.
+
+
 <!-- END /en/docs/api-reference/with-ai-ready -->
 
 <!-- BEGIN /en/docs/concepts/capability-plane -->
@@ -508,6 +563,17 @@ Actions are **private by default**. Set `public: true` to expose them to AI:
 - **`public: false`** (default) — the action exists in the registry but is not exposed externally
 
 The `whenToUse` field is critical for AI tool selection — it tells the model *when* this action is appropriate. The `doctor` CLI warns if a public action lacks `whenToUse`.
+
+## FAQ
+
+### What does the Capability plane produce?
+
+OpenAPI 3.1, tools.json, ai-plugin.json, MCP tools, and POST /api/actions/<name> endpoints.
+
+### How do I define a callable feature?
+
+Use defineAction with Zod input/output schemas, then run next-ai-ready build to expose it to agents.
+
 
 <!-- END /en/docs/concepts/capability-plane -->
 
@@ -567,6 +633,21 @@ The `withAiReady()` wrapper in `next.config.mjs` does two things:
 
 It does **not** register bundler plugins, inject routes, or use virtual modules. This keeps it Turbopack-safe.
 
+## FAQ
+
+### What happens during next-ai-ready build?
+
+Load config, scan MDX, compile semantic nodes, load actions, assemble the graph, and write public/ plus .next-ai-ready/ artifacts.
+
+### Is the build deterministic?
+
+Yes. Same source tree and config produce byte-identical graph and llms output, suitable for CI diffing.
+
+### Why a separate build step?
+
+The build CLI runs outside the bundler. This is deliberate (ADR-006): Turbopack does not accept custom plugins. A webpack-only plugin would break Next 15+ defaults.Decoupling from the bundler makes the pipeline portable — it can run in CI before next build.Same pattern used by Contentlayer, Velite, and fumadocs-mdx. The cost is one extra line in your build script: next-ai-ready build && next build. The benefit is that your AI layer works identically under Webpack and Turbopack.
+
+
 <!-- END /en/docs/concepts/how-it-works -->
 
 <!-- BEGIN /en/docs/concepts/knowledge-plane -->
@@ -608,6 +689,17 @@ export const semantic = {
 ```
 
 Questions become `FAQPage` JSON-LD automatically — giving your pages a chance to appear in AI-generated FAQ results.
+
+## FAQ
+
+### What does the Knowledge plane produce?
+
+llms.txt, llms-full.txt, per-page .md and .ai.json routes, JSON-LD, and a semantic graph from MDX.
+
+### What content formats are scanned?
+
+MDX and Markdown files matched by the content globs in ai-ready.config.mjs.
+
 
 <!-- END /en/docs/concepts/knowledge-plane -->
 
@@ -655,6 +747,21 @@ The split reflects two fundamentally different problems:
 2. **Features are interactive.** AI agents call your actions on behalf of users; the result depends on runtime state. The pipeline needs validation, auth, and error handling.
 
 Keeping them separate means you can adopt one without the other. A docs-only site uses just the Knowledge Plane. An API-only site uses just the Capability Plane. Most sites use both.
+
+## FAQ
+
+### What are the Knowledge and Capability planes?
+
+Knowledge makes content AI-readable (llms.txt, Markdown, JSON-LD). Capability makes features AI-callable (OpenAPI, MCP, actions).
+
+### Why are the planes separate?
+
+Content ingestion and tool execution have different consumers, security models, and build steps.
+
+### Why two planes?
+
+The split reflects two fundamentally different problems: Content is read-only. AI consumers ingest your docs; they do not modify them. The pipeline is static, cacheable, and deterministic.Features are interactive. AI agents call your actions on behalf of users; the result depends on runtime state. The pipeline needs validation, auth, and error handling. Keeping them separate means you can adopt one without the other. A docs-only site uses just the Knowledge Plane. An API-only site uses just the Capability Plane. Most sites use both.
+
 
 <!-- END /en/docs/concepts/two-planes -->
 
@@ -709,6 +816,17 @@ All semantic extraction is heuristic-based. No LLM calls. Same input + same conf
 
 Users author `actions/index.ts` that exports an array. No file-system scanning. This avoids `"use server"` collisions, is tree-shaking friendly, and gives users a union type of all actions.
 
+## FAQ
+
+### What are ADRs in this project?
+
+Architecture Decision Records documenting why the framework chose specific designs over alternatives.
+
+### Are ADRs normative for users?
+
+They explain intent and trade-offs; the API reference and doctor checks are the operational source of truth.
+
+
 <!-- END /en/docs/decisions/adr-index -->
 
 <!-- BEGIN /en/docs/getting-started/project-structure -->
@@ -762,6 +880,17 @@ Created by `init` in `app/`. Each file is a one-line re-export — readable, aud
 ## Optional files
 
 - `instrumentation.ts` + `instrumentation-node.ts` — Next.js instrumentation (Node-only hooks via `next-ai-ready/hooks`). See [Analytics](/docs/guides/analytics).
+
+## FAQ
+
+### What files does next-ai-ready add to my project?
+
+ai-ready.config, app/_ai-ready/ route stubs, actions/, instrumentation files, and build outputs under public/ and .next-ai-ready/.
+
+### Where does the semantic graph live?
+
+.next-ai-ready/graph.json is written by next-ai-ready build and read at runtime by handlers and JSON-LD helpers.
+
 
 <!-- END /en/docs/getting-started/project-structure -->
 
@@ -882,6 +1011,17 @@ For each public action, the build produces:
 - A `POST /api/actions/<name>` HTTP endpoint.
 - An MCP tool definition in `/api/mcp`.
 
+## FAQ
+
+### How do I expose an action to AI agents?
+
+Define it with defineAction, mark public or add auth, register in actions/index, and run build.
+
+### What is whenToUse for?
+
+It tells agents when to invoke the action versus alternatives, improving tool selection quality.
+
+
 <!-- END /en/docs/guides/actions -->
 
 <!-- BEGIN /en/docs/guides/analytics -->
@@ -984,6 +1124,17 @@ The hooks are registered globally and called by the route handlers at request ti
 
 No external dependencies are required. The hooks are designed to be a thin integration point — bring your own analytics SDK.
 
+## FAQ
+
+### How do I track AI bot traffic?
+
+Use registerAiHooks from next-ai-ready/hooks with onAiRequest for artifact fetches and onInvoke for action calls.
+
+### Why split instrumentation.ts and instrumentation-node.ts?
+
+Next.js loads instrumentation on Edge; Node-only hooks must stay in a separate file dynamically imported on nodejs runtime.
+
+
 <!-- END /en/docs/guides/analytics -->
 
 <!-- BEGIN /en/docs/guides/i18n-ai-urls -->
@@ -1043,6 +1194,17 @@ Use `sections` in config to prioritize one locale in `llms.txt`, or emit separat
 ## Future (Phase 6)
 
 See [`docs/phase6-design.md`](../../../../docs/phase6-design.md) for planned `locale` metadata and cross-locale linking.
+
+## FAQ
+
+### How do locale prefixes affect AI routes?
+
+Each locale path (e.g. /en/docs/page) becomes a separate route in the semantic graph.
+
+### Should middleware redirect AI artifact URLs?
+
+No. Exclude paths with dots, /api, and _ai-ready from locale middleware so crawlers fetch artifacts without redirects.
+
 
 <!-- END /en/docs/guides/i18n-ai-urls -->
 
@@ -1121,6 +1283,17 @@ These are declared as optional in `@next-ai-ready/next`. If they are not install
 - The stdio server runs locally and does not require token auth.
 - **Stdio + auth-gated actions:** MCP stdio uses a synthetic `Request` without browser cookies or session headers. Actions with `auth: (ctx) => ...` that expect real HTTP context may return 401 over stdio — use HTTP MCP or mark demo actions `public: true` for local testing (C-70).
 - You can disable auth entirely by passing `auth: false` to `createAiReadyMcpHandler()`, but this is not recommended in production.
+
+## FAQ
+
+### How do MCP clients connect to my site?
+
+HTTP transport at /api/mcp when running Next.js, or stdio via npx next-ai-ready mcp for Claude Desktop and Cursor.
+
+### How do I secure MCP in production?
+
+Set NEXT_AI_READY_MCP_TOKEN and send Authorization: Bearer <token> on HTTP requests.
+
 
 <!-- END /en/docs/guides/mcp-integration -->
 
@@ -1233,6 +1406,17 @@ From each MDX file, the compiler produces:
 
 All extraction is deterministic. No LLM calls.
 
+## FAQ
+
+### Which frontmatter fields help AI extraction?
+
+summary, questions, tags, updatedAt, and author improve llms.txt, FAQ nodes, and JSON-LD quality.
+
+### Does the docs-site UI execute MDX exports?
+
+No. This site uses a simplified Markdown renderer for UI; the build pipeline runs the full semantic compiler.
+
+
 <!-- END /en/docs/guides/mdx-content -->
 
 <!-- BEGIN /en/docs/guides/quickstart -->
@@ -1314,6 +1498,21 @@ All checks should pass. Then start your dev server and visit:
 - Read about the [Knowledge Plane](/docs/concepts/knowledge-plane) to understand content compilation
 - Read about the [Capability Plane](/docs/concepts/capability-plane) to define custom actions
 - Check the [API Reference](/docs/api-reference/config) for full configuration options
+
+## FAQ
+
+### How long does the quickstart take?
+
+About five minutes from install through init, content, build, and doctor.
+
+### Which endpoints should work after build?
+
+/llms.txt, /openapi.json, /tools.json, and per-page Markdown routes when the dev server is running.
+
+### When should I run next-ai-ready build?
+
+After changing MDX content or actions, and before deploy so public/ and .next-ai-ready/ artifacts stay fresh.
+
 
 <!-- END /en/docs/guides/quickstart -->
 
@@ -1409,6 +1608,17 @@ The framework detects these user agents:
 - `CCBot` — Common Crawl
 - `Bytespider` — ByteDance
 - `Applebot-Extended` — Apple
+
+## FAQ
+
+### How do I allow AI crawlers explicitly?
+
+next-ai-ready build can emit robots.txt with GPTBot, ClaudeBot, and other AI bots allowed, or use app/robots.ts with aiRobots().
+
+### Should I advertise llms.txt in robots.txt?
+
+Yes. The build adds comments pointing crawlers to /llms.txt and /llms-full.txt when configured.
+
 
 <!-- END /en/docs/guides/robots-txt -->
 
@@ -1510,6 +1720,21 @@ npx next-ai-ready doctor --score
 
 Doctor checks your config, validates action exposure rules, detects `noai` meta, robots conflicts, and confirms route wiring. Use it in CI — exit 0 means no errors (warnings are OK).
 
+## FAQ
+
+### What are the prerequisites for next-ai-ready?
+
+Node.js 20+, Next.js 15+ with App Router, and Zod v4 for actions.
+
+### Do I need to install @next-ai-ready/* packages separately?
+
+No. Install only the next-ai-ready meta package; it re-exports handlers and the CLI.
+
+### What does next-ai-ready init create?
+
+ai-ready.config, route stubs under app/_ai-ready/, action and MCP endpoints, and optional instrumentation files.
+
+
 <!-- END /en/docs/installation -->
 
 <!-- BEGIN /en/docs/introduction -->
@@ -1556,6 +1781,21 @@ Your existing UI is untouched. The framework adds **new routes** that serve AI-o
 | `/<page>.md`    | RAG pipelines          |
 | `JSON-LD`       | Search engines         |
 | `/tools.json`   | OpenAI tool format     |
+
+## FAQ
+
+### What is next-ai-ready?
+
+An AEO and Agent-API layer for Next.js that adds llms.txt, OpenAPI, MCP, and structured content without changing your UI.
+
+### How is next-ai-ready different from SEO?
+
+SEO targets browsers and search rankings; next-ai-ready targets AI crawlers and agents with artifacts like llms.txt, JSON-LD, and callable actions.
+
+### Do I need to change my existing pages?
+
+No. The framework adds AI routes and build artifacts alongside your current App Router UI.
+
 
 <!-- END /en/docs/introduction -->
 
@@ -1678,6 +1918,17 @@ npx next-ai-ready mcp
 | `1` | 错误（缺少配置、无效 action、构建失败）。 |
 | `2` | 未知命令。                    |
 
+## FAQ
+
+### next-ai-ready 有哪些 CLI 命令？
+
+init 脚手架、build 编译产物、doctor 校验、dev 监听内容、mcp 启动 stdio 服务。
+
+### CLI 来自哪个包？
+
+next-ai-ready 聚合包。使用 npx next-ai-ready 或 pnpm exec next-ai-ready。
+
+
 <!-- END /zh/docs/api-reference/cli -->
 
 <!-- BEGIN /zh/docs/api-reference/config -->
@@ -1744,6 +1995,17 @@ export default defineActions([ ... ]);
 | 字段        | 类型        | 默认值    | 描述                                                 |
 | --------- | --------- | ------ | -------------------------------------------------- |
 | `openapi` | `boolean` | `true` | 生成 `/openapi.json`、`/tools.json`、`/ai-plugin.json` |
+
+## FAQ
+
+### ai-ready.config.mjs 是什么？
+
+全站配置：site 元数据、content glob、actions 路径、llms 分区、robots 策略与 emit 开关。
+
+### 可以用 TypeScript 写配置吗？
+
+可以。支持 ai-ready.config.ts，通过 jiti 加载。
+
 
 <!-- END /zh/docs/api-reference/config -->
 
@@ -1846,6 +2108,17 @@ if (result.ok) {
 | `message`   | `string`  | 错误信息（仅当 `ok` 为 `false`）。                   |
 | `details`   | `unknown` | Zod issues（仅当 `code` 为 `"invalid_input"`）。 |
 
+## FAQ
+
+### defineAction 是什么？
+
+声明带 Zod 校验的类型安全 action，并生成 OpenAPI 操作与 MCP 工具。
+
+### 何时应设为 public action？
+
+仅当对未认证 Agent 也安全时。否则使用 auth 或保持私有。
+
+
 <!-- END /zh/docs/api-reference/define-action -->
 
 <!-- BEGIN /zh/docs/api-reference/define-semantic -->
@@ -1926,6 +2199,17 @@ reviewedBy:
 所有提取都是**确定性的**。相同的 MDX 文件加相同的配置总是产出字节级一致的输出。无 LLM 调用，无 API 密钥，无随机性。
 
 存在可插拔的 `SemanticProvider` 接口用于 LLM 增强提取，但 MVP 中不提供任何实现。
+
+## FAQ
+
+### MDX 中的 semantic 是什么？
+
+可选 export 或 frontmatter，包含 summary、topics、questions、entities，用于丰富图谱节点。
+
+### 每页都必须写 semantic 吗？
+
+不必须，但有 questions 与 topics 的页面会产生更好的 FAQ JSON-LD 与 llms 条目。
+
 
 <!-- END /zh/docs/api-reference/define-semantic -->
 
@@ -2017,6 +2301,17 @@ export default withAiReady({ rewrites: false })({
 
 你仍然需要 `app/_ai-ready/` 中的 route handler 文件——rewrite 只是将干净 URL 映射到它们。
 
+## FAQ
+
+### withAiReady() 在 next.config 里做什么？
+
+包装 Next 配置，添加 AI 路由 rewrite，以及可选的 monorepo outputFileTracingRoot 默认值。
+
+### 可以关闭自动 rewrite 吗？
+
+可以。传入 { rewrites: false }，手动在 app/_ai-ready/ 挂载路由。
+
+
 <!-- END /zh/docs/api-reference/with-ai-ready -->
 
 <!-- BEGIN /zh/docs/concepts/capability-plane -->
@@ -2065,6 +2360,17 @@ Action **默认私有**。设置 `public: true` 将其暴露给 AI：
 - **`public: false`**（默认） — Action 存在于注册表中但不对外暴露
 
 `whenToUse` 字段对 AI 工具选择至关重要 —— 它告诉模型*何时*该 Action 是合适的。`doctor` CLI 会在公开 Action 缺少 `whenToUse` 时发出警告。
+
+## FAQ
+
+### 能力平面产出什么？
+
+OpenAPI 3.1、tools.json、ai-plugin.json、MCP 工具，以及 POST /api/actions/<name> 端点。
+
+### 如何定义可被调用的功能？
+
+用 defineAction 声明 Zod schema，再运行 next-ai-ready build 暴露给 Agent。
+
 
 <!-- END /zh/docs/concepts/capability-plane -->
 
@@ -2124,6 +2430,17 @@ Updated: 2026-06-02
 
 它**不**注册 bundler 插件、不注入路由、不使用虚拟模块。这保证了 Turbopack 兼容性。
 
+## FAQ
+
+### next-ai-ready build 做了什么？
+
+加载配置、扫描 MDX、编译语义节点、加载 action、组装 graph，并写入 public/ 与 .next-ai-ready/。
+
+### 构建是确定性的吗？
+
+是。相同源码与配置会产生字节级一致的 graph 与 llms 输出，适合 CI diff。
+
+
 <!-- END /zh/docs/concepts/how-it-works -->
 
 <!-- BEGIN /zh/docs/concepts/knowledge-plane -->
@@ -2165,6 +2482,17 @@ export const semantic = {
 ```
 
 Questions 会自动成为 `FAQPage` JSON-LD —— 让你的页面有机会出现在 AI 生成的 FAQ 结果中。
+
+## FAQ
+
+### 知识平面产出什么？
+
+llms.txt、llms-full.txt、逐页 .md/.ai.json 路由、JSON-LD，以及由 MDX 编译的语义图谱。
+
+### 扫描哪些内容格式？
+
+ai-ready.config.mjs 中 content glob 匹配的 MDX 与 Markdown 文件。
+
 
 <!-- END /zh/docs/concepts/knowledge-plane -->
 
@@ -2212,6 +2540,17 @@ Updated: 2026-06-02
 2. **功能是交互式的。** AI agent 代表用户调用你的 action；结果取决于运行时状态。管线需要验证、认证和错误处理。
 
 分开意味着你可以只采用其中一个。纯文档站只用知识平面。纯 API 站只用能力平面。大多数站点两者都用。
+
+## FAQ
+
+### 知识平面和能力平面分别是什么？
+
+知识平面让内容 AI 可读（llms.txt、Markdown、JSON-LD）；能力平面让功能 AI 可调用（OpenAPI、MCP、action）。
+
+### 为什么要分成两个平面？
+
+内容摄取与工具调用的消费者、安全模型和构建步骤不同，分离更清晰。
+
 
 <!-- END /zh/docs/concepts/two-planes -->
 
@@ -2266,6 +2605,17 @@ Action 默认私有。必须设置 `public: true` 才能通过 HTTP 或 MCP 暴�
 
 用户编写导出数组的 `actions/index.ts`。无文件系统扫描。这避免了 `"use server"` 冲突，对 tree-shaking 友好，并给用户提供所有 action 的联合类型。
 
+## FAQ
+
+### 本项目中的 ADR 是什么？
+
+架构决策记录，说明框架为何选择某种设计而非替代方案。
+
+### ADR 对用户是强制规范吗？
+
+ADR 解释意图与权衡；API 参考与 doctor 检查才是运行时的权威来源。
+
+
 <!-- END /zh/docs/decisions/adr-index -->
 
 <!-- BEGIN /zh/docs/getting-started/project-structure -->
@@ -2319,6 +2669,17 @@ Updated: 2026-06-02
 ## 可选文件
 
 - `instrumentation.ts` + `instrumentation-node.ts` — Next.js instrumentation（通过 `next-ai-ready/hooks` 注册 Node 专用 hook）。详见 [分析](/docs/guides/analytics)。
+
+## FAQ
+
+### next-ai-ready 会在项目里添加哪些文件？
+
+ai-ready.config、app/_ai-ready/ 路由桩、actions/、instrumentation，以及 public/ 与 .next-ai-ready/ 下的构建产物。
+
+### 语义图谱保存在哪里？
+
+next-ai-ready build 写入 .next-ai-ready/graph.json，运行时由 handler 与 JSON-LD 助手读取。
+
 
 <!-- END /zh/docs/getting-started/project-structure -->
 
@@ -2439,6 +2800,17 @@ defineAction({
 - `POST /api/actions/<name>` HTTP 端点。
 - `/api/mcp` 中的 MCP 工具定义。
 
+## FAQ
+
+### 如何把 action 暴露给 AI Agent？
+
+用 defineAction 定义，设置 public 或 auth，在 actions/index 注册，然后 build。
+
+### whenToUse 有什么用？
+
+告诉 Agent 何时应调用该 action，提升工具选择质量。
+
+
 <!-- END /zh/docs/guides/actions -->
 
 <!-- BEGIN /zh/docs/guides/analytics -->
@@ -2541,6 +2913,17 @@ Hook 全局注册，由 route handler 在请求时调用。它们在 handler 执
 
 不需要外部依赖。Hook 被设计为薄集成点——自行引入你的分析 SDK。
 
+## FAQ
+
+### 如何追踪 AI 爬虫访问？
+
+通过 next-ai-ready/hooks 的 registerAiHooks，用 onAiRequest 记录产物请求，onInvoke 记录 action 调用。
+
+### 为什么要拆分 instrumentation 文件？
+
+Next.js 在 Edge 也会加载 instrumentation；Node 专用 hooks 需在 nodejs 运行时动态 import。
+
+
 <!-- END /zh/docs/guides/analytics -->
 
 <!-- BEGIN /zh/docs/guides/i18n-ai-urls -->
@@ -2597,6 +2980,17 @@ export const config = {
 ## 后续（Phase 6）
 
 见 [`docs/phase6-design.md`](../../../../docs/phase6-design.md)。
+
+## FAQ
+
+### locale 前缀如何影响 AI 路由？
+
+每个 locale 路径（如 /zh/docs/page）在语义图谱中是独立路由。
+
+### middleware 应 redirect AI 产物 URL 吗？
+
+不应。matcher 需排除带点路径、/api、_ai-ready，避免爬虫被重定向。
+
 
 <!-- END /zh/docs/guides/i18n-ai-urls -->
 
@@ -2676,6 +3070,17 @@ pnpm add @modelcontextprotocol/sdk mcp-handler
 - **Stdio 与 auth action：** stdio 使用合成 `Request`，无浏览器 cookie/会话。依赖 HTTP 上下文的 `auth` 钩子在 stdio 下可能返回 401 — 本地测试请用 HTTP MCP 或将 demo action 设为 `public: true`（C-70）。
 - 可通过 `createAiReadyMcpHandler({ auth: false })` 关闭 HTTP 鉴权，生产环境不推荐。
 - 可以通过传递 `auth: false` 给 `createAiReadyMcpHandler()` 完全禁用认证，但不建议在生产环境中这样做。
+
+## FAQ
+
+### MCP 客户端如何连接我的站点？
+
+Next.js 运行时走 /api/mcp HTTP 传输；Claude Desktop/Cursor 可用 npx next-ai-ready mcp stdio。
+
+### 生产环境如何保护 MCP？
+
+设置 NEXT_AI_READY_MCP_TOKEN，HTTP 请求需带 Authorization: Bearer <token>。
+
 
 <!-- END /zh/docs/guides/mcp-integration -->
 
@@ -2788,6 +3193,17 @@ pnpm add next-ai-ready
 
 所有提取都是确定性的，无 LLM 调用。
 
+## FAQ
+
+### 哪些 frontmatter 有助于 AI 提取？
+
+summary、questions、tags、updatedAt、author 可提升 llms.txt、FAQ 节点与 JSON-LD 质量。
+
+### docs-site 的 UI 会执行 MDX export 吗？
+
+不会。UI 使用简化 Markdown 渲染；完整语义编译由 build 管线完成。
+
+
 <!-- END /zh/docs/guides/mdx-content -->
 
 <!-- BEGIN /zh/docs/guides/quickstart -->
@@ -2869,6 +3285,21 @@ npx next-ai-ready doctor
 - 阅读[知识平面](/zh/docs/concepts/knowledge-plane)了解内容编译
 - 阅读[能力平面](/zh/docs/concepts/capability-plane)了解自定义 Action
 - 查看 [API 参考](/docs/api-reference/config)了解完整配置选项
+
+## FAQ
+
+### 快速开始需要多久？
+
+约五分钟，完成安装、init、内容、build 和 doctor 验证。
+
+### build 之后应能访问哪些端点？
+
+/llms.txt、/openapi.json、/tools.json，以及 dev 服务器运行时的逐页 Markdown 路由。
+
+### 什么时候需要运行 next-ai-ready build？
+
+修改 MDX 或 action 后、部署前，确保 public/ 与 .next-ai-ready/ 产物最新。
+
 
 <!-- END /zh/docs/guides/quickstart -->
 
@@ -2964,6 +3395,17 @@ robots: {
 - `CCBot` — Common Crawl
 - `Bytespider` — ByteDance
 - `Applebot-Extended` — Apple
+
+## FAQ
+
+### 如何显式允许 AI 爬虫？
+
+build 可生成含 GPTBot、ClaudeBot 等规则的 robots.txt，或在 app/robots.ts 使用 aiRobots()。
+
+### 是否应在 robots.txt 中声明 llms.txt？
+
+建议声明。构建时可通过注释指向 /llms.txt 与 /llms-full.txt。
+
 
 <!-- END /zh/docs/guides/robots-txt -->
 
@@ -3065,6 +3507,21 @@ npx next-ai-ready doctor --score
 
 Doctor 检查配置、action 暴露规则、`noai` meta、robots 冲突及路由接线。可在 CI 中使用 — exit 0 表示无 error（warning 可接受）。
 
+## FAQ
+
+### 安装 next-ai-ready 需要什么环境？
+
+Node.js 20+、Next.js 15+ App Router，以及用于 action 的 Zod v4。
+
+### 需要单独安装 @next-ai-ready/* 包吗？
+
+不需要。只安装 next-ai-ready 聚合包即可，已包含 handler 与 CLI。
+
+### next-ai-ready init 会生成什么？
+
+ai-ready.config、app/_ai-ready/ 路由桩、action/MCP 端点，以及可选的 instrumentation 文件。
+
+
 <!-- END /zh/docs/installation -->
 
 <!-- BEGIN /zh/docs/introduction -->
@@ -3111,5 +3568,20 @@ npx next-ai-ready build
 | `/<page>.md`    | RAG 管道                |
 | `JSON-LD`       | 搜索引擎                  |
 | `/tools.json`   | OpenAI 工具格式           |
+
+## FAQ
+
+### 什么是 next-ai-ready？
+
+面向 Next.js 的 AEO 与 Agent-API 层，在不改 UI 的前提下提供 llms.txt、OpenAPI、MCP 与结构化内容。
+
+### next-ai-ready 和 SEO 有什么区别？
+
+SEO 面向浏览器与搜索排名；next-ai-ready 面向 AI 爬虫与 Agent，产出 llms.txt、JSON-LD 和可调用 action。
+
+### 需要改动现有页面吗？
+
+不需要。框架在现有 App Router 之外增加 AI 路由与构建产物。
+
 
 <!-- END /zh/docs/introduction -->

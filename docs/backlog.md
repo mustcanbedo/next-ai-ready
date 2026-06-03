@@ -7,11 +7,13 @@
 > | 文档 | 读者 | 内容 |
 > |------|------|------|
 > | `completion-audit.md` | 决策者 / 发布负责人 | 完成度评估、P0–P2 行动项、0.1 DoD |
+> | [`ga-readiness.md`](./ga-readiness.md) | 发布负责人 | **0.1 GA** 还剩什么、DoD |
+> | [`post-ga.md`](./post-ga.md) | 产品 / 维护者 | **GA 之后**优化（PG-xx） |
 > | **`backlog.md`（本文）** | 开发者 / 长期维护 | **全部**未完成项、优化项、Phase 6、文档债 |
 >
 > **维护规则：** 完成一项 → 在本文件标记 `[x]` 并注明日期；`completion-audit.md` 的 P0/P1 仅保留摘要，细节以本文为准。
 >
-> **最后更新：** 2026-06-01（alpha.7 backlog 清零：R-08、T-07、测试、文档、Phase 6 设计）
+> **最后更新：** 2026-06-02（alpha.9/10 adopter UX；GA 清单见 [`ga-readiness.md`](./ga-readiness.md)；GA 后见 [`post-ga.md`](./post-ga.md)）
 
 ---
 
@@ -357,11 +359,32 @@
 
 R-05～R-07, R-09～R-10, N-05～N-06, N-09～N-11, X-01～X-05, C-02, E-08
 
-**当前主战场：** 0.1 GA（UX 手验）+ Phase 6 预研 + §8 🟢 技术债
+**当前主战场：** 0.1 GA（见 [`ga-readiness.md`](./ga-readiness.md)）+ [`post-ga.md`](./post-ga.md) 排队
 
 ---
 
-## 13. 统计摘要
+## 13. Post-GA 产品与 DX
+
+> 完整说明与优先级 → **[`post-ga.md`](./post-ga.md)**。实现时在本节登记 ID。
+
+| ID | 项 | 优先级 |
+|----|-----|--------|
+| PG-01 | 单轨 docs 模板（create-next-ai-ready） | P1 |
+| PG-02 | Locale-aware llms.txt 分区 | P1 |
+| PG-03 | HTTP actions 全局鉴权 recipe / 可选 env gate | P1 |
+| PG-04 | `doctor --check-artifacts` 通用化 | P1 |
+| PG-05 | npm `0.1.0` GA tag（非 @alpha） | P1 |
+| PG-06 | ContentSource / CMS 适配器产品化 | P2 |
+| PG-07 | SemanticProvider LLM enrich | P2 |
+| PG-08 | 更简 onboarding（doctor --fix） | P2 |
+| PG-09 | UI 完整 MDX 或官方 docs 栈指引 | P2 |
+| PG-10 | Edge Knowledge handlers 完整移植 | P2 |
+| PG-11 | MCP 按 locale 过滤 resources | P2 |
+| PG-12～PG-17 | 见 post-ga.md | P3 |
+
+---
+
+## 14. 统计摘要
 
 | 类别 | 未完成项（约） |
 |------|----------------|
@@ -374,10 +397,11 @@ R-05～R-07, R-09～R-10, N-05～N-06, N-09～N-11, X-01～X-05, C-02, E-08
 
 ---
 
-## 14. 变更 log
+## 15. 变更 log
 
 | 日期 | 变更 |
 |------|------|
+| 2026-06-02 | GA 文档：`ga-readiness.md`、`post-ga.md`、`docs/README.md`；adopter UX alpha.10；action-auth recipe |
 | 2026-06-01 | alpha.7 backlog 清零：AiReadyError, ai-plugin handler, snapshots, i18n/peer docs, Phase 6 design |
 | 2026-06-01 | alpha.4 bump；e2e-smoke + doctor；E-06 bin-smoke；CI release checks |
 | 2026-06-01 | D-10～D-22 文档内容 ✅；PR-5/PR-6 完成（R-01/R-02/R-03/R-06/D-06/U-05/T-*）；测试 97→109 |

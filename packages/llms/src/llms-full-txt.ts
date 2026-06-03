@@ -12,6 +12,7 @@ import type { SemanticGraph, SemanticNode } from "@next-ai-ready/core";
  *   Updated: <updatedAt?>
  *
  *   <body>
+ *   ## FAQ (when page.questions present)
  *   <!-- END <route> -->
  *
  * Pages are emitted in lexicographic route order for stable diffs.
@@ -34,6 +35,17 @@ export function renderLlmsFullTxt(graph: SemanticGraph): string {
     if (page.updatedAt) out.push(`Updated: ${page.updatedAt}`);
     out.push("");
     if (page.body) out.push(page.body);
+    if (page.questions?.length) {
+      out.push("");
+      out.push("## FAQ");
+      out.push("");
+      for (const { q, a } of page.questions) {
+        out.push(`### ${q}`);
+        out.push("");
+        out.push(a);
+        out.push("");
+      }
+    }
     out.push("");
     out.push(`<!-- END ${page.route} -->`);
     out.push("");

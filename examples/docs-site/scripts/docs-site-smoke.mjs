@@ -53,6 +53,12 @@ async function main() {
   }
   ok("graph.json curated FAQ");
 
+  const llmsFull = await readFile(join(ROOT, "public/llms-full.txt"), "utf8");
+  if (!llmsFull.includes("What is next-ai-ready?")) {
+    fail("llms-full.txt missing curated FAQ content");
+  }
+  ok("llms-full.txt curated FAQ");
+
   const openapi = await readFile(join(ROOT, "public/openapi.json"), "utf8");
   if (openapi.includes("/en/introduction'") || openapi.includes('/en/introduction"')) {
     fail("openapi.json still uses stale /en/introduction route example");
@@ -74,10 +80,13 @@ async function main() {
     console.error(doctor.stderr);
     fail(`doctor exit ${doctor.status}`);
   }
-  const scoreLine = doctor.stdout.trim().split("\n").pop() ?? "";
-  console.log(`  ✓ ${scoreLine}`);
+  const scoreLine =
+    doctor.stdout
+      .split("\n")
+      .find((line) => /\[next-ai-ready\] doctor:.*score \d+\/100/.test(line)) ?? "";
+  console.log(`  ✓ ${scoreLine.trim()}`);
   if (!/score 9[0-9]\/100|score 100\/100/.test(scoreLine)) {
-    fail(`expected doctor score ≥ 90, got: ${scoreLine}`);
+    fail(`expected doctor score ≥ 90, got: ${scoreLine || doctor.stdout}`);
   }
 
   console.log("\n[docs-site-smoke] ALL CHECKS PASSED");

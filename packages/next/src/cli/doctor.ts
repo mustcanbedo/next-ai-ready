@@ -25,6 +25,8 @@ export interface DoctorResult {
   score?: number;
   /** Machine-readable JSON report. Only present when `json` option is set. */
   report?: DoctorReport;
+  /** Top fixes to raise score (when `score` or `json`). */
+  actionItems?: string[];
 }
 
 export interface DoctorReport {
@@ -47,6 +49,8 @@ export interface DoctorReport {
   /** 24 tactics from goals.md (R-05). Present when --json or --score. */
   tactics?: TacticResult[];
   tacticsScore?: number;
+  /** Top actionable fixes (warn/error checks), highest impact first. */
+  actionItems?: string[];
 }
 
 export interface DoctorOptions {
@@ -246,6 +250,10 @@ export async function runDoctor(opts: DoctorOptions = {}): Promise<DoctorResult>
   }
 
   // 7. T-03: robots.txt allows AI bots.
+  const emitStaticRobots = config.emit?.robots !== false;
+  const hasAppRobots =
+    (await fileExists(join(cwd, "app", "robots.ts"))) ||
+    (await fileExists(join(cwd, "app", "robots.js")));
   const robotsTxt = await readTextFile(publicRobotsTxtPath(cwd));
   if (robotsTxt !== null) {
     const knownBotIds = AI_BOTS.map((b) => b.id);
@@ -262,14 +270,25 @@ export async function runDoctor(opts: DoctorOptions = {}): Promise<DoctorResult>
         "Robots AI policy",
       );
     }
+  } else if (hasAppRobots && !emitStaticRobots) {
+    add(
+      CHECK.ROBOTS_AI_BOTS,
+      "ok",
+      "Using app/robots.ts with emit.robots: false — static public/robots.txt is not required.",
+      "Robots AI policy",
+    );
+  } else if (hasAppRobots) {
+    add(
+      CHECK.ROBOTS_AI_BOTS,
+      "ok",
+      "Using app/robots.ts for robots policy at runtime (no static public/robots.txt).",
+      "Robots AI policy",
+    );
   } else {
     add(CHECK.ROBOTS_AI_BOTS, "warn", "No public/robots.txt found. Run `next-ai-ready build`.", "Robots AI policy");
   }
 
   // 7b. N-04: static public/robots.txt vs dynamic app/robots.ts.
-  const hasAppRobots =
-    (await fileExists(join(cwd, "app", "robots.ts"))) ||
-    (await fileExists(join(cwd, "app", "robots.js")));
   if (hasAppRobots && robotsTxt !== null) {
     add(
       CHECK.ROBOTS_STRATEGY,
@@ -474,6 +493,53 @@ function weight(checkId: string): number {
 // Finalize + helpers
 // ─────────────────────────────────────────────────────────────────────────────
 
+/** Actionable fix hints keyed by check id (warn/error only). */
+const CHECK_FIXES: Partial<Record<string, string>> = {
+  [CHECK.CONFIG]: "Run `npx next-ai-ready init` to create ai-ready.config.mjs and route stubs.",
+  [CHECK.SITE_NAME]: "Set `site.name` in ai-ready.config.mjs.",
+  [CHECK.SITE_BASE_URL]: "Set `site.baseUrl` to your production URL (no trailing slash).",
+  [CHECK.SITE_DESCRIPTION]: "Add `site.description` — used in llms.txt and OpenAPI metadata.",
+  [CHECK.ACTIONS_LOAD]: "Fix `actions` path in config or register at least one `defineAction`.",
+  [CHECK.ACTIONS_PUBLIC]: "Set `public: true` only on actions you intend agents to call.",
+  [CHECK.ACTIONS_WHEN_TO_USE]: "Add `whenToUse` to every public action so agents pick the right tool.",
+  [CHECK.BUILD_GRAPH]: "Run `npx next-ai-ready build` before deploy.",
+  [CHECK.BUILD_OPENAPI]: "Run `npx next-ai-ready build` to emit openapi.json.",
+  [CHECK.ROUTE_STUBS]: "Run `npx next-ai-ready init` to scaffold app/_ai-ready handler stubs.",
+  [CHECK.NEXT_CONFIG]: "Wrap next.config with `withAiReady()` from next-ai-ready (or @next-ai-ready/next).",
+  [CHECK.BUILD_SCRIPT]: 'Add `"prebuild": "next-ai-ready build"` (or include build in `build` script).',
+  [CHECK.ROBOTS_AI_BOTS]:
+    "Run `next-ai-ready build`, or use `app/robots.ts` + `aiRobots()` and set `emit.robots: false`.",
+  [CHECK.ROBOTS_STRATEGY]:
+    "Remove `public/robots.txt` when using `app/robots.ts`, or set `emit.robots: false` in config.",
+  [CHECK.NOAI_META]: "Remove `noai: true` from pages you want AI crawlers to index.",
+  [CHECK.JSON_LD]: "Inject JSON-LD via `getPageJsonLd()` / `getSiteJsonLd()` in your layout or doc pages.",
+  [CHECK.GRAPH_UPDATED_AT]: "Add `updatedAt` to MDX frontmatter for fresher citations.",
+  [CHECK.GRAPH_AUTHOR]: "Add `author` to MDX frontmatter for E-E-A-T signals.",
+  [CHECK.MCP_TOKEN]: "Set `NEXT_AI_READY_MCP_TOKEN` in production to protect `/api/mcp`.",
+};
+
+function buildActionItems(checks: DoctorReport["checks"], limit = 3): string[] {
+  const items: string[] = [];
+  const seen = new Set<string>();
+  const ranked = checks
+    .filter((c) => c.level === "error" || c.level === "warn")
+    .sort((a, b) => {
+      const levelOrder = { error: 0, warn: 1, ok: 2 };
+      const ld = levelOrder[a.level] - levelOrder[b.level];
+      if (ld !== 0) return ld;
+      return weight(b.id) - weight(a.id);
+    });
+
+  for (const c of ranked) {
+    const fix = CHECK_FIXES[c.id];
+    if (!fix || seen.has(fix)) continue;
+    seen.add(fix);
+    items.push(fix);
+    if (items.length >= limit) break;
+  }
+  return items;
+}
+
 function finalize(
   diagnostics: Diagnostic[],
   checks: DoctorReport["checks"],
@@ -484,6 +550,8 @@ function finalize(
   tacticsScoreValue?: number,
 ): DoctorResult {
   const score = opts.score || opts.json ? computeScore(checks) : undefined;
+  const actionItems =
+    opts.score || opts.json ? buildActionItems(checks) : undefined;
   const report: DoctorReport | undefined = opts.json
     ? {
         version: "1",
@@ -499,6 +567,7 @@ function finalize(
         },
         tactics,
         tacticsScore: tacticsScoreValue,
+        actionItems,
       }
     : undefined;
 
@@ -508,6 +577,7 @@ function finalize(
     warnings: diagnostics.filter((d) => d.level === "warn").length,
     score,
     report,
+    actionItems,
   };
 }
 

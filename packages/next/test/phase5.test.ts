@@ -200,6 +200,42 @@ describe("runDoctor()", () => {
     }
   });
 
+  it("does not warn missing public/robots.txt when app/robots.ts and emit.robots false", async () => {
+    const config = `export default {
+  site: { name: "Doc", baseUrl: "https://doc.test", description: "x" },
+  content: ["content/**/*.mdx"],
+  emit: { robots: false },
+};
+`;
+    const { dir, cleanup } = await makeProject(config);
+    await mkdir(join(dir, "app"), { recursive: true });
+    await writeFile(
+      join(dir, "app", "robots.ts"),
+      `export default function robots() { return { rules: [{ userAgent: "*", allow: "/" }] }; }\n`,
+      "utf8",
+    );
+    try {
+      const r = await runDoctor({ cwd: dir, score: true });
+      expect(r.diagnostics.some((d) => d.message.includes("No public/robots.txt found"))).toBe(false);
+      expect(
+        r.diagnostics.some((d) => d.level === "ok" && d.message.includes("app/robots.ts")),
+      ).toBe(true);
+    } finally {
+      await cleanup();
+    }
+  });
+
+  it("includes actionItems when --json is set", async () => {
+    const { dir, cleanup } = await makeProject();
+    try {
+      const r = await runDoctor({ cwd: dir, json: true });
+      expect(r.report?.actionItems).toBeDefined();
+      expect(Array.isArray(r.report!.actionItems)).toBe(true);
+    } finally {
+      await cleanup();
+    }
+  });
+
   it("warns when graph pages lack JSON-LD helpers (T-02)", async () => {
     const { dir, cleanup } = await makeProject(CONFIG_WITH_ACTIONS);
     await mkdir(join(dir, "content"), { recursive: true });

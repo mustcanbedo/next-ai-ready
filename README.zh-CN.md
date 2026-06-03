@@ -98,6 +98,14 @@ npx next-ai-ready mcp      # 通过 stdio 运行 MCP 服务器（Claude Desktop 
 
 然后运行 `next build`，你的站点就能被 AI 发现和调用了。
 
+**10 分钟上手：** [`docs/quickstart-10min.zh-CN.md`](./docs/quickstart-10min.zh-CN.md) · [English](./docs/quickstart-10min.md)
+
+或使用脚手架：
+
+```bash
+npm create next-ai-ready@alpha my-app
+```
+
 ### 分析钩子
 
 了解哪些 AI 爬虫读取了你的内容、哪些 Agent 调用了你的 action：
@@ -124,7 +132,7 @@ registerAiHooks({
 
 ## 状态
 
-🚧 **Pre-alpha**（`0.1.0-alpha.7`），但核心功能已实现并测试（9 个包共 146 个测试）：
+🚧 **Pre-alpha**（`0.1.0-alpha.10`，待 publish），但核心功能已实现并测试（9 个包共 145+ 个测试）：
 
 - ✅ **知识平面** — MDX → 语义图 → `llms.txt` / `*.md` / `*.ai.json` / JSON-LD
 - ✅ **能力平面** — `defineAction` → `/api/actions/<name>` + OpenAPI 3.1 / `tools.json` / `ai-plugin.json`
@@ -132,13 +140,16 @@ registerAiHooks({
 - ✅ **开发工具** — `build` / `init` / `doctor` / `mcp` CLI，`robots.txt`，分析钩子
 - ✅ **文档站** — 线上 [next-ai-ready.vercel.app](https://next-ai-ready.vercel.app/zh)（[源码](./examples/docs-site)）
 
-详见 [`docs/`](./docs)：
+详见 [`docs/`](./docs)（[**文档索引**](./docs/README.md)）：
 
 - [`docs/goals.md`](./docs/goals.md) — 北极星：AEO + Agent 能力
+- [`docs/ga-readiness.md`](./docs/ga-readiness.md) — 0.1 GA 清单
+- [`docs/post-ga.md`](./docs/post-ga.md) — GA 之后规划
 - [`docs/research.md`](./docs/research.md) — 竞品分析
 - [`docs/architecture.md`](./docs/architecture.md) — 完整架构
 - [`docs/decisions.md`](./docs/decisions.md) — 架构决策记录
 - [`docs/roadmap.md`](./docs/roadmap.md) — 分阶段交付计划
+- [`docs/quickstart-10min.zh-CN.md`](./docs/quickstart-10min.zh-CN.md) — 10 分钟上手
 
 ### 已知限制
 
@@ -147,7 +158,7 @@ registerAiHooks({
 - **不支持静态导出** — Next.js 的 `output: 'export'` 不兼容（handler 需要服务端运行时）。
 - **不支持 Pages Router** — 仅支持 App Router。`withAiReady()` 和路由 handler 基于 App Router 约定。
 - **推荐 Next.js 15+** — handler 使用 `params: Promise<>`（异步 params）。Next.js 14 可通过 `Promise.resolve()` 兼容但未官方测试。
-- **无 i18n 图** — SemanticGraph 没有 locale 维度。多语言站点通过扫描 `content/{locale}/*.mdx` 工作，但 graph 路由包含 locale 前缀。
+- **i18n 在 graph 层为路由级，非 CMS 级** — 当路由带 locale 前缀（如 `/zh/docs/...`）时，`SemanticGraph` 含 `locale` 与 `routesByLocale`；`llms.txt` 分区与 MCP 资源仍需按语言手动策展。见 [i18n 指南](https://next-ai-ready.vercel.app/zh/docs/guides/i18n-ai-urls) 与 [Phase 6 设计](./docs/phase6-design.md)。
 
 ## 许可证
 

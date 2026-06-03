@@ -79,6 +79,8 @@ describe("renderLlmsFullTxt()", () => {
     expect(beginIdx).toBeGreaterThan(-1);
     expect(installIdx).toBeGreaterThan(beginIdx); // '/' sorts before '/docs/...'
     expect(out).toContain("URL: https://acme.com/docs/install");
+    expect(out).toContain("## FAQ");
+    expect(out).toContain("What runtime is required?");
   });
 });
 

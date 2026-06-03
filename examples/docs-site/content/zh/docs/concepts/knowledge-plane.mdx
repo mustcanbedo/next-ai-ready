@@ -4,7 +4,9 @@ summary: next-ai-ready 如何让你的内容被 AI 可读。
 order: 1
 questions:
   - q: 知识平面产出什么？
-    a: llms.txt、llms-full.txt、逐页 .md/.ai.json 路由、JSON-LD，以及由 MDX 编译的语义图谱。
+    a: >-
+      llms.txt、llms-full.txt（有 questions 时含 FAQ 块）、逐页 .md/.ai.json
+      路由、JSON-LD，以及由 MDX 编译的语义图谱。
   - q: 扫描哪些内容格式？
     a: ai-ready.config.mjs 中 content glob 匹配的 MDX 与 Markdown 文件。
 tags:
@@ -29,7 +31,7 @@ author: next-ai-ready 团队
 ## 产出物
 
 - **`llms.txt`** — 站点级索引，列出每个页面及其摘要，遵循 [llms.txt 提案](https://llmstxt.org)
-- **`llms-full.txt`** — 每个页面的完整正文拼接，用于深度摄取
+- **`llms-full.txt`** — 每页正文；若 frontmatter 含 `questions`，会追加 `## FAQ` 块，供深度摄取与 RAG
 - **`/<page>.md`** — 每个页面渲染为干净的 Markdown（含 YAML header）
 - **`/<page>.ai.json`** — 结构化 JSON，包含语义节点和所有后代
 - **JSON-LD** — `Article`、`FAQPage`、`WebPage` 标记嵌入你的页面

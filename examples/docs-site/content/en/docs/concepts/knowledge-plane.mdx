@@ -5,8 +5,8 @@ order: 1
 questions:
   - q: What does the Knowledge plane produce?
     a: >-
-      llms.txt, llms-full.txt, per-page .md and .ai.json routes, JSON-LD, and a
-      semantic graph from MDX.
+      llms.txt, llms-full.txt (with FAQ sections when questions exist), per-page
+      .md and .ai.json routes, JSON-LD, and a semantic graph from MDX.
   - q: What content formats are scanned?
     a: >-
       MDX and Markdown files matched by the content globs in
@@ -33,7 +33,7 @@ The Knowledge Plane is responsible for making your content **citable** by AI sea
 ## Artifacts
 
 - **`llms.txt`** — a site-wide index listing every page with its summary, following the [llms.txt proposal](https://llmstxt.org)
-- **`llms-full.txt`** — the full body of every page concatenated, for deep ingestion
+- **`llms-full.txt`** — every page’s body plus an optional `## FAQ` section (from frontmatter `questions`), for deep ingestion and RAG
 - **`/<page>.md`** — each page rendered as clean Markdown with YAML header
 - **`/<page>.ai.json`** — structured JSON with the semantic node and all descendants
 - **JSON-LD** — `Article`, `FAQPage`, `WebPage` markup embedded in your pages

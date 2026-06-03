@@ -88,8 +88,10 @@ By default, `robots.txt` is written to `public/` as a static file. This is the s
 If you need dynamic robots.txt (e.g. per-request A/B testing), you can:
 
 1. Set `emit: { robots: false }` in config to skip static generation.
-2. Create `app/robots.ts` using Next.js built-in robots support.
-3. Use `buildRobotsTxt()` from `@next-ai-ready/core` to generate the content programmatically.
+2. Create `app/robots.ts` using Next.js built-in robots support (this docs site does this).
+3. Use `aiRobots()` from `next-ai-ready` / `@next-ai-ready/core` inside `app/robots.ts`.
+
+Doctor recognizes `app/robots.ts` + `emit.robots: false` and will not warn about a missing `public/robots.txt`.
 
 ## Known AI bots
 

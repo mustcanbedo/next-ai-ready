@@ -110,6 +110,15 @@ defineAction({
 
 The `auth` function runs before the handler. Return `false` (or a Promise that resolves to `false`) to reject the request with a 401.
 
+### MCP vs HTTP auth
+
+| Surface | Production guard |
+|---------|------------------|
+| `POST /api/actions/<name>` | Per-action `auth` or your Next.js middleware |
+| `/api/mcp` | `NEXT_AI_READY_MCP_TOKEN` (Bearer), checked by the MCP handler |
+
+See the [action-auth recipe](https://github.com/mustcanbedo/next-ai-ready/tree/main/examples/recipes/action-auth) for API keys and session patterns. Rate limiting: [upstash-ratelimit recipe](https://github.com/mustcanbedo/next-ai-ready/tree/main/examples/recipes/upstash-ratelimit).
+
 ## Action context
 
 The second argument to `handler` is an `ActionContext` object:

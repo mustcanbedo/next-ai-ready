@@ -59,7 +59,19 @@ Install **one** meta package for typical apps: `pnpm add next-ai-ready@alpha`. T
 
 Only **`next-ai-ready`** exposes the `next-ai-ready` CLI binary. `@next-ai-ready/next` also ships a bin for monorepo dogfooding — use the meta package in consumer apps (C-01).
 
+## Scaffold (recommended)
+
+```bash
+npm create next-ai-ready@alpha my-site
+cd my-site
+pnpm install
+```
+
+The template includes config and handler stubs. Skip to [Configure](#configure) if you already have a project.
+
 ## Initialize
+
+For an existing Next.js app:
 
 ```bash
 npx next-ai-ready init
@@ -96,7 +108,7 @@ export default defineConfig({
 
 ### Robots policy
 
-`next-ai-ready build` emits `public/robots.txt` with explicit AI-bot rules. For dynamic policies, add `app/robots.ts` and use `aiRobots()` from `@next-ai-ready/core` — Next.js serves `app/robots.ts` at runtime.
+`next-ai-ready build` emits `public/robots.txt` with explicit AI-bot rules unless you set `emit: { robots: false }`. For dynamic policies, add `app/robots.ts` and use `aiRobots()` from `@next-ai-ready/core` — Next.js serves `app/robots.ts` at runtime. Doctor treats that as valid and does not require a static `public/robots.txt`.
 
 ## Build
 
@@ -112,4 +124,6 @@ This scans your content, compiles the semantic graph, and writes all AI artifact
 npx next-ai-ready doctor --score
 ```
 
-Doctor checks your config, validates action exposure rules, detects `noai` meta, robots conflicts, and confirms route wiring. Use it in CI — exit 0 means no errors (warnings are OK).
+Doctor checks your config, validates action exposure rules, detects `noai` meta, robots strategy, and route wiring. With `--score` you get a 0–100 readiness score and **Top fixes**. Use it in CI — exit 0 means no errors (warnings are OK).
+
+For a full walkthrough see the monorepo [quickstart-10min](https://github.com/mustcanbedo/next-ai-ready/blob/main/docs/quickstart-10min.md) guide.

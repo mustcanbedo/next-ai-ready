@@ -55,7 +55,7 @@ What it produces:
 - `.next-ai-ready/graph.json` — the SemanticGraph.
 - `.next-ai-ready/actions.manifest.json` — action manifest with JSON Schemas.
 - `public/llms.txt` — site-wide LLM index.
-- `public/llms-full.txt` — full content dump.
+- `public/llms-full.txt` — full content dump (page bodies plus `## FAQ` when `questions` exist in frontmatter).
 - `public/openapi.json` — OpenAPI 3.1 spec.
 - `public/tools.json` — tool definitions.
 - `public/.well-known/ai-plugin.json` — plugin manifest.
@@ -79,22 +79,29 @@ Validates your config, action exposure rules, and route wiring.
 
 ```bash
 npx next-ai-ready doctor
+npx next-ai-ready doctor --score   # 0–100 AI-readiness score + top fixes
+npx next-ai-ready doctor --json    # machine-readable report (includes actionItems)
 ```
 
-Checks:
+Checks include:
 
-1. **Config** — `ai-ready.config.mjs` exists with required `site.name`, `site.baseUrl`, and `site.description`.
-2. **Actions** — loads actions, counts public vs private, warns if public actions lack `whenToUse`.
-3. **Build artifacts** — warns if `.next-ai-ready/graph.json` is missing (run `build` first).
-4. **Route stubs** — warns if `app/_ai-ready/llms-txt/route.ts` or `app/_ai-ready/md/[...path]/route.ts` are missing.
+1. **Config** — `ai-ready.config.mjs` with required `site.name`, `site.baseUrl`, and `site.description`.
+2. **Actions** — public vs private counts; warns if public actions lack `whenToUse`.
+3. **Build artifacts** — graph, OpenAPI, `package.json` prebuild script.
+4. **Route stubs** — `app/_ai-ready/*` handler files and `withAiReady()` in `next.config`.
+5. **Robots** — static `public/robots.txt` **or** `app/robots.ts` (when `emit.robots: false`, doctor does not warn about a missing static file).
+6. **MCP** — warns if `NEXT_AI_READY_MCP_TOKEN` is unset in production.
+7. **Content quality** — `noai` meta, JSON-LD helpers, `updatedAt` / `author` coverage in the graph.
 
-Exits with code 1 if any errors are found. Warnings do not cause a non-zero exit.
+Exits with code 1 if any **errors** are found. Warnings do not cause a non-zero exit.
+
+With `--score`, the CLI prints **Top fixes** (e.g. add prebuild, set MCP token, add `updatedAt` to frontmatter).
 
 Use in CI:
 
 ```yaml
 # .github/workflows/ci.yml
-- run: npx next-ai-ready doctor
+- run: npx next-ai-ready doctor --score
 ```
 
 ### `next-ai-ready mcp`

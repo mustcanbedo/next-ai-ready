@@ -55,7 +55,19 @@ pnpm add next-ai-ready@alpha zod@^4
 
 消费者应用请只使用 **`next-ai-ready`** 的 CLI；`@next-ai-ready/next` 的 bin 供 monorepo 开发（C-01）。
 
+## 脚手架（推荐）
+
+```bash
+npm create next-ai-ready@alpha my-site
+cd my-site
+pnpm install
+```
+
+模板已包含配置与 handler stub。若已有项目，可直接跳到 [配置](#配置)。
+
 ## 初始化
+
+在已有 Next.js 项目中：
 
 ```bash
 npx next-ai-ready init
@@ -92,7 +104,7 @@ export default defineConfig({
 
 ### Robots 策略
 
-`next-ai-ready build` 会生成带 AI 爬虫规则的 `public/robots.txt`。若需动态策略，添加 `app/robots.ts` 并使用 `@next-ai-ready/core` 的 `aiRobots()` — Next.js 运行时优先使用 `app/robots.ts`。
+`next-ai-ready build` 默认生成 `public/robots.txt`；若设置 `emit: { robots: false }` 则跳过。动态策略请用 `app/robots.ts` + `aiRobots()` — Next.js 运行时优先 `app/robots.ts`。Doctor 认可该组合，不会误报缺少静态 `public/robots.txt`。
 
 ## 构建
 
@@ -108,4 +120,6 @@ npx next-ai-ready build
 npx next-ai-ready doctor --score
 ```
 
-Doctor 检查配置、action 暴露规则、`noai` meta、robots 冲突及路由接线。可在 CI 中使用 — exit 0 表示无 error（warning 可接受）。
+Doctor 检查配置、action 暴露、`noai`、robots 策略与路由接线。`--score` 提供 0–100 分数与 **Top fixes**。CI 中 exit 0 表示无 error（warning 可接受）。
+
+完整步骤见仓库 [quickstart-10min（中文）](https://github.com/mustcanbedo/next-ai-ready/blob/main/docs/quickstart-10min.zh-CN.md)。

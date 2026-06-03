@@ -51,7 +51,7 @@ npx next-ai-ready build
 - `.next-ai-ready/graph.json` — SemanticGraph。
 - `.next-ai-ready/actions.manifest.json` — 带 JSON Schema 的 action 清单。
 - `public/llms.txt` — 全站 LLM 索引。
-- `public/llms-full.txt` — 完整内容。
+- `public/llms-full.txt` — 完整内容（含正文；frontmatter 有 `questions` 时追加 `## FAQ`）。
 - `public/openapi.json` — OpenAPI 3.1 规范。
 - `public/tools.json` — 工具定义。
 - `public/.well-known/ai-plugin.json` — 插件清单。
@@ -75,22 +75,29 @@ npx next-ai-ready build
 
 ```bash
 npx next-ai-ready doctor
+npx next-ai-ready doctor --score   # 0–100 就绪分数 + 优先修复建议
+npx next-ai-ready doctor --json    # 机器可读报告（含 actionItems）
 ```
 
-检查项：
+检查项包括：
 
-1. **配置** — `ai-ready.config.mjs` 存在且包含必填的 `site.name`、`site.baseUrl` 和 `site.description`。
-2. **Actions** — 加载 action，统计公开 vs 私有，公开 action 缺少 `whenToUse` 时警告。
-3. **构建产物** — `.next-ai-ready/graph.json` 缺失时警告（先运行 `build`）。
-4. **路由桩文件** — `app/_ai-ready/llms-txt/route.ts` 或 `app/_ai-ready/md/[...path]/route.ts` 缺失时警告。
+1. **配置** — `ai-ready.config.mjs` 及必填的 `site.name`、`site.baseUrl`、`site.description`。
+2. **Actions** — 公开/私有统计；公开 action 缺少 `whenToUse` 时警告。
+3. **构建产物** — graph、OpenAPI、`package.json` 是否含 prebuild。
+4. **路由桩文件** — `app/_ai-ready/*` 与 `next.config` 中的 `withAiReady()`。
+5. **Robots** — `public/robots.txt` **或** `app/robots.ts`（`emit.robots: false` 时不会因缺少静态文件误报）。
+6. **MCP** — 生产环境未设置 `NEXT_AI_READY_MCP_TOKEN` 时警告。
+7. **内容质量** — `noai`、JSON-LD helper、`updatedAt` / `author` 覆盖率。
 
-发现错误时以代码 1 退出。警告不会导致非零退出。
+发现**错误**时以代码 1 退出。警告不会导致非零退出。
+
+使用 `--score` 时会打印 **Top fixes**（如添加 prebuild、配置 MCP token、补充 frontmatter）。
 
 在 CI 中使用：
 
 ```yaml
 # .github/workflows/ci.yml
-- run: npx next-ai-ready doctor
+- run: npx next-ai-ready doctor --score
 ```
 
 ### `next-ai-ready mcp`

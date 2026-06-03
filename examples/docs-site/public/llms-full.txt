@@ -44,7 +44,7 @@ What it produces:
 - `.next-ai-ready/graph.json` — the SemanticGraph.
 - `.next-ai-ready/actions.manifest.json` — action manifest with JSON Schemas.
 - `public/llms.txt` — site-wide LLM index.
-- `public/llms-full.txt` — full content dump.
+- `public/llms-full.txt` — full content dump (page bodies plus `## FAQ` when `questions` exist in frontmatter).
 - `public/openapi.json` — OpenAPI 3.1 spec.
 - `public/tools.json` — tool definitions.
 - `public/.well-known/ai-plugin.json` — plugin manifest.
@@ -68,22 +68,29 @@ Validates your config, action exposure rules, and route wiring.
 
 ```bash
 npx next-ai-ready doctor
+npx next-ai-ready doctor --score   # 0–100 AI-readiness score + top fixes
+npx next-ai-ready doctor --json    # machine-readable report (includes actionItems)
 ```
 
-Checks:
+Checks include:
 
-1. **Config** — `ai-ready.config.mjs` exists with required `site.name`, `site.baseUrl`, and `site.description`.
-2. **Actions** — loads actions, counts public vs private, warns if public actions lack `whenToUse`.
-3. **Build artifacts** — warns if `.next-ai-ready/graph.json` is missing (run `build` first).
-4. **Route stubs** — warns if `app/_ai-ready/llms-txt/route.ts` or `app/_ai-ready/md/[...path]/route.ts` are missing.
+1. **Config** — `ai-ready.config.mjs` with required `site.name`, `site.baseUrl`, and `site.description`.
+2. **Actions** — public vs private counts; warns if public actions lack `whenToUse`.
+3. **Build artifacts** — graph, OpenAPI, `package.json` prebuild script.
+4. **Route stubs** — `app/_ai-ready/*` handler files and `withAiReady()` in `next.config`.
+5. **Robots** — static `public/robots.txt` **or** `app/robots.ts` (when `emit.robots: false`, doctor does not warn about a missing static file).
+6. **MCP** — warns if `NEXT_AI_READY_MCP_TOKEN` is unset in production.
+7. **Content quality** — `noai` meta, JSON-LD helpers, `updatedAt` / `author` coverage in the graph.
 
-Exits with code 1 if any errors are found. Warnings do not cause a non-zero exit.
+Exits with code 1 if any **errors** are found. Warnings do not cause a non-zero exit.
+
+With `--score`, the CLI prints **Top fixes** (e.g. add prebuild, set MCP token, add `updatedAt` to frontmatter).
 
 Use in CI:
 
 ```yaml
 # .github/workflows/ci.yml
-- run: npx next-ai-ready doctor
+- run: npx next-ai-ready doctor --score
 ```
 
 ### `next-ai-ready mcp`
@@ -669,7 +676,7 @@ The Knowledge Plane is responsible for making your content **citable** by AI sea
 ## Artifacts
 
 - **`llms.txt`** — a site-wide index listing every page with its summary, following the [llms.txt proposal](https://llmstxt.org)
-- **`llms-full.txt`** — the full body of every page concatenated, for deep ingestion
+- **`llms-full.txt`** — every page’s body plus an optional `## FAQ` section (from frontmatter `questions`), for deep ingestion and RAG
 - **`/<page>.md`** — each page rendered as clean Markdown with YAML header
 - **`/<page>.ai.json`** — structured JSON with the semantic node and all descendants
 - **JSON-LD** — `Article`, `FAQPage`, `WebPage` markup embedded in your pages
@@ -694,7 +701,7 @@ Questions become `FAQPage` JSON-LD automatically — giving your pages a chance 
 
 ### What does the Knowledge plane produce?
 
-llms.txt, llms-full.txt, per-page .md and .ai.json routes, JSON-LD, and a semantic graph from MDX.
+llms.txt, llms-full.txt (with FAQ sections when questions exist), per-page .md and .ai.json routes, JSON-LD, and a semantic graph from MDX.
 
 ### What content formats are scanned?
 
@@ -854,7 +861,7 @@ These are created by `npx next-ai-ready build` and should be gitignored:
 Written to `public/` at build time:
 
 - `public/llms.txt` — site-wide index for LLMs and AI crawlers.
-- `public/llms-full.txt` — full content dump for RAG pipelines.
+- `public/llms-full.txt` — full dump (bodies + FAQ) for RAG pipelines.
 - `public/openapi.json` — OpenAPI 3.1 spec for your public actions.
 - `public/tools.json` — tool definitions in OpenAI function-calling format.
 - `public/.well-known/ai-plugin.json` — plugin manifest for AI gateways.
@@ -990,6 +997,15 @@ defineAction({
 ```
 
 The `auth` function runs before the handler. Return `false` (or a Promise that resolves to `false`) to reject the request with a 401.
+
+### MCP vs HTTP auth
+
+| Surface                    | Production guard                                               |
+| -------------------------- | -------------------------------------------------------------- |
+| `POST /api/actions/<name>` | Per-action `auth` or your Next.js middleware                   |
+| `/api/mcp`                 | `NEXT_AI_READY_MCP_TOKEN` (Bearer), checked by the MCP handler |
+
+See the [action-auth recipe](https://github.com/mustcanbedo/next-ai-ready/tree/main/examples/recipes/action-auth) for API keys and session patterns. Rate limiting: [upstash-ratelimit recipe](https://github.com/mustcanbedo/next-ai-ready/tree/main/examples/recipes/upstash-ratelimit).
 
 ## Action context
 
@@ -1428,28 +1444,26 @@ Updated: 2026-06-02
 
 This guide takes you from zero to a fully AI-ready Next.js site in under 5 minutes.
 
-## 1. Create a Next.js app
+## 1. Create a project
+
+**Option A — template (fastest):**
+
+```bash
+npm create next-ai-ready@alpha my-site
+cd my-site
+pnpm install
+```
+
+**Option B — existing Next.js app:**
 
 ```bash
 npx create-next-app@latest my-site --typescript --app --tailwind
 cd my-site
-```
-
-## 2. Install next-ai-ready
-
-```bash
-pnpm add next-ai-ready
-```
-
-## 3. Initialize
-
-```bash
+pnpm add next-ai-ready zod@^4
 npx next-ai-ready init
 ```
 
-This scaffolds your config, route handlers, and a sample action.
-
-## 4. Add content
+## 2. Add content
 
 Create an MDX page with semantic metadata:
 
@@ -1464,7 +1478,7 @@ summary: Learn how to use our product.
 Welcome to our product. Here's how to get started.
 ```
 
-## 5. Build
+## 3. Build
 
 ```bash
 npx next-ai-ready build
@@ -1481,13 +1495,13 @@ You should see output like:
 [next-ai-ready] build complete — 1 routes, 1 actions, 8 files written
 ```
 
-## 6. Verify
+## 4. Verify
 
 ```bash
-npx next-ai-ready doctor
+npx next-ai-ready doctor --score
 ```
 
-All checks should pass. Then start your dev server and visit:
+Aim for 90+. The CLI prints **Top fixes** for any remaining warnings. Then start your dev server and visit:
 
 - `http://localhost:3000/_ai-ready/llms-txt` — your llms.txt
 - `http://localhost:3000/_ai-ready/openapi` — your OpenAPI spec
@@ -1591,8 +1605,10 @@ By default, `robots.txt` is written to `public/` as a static file. This is the s
 If you need dynamic robots.txt (e.g. per-request A/B testing), you can:
 
 1. Set `emit: { robots: false }` in config to skip static generation.
-2. Create `app/robots.ts` using Next.js built-in robots support.
-3. Use `buildRobotsTxt()` from `@next-ai-ready/core` to generate the content programmatically.
+2. Create `app/robots.ts` using Next.js built-in robots support (this docs site does this).
+3. Use `aiRobots()` from `next-ai-ready` / `@next-ai-ready/core` inside `app/robots.ts`.
+
+Doctor recognizes `app/robots.ts` + `emit.robots: false` and will not warn about a missing `public/robots.txt`.
 
 ## Known AI bots
 
@@ -1665,7 +1681,19 @@ Install **one** meta package for typical apps: `pnpm add next-ai-ready@alpha`. T
 
 Only **`next-ai-ready`** exposes the `next-ai-ready` CLI binary. `@next-ai-ready/next` also ships a bin for monorepo dogfooding — use the meta package in consumer apps (C-01).
 
+## Scaffold (recommended)
+
+```bash
+npm create next-ai-ready@alpha my-site
+cd my-site
+pnpm install
+```
+
+The template includes config and handler stubs. Skip to [Configure](#configure) if you already have a project.
+
 ## Initialize
+
+For an existing Next.js app:
 
 ```bash
 npx next-ai-ready init
@@ -1702,7 +1730,7 @@ export default defineConfig({
 
 ### Robots policy
 
-`next-ai-ready build` emits `public/robots.txt` with explicit AI-bot rules. For dynamic policies, add `app/robots.ts` and use `aiRobots()` from `@next-ai-ready/core` — Next.js serves `app/robots.ts` at runtime.
+`next-ai-ready build` emits `public/robots.txt` with explicit AI-bot rules unless you set `emit: { robots: false }`. For dynamic policies, add `app/robots.ts` and use `aiRobots()` from `@next-ai-ready/core` — Next.js serves `app/robots.ts` at runtime. Doctor treats that as valid and does not require a static `public/robots.txt`.
 
 ## Build
 
@@ -1718,7 +1746,9 @@ This scans your content, compiles the semantic graph, and writes all AI artifact
 npx next-ai-ready doctor --score
 ```
 
-Doctor checks your config, validates action exposure rules, detects `noai` meta, robots conflicts, and confirms route wiring. Use it in CI — exit 0 means no errors (warnings are OK).
+Doctor checks your config, validates action exposure rules, detects `noai` meta, robots strategy, and route wiring. With `--score` you get a 0–100 readiness score and **Top fixes**. Use it in CI — exit 0 means no errors (warnings are OK).
+
+For a full walkthrough see the monorepo [quickstart-10min](https://github.com/mustcanbedo/next-ai-ready/blob/main/docs/quickstart-10min.md) guide.
 
 ## FAQ
 
@@ -1841,7 +1871,7 @@ npx next-ai-ready build
 - `.next-ai-ready/graph.json` — SemanticGraph。
 - `.next-ai-ready/actions.manifest.json` — 带 JSON Schema 的 action 清单。
 - `public/llms.txt` — 全站 LLM 索引。
-- `public/llms-full.txt` — 完整内容。
+- `public/llms-full.txt` — 完整内容（含正文；frontmatter 有 `questions` 时追加 `## FAQ`）。
 - `public/openapi.json` — OpenAPI 3.1 规范。
 - `public/tools.json` — 工具定义。
 - `public/.well-known/ai-plugin.json` — 插件清单。
@@ -1865,22 +1895,29 @@ npx next-ai-ready build
 
 ```bash
 npx next-ai-ready doctor
+npx next-ai-ready doctor --score   # 0–100 就绪分数 + 优先修复建议
+npx next-ai-ready doctor --json    # 机器可读报告（含 actionItems）
 ```
 
-检查项：
+检查项包括：
 
-1. **配置** — `ai-ready.config.mjs` 存在且包含必填的 `site.name`、`site.baseUrl` 和 `site.description`。
-2. **Actions** — 加载 action，统计公开 vs 私有，公开 action 缺少 `whenToUse` 时警告。
-3. **构建产物** — `.next-ai-ready/graph.json` 缺失时警告（先运行 `build`）。
-4. **路由桩文件** — `app/_ai-ready/llms-txt/route.ts` 或 `app/_ai-ready/md/[...path]/route.ts` 缺失时警告。
+1. **配置** — `ai-ready.config.mjs` 及必填的 `site.name`、`site.baseUrl`、`site.description`。
+2. **Actions** — 公开/私有统计；公开 action 缺少 `whenToUse` 时警告。
+3. **构建产物** — graph、OpenAPI、`package.json` 是否含 prebuild。
+4. **路由桩文件** — `app/_ai-ready/*` 与 `next.config` 中的 `withAiReady()`。
+5. **Robots** — `public/robots.txt` **或** `app/robots.ts`（`emit.robots: false` 时不会因缺少静态文件误报）。
+6. **MCP** — 生产环境未设置 `NEXT_AI_READY_MCP_TOKEN` 时警告。
+7. **内容质量** — `noai`、JSON-LD helper、`updatedAt` / `author` 覆盖率。
 
-发现错误时以代码 1 退出。警告不会导致非零退出。
+发现**错误**时以代码 1 退出。警告不会导致非零退出。
+
+使用 `--score` 时会打印 **Top fixes**（如添加 prebuild、配置 MCP token、补充 frontmatter）。
 
 在 CI 中使用：
 
 ```yaml
 # .github/workflows/ci.yml
-- run: npx next-ai-ready doctor
+- run: npx next-ai-ready doctor --score
 ```
 
 ### `next-ai-ready mcp`
@@ -2462,7 +2499,7 @@ Updated: 2026-06-02
 ## 产出物
 
 - **`llms.txt`** — 站点级索引，列出每个页面及其摘要，遵循 [llms.txt 提案](https://llmstxt.org)
-- **`llms-full.txt`** — 每个页面的完整正文拼接，用于深度摄取
+- **`llms-full.txt`** — 每页正文；若 frontmatter 含 `questions`，会追加 `## FAQ` 块，供深度摄取与 RAG
 - **`/<page>.md`** — 每个页面渲染为干净的 Markdown（含 YAML header）
 - **`/<page>.ai.json`** — 结构化 JSON，包含语义节点和所有后代
 - **JSON-LD** — `Article`、`FAQPage`、`WebPage` 标记嵌入你的页面
@@ -2487,7 +2524,7 @@ Questions 会自动成为 `FAQPage` JSON-LD —— 让你的页面有机会出�
 
 ### 知识平面产出什么？
 
-llms.txt、llms-full.txt、逐页 .md/.ai.json 路由、JSON-LD，以及由 MDX 编译的语义图谱。
+llms.txt、llms-full.txt（有 questions 时含 FAQ 块）、逐页 .md/.ai.json 路由、JSON-LD，以及由 MDX 编译的语义图谱。
 
 ### 扫描哪些内容格式？
 
@@ -2643,7 +2680,7 @@ Updated: 2026-06-02
 构建时写入 `public/`：
 
 - `public/llms.txt` — 面向 LLM 和 AI 爬虫的全站索引。
-- `public/llms-full.txt` — 完整内容，供 RAG 管线使用。
+- `public/llms-full.txt` — 完整 dump（正文 + FAQ），供 RAG 使用。
 - `public/openapi.json` — OpenAPI 3.1 规范。
 - `public/tools.json` — OpenAI function-calling 格式的工具定义。
 - `public/.well-known/ai-plugin.json` — AI 网关的插件清单。
@@ -2779,6 +2816,15 @@ defineAction({
 ```
 
 `auth` 函数在 handler 之前运行。返回 `false`（或 resolve 为 `false` 的 Promise）将拒绝请求并返回 401。
+
+### MCP 与 HTTP 鉴权
+
+| 入口                         | 生产环境建议                                  |
+| -------------------------- | --------------------------------------- |
+| `POST /api/actions/<name>` | 每个 action 的 `auth` 或 Next.js middleware |
+| `/api/mcp`                 | 环境变量 `NEXT_AI_READY_MCP_TOKEN`（Bearer）  |
+
+示例见仓库 [action-auth recipe](https://github.com/mustcanbedo/next-ai-ready/tree/main/examples/recipes/action-auth)；限流见 [upstash-ratelimit](https://github.com/mustcanbedo/next-ai-ready/tree/main/examples/recipes/upstash-ratelimit)。
 
 ## Action context
 
@@ -3215,28 +3261,26 @@ Updated: 2026-06-02
 
 本指南带你从零开始，在 5 分钟内搭建一个完整的 AI-Ready Next.js 站点。
 
-## 1. 创建 Next.js 应用
+## 1. 创建项目
+
+**方式 A — 模板（最快）：**
+
+```bash
+npm create next-ai-ready@alpha my-site
+cd my-site
+pnpm install
+```
+
+**方式 B — 已有 Next.js 项目：**
 
 ```bash
 npx create-next-app@latest my-site --typescript --app --tailwind
 cd my-site
-```
-
-## 2. 安装 next-ai-ready
-
-```bash
-pnpm add next-ai-ready
-```
-
-## 3. 初始化
-
-```bash
+pnpm add next-ai-ready zod@^4
 npx next-ai-ready init
 ```
 
-生成配置、路由处理器和示例 Action。
-
-## 4. 添加内容
+## 2. 添加内容
 
 创建包含语义元数据的 MDX 页面：
 
@@ -3251,7 +3295,7 @@ summary: 了解如何使用我们的产品。
 欢迎使用我们的产品，以下是开始步骤。
 ```
 
-## 5. 构建
+## 3. 构建
 
 ```bash
 npx next-ai-ready build
@@ -3268,10 +3312,10 @@ npx next-ai-ready build
 [next-ai-ready] build complete — 1 routes, 1 actions, 8 files written
 ```
 
-## 6. 验证
+## 4. 验证
 
 ```bash
-npx next-ai-ready doctor
+npx next-ai-ready doctor --score
 ```
 
 所有检查应通过。然后启动开发服务器并访问：
@@ -3378,8 +3422,10 @@ robots: {
 如果需要动态 robots.txt（如按请求 A/B 测试），可以：
 
 1. 在配置中设置 `emit: { robots: false }` 跳过静态生成。
-2. 使用 Next.js 内置的 robots 支持创建 `app/robots.ts`。
-3. 使用 `@next-ai-ready/core` 的 `buildRobotsTxt()` 编程式生成内容。
+2. 使用 Next.js 内置的 robots 支持创建 `app/robots.ts`（本文档站采用此方式）。
+3. 在 `app/robots.ts` 中使用 `aiRobots()`（`next-ai-ready` / `@next-ai-ready/core`）。
+
+Doctor 认可 `app/robots.ts` + `emit.robots: false`，不会误报缺少 `public/robots.txt`。
 
 ## 已知 AI 爬虫
 
@@ -3452,7 +3498,19 @@ pnpm add next-ai-ready@alpha zod@^4
 
 消费者应用请只使用 **`next-ai-ready`** 的 CLI；`@next-ai-ready/next` 的 bin 供 monorepo 开发（C-01）。
 
+## 脚手架（推荐）
+
+```bash
+npm create next-ai-ready@alpha my-site
+cd my-site
+pnpm install
+```
+
+模板已包含配置与 handler stub。若已有项目，可直接跳到 [配置](#配置)。
+
 ## 初始化
+
+在已有 Next.js 项目中：
 
 ```bash
 npx next-ai-ready init
@@ -3489,7 +3547,7 @@ export default defineConfig({
 
 ### Robots 策略
 
-`next-ai-ready build` 会生成带 AI 爬虫规则的 `public/robots.txt`。若需动态策略，添加 `app/robots.ts` 并使用 `@next-ai-ready/core` 的 `aiRobots()` — Next.js 运行时优先使用 `app/robots.ts`。
+`next-ai-ready build` 默认生成 `public/robots.txt`；若设置 `emit: { robots: false }` 则跳过。动态策略请用 `app/robots.ts` + `aiRobots()` — Next.js 运行时优先 `app/robots.ts`。Doctor 认可该组合，不会误报缺少静态 `public/robots.txt`。
 
 ## 构建
 
@@ -3505,7 +3563,9 @@ npx next-ai-ready build
 npx next-ai-ready doctor --score
 ```
 
-Doctor 检查配置、action 暴露规则、`noai` meta、robots 冲突及路由接线。可在 CI 中使用 — exit 0 表示无 error（warning 可接受）。
+Doctor 检查配置、action 暴露、`noai`、robots 策略与路由接线。`--score` 提供 0–100 分数与 **Top fixes**。CI 中 exit 0 表示无 error（warning 可接受）。
+
+完整步骤见仓库 [quickstart-10min（中文）](https://github.com/mustcanbedo/next-ai-ready/blob/main/docs/quickstart-10min.zh-CN.md)。
 
 ## FAQ
 

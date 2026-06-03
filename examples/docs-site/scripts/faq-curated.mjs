@@ -69,7 +69,7 @@ export const CURATED_FAQ = {
     "concepts/knowledge-plane": [
       {
         q: "What does the Knowledge plane produce?",
-        a: "llms.txt, llms-full.txt, per-page .md and .ai.json routes, JSON-LD, and a semantic graph from MDX.",
+        a: "llms.txt, llms-full.txt (with FAQ sections when questions exist), per-page .md and .ai.json routes, JSON-LD, and a semantic graph from MDX.",
       },
       {
         q: "What content formats are scanned?",
@@ -283,7 +283,7 @@ export const CURATED_FAQ = {
     "concepts/knowledge-plane": [
       {
         q: "知识平面产出什么？",
-        a: "llms.txt、llms-full.txt、逐页 .md/.ai.json 路由、JSON-LD，以及由 MDX 编译的语义图谱。",
+        a: "llms.txt、llms-full.txt（有 questions 时含 FAQ 块）、逐页 .md/.ai.json 路由、JSON-LD，以及由 MDX 编译的语义图谱。",
       },
       {
         q: "扫描哪些内容格式？",

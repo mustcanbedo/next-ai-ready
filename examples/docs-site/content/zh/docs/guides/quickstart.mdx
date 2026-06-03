@@ -21,28 +21,26 @@ author: next-ai-ready 团队
 
 本指南带你从零开始，在 5 分钟内搭建一个完整的 AI-Ready Next.js 站点。
 
-## 1. 创建 Next.js 应用
+## 1. 创建项目
+
+**方式 A — 模板（最快）：**
+
+```bash
+npm create next-ai-ready@alpha my-site
+cd my-site
+pnpm install
+```
+
+**方式 B — 已有 Next.js 项目：**
 
 ```bash
 npx create-next-app@latest my-site --typescript --app --tailwind
 cd my-site
-```
-
-## 2. 安装 next-ai-ready
-
-```bash
-pnpm add next-ai-ready
-```
-
-## 3. 初始化
-
-```bash
+pnpm add next-ai-ready zod@^4
 npx next-ai-ready init
 ```
 
-生成配置、路由处理器和示例 Action。
-
-## 4. 添加内容
+## 2. 添加内容
 
 创建包含语义元数据的 MDX 页面：
 
@@ -57,7 +55,7 @@ summary: 了解如何使用我们的产品。
 欢迎使用我们的产品，以下是开始步骤。
 ```
 
-## 5. 构建
+## 3. 构建
 
 ```bash
 npx next-ai-ready build
@@ -74,10 +72,10 @@ npx next-ai-ready build
 [next-ai-ready] build complete — 1 routes, 1 actions, 8 files written
 ```
 
-## 6. 验证
+## 4. 验证
 
 ```bash
-npx next-ai-ready doctor
+npx next-ai-ready doctor --score
 ```
 
 所有检查应通过。然后启动开发服务器并访问：

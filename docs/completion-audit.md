@@ -4,7 +4,7 @@
 >
 > **审查日期：** 2026-07-26（alpha.11 + deployed audit + agent readability）
 >
-> **当前版本：** 仓库 `0.1.0-alpha.11`；npm `@alpha` 待手动发布工作流
+> **当前版本：** 仓库与 npm `@alpha` 均为 `0.1.0-alpha.11`
 > **测试状态：** 145+ tests / 9 packages · CI 含 `docs-site-smoke`
 
 ### 相关文档（分工）
@@ -28,11 +28,11 @@
 
 `next-ai-ready` 的**核心架构已经成立**：Knowledge + Capability 双平面、build-time 产物 + runtime handler 分离、与 bundler 解耦——这是正确的 Next.js 集成方向，和 Turbopack / Webpack 都能共存。
 
-**框架代码本身约 97% 完成**；**作为可推荐给早期用户的产品约 96% 完成**。P0 + P1 + P2 均已完成；线上页面审计、Markdown 内容协商与 AI 路由已合入，待 **npm alpha.11** 发布。
+**框架代码本身约 97% 完成**；**作为可推荐给早期用户的产品约 96% 完成**。P0 + P1 + P2 均已完成；线上页面审计、Markdown 内容协商与 AI 路由已发布到 **npm alpha.11**。
 
 **剩余差距**主要在：
 
-1. **0.1 GA 发布动作** — 见 [`ga-readiness.md`](./ga-readiness.md)（publish alpha.11、Vercel MCP token、可选 `v0.1.0` tag）
+1. **0.1 GA 发布动作** — 见 [`ga-readiness.md`](./ga-readiness.md)（Vercel MCP token、可选 `v0.1.0` tag）
 2. **GA 后产品化** — 见 [`post-ga.md`](./post-ga.md)（PG-01～PG-17，非阻塞）
 3. **可选 refactor** — C-04/C-11/C-31/C-72 等 🟢 细项 → backlog
 
@@ -349,7 +349,7 @@ canonical = `/openapi.json`、`/tools.json`；`buildAiPlugin()` 默认已改。D
 - [x] npm `@alpha` → **0.1.0-alpha.10**（当前已发布版）
 - [x] 已知限制 documented（2026-05-31；i18n graph 表述 2026-06-02 修正）
 - [x] Adopter quickstart + doctor actionItems + llms-full FAQ（2026-06-02）
-- [ ] npm `@alpha` → **0.1.0-alpha.11**（maintainer: manual Release Alpha workflow）
+- [x] npm `@alpha` → **0.1.0-alpha.11**（2026-07-26；registry install smoke 通过）
 - [ ] Vercel `NEXT_AI_READY_MCP_TOKEN`（ops）
 
 ---

@@ -144,7 +144,7 @@ registerAiHooks({
 
 ## 状态
 
-🚧 **Pre-alpha**（`0.1.0-alpha.11` 源码版；npm `@alpha` 按发布工作流更新），但核心功能已实现并测试（9 个包共 145+ 个测试）：
+🚧 **Pre-alpha**（`0.1.0-alpha.11` 已发布到 npm `@alpha`），但核心功能已实现并测试（9 个包共 145+ 个测试）：
 
 - ✅ **知识平面** — MDX → 语义图 → `llms.txt` / `*.md` / `*.ai.json` / JSON-LD
 - ✅ **能力平面** — `defineAction` → `/api/actions/<name>` + OpenAPI 3.1 / `tools.json` / `ai-plugin.json`

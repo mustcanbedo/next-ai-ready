@@ -1,0 +1,48 @@
+name: Release Alpha
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirmation:
+        description: Type publish-alpha to publish the current package versions
+        required: true
+        type: string
+
+concurrency:
+  group: release-alpha
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    name: Verify and publish npm alpha
+    if: github.event.inputs.confirmation == 'publish-alpha'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: pnpm/action-setup@v4.4.0
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 20
+          cache: pnpm
+          registry-url: https://registry.npmjs.org
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run release gate
+        run: pnpm verify:release
+
+      - name: Publish missing alpha packages
+        run: pnpm publish:alpha:interactive
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Verify npm tags
+        run: |
+          npm view next-ai-ready dist-tags --json
+          npm view create-next-ai-ready dist-tags --json

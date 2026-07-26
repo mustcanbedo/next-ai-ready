@@ -16,6 +16,8 @@
     "create-next-ai-ready": "0.1.0-alpha.8"
   },
   "changesets": [
-    "fix-alpha8-publish-deps"
+    "adopter-ux-alpha10",
+    "audit-deployed-pages",
+    "fix-escaped-ai-routes"
   ]
 }

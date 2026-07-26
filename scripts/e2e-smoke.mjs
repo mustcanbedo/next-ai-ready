@@ -56,6 +56,7 @@ async function main() {
           name: "e2e-smoke",
           version: "0.0.0",
           private: true,
+          packageManager: "pnpm@9.12.0",
           scripts: { build: "next build" },
           dependencies: {
             "zod": "^4.4.3",

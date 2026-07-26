@@ -11,7 +11,7 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
 
-PACKAGES=(core semantic mdx actions llms openapi mcp next meta)
+PACKAGES=(core semantic mdx actions llms openapi mcp next meta create-next-ai-ready)
 
 echo "Building first…"
 pnpm build

@@ -2,8 +2,9 @@
 
 > **审查视角：** 以 Next.js 生态作者的标准审视——不仅看「功能有没有写」，更看「Next 开发者能否在 10 分钟内跑通、部署后不踩坑、与 App Router / Turbopack / Serverless 部署模型是否一致」。
 >
-> **审查日期：** 2026-06-02（alpha.9 + docs-site FAQ/smoke + adopter UX）  
-> **当前版本：** 仓库 `0.1.0-alpha.10`；npm `@alpha` 待 publish（当前线 alpha.9）  
+> **审查日期：** 2026-07-26（alpha.11 + deployed audit + agent readability）
+>
+> **当前版本：** 仓库 `0.1.0-alpha.11`；npm `@alpha` 待手动发布工作流
 > **测试状态：** 145+ tests / 9 packages · CI 含 `docs-site-smoke`
 
 ### 相关文档（分工）
@@ -27,15 +28,15 @@
 
 `next-ai-ready` 的**核心架构已经成立**：Knowledge + Capability 双平面、build-time 产物 + runtime handler 分离、与 bundler 解耦——这是正确的 Next.js 集成方向，和 Turbopack / Webpack 都能共存。
 
-**框架代码本身约 96% 完成**；**作为可推荐给早期用户的产品约 95% 完成**。P0 + P1 + P2 均已完成；**adopter UX 批次**（doctor/robots、llms-full FAQ、quickstart、action-auth recipe）已合入，待 **npm alpha.10** 发布。
+**框架代码本身约 97% 完成**；**作为可推荐给早期用户的产品约 96% 完成**。P0 + P1 + P2 均已完成；线上页面审计、Markdown 内容协商与 AI 路由已合入，待 **npm alpha.11** 发布。
 
 **剩余差距**主要在：
 
-1. **0.1 GA 发布动作** — 见 [`ga-readiness.md`](./ga-readiness.md)（publish alpha.10、Vercel MCP token、可选 `v0.1.0` tag）
+1. **0.1 GA 发布动作** — 见 [`ga-readiness.md`](./ga-readiness.md)（publish alpha.11、Vercel MCP token、可选 `v0.1.0` tag）
 2. **GA 后产品化** — 见 [`post-ga.md`](./post-ga.md)（PG-01～PG-17，非阻塞）
 3. **可选 refactor** — C-04/C-11/C-31/C-72 等 🟢 细项 → backlog
 
-**结论：** **可对外推荐 `next-ai-ready@alpha` 给早期 adopter**；下一里程碑：**0.1 GA**（`0.1.0` 或 alpha.10 收口）。
+**结论：** **可对外推荐 `next-ai-ready@alpha` 给早期 adopter**；下一里程碑：**0.1 GA**（`0.1.0` 或 alpha.11 收口）。
 
 ---
 
@@ -344,11 +345,11 @@ canonical = `/openapi.json`、`/tools.json`；`buildAiPlugin()` 默认已改。D
 - [x] `examples/docs-site` 完全 dogfood 框架（2026-05-31）
 - [x] 文档站内容至 checklist 规划（2026-06-01 — D-10～D-22）
 - [x] OpenAPI / ai-plugin / tools URL **一致且可访问**（2026-05-31）
-- [ ] CI green on every PR（流程项）
-- [x] npm `@alpha` → **0.1.0-alpha.9**（2026-06-02；alpha.10 待 publish）
+- [x] CI green on `main`（2026-07-26）
+- [x] npm `@alpha` → **0.1.0-alpha.10**（当前已发布版）
 - [x] 已知限制 documented（2026-05-31；i18n graph 表述 2026-06-02 修正）
 - [x] Adopter quickstart + doctor actionItems + llms-full FAQ（2026-06-02）
-- [ ] npm `@alpha` → **0.1.0-alpha.10**（maintainer: `pnpm publish:alpha`）
+- [ ] npm `@alpha` → **0.1.0-alpha.11**（maintainer: manual Release Alpha workflow）
 - [ ] Vercel `NEXT_AI_READY_MCP_TOKEN`（ops）
 
 ---

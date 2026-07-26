@@ -1,6 +1,6 @@
 {
   "name": "@next-ai-ready/core",
-  "version": "0.1.0-alpha.10",
+  "version": "0.1.0-alpha.11",
   "description": "Shared types, config, scanner, IO for next-ai-ready.",
   "license": "MIT",
   "type": "module",

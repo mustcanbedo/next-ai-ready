@@ -1,5 +1,12 @@
 # @next-ai-ready/core
 
+## 0.1.0-alpha.11
+
+### Patch Changes
+
+- f3d8a99: Adopter UX: llms-full FAQ sections, doctor robots.ts + emit.robots fix, Top fixes actionItems, docs hub and GA/post-GA guides.
+- db3a892: Generate AI route handlers under `app/%5Fai-ready` so Next.js registers the `/_ai-ready/*` URL namespace instead of treating the directory as private. Add opt-in Markdown content negotiation, canonical Markdown response headers, and `sitemap.md` generation for agent-readable delivery.
+
 ## 0.1.0-alpha.9
 
 ### Patch Changes

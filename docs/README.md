@@ -27,6 +27,7 @@ Central map for **next-ai-ready** repository docs (not the live docs site — th
 | Doc | Purpose |
 |-----|---------|
 | [ga-readiness.md](./ga-readiness.md) | **0.1 GA** checklist — done vs remaining |
+| [release-alpha.md](./release-alpha.md) | Maintainer runbook for the guarded npm alpha workflow |
 | [completion-audit.md](./completion-audit.md) | Completion %, P0–P2 history, 0.1 DoD |
 | [backlog.md](./backlog.md) | Full tracked items (single source of truth) |
 | [post-ga.md](./post-ga.md) | **After GA** — product/DX optimizations |

@@ -1,6 +1,6 @@
 {
   "name": "@next-ai-ready/semantic",
-  "version": "0.1.0-alpha.10",
+  "version": "0.1.0-alpha.11",
   "description": "SemanticGraph builder + JSON-LD emitter.",
   "license": "MIT",
   "type": "module",

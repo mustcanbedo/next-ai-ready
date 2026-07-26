@@ -32,7 +32,7 @@ pnpm typecheck
 | `pnpm lint` | ESLint on package sources (C-02) |
 | `pnpm external:smoke` | Single-package install smoke |
 | `pnpm verify:release` | Full pre-publish gate |
-| `pnpm publish:alpha` | Publish all packages to npm `@alpha` (requires Granular Token) |
+| `pnpm publish:alpha:interactive` | Build and publish missing package versions to npm `@alpha` |
 
 ### Package layout
 
@@ -87,13 +87,17 @@ We use [Changesets](https://github.com/changesets/changesets).
 
 ### Pre-release (`@alpha`)
 
-Current channel: **`0.1.0-alpha.x`**. Manual bump + publish:
+Current channel: **`0.1.0-alpha.x`**. Prepare and verify a release locally:
 
 ```bash
-# 1. Bump version in all packages/*/package.json (keep versions aligned)
-# 2. pnpm build && pnpm test
-pnpm publish:alpha
+pnpm version:packages
+pnpm verify:release
+pnpm publish:alpha:interactive
 ```
+
+Maintainers can instead run the **Release Alpha** GitHub Actions workflow and
+enter `publish-alpha` when prompted. It runs the same release gate before
+publishing and requires the repository secret `NPM_TOKEN`.
 
 **npm auth:** use a [Granular Access Token](https://www.npmjs.com/settings/~tokens) with **Read and Write** on `@next-ai-ready/*` and **Bypass 2FA** enabled. Configure locally:
 
@@ -103,7 +107,8 @@ npm config set //registry.npmjs.org/:_authToken=YOUR_TOKEN
 
 Never commit tokens. Do not paste tokens in chat or PRs.
 
-Alternative (Touch ID / Security Key): `pnpm publish:alpha:interactive` runs `npm publish` from each package directory.
+The publish script checks npm first and skips versions that already exist, so a
+partially completed release can be resumed safely.
 
 ### Stable release (future 0.1.0+)
 
@@ -111,7 +116,7 @@ When ready for a stable release:
 
 ```bash
 pnpm changeset          # describe changes; select affected packages
-pnpm version            # apply version bumps + CHANGELOG
+pnpm version:packages   # apply version bumps + CHANGELOG
 pnpm release            # build + changeset publish
 pnpm changeset:status   # verify changeset wiring (E-04)
 ```

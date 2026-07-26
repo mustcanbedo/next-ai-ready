@@ -22,13 +22,29 @@ async function main() {
   await access(configPath);
   await access(CHANGESET_BIN);
 
+  // A prepared release changes only generated manifests and changelogs. Compare
+  // from HEAD in that state so Changesets does not flag its own version output.
+  const { stdout: changedPackageFiles } = await execFileAsync(
+    "git",
+    ["diff", "--name-only", "HEAD", "--", "packages"],
+    { cwd: ROOT, timeout: 30_000 },
+  );
+  const packageChanges = changedPackageFiles.trim().split("\n").filter(Boolean);
+  const isPreparedRelease =
+    packageChanges.length > 0 &&
+    packageChanges.every((file) => /^packages\/[^/]+\/(package\.json|CHANGELOG\.md)$/.test(file));
   // Invoke the CLI binary directly — `pnpm changeset` pollutes stdout.
-  await execFileAsync(CHANGESET_BIN, ["status"], { cwd: ROOT, timeout: 30_000 });
+  // Changesets always includes uncommitted files, even with `--since HEAD`, so
+  // its status command cannot inspect generated release output meaningfully.
+  if (!isPreparedRelease) {
+    await execFileAsync(CHANGESET_BIN, ["status"], { cwd: ROOT, timeout: 30_000 });
+  }
 
   const files = await readdir(join(ROOT, ".changeset"));
   const pending = files.filter((f) => f.endsWith(".md") && f !== "README.md").length;
   console.log(`[changeset] config OK — ${pending} pending changeset file(s)`);
-  console.log("[changeset] stable release path: pnpm changeset → pnpm version → pnpm release");
+  if (isPreparedRelease) console.log("[changeset] prepared release output detected");
+  console.log("[changeset] stable release path: pnpm changeset → pnpm version:packages → pnpm release");
 }
 
 main().catch((err) => {

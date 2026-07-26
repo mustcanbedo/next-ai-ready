@@ -96,6 +96,7 @@ pnpm add next-ai-ready@alpha
 npx next-ai-ready init     # scaffold config + route stubs + starter action
 npx next-ai-ready build    # emit llms.txt, sitemap.md, graph, OpenAPI, tools, robots
 npx next-ai-ready doctor   # validate config, action exposure, route wiring (CI-friendly)
+npx next-ai-ready audit https://example.com/about  # verify the deployed page agents receive
 npx next-ai-ready mcp      # run an MCP server over stdio (Claude Desktop / Cursor)
 ```
 
@@ -148,7 +149,7 @@ Use `next-ai-ready/hooks` (or `@next-ai-ready/next/hooks`) — not the main pack
 - ✅ **Knowledge plane** — MDX → semantic graph → `llms.txt` / `*.md` / `*.ai.json` / JSON-LD
 - ✅ **Capability plane** — `defineAction` → `/api/actions/<name>` + OpenAPI 3.1 / `tools.json` / `ai-plugin.json`
 - ✅ **MCP server** — actions as MCP tools + pages as resources (HTTP + stdio)
-- ✅ **Dev tooling** — `build` / `init` / `doctor` / `mcp` CLIs, `robots.txt`, analytics hooks
+- ✅ **Dev tooling** — `build` / `init` / `doctor` / `audit` / `mcp` CLIs, `robots.txt`, analytics hooks
 - ✅ **Docs site** — live at [next-ai-ready.vercel.app](https://next-ai-ready.vercel.app/en) ([source](./examples/docs-site))
 
 See [`docs/`](./docs) ([**full index**](./docs/README.md)):

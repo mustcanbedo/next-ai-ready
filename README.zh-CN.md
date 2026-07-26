@@ -96,6 +96,7 @@ pnpm add next-ai-ready@alpha
 npx next-ai-ready init     # 生成配置 + 路由桩文件 + 示例 action
 npx next-ai-ready build    # 产出 llms.txt、sitemap.md、语义图、OpenAPI、tools、robots
 npx next-ai-ready doctor   # 验证配置、action 暴露规则、路由接线（CI 友好）
+npx next-ai-ready audit https://example.com/about  # 验证 Agent 实际收到的线上页面
 npx next-ai-ready mcp      # 通过 stdio 运行 MCP 服务器（Claude Desktop / Cursor）
 ```
 
@@ -148,7 +149,7 @@ registerAiHooks({
 - ✅ **知识平面** — MDX → 语义图 → `llms.txt` / `*.md` / `*.ai.json` / JSON-LD
 - ✅ **能力平面** — `defineAction` → `/api/actions/<name>` + OpenAPI 3.1 / `tools.json` / `ai-plugin.json`
 - ✅ **MCP 服务器** — action 作为 MCP 工具 + 页面作为资源（HTTP + stdio）
-- ✅ **开发工具** — `build` / `init` / `doctor` / `mcp` CLI，`robots.txt`，分析钩子
+- ✅ **开发工具** — `build` / `init` / `doctor` / `audit` / `mcp` CLI，`robots.txt`，分析钩子
 - ✅ **文档站** — 线上 [next-ai-ready.vercel.app](https://next-ai-ready.vercel.app/zh)（[源码](./examples/docs-site)）
 
 详见 [`docs/`](./docs)（[**文档索引**](./docs/README.md)）：

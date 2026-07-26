@@ -1,22 +1,22 @@
 ---
 title: CLI
-summary: 命令行接口——init、build、doctor 和 mcp。
+summary: 命令行接口——init、build、doctor、audit 和 mcp。
 order: 5
 questions:
   - q: next-ai-ready 有哪些 CLI 命令？
-    a: init 脚手架、build 编译产物、doctor 校验、dev 监听内容、mcp 启动 stdio 服务。
+    a: init 脚手架、build 编译产物、doctor 校验本地接线、audit 验证线上页面、dev 监听内容、mcp 启动 stdio 服务。
   - q: CLI 来自哪个包？
     a: next-ai-ready 聚合包。使用 npx next-ai-ready 或 pnpm exec next-ai-ready。
 tags:
   - api
   - reference
-updatedAt: '2026-06-02'
+updatedAt: '2026-07-26'
 author: next-ai-ready 团队
 ---
 
 # CLI
 
-`next-ai-ready` 提供四个 CLI 命令，用于构建、验证和运行你的 AI 就绪站点。
+`next-ai-ready` 提供用于构建、验证、审计和运行 AI 就绪站点的 CLI 命令。
 
 ## 命令
 
@@ -99,6 +99,23 @@ npx next-ai-ready doctor --json    # 机器可读报告（含 actionItems）
 # .github/workflows/ci.yml
 - run: npx next-ai-ready doctor --score
 ```
+
+### `next-ai-ready audit <url>`
+
+按照浏览器、爬虫和 AI Agent 实际收到的响应审计一个已部署页面。
+
+```bash
+npx next-ai-ready audit https://example.com/about
+npx next-ai-ready audit https://example.com/about --json
+```
+
+100 分报告会检查 HTML、`llms.txt`、两种 sitemap、`robots.txt`、Markdown
+内容协商、已知 AI User-Agent、显式 `.md` URL、canonical 与响应头、
+frontmatter、JSON-LD、description、H1 和真实 404。每项都会返回证据 URL
+与明确说明。
+
+必需项失败时命令以代码 1 退出，因此 JSON 输出可作为部署后的 CI 门禁。
+警告只降低分数，不会让 CI 失败。
 
 ### `next-ai-ready mcp`
 

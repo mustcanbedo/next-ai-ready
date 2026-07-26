@@ -5,11 +5,11 @@
 <!-- BEGIN /en/docs/api-reference/cli -->
 # CLI
 URL: https://next-ai-ready.vercel.app/en/docs/api-reference/cli
-Updated: 2026-06-02
+Updated: 2026-07-26
 
 # CLI
 
-`next-ai-ready` provides four CLI commands for building, validating, and running your AI-ready site.
+`next-ai-ready` provides commands for building, validating, auditing, and running your AI-ready site.
 
 ## Commands
 
@@ -93,6 +93,23 @@ Use in CI:
 - run: npx next-ai-ready doctor --score
 ```
 
+### `next-ai-ready audit <url>`
+
+Audits a deployed page as browsers, crawlers, and AI agents actually receive it.
+
+```bash
+npx next-ai-ready audit https://example.com/about
+npx next-ai-ready audit https://example.com/about --json
+```
+
+The 100-point report checks the HTML response, `llms.txt`, both sitemap formats,
+`robots.txt`, Markdown content negotiation, known AI User-Agents, explicit `.md`
+URLs, canonical and response metadata, frontmatter, JSON-LD, description, H1, and
+real 404 semantics. Each check includes its evidence URL and a concrete message.
+
+The command exits with code 1 when a required check fails, so the JSON form can
+act as a post-deployment CI gate. Warnings reduce the score without failing CI.
+
 ### `next-ai-ready mcp`
 
 Starts an MCP server over stdio for local desktop clients.
@@ -132,7 +149,7 @@ Use with Claude Desktop:
 
 ### What CLI commands does next-ai-ready provide?
 
-init scaffolds a project; build compiles artifacts; doctor validates wiring; dev watches content; mcp runs stdio MCP.
+init scaffolds a project; build compiles artifacts; doctor validates local wiring; audit verifies a deployed page; dev watches content; mcp runs stdio MCP.
 
 ### Which package provides the CLI binary?
 
@@ -1844,11 +1861,11 @@ No. The framework adds AI routes and build artifacts alongside your current App 
 <!-- BEGIN /zh/docs/api-reference/cli -->
 # CLI
 URL: https://next-ai-ready.vercel.app/zh/docs/api-reference/cli
-Updated: 2026-06-02
+Updated: 2026-07-26
 
 # CLI
 
-`next-ai-ready` 提供四个 CLI 命令，用于构建、验证和运行你的 AI 就绪站点。
+`next-ai-ready` 提供用于构建、验证、审计和运行 AI 就绪站点的 CLI 命令。
 
 ## 命令
 
@@ -1932,6 +1949,23 @@ npx next-ai-ready doctor --json    # 机器可读报告（含 actionItems）
 - run: npx next-ai-ready doctor --score
 ```
 
+### `next-ai-ready audit <url>`
+
+按照浏览器、爬虫和 AI Agent 实际收到的响应审计一个已部署页面。
+
+```bash
+npx next-ai-ready audit https://example.com/about
+npx next-ai-ready audit https://example.com/about --json
+```
+
+100 分报告会检查 HTML、`llms.txt`、两种 sitemap、`robots.txt`、Markdown
+内容协商、已知 AI User-Agent、显式 `.md` URL、canonical 与响应头、
+frontmatter、JSON-LD、description、H1 和真实 404。每项都会返回证据 URL
+与明确说明。
+
+必需项失败时命令以代码 1 退出，因此 JSON 输出可作为部署后的 CI 门禁。
+警告只降低分数，不会让 CI 失败。
+
 ### `next-ai-ready mcp`
 
 通过 stdio 启动 MCP 服务器，供本地桌面客户端使用。
@@ -1971,7 +2005,7 @@ npx next-ai-ready mcp
 
 ### next-ai-ready 有哪些 CLI 命令？
 
-init 脚手架、build 编译产物、doctor 校验、dev 监听内容、mcp 启动 stdio 服务。
+init 脚手架、build 编译产物、doctor 校验本地接线、audit 验证线上页面、dev 监听内容、mcp 启动 stdio 服务。
 
 ### CLI 来自哪个包？
 

@@ -4,7 +4,7 @@
   "private": true,
   "description": "E-commerce demo — Capability plane with product search action (R-09).",
   "scripts": {
-    "build": "next-ai-ready build"
+    "build": "node ../../packages/meta/dist/cli.js build"
   },
   "dependencies": {
     "next-ai-ready": "workspace:*",

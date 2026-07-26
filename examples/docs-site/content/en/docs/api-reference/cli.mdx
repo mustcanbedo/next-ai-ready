@@ -1,12 +1,13 @@
 ---
 title: CLI
-summary: 'Command-line interface — init, build, doctor, and mcp.'
+summary: 'Command-line interface — init, build, doctor, audit, and mcp.'
 order: 5
 questions:
   - q: What CLI commands does next-ai-ready provide?
     a: >-
       init scaffolds a project; build compiles artifacts; doctor validates
-      wiring; dev watches content; mcp runs stdio MCP.
+      local wiring; audit verifies a deployed page; dev watches content; mcp
+      runs stdio MCP.
   - q: Which package provides the CLI binary?
     a: >-
       The next-ai-ready meta package. Use npx next-ai-ready or pnpm exec
@@ -14,13 +15,13 @@ questions:
 tags:
   - api
   - reference
-updatedAt: '2026-06-02'
+updatedAt: '2026-07-26'
 author: next-ai-ready team
 ---
 
 # CLI
 
-`next-ai-ready` provides four CLI commands for building, validating, and running your AI-ready site.
+`next-ai-ready` provides commands for building, validating, auditing, and running your AI-ready site.
 
 ## Commands
 
@@ -103,6 +104,23 @@ Use in CI:
 # .github/workflows/ci.yml
 - run: npx next-ai-ready doctor --score
 ```
+
+### `next-ai-ready audit <url>`
+
+Audits a deployed page as browsers, crawlers, and AI agents actually receive it.
+
+```bash
+npx next-ai-ready audit https://example.com/about
+npx next-ai-ready audit https://example.com/about --json
+```
+
+The 100-point report checks the HTML response, `llms.txt`, both sitemap formats,
+`robots.txt`, Markdown content negotiation, known AI User-Agents, explicit `.md`
+URLs, canonical and response metadata, frontmatter, JSON-LD, description, H1, and
+real 404 semantics. Each check includes its evidence URL and a concrete message.
+
+The command exits with code 1 when a required check fails, so the JSON form can
+act as a post-deployment CI gate. Warnings reduce the score without failing CI.
 
 ### `next-ai-ready mcp`
 

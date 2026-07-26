@@ -3,6 +3,7 @@ import { runInit } from "./init.js";
 import { runMcpStdio } from "./mcp-stdio.js";
 import { runDoctor } from "./doctor.js";
 import { runDev } from "./dev.js";
+import { runAudit } from "./audit.js";
 import { AiReadyError, formatCliError } from "./errors.js";
 
 const HELP = `next-ai-ready — AEO + Agent-API layer for Next.js
@@ -17,6 +18,8 @@ Commands:
   doctor      Validate config, action exposure, and route wiring (CI-friendly).
               --score   Include AI-readiness score (0–100).
               --json    Emit machine-readable JSON report (includes 24 tactics).
+  audit URL   Audit a deployed page as crawlers and AI agents receive it.
+              --json    Emit a machine-readable JSON report.
   mcp         Start an MCP server over stdio (for Claude Desktop, Cursor, etc.).
   help        Show this help.
 
@@ -25,6 +28,7 @@ Examples:
   npx next-ai-ready build
   npx next-ai-ready dev
   npx next-ai-ready doctor --score
+  npx next-ai-ready audit https://example.com/about
   npx next-ai-ready mcp
 `;
 
@@ -91,6 +95,26 @@ export async function runCli(argv: string[]): Promise<number> {
         return result.errors > 0 ? 1 : 0;
       }
 
+      case "audit": {
+        const target = rest.find((value) => !value.startsWith("--")) ?? "";
+        const wantJson = flags.has("--json");
+        const result = await runAudit(target);
+
+        if (wantJson) {
+          process.stdout.write(JSON.stringify(result, null, 2) + "\n");
+        } else {
+          for (const check of result.checks) {
+            const icon = check.status === "fail" ? "✗" : check.status === "warn" ? "!" : "✓";
+            const stream = check.status === "fail" ? process.stderr : process.stdout;
+            stream.write(`  ${icon} ${check.name}: ${check.message}\n`);
+          }
+          console.log(
+            `[next-ai-ready] audit: score ${result.score}/100 — ${result.errors} error(s), ${result.warnings} warning(s), ${result.passed} passed`,
+          );
+        }
+        return result.errors > 0 ? 1 : 0;
+      }
+
       case "mcp": {
         // Blocks until the client disconnects. All logging goes to stderr so
         // stdout stays a clean JSON-RPC channel.
@@ -110,6 +134,7 @@ export async function runCli(argv: string[]): Promise<number> {
 
 /** Entry point used by the bin shim. */
 export { AiReadyError, formatCliError } from "./errors.js";
+export { runAudit, type AuditCheck, type AuditOptions, type AuditResult } from "./audit.js";
 
 export async function main(): Promise<void> {
   const code = await runCli(process.argv.slice(2));

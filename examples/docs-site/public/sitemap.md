@@ -4,7 +4,7 @@
 
 ## Pages
 
-- [CLI](https://next-ai-ready.vercel.app/en/docs/api-reference/cli): Command-line interface — init, build, doctor, and mcp.
+- [CLI](https://next-ai-ready.vercel.app/en/docs/api-reference/cli): Command-line interface — init, build, doctor, audit, and mcp.
 - [Configuration](https://next-ai-ready.vercel.app/en/docs/api-reference/config): Full reference for ai-ready.config.mjs options.
 - [defineAction](https://next-ai-ready.vercel.app/en/docs/api-reference/define-action): API reference for defineAction() and defineActions().
 - [Semantic Metadata](https://next-ai-ready.vercel.app/en/docs/api-reference/define-semantic): How to add structured metadata to your MDX content for richer AI extraction.
@@ -24,7 +24,7 @@
 - [Robots.txt](https://next-ai-ready.vercel.app/en/docs/guides/robots-txt): Configure your robots.txt to explicitly allow or block AI crawlers.
 - [Installation](https://next-ai-ready.vercel.app/en/docs/installation): Install next-ai-ready and scaffold your first config.
 - [Introduction](https://next-ai-ready.vercel.app/en/docs/introduction): What next-ai-ready is and why it exists.
-- [CLI](https://next-ai-ready.vercel.app/zh/docs/api-reference/cli): 命令行接口——init、build、doctor 和 mcp。
+- [CLI](https://next-ai-ready.vercel.app/zh/docs/api-reference/cli): 命令行接口——init、build、doctor、audit 和 mcp。
 - [配置](https://next-ai-ready.vercel.app/zh/docs/api-reference/config): ai-ready.config.mjs 的完整参考。
 - [defineAction](https://next-ai-ready.vercel.app/zh/docs/api-reference/define-action): defineAction() 和 defineActions() 的 API 参考。
 - [语义元数据](https://next-ai-ready.vercel.app/zh/docs/api-reference/define-semantic): 如何为 MDX 内容添加结构化元数据以获得更丰富的 AI 提取。

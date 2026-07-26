@@ -97,7 +97,7 @@
 |----|--------|-----|
 | D-01 | ~~🔴~~ ✅ | 添加 `ai-ready.config.mjs` | [x] 2026-05-31 — content globs `content/{en,zh}/**/*.mdx` |
 | D-02 | ~~🔴~~ ✅ | `next.config` 接入 `withAiReady()` | [x] 2026-05-31 — `.mjs` config（Next.js require() 不支持 ESM-only 包） |
-| D-03 | ~~🔴~~ ✅ | `app/_ai-ready/**` route stubs | [x] 2026-05-31 — 7 handler stubs + action + MCP routes |
+| D-03 | ~~🔴~~ ✅ | `app/%5Fai-ready/**` route stubs | [x] 2026-05-31 — 7 handler stubs + action + MCP routes |
 | D-04 | ~~🔴~~ ✅ | `actions/` + demo actions | [x] 2026-05-31 — search_docs, get_page_content, list_api_methods |
 | D-05 | ~~🔴~~ ✅ | `next-ai-ready build` 产出 graph + llms.txt | [x] 2026-05-31 — 12 routes, 3 actions, 8 files; prebuild script |
 | D-06 | ~~🟡~~ ✅ | `instrumentation.ts` + `instrumentation-node.ts` + hooks subpath | [x] 2026-06-01 — Edge-safe dogfood |

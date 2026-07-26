@@ -3,7 +3,12 @@ import { readFile, rm } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 import { runBuild } from "../src/cli/build.js";
-import { graphPath, publicLlmsTxtPath, publicLlmsFullTxtPath } from "../src/paths.js";
+import {
+  graphPath,
+  publicLlmsTxtPath,
+  publicLlmsFullTxtPath,
+  publicSitemapMdPath,
+} from "../src/paths.js";
 import { invalidateGraphCache, loadGraph } from "../src/runtime/graph-loader.js";
 import { GET as llmsTxtGET } from "../src/handlers/llms-txt.js";
 import { GET as pageMdGET } from "../src/handlers/page-md.js";
@@ -28,6 +33,7 @@ describe("runBuild()", () => {
     expect(result.filesWritten).toContain(graphPath(SAMPLE));
     expect(result.filesWritten).toContain(publicLlmsTxtPath(SAMPLE));
     expect(result.filesWritten).toContain(publicLlmsFullTxtPath(SAMPLE));
+    expect(result.filesWritten).toContain(publicSitemapMdPath(SAMPLE));
 
     const graph = JSON.parse(await readFile(graphPath(SAMPLE), "utf8")) as Record<string, unknown>;
     expect((graph.routes as Record<string, string>)["/"]).toBeDefined();
@@ -38,6 +44,9 @@ describe("runBuild()", () => {
     // Section config: "Guides" should appear (priority: high).
     expect(llmsTxt).toContain("## Guides");
     expect(llmsTxt).toContain("[Install](https://sample.test/docs/install)");
+
+    const sitemapMd = await readFile(publicSitemapMdPath(SAMPLE), "utf8");
+    expect(sitemapMd).toContain("[Install](https://sample.test/docs/install)");
   });
 
   it("is deterministic (same source → identical bytes)", async () => {
@@ -76,6 +85,10 @@ describe("runtime handlers (post-build)", () => {
     });
     expect(mdResp.status).toBe(200);
     expect(mdResp.headers.get("content-type")).toContain("text/markdown");
+    expect(mdResp.headers.get("link")).toBe(
+      '<https://sample.test/docs/install>; rel="canonical"',
+    );
+    expect(mdResp.headers.get("vary")).toBe("Accept, User-Agent");
     const md = await mdResp.text();
     expect(md).toContain("title: Install");
     expect(md).toContain("# Install");

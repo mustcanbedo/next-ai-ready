@@ -9,18 +9,18 @@ const zh = {
     badge: "v0.1.0-alpha.10 — 已发布至 npm",
     title: "Next.js 的\nAI 基础设施层",
     subtitle:
-      "让你的网站被 AI 搜索引擎收录、被 AI Agent 调用。一个配置文件，UI 零改动。",
+      "让 AI 更容易发现和读取你的内容，并通过明确授权的接口调用功能。一个配置文件，UI 零改动。",
     cta: "开始使用",
-    install: "pnpm add next-ai-ready",
+    install: "pnpm add next-ai-ready@alpha",
   },
   features: {
     heading: "AI 从你的站点获取一切所需",
     subheading: "现有 Next.js 应用自动获得完整的 AI 接口 —— 发现、检索、工具调用。",
     items: [
       {
-        title: "AI 搜索收录",
+        title: "AI 内容发现",
         description:
-          "你的内容出现在 ChatGPT、Perplexity、Google AI Overviews 中。结构化的 llms.txt 和逐页 Markdown 让 AI 可引用你。",
+          "通过 llms.txt、逐页 Markdown 和结构化元数据，为 AI 消费者提供清晰的发现与读取路径。",
         icon: "search",
       },
       {

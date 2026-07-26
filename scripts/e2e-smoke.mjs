@@ -110,13 +110,14 @@ This is a test page for the e2e smoke test.
     const required = [
       ".next-ai-ready/graph.json",
       "public/llms.txt",
+      "public/sitemap.md",
       "public/robots.txt",
       "public/openapi.json",
       "public/tools.json",
       "public/.well-known/ai-plugin.json",
       // Handler stubs
-      "app/_ai-ready/llms-txt/route.ts",
-      "app/_ai-ready/openapi/route.ts",
+      "app/%5Fai-ready/llms-txt/route.ts",
+      "app/%5Fai-ready/openapi/route.ts",
       "app/api/actions/[name]/route.ts",
       // Config patched
       "next.config.mjs",

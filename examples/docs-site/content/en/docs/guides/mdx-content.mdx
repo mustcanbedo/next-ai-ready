@@ -65,7 +65,7 @@ For richer extraction, export a `semantic` object from your MDX:
 export const semantic = {
   topics: ["install", "quickstart", "pnpm"],
   questions: [
-    { q: "How do I install next-ai-ready?", a: "Run `pnpm add next-ai-ready`." },
+    { q: "How do I install next-ai-ready?", a: "Run `pnpm add next-ai-ready@alpha`." },
     { q: "Do I need Zod?", a: "Yes, Zod v4 is required for actions." },
   ],
   entities: [
@@ -87,7 +87,7 @@ Use `##` headings to break your page into sections. Each heading becomes a separ
 ```text
 ## Installation
 
-Run `pnpm add next-ai-ready`.
+Run `pnpm add next-ai-ready@alpha`.
 
 ## Configuration
 
@@ -101,7 +101,7 @@ The compiler preserves heading IDs for stable anchor links. AI consumers can cit
 Use fenced code blocks with language tags. Wrap your code in triple backticks with a language identifier:
 
     ```bash
-    pnpm add next-ai-ready
+    pnpm add next-ai-ready@alpha
     ```
 
 The compiler strips code blocks to plain text in the Markdown body but preserves them in the HTML output.

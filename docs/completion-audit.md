@@ -205,7 +205,7 @@ canonical = `/openapi.json`、`/tools.json`；`buildAiPlugin()` 默认已改。D
 ### 5.1 已有
 
 - Next.js 16 App Router + Tailwind 4 + 中英 i18n UI
-- **框架 dogfood：** `ai-ready.config.mjs`、`withAiReady()`、`app/_ai-ready/**`、3 demo actions、`prebuild: next-ai-ready build`
+- **框架 dogfood：** `ai-ready.config.mjs`、`withAiReady()`、`app/%5Fai-ready/**`、3 demo actions、`prebuild: next-ai-ready build`
 - **19 篇/语言 MDX**（en/zh 各 19）：含 D-10～D-22 guides + api-reference + 原有 6 篇
 - **双轨架构（D-07）：** UI 读 MDX；AI 端点走 framework build（routes + actions in graph）
 - content 在 `content/{locale}/**`，scanner route 映射已验证（D-08）

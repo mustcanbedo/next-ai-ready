@@ -94,11 +94,8 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Build packages (docs-site deps)
-        run: pnpm turbo run build --filter=docs-site^...
+      - name: Build docs site
+        run: pnpm --filter docs-site build
 
       - name: Run docs-site smoke
-        working-directory: examples/docs-site
-        run: |
-          node ../../packages/meta/dist/cli.js build
-          node scripts/docs-site-smoke.mjs
+        run: pnpm --filter docs-site smoke

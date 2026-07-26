@@ -30,7 +30,7 @@ Traditional websites are built for browsers. `next-ai-ready` makes your Next.js 
 
 ## The problem
 
-Search is changing. Users increasingly get answers from AI — ChatGPT, Perplexity, Claude, Gemini, Google AI Overviews. If your content isn't structured for AI consumption, you're invisible to this new traffic.
+Search is changing. Users increasingly get answers from AI systems. Standard SEO remains essential, while clean machine-readable representations give AI consumers another reliable way to discover and retrieve your content.
 
 At the same time, AI agents are emerging. They need to **call your features** — not just read your pages. But there's no standard way to expose Next.js functionality to agents.
 
@@ -44,12 +44,14 @@ At the same time, AI agents are emerging. They need to **call your features** �
 ## How it works
 
 ```bash
-pnpm add next-ai-ready
+pnpm add next-ai-ready@alpha
 npx next-ai-ready init
 npx next-ai-ready build
 ```
 
 The `init` command scaffolds route handlers and a config file. The `build` command scans your MDX content and compiles everything into the artifacts AI consumers need.
+
+These artifacts improve technical accessibility. They do not guarantee indexing, ranking, citation, or inclusion in an AI-generated answer.
 
 Your existing UI is untouched. The framework adds **new routes** that serve AI-optimized representations of your content and capabilities.
 
@@ -58,6 +60,7 @@ Your existing UI is untouched. The framework adds **new routes** that serve AI-o
 | Artifact | Consumer |
 | --- | --- |
 | `/llms.txt` | AI search crawlers |
+| `/sitemap.md` | Agent-readable page discovery |
 | `/openapi.json` | Agent frameworks |
 | `/api/mcp` | Claude Desktop, Cursor |
 | `/<page>.md` | RAG pipelines |

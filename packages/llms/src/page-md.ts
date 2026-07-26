@@ -20,8 +20,15 @@ export function renderPageMarkdown(graph: SemanticGraph, route: string): string 
 function formatPage(page: SemanticNode): string {
   const meta: string[] = ["---"];
   meta.push(`title: ${page.title ?? page.route}`);
-  if (page.citeUrl) meta.push(`url: ${page.citeUrl}`);
-  if (page.updatedAt) meta.push(`updated: ${page.updatedAt}`);
+  if (page.summary) meta.push(`description: ${page.summary}`);
+  if (page.citeUrl) {
+    meta.push(`canonical_url: ${page.citeUrl}`);
+    meta.push(`url: ${page.citeUrl}`);
+  }
+  if (page.updatedAt) {
+    meta.push(`last_updated: ${page.updatedAt}`);
+    meta.push(`updated: ${page.updatedAt}`);
+  }
   if (page.author?.name) meta.push(`author: ${page.author.name}`);
   if (page.summary) meta.push(`summary: ${page.summary}`);
   if (page.topics?.length) meta.push(`topics: [${page.topics.join(", ")}]`);

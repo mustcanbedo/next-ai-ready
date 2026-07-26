@@ -504,7 +504,7 @@ const CHECK_FIXES: Partial<Record<string, string>> = {
   [CHECK.ACTIONS_WHEN_TO_USE]: "Add `whenToUse` to every public action so agents pick the right tool.",
   [CHECK.BUILD_GRAPH]: "Run `npx next-ai-ready build` before deploy.",
   [CHECK.BUILD_OPENAPI]: "Run `npx next-ai-ready build` to emit openapi.json.",
-  [CHECK.ROUTE_STUBS]: "Run `npx next-ai-ready init` to scaffold app/_ai-ready handler stubs.",
+  [CHECK.ROUTE_STUBS]: "Run `npx next-ai-ready init` to scaffold app/%5Fai-ready handler stubs.",
   [CHECK.NEXT_CONFIG]: "Wrap next.config with `withAiReady()` from next-ai-ready (or @next-ai-ready/next).",
   [CHECK.BUILD_SCRIPT]: 'Add `"prebuild": "next-ai-ready build"` (or include build in `build` script).',
   [CHECK.ROBOTS_AI_BOTS]:

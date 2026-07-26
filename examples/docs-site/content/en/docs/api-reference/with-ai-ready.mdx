@@ -10,7 +10,7 @@ questions:
   - q: Can I disable automatic rewrites?
     a: >-
       Yes. Pass { rewrites: false } to mount AI routes manually under
-      app/_ai-ready/.
+      app/%5Fai-ready/.
 tags:
   - api
   - reference
@@ -46,8 +46,12 @@ The function is curried: the first call accepts options, the second call accepts
 
 ```ts
 interface WithAiReadyOptions {
-  rewrites?: boolean    // default: true
-  fileTracing?: boolean // default: true
+  rewrites?: boolean
+  fileTracing?: boolean
+  agentReadable?: boolean | {
+    accept?: boolean
+    userAgents?: boolean | string[]
+  }
 }
 ```
 
@@ -55,6 +59,9 @@ interface WithAiReadyOptions {
 |---|---|---|---|
 | `rewrites` | `boolean` | `true` | Add URL rewrites for AI routes. Disable if you want to mount routes yourself. |
 | `fileTracing` | `boolean` | `true` | Add `outputFileTracingIncludes` so `.next-ai-ready/*.json` ships with serverless bundles. Disable if your deployment adapter ships the whole project. |
+| `agentReadable` | `boolean \| object` | `false` | Opt in to `Accept: text/markdown` negotiation and, when enabled, Markdown responses for known or custom agent user agents. Adds the matching `Vary` header. |
+
+Use `agentReadable: true` to enable both Accept and built-in agent User-Agent negotiation. Use `agentReadable: { accept: true }` for Accept-only behavior, or pass a custom `userAgents` list. API paths, Next.js internals, and paths with file extensions are excluded.
 
 ## What it does
 
@@ -99,4 +106,4 @@ export default withAiReady({ rewrites: false })({
 })
 ```
 
-You still need the route handler files in `app/_ai-ready/` — the rewrites just map clean URLs to them.
+You still need the route handler files in `app/%5Fai-ready/` — the rewrites just map clean URLs to them.

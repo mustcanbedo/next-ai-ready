@@ -8,7 +8,7 @@ import { resolveParams } from "../runtime/params.js";
  * Handler for `/<route>.md`. Expects `params.path` to be the route
  * segments (e.g. `["docs", "install"]`).
  *
- * Wire-up: see `app/_ai-ready/md/[...path]/route.ts` written by the
+ * Wire-up: see `app/%5Fai-ready/md/[...path]/route.ts` written by the
  * `init` codemod, and the rewrite in `withAiReady()`.
  */
 export async function GET(req: Request, ctx: { params: Promise<{ path?: string[] }> | { path?: string[] } }) {
@@ -18,10 +18,14 @@ export async function GET(req: Request, ctx: { params: Promise<{ path?: string[]
   const graph = await loadGraph();
   const body = renderPageMarkdown(graph, route);
   if (!body) return new Response("Not found", { status: 404 });
+  const canonical = new URL(route, graph.site.baseUrl).toString();
   return new Response(body, {
     headers: {
       "content-type": "text/markdown; charset=utf-8",
       "cache-control": "public, max-age=0, must-revalidate",
+      "content-location": `${route}.md`,
+      link: `<${canonical}>; rel="canonical"`,
+      vary: "Accept, User-Agent",
     },
   });
 }

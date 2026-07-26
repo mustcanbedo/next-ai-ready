@@ -35,7 +35,7 @@ npx next-ai-ready init
 Creates:
 
 - `ai-ready.config.mjs` — site configuration with placeholder values.
-- `app/_ai-ready/` — route handler stubs (one-line re-exports).
+- `app/%5Fai-ready/` — route handler stubs (one-line re-exports).
 - `app/api/actions/[name]/route.ts` — action execution endpoint.
 - `app/api/mcp/[transport]/route.ts` — MCP server endpoint.
 - `actions/index.mjs` — starter action file with a `ping` health check.
@@ -88,7 +88,7 @@ Checks include:
 1. **Config** — `ai-ready.config.mjs` with required `site.name`, `site.baseUrl`, and `site.description`.
 2. **Actions** — public vs private counts; warns if public actions lack `whenToUse`.
 3. **Build artifacts** — graph, OpenAPI, `package.json` prebuild script.
-4. **Route stubs** — `app/_ai-ready/*` handler files and `withAiReady()` in `next.config`.
+4. **Route stubs** — `app/%5Fai-ready/*` handler files and `withAiReady()` in `next.config`.
 5. **Robots** — static `public/robots.txt` **or** `app/robots.ts` (when `emit.robots: false`, doctor does not warn about a missing static file).
 6. **MCP** — warns if `NEXT_AI_READY_MCP_TOKEN` is unset in production.
 7. **Content quality** — `noai` meta, JSON-LD helpers, `updatedAt` / `author` coverage in the graph.

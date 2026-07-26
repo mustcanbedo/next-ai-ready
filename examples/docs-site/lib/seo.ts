@@ -26,6 +26,9 @@ export function docPageMetadata(input: {
     alternates: {
       canonical: url,
       languages,
+      types: {
+        "text/markdown": `${url}.md`,
+      },
     },
     openGraph: {
       type: "article",

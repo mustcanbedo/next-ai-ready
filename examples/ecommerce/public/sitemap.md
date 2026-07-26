@@ -1,8 +1,6 @@
-# Demo Shop
+# Demo Shop Sitemap
 
-> Example e-commerce catalog for next-ai-ready agents.
-
-<!-- Last updated: 2026-07-26 -->
+> Canonical pages available on this site.
 
 ## Pages
 

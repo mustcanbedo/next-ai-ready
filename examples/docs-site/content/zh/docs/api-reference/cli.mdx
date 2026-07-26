@@ -31,7 +31,7 @@ npx next-ai-ready init
 创建：
 
 - `ai-ready.config.mjs` — 带占位值的站点配置。
-- `app/_ai-ready/` — route handler 桩文件（一行 re-export）。
+- `app/%5Fai-ready/` — route handler 桩文件（一行 re-export）。
 - `app/api/actions/[name]/route.ts` — action 执行端点。
 - `app/api/mcp/[transport]/route.ts` — MCP 服务器端点。
 - `actions/index.mjs` — 带 `ping` 健康检查的 starter action 文件。
@@ -84,7 +84,7 @@ npx next-ai-ready doctor --json    # 机器可读报告（含 actionItems）
 1. **配置** — `ai-ready.config.mjs` 及必填的 `site.name`、`site.baseUrl`、`site.description`。
 2. **Actions** — 公开/私有统计；公开 action 缺少 `whenToUse` 时警告。
 3. **构建产物** — graph、OpenAPI、`package.json` 是否含 prebuild。
-4. **路由桩文件** — `app/_ai-ready/*` 与 `next.config` 中的 `withAiReady()`。
+4. **路由桩文件** — `app/%5Fai-ready/*` 与 `next.config` 中的 `withAiReady()`。
 5. **Robots** — `public/robots.txt` **或** `app/robots.ts`（`emit.robots: false` 时不会因缺少静态文件误报）。
 6. **MCP** — 生产环境未设置 `NEXT_AI_READY_MCP_TOKEN` 时警告。
 7. **内容质量** — `noai`、JSON-LD helper、`updatedAt` / `author` 覆盖率。

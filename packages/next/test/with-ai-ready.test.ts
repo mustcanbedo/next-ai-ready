@@ -65,4 +65,49 @@ describe("withAiReady()", () => {
     const config = withAiReady({ fileTracing: false })({} as Record<string, unknown>);
     expect(config.outputFileTracingIncludes).toBeUndefined();
   });
+
+  it("adds Accept and agent UA Markdown negotiation when enabled", async () => {
+    const config = withAiReady({ agentReadable: true })({} as Record<string, unknown>);
+    const rewrites = await (config.rewrites as () => Promise<unknown>)();
+    expect(Array.isArray(rewrites)).toBe(false);
+
+    const result = rewrites as {
+      beforeFiles: Array<{ has?: Array<{ key: string; value: string }> }>;
+    };
+    expect(result.beforeFiles).toHaveLength(2);
+    expect(result.beforeFiles[0].has?.[0]).toMatchObject({
+      key: "accept",
+      value: ".*text/markdown.*",
+    });
+    expect(result.beforeFiles[1].has?.[0]?.key).toBe("user-agent");
+    expect(result.beforeFiles[1].has?.[0]?.value).toContain("OAI-SearchBot");
+
+    const headers = await (config.headers as () => Promise<unknown>)();
+    expect(headers).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          headers: [{ key: "Vary", value: "Accept, User-Agent" }],
+        }),
+      ]),
+    );
+  });
+
+  it("supports Accept-only negotiation and merges user headers", async () => {
+    const config = withAiReady({ agentReadable: { accept: true } })({
+      headers: async () => [
+        { source: "/legacy", headers: [{ key: "X-Legacy", value: "1" }] },
+      ],
+    });
+    const headers = await (config.headers as () => Promise<Array<{ source: string }>>)();
+    expect(headers[0].source).toBe("/legacy");
+    expect(headers[1]).toMatchObject({
+      headers: [{ key: "Vary", value: "Accept" }],
+    });
+  });
+
+  it("does not add negotiation headers when rewrites are disabled", () => {
+    const config = withAiReady({ rewrites: false, agentReadable: true })({});
+    expect(config.rewrites).toBeUndefined();
+    expect(config.headers).toBeUndefined();
+  });
 });

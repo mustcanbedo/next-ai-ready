@@ -5,7 +5,7 @@ order: 3
 questions:
   - q: next-ai-ready 会在项目里添加哪些文件？
     a: >-
-      ai-ready.config、app/_ai-ready/ 路由桩、actions/、instrumentation，以及 public/ 与
+      ai-ready.config、app/%5Fai-ready/ 路由桩、actions/、instrumentation，以及 public/ 与
       .next-ai-ready/ 下的构建产物。
   - q: 语义图谱保存在哪里？
     a: >-
@@ -49,12 +49,12 @@ author: next-ai-ready 团队
 
 由 `init` 创建在 `app/` 下。每个文件都是一行 re-export——可读、可审计、可自定义：
 
-- `app/_ai-ready/llms-txt/route.ts` — 提供 `/llms.txt`
-- `app/_ai-ready/llms-full/route.ts` — 提供 `/llms-full.txt`
-- `app/_ai-ready/md/[...path]/route.ts` — 提供 `/<route>.md`
-- `app/_ai-ready/ai-json/[...path]/route.ts` — 提供 `/<route>.ai.json`
-- `app/_ai-ready/openapi/route.ts` — 提供 `/openapi.json`
-- `app/_ai-ready/tools/route.ts` — 提供 `/tools.json`
+- `app/%5Fai-ready/llms-txt/route.ts` — 提供 `/llms.txt`
+- `app/%5Fai-ready/llms-full/route.ts` — 提供 `/llms-full.txt`
+- `app/%5Fai-ready/md/[...path]/route.ts` — 提供 `/<route>.md`
+- `app/%5Fai-ready/ai-json/[...path]/route.ts` — 提供 `/<route>.ai.json`
+- `app/%5Fai-ready/openapi/route.ts` — 提供 `/openapi.json`
+- `app/%5Fai-ready/tools/route.ts` — 提供 `/tools.json`
 - `app/api/actions/[name]/route.ts` — action 执行端点
 - `app/api/mcp/[transport]/route.ts` — MCP 服务器端点
 

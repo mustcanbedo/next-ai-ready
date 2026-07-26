@@ -59,7 +59,7 @@ Phased delivery. Each phase produces a usable, shippable slice.
 - `examples/docs-site` consuming all of the above.
 
 ### Exit criteria
-- Fresh Next app + `pnpm add next-ai-ready` + `init` + `build` produces working `/llms.txt`, `/docs/foo.md`, `/docs/foo.ai.json`.
+- Fresh Next app + `pnpm add next-ai-ready@alpha` + `init` + `build` produces working `/llms.txt`, `/docs/foo.md`, `/docs/foo.ai.json`.
 - **🚀 First public alpha tag.**
 
 ---

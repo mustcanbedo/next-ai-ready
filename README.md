@@ -16,10 +16,12 @@
 `next-ai-ready` is the **AEO / Agent-API layer** for Next.js.
 
 SEO optimizes your site for browsers and search engines.
-`next-ai-ready` optimizes your site for **AI consumers** — so:
+`next-ai-ready` adds interfaces for **AI consumers** — so:
 
-1. **AI search engines cite you** (ChatGPT, Perplexity, Claude, Gemini, Google AI Overviews).
-2. **AI agents call you** (your features become tools that agents can invoke on behalf of users).
+1. **AI systems can discover and retrieve clean representations of your content.**
+2. **Authorized AI agents can call your features** as tools on behalf of users.
+
+These interfaces improve technical accessibility; they do not guarantee indexing, ranking, citation, or inclusion in an AI-generated answer.
 
 This is not a SaaS, not a dashboard, not a chatbot. It is a **developer infra tool** that lives next to `next.config.js`.
 
@@ -31,6 +33,7 @@ From the same Next.js app, with zero changes to your UI, you get:
 | ------------------------------- | ------------------------- |
 | HTML                            | Browsers (untouched)      |
 | `/llms.txt`, `/llms-full.txt`   | LLMs, AI search crawlers  |
+| `/sitemap.md`                   | Agent-readable page discovery |
 | `/<route>.md`, `/<route>.ai.json` | Retrieval, RAG, AI ingestion |
 | JSON-LD (`Article`, `FAQPage`, `WebPage`) | Search engines, AI search |
 | `/openapi.json`, `/tools.json`, `/.well-known/ai-plugin.json` | Agents, OpenAPI consumers |
@@ -89,14 +92,22 @@ export default defineAction({
 ```
 
 ```bash
-pnpm add next-ai-ready
+pnpm add next-ai-ready@alpha
 npx next-ai-ready init     # scaffold config + route stubs + starter action
-npx next-ai-ready build    # emit llms.txt, graph, openapi.json, tools.json, robots.txt
+npx next-ai-ready build    # emit llms.txt, sitemap.md, graph, OpenAPI, tools, robots
 npx next-ai-ready doctor   # validate config, action exposure, route wiring (CI-friendly)
 npx next-ai-ready mcp      # run an MCP server over stdio (Claude Desktop / Cursor)
 ```
 
-Then `next build` and you're discoverable + callable by AI.
+Then run `next build` to expose the generated discovery, retrieval, and capability interfaces.
+
+Opt in to Markdown content negotiation in `next.config.mjs`:
+
+```js
+export default withAiReady({ agentReadable: true })(nextConfig)
+```
+
+This serves page Markdown for `Accept: text/markdown` and known agent User-Agents, while normal browser requests continue to receive HTML.
 
 **Get started in 10 minutes:** [`docs/quickstart-10min.md`](./docs/quickstart-10min.md) · [中文](./docs/quickstart-10min.zh-CN.md)
 

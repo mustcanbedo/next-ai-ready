@@ -25,7 +25,7 @@ author: next-ai-ready 团队
 
 ## 问题
 
-搜索正在变革。用户越来越多地从 AI 获取答案 —— ChatGPT、Perplexity、Claude、Gemini、Google AI Overviews。如果你的内容没有为 AI 消费做好结构化，你就对这些新流量隐身了。
+搜索正在变化，用户越来越多地通过 AI 系统获取答案。传统 SEO 仍然是基础，而清晰的机器可读表示可以为 AI 消费者提供另一条稳定的内容发现与读取路径。
 
 与此同时，AI Agent 正在兴起。它们需要**调用你的功能** —— 而不只是阅读你的页面。但目前没有标准方式将 Next.js 功能暴露给 Agent。
 
@@ -39,12 +39,14 @@ author: next-ai-ready 团队
 ## 工作原理
 
 ```bash
-pnpm add next-ai-ready
+pnpm add next-ai-ready@alpha
 npx next-ai-ready init
 npx next-ai-ready build
 ```
 
 `init` 命令生成路由处理器和配置文件。`build` 命令扫描你的 MDX 内容，将一切编译为 AI 消费者所需的产出物。
+
+这些产出物改善的是技术可访问性，不保证被索引、获得排名、被引用或出现在 AI 生成的回答中。
 
 你现有的 UI 不受影响。框架添加**新路由**来提供内容和能力的 AI 优化表示。
 
@@ -53,6 +55,7 @@ npx next-ai-ready build
 | 产出物 | 消费者 |
 | --- | --- |
 | `/llms.txt` | AI 搜索爬虫 |
+| `/sitemap.md` | Agent 可读的页面发现目录 |
 | `/openapi.json` | Agent 框架 |
 | `/api/mcp` | Claude Desktop、Cursor |
 | `/<page>.md` | RAG 管道 |

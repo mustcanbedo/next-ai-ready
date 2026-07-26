@@ -16,10 +16,12 @@ English | [中文文档](./README.zh-CN.md)
 `next-ai-ready` 是 Next.js 的 **AEO / Agent-API 层**。
 
 SEO 为浏览器和搜索引擎优化你的网站。
-`next-ai-ready` 为 **AI 消费者** 优化你的网站——让：
+`next-ai-ready` 为 **AI 消费者** 增加标准化接口，让：
 
-1. **AI 搜索引擎引用你**（ChatGPT、Perplexity、Claude、Gemini、Google AI Overviews）。
-2. **AI Agent 调用你**（你的功能变成 Agent 可以代替用户调用的工具）。
+1. **AI 系统可以发现并读取干净的内容表示。**
+2. **获得授权的 AI Agent 可以调用你的功能**，将其作为代表用户执行的工具。
+
+这些接口改善技术可访问性，但不保证被索引、获得排名、被引用或出现在 AI 生成的回答中。
 
 这不是 SaaS，不是仪表盘，不是聊天机器人。它是一个 **开发者基础设施工具**，与 `next.config.js` 并列使用。
 
@@ -31,6 +33,7 @@ SEO 为浏览器和搜索引擎优化你的网站。
 | ------------------------------- | ------------------------- |
 | HTML                            | 浏览器（不受影响）        |
 | `/llms.txt`、`/llms-full.txt`   | LLM、AI 搜索爬虫          |
+| `/sitemap.md`                   | Agent 可读的页面发现目录  |
 | `/<route>.md`、`/<route>.ai.json` | 检索、RAG、AI 数据摄取   |
 | JSON-LD（`Article`、`FAQPage`、`WebPage`） | 搜索引擎、AI 搜索 |
 | `/openapi.json`、`/tools.json`、`/.well-known/ai-plugin.json` | Agent、OpenAPI 消费者 |
@@ -89,14 +92,22 @@ export default defineAction({
 ```
 
 ```bash
-pnpm add next-ai-ready
+pnpm add next-ai-ready@alpha
 npx next-ai-ready init     # 生成配置 + 路由桩文件 + 示例 action
-npx next-ai-ready build    # 产出 llms.txt、语义图、openapi.json、tools.json、robots.txt
+npx next-ai-ready build    # 产出 llms.txt、sitemap.md、语义图、OpenAPI、tools、robots
 npx next-ai-ready doctor   # 验证配置、action 暴露规则、路由接线（CI 友好）
 npx next-ai-ready mcp      # 通过 stdio 运行 MCP 服务器（Claude Desktop / Cursor）
 ```
 
-然后运行 `next build`，你的站点就能被 AI 发现和调用了。
+然后运行 `next build`，暴露生成的发现、读取与能力接口。
+
+在 `next.config.mjs` 中显式启用 Markdown 内容协商：
+
+```js
+export default withAiReady({ agentReadable: true })(nextConfig)
+```
+
+带有 `Accept: text/markdown` 或已知 Agent User-Agent 的页面请求会得到 Markdown，普通浏览器请求仍然获得 HTML。
 
 **10 分钟上手：** [`docs/quickstart-10min.zh-CN.md`](./docs/quickstart-10min.zh-CN.md) · [English](./docs/quickstart-10min.md)
 

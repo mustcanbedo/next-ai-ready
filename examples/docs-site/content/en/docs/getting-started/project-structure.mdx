@@ -5,7 +5,7 @@ order: 3
 questions:
   - q: What files does next-ai-ready add to my project?
     a: >-
-      ai-ready.config, app/_ai-ready/ route stubs, actions/, instrumentation
+      ai-ready.config, app/%5Fai-ready/ route stubs, actions/, instrumentation
       files, and build outputs under public/ and .next-ai-ready/.
   - q: Where does the semantic graph live?
     a: >-
@@ -49,12 +49,12 @@ Written to `public/` at build time:
 
 Created by `init` in `app/`. Each file is a one-line re-export — readable, auditable, customisable:
 
-- `app/_ai-ready/llms-txt/route.ts` — serves `/llms.txt`
-- `app/_ai-ready/llms-full/route.ts` — serves `/llms-full.txt`
-- `app/_ai-ready/md/[...path]/route.ts` — serves `/<route>.md`
-- `app/_ai-ready/ai-json/[...path]/route.ts` — serves `/<route>.ai.json`
-- `app/_ai-ready/openapi/route.ts` — serves `/openapi.json`
-- `app/_ai-ready/tools/route.ts` — serves `/tools.json`
+- `app/%5Fai-ready/llms-txt/route.ts` — serves `/llms.txt`
+- `app/%5Fai-ready/llms-full/route.ts` — serves `/llms-full.txt`
+- `app/%5Fai-ready/md/[...path]/route.ts` — serves `/<route>.md`
+- `app/%5Fai-ready/ai-json/[...path]/route.ts` — serves `/<route>.ai.json`
+- `app/%5Fai-ready/openapi/route.ts` — serves `/openapi.json`
+- `app/%5Fai-ready/tools/route.ts` — serves `/tools.json`
 - `app/api/actions/[name]/route.ts` — action execution endpoint
 - `app/api/mcp/[transport]/route.ts` — MCP server endpoint
 

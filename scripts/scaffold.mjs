@@ -90,6 +90,6 @@ writeFileSync(join(meta, 'src', 'index.ts'),
 writeFileSync(join(meta, 'src', 'cli.ts'),
   `#!/usr/bin/env node\n// next-ai-ready CLI entry — forwards to @next-ai-ready/next CLI when implemented.\nconsole.log('next-ai-ready CLI — not yet implemented (Phase 2).')\nprocess.exit(0)\n`);
 writeFileSync(join(meta, 'README.md'),
-  `# next-ai-ready\n\nOne-line install for the full next-ai-ready stack.\n\n\`\`\`bash\npnpm add next-ai-ready\nnpx next-ai-ready init\n\`\`\`\n\nSee the [project README](../../README.md) for the full picture.\n`);
+  `# next-ai-ready\n\nOne-line install for the full next-ai-ready stack.\n\n\`\`\`bash\npnpm add next-ai-ready@alpha\nnpx next-ai-ready init\n\`\`\`\n\nSee the [project README](../../README.md) for the full picture.\n`);
 
 console.log(`Scaffolded ${pkgs.length} packages + meta.`);

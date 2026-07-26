@@ -288,6 +288,8 @@ export interface LlmsSectionConfig {
 export interface EmitConfig {
   llmsTxt?: boolean;
   llmsFullTxt?: boolean;
+  /** Emit `public/sitemap.md`, a Markdown directory for agents. Default `true`. */
+  sitemapMd?: boolean;
   pageMarkdown?: boolean;
   pageAiJson?: boolean;
   jsonLd?: boolean;

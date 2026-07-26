@@ -11,7 +11,7 @@ import {
 } from "@next-ai-ready/core";
 import { compile } from "@next-ai-ready/mdx";
 import { buildGraph } from "@next-ai-ready/semantic";
-import { renderLlmsTxt, renderLlmsFullTxt } from "@next-ai-ready/llms";
+import { renderLlmsTxt, renderLlmsFullTxt, renderSitemapMarkdown } from "@next-ai-ready/llms";
 import {
   buildActionsManifest,
   clearRegistry,
@@ -25,6 +25,7 @@ import {
   publicAiPluginPath,
   publicLlmsTxtPath,
   publicLlmsFullTxtPath,
+  publicSitemapMdPath,
   publicOpenApiPath,
   publicRobotsTxtPath,
   publicToolsJsonPath,
@@ -117,7 +118,14 @@ export async function runBuild(opts: BuildOptions = {}): Promise<BuildResult> {
     written.push(path);
   }
 
-  // 4. public/robots.txt — explicit AI-crawler policy (see ADR-011 + robots.ts).
+  // 4. public/sitemap.md — compact canonical page directory for agents.
+  if (config.emit?.sitemapMd !== false) {
+    const path = publicSitemapMdPath(cwd);
+    await writeText(path, renderSitemapMarkdown(graph));
+    written.push(path);
+  }
+
+  // 5. public/robots.txt — explicit AI-crawler policy (see ADR-011 + robots.ts).
   if (config.emit?.robots !== false) {
     const path = publicRobotsTxtPath(cwd);
     await writeText(path, buildRobotsTxt(config.site, config.robots));

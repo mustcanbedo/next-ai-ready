@@ -39,8 +39,9 @@ async function run(cwd, cmd, args, opts = {}) {
     return { stdout, stderr };
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
+    const stdout = err && typeof err === "object" && "stdout" in err ? String(err.stdout) : "";
     const stderr = err && typeof err === "object" && "stderr" in err ? String(err.stderr) : "";
-    throw new Error([msg, stderr].filter(Boolean).join("\n"));
+    throw new Error([msg, stdout, stderr].filter(Boolean).join("\n"));
   }
 }
 
@@ -57,6 +58,7 @@ async function main() {
           version: "0.0.0",
           private: true,
           type: "module",
+          packageManager: "pnpm@9.12.0",
           scripts: { build: "next build" },
         },
         null,
@@ -103,6 +105,7 @@ async function main() {
     for (const rel of [
       ".next-ai-ready/graph.json",
       "public/llms.txt",
+      "public/sitemap.md",
       "public/openapi.json",
       "instrumentation.ts",
     ]) {

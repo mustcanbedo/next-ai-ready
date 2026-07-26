@@ -24,7 +24,7 @@ npx next-ai-ready init
 Creates:
 
 - `ai-ready.config.mjs` — site configuration with placeholder values.
-- `app/_ai-ready/` — route handler stubs (one-line re-exports).
+- `app/%5Fai-ready/` — route handler stubs (one-line re-exports).
 - `app/api/actions/[name]/route.ts` — action execution endpoint.
 - `app/api/mcp/[transport]/route.ts` — MCP server endpoint.
 - `actions/index.mjs` — starter action file with a `ping` health check.
@@ -77,7 +77,7 @@ Checks include:
 1. **Config** — `ai-ready.config.mjs` with required `site.name`, `site.baseUrl`, and `site.description`.
 2. **Actions** — public vs private counts; warns if public actions lack `whenToUse`.
 3. **Build artifacts** — graph, OpenAPI, `package.json` prebuild script.
-4. **Route stubs** — `app/_ai-ready/*` handler files and `withAiReady()` in `next.config`.
+4. **Route stubs** — `app/%5Fai-ready/*` handler files and `withAiReady()` in `next.config`.
 5. **Robots** — static `public/robots.txt` **or** `app/robots.ts` (when `emit.robots: false`, doctor does not warn about a missing static file).
 6. **MCP** — warns if `NEXT_AI_READY_MCP_TOKEN` is unset in production.
 7. **Content quality** — `noai` meta, JSON-LD helpers, `updatedAt` / `author` coverage in the graph.
@@ -348,7 +348,7 @@ Add this to any MDX file:
 export const semantic = {
   topics: ["install", "quickstart", "pnpm"],
   questions: [
-    { q: "How do I install next-ai-ready?", a: "Run `pnpm add next-ai-ready`." },
+    { q: "How do I install next-ai-ready?", a: "Run `pnpm add next-ai-ready@alpha`." },
     { q: "Do I need Zod?", a: "Yes, Zod v4 is required for actions." },
   ],
   entities: [
@@ -456,15 +456,22 @@ The function is curried: the first call accepts options, the second call accepts
 
 ```ts
 interface WithAiReadyOptions {
-  rewrites?: boolean    // default: true
-  fileTracing?: boolean // default: true
+  rewrites?: boolean
+  fileTracing?: boolean
+  agentReadable?: boolean | {
+    accept?: boolean
+    userAgents?: boolean | string[]
+  }
 }
 ```
 
-| Option        | Type      | Default | Description                                                                                                                                           |
-| ------------- | --------- | ------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `rewrites`    | `boolean` | `true`  | Add URL rewrites for AI routes. Disable if you want to mount routes yourself.                                                                         |
-| `fileTracing` | `boolean` | `true`  | Add `outputFileTracingIncludes` so `.next-ai-ready/*.json` ships with serverless bundles. Disable if your deployment adapter ships the whole project. |
+| Option          | Type                | Default | Description                                                                                                                                                 |
+| --------------- | ------------------- | ------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `rewrites`      | `boolean`           | `true`  | Add URL rewrites for AI routes. Disable if you want to mount routes yourself.                                                                               |
+| `fileTracing`   | `boolean`           | `true`  | Add `outputFileTracingIncludes` so `.next-ai-ready/*.json` ships with serverless bundles. Disable if your deployment adapter ships the whole project.       |
+| `agentReadable` | `boolean \| object` | `false` | Opt in to `Accept: text/markdown` negotiation and, when enabled, Markdown responses for known or custom agent user agents. Adds the matching `Vary` header. |
+
+Use `agentReadable: true` to enable both Accept and built-in agent User-Agent negotiation. Use `agentReadable: { accept: true }` for Accept-only behavior, or pass a custom `userAgents` list. API paths, Next.js internals, and paths with file extensions are excluded.
 
 ## What it does
 
@@ -509,7 +516,7 @@ export default withAiReady({ rewrites: false })({
 })
 ```
 
-You still need the route handler files in `app/_ai-ready/` — the rewrites just map clean URLs to them.
+You still need the route handler files in `app/%5Fai-ready/` — the rewrites just map clean URLs to them.
 
 ## FAQ
 
@@ -519,7 +526,7 @@ Wraps your Next config to add rewrites for AI routes and optional monorepo outpu
 
 ### Can I disable automatic rewrites?
 
-Yes. Pass { rewrites: false } to mount AI routes manually under app/_ai-ready/.
+Yes. Pass { rewrites: false } to mount AI routes manually under app/%5Fai-ready/.
 
 
 <!-- END /en/docs/api-reference/with-ai-ready -->
@@ -690,7 +697,7 @@ export const semantic = {
   summary: "How to install the CLI tool.",
   topics: ["installation", "cli"],
   questions: [
-    { q: "How do I install?", a: "Run pnpm add next-ai-ready." }
+    { q: "How do I install?", a: "Run pnpm add next-ai-ready@alpha." }
   ],
 };
 ```
@@ -871,12 +878,12 @@ Written to `public/` at build time:
 
 Created by `init` in `app/`. Each file is a one-line re-export — readable, auditable, customisable:
 
-- `app/_ai-ready/llms-txt/route.ts` — serves `/llms.txt`
-- `app/_ai-ready/llms-full/route.ts` — serves `/llms-full.txt`
-- `app/_ai-ready/md/[...path]/route.ts` — serves `/<route>.md`
-- `app/_ai-ready/ai-json/[...path]/route.ts` — serves `/<route>.ai.json`
-- `app/_ai-ready/openapi/route.ts` — serves `/openapi.json`
-- `app/_ai-ready/tools/route.ts` — serves `/tools.json`
+- `app/%5Fai-ready/llms-txt/route.ts` — serves `/llms.txt`
+- `app/%5Fai-ready/llms-full/route.ts` — serves `/llms-full.txt`
+- `app/%5Fai-ready/md/[...path]/route.ts` — serves `/<route>.md`
+- `app/%5Fai-ready/ai-json/[...path]/route.ts` — serves `/<route>.ai.json`
+- `app/%5Fai-ready/openapi/route.ts` — serves `/openapi.json`
+- `app/%5Fai-ready/tools/route.ts` — serves `/tools.json`
 - `app/api/actions/[name]/route.ts` — action execution endpoint
 - `app/api/mcp/[transport]/route.ts` — MCP server endpoint
 
@@ -892,7 +899,7 @@ Created by `init` in `app/`. Each file is a one-line re-export — readable, aud
 
 ### What files does next-ai-ready add to my project?
 
-ai-ready.config, app/_ai-ready/ route stubs, actions/, instrumentation files, and build outputs under public/ and .next-ai-ready/.
+ai-ready.config, app/%5Fai-ready/ route stubs, actions/, instrumentation files, and build outputs under public/ and .next-ai-ready/.
 
 ### Where does the semantic graph live?
 
@@ -1365,7 +1372,7 @@ For richer extraction, export a `semantic` object from your MDX:
 export const semantic = {
   topics: ["install", "quickstart", "pnpm"],
   questions: [
-    { q: "How do I install next-ai-ready?", a: "Run `pnpm add next-ai-ready`." },
+    { q: "How do I install next-ai-ready?", a: "Run `pnpm add next-ai-ready@alpha`." },
     { q: "Do I need Zod?", a: "Yes, Zod v4 is required for actions." },
   ],
   entities: [
@@ -1387,7 +1394,7 @@ Use `##` headings to break your page into sections. Each heading becomes a separ
 ```text
 ## Installation
 
-Run `pnpm add next-ai-ready`.
+Run `pnpm add next-ai-ready@alpha`.
 
 ## Configuration
 
@@ -1401,7 +1408,7 @@ The compiler preserves heading IDs for stable anchor links. AI consumers can cit
 Use fenced code blocks with language tags. Wrap your code in triple backticks with a language identifier:
 
 ```bash
-pnpm add next-ai-ready
+pnpm add next-ai-ready@alpha
 ```
 
 The compiler strips code blocks to plain text in the Markdown body but preserves them in the HTML output.
@@ -1459,7 +1466,7 @@ pnpm install
 ```bash
 npx create-next-app@latest my-site --typescript --app --tailwind
 cd my-site
-pnpm add next-ai-ready zod@^4
+pnpm add next-ai-ready@alpha zod@^4
 npx next-ai-ready init
 ```
 
@@ -1665,7 +1672,7 @@ This installs the meta package which re-exports everything you need and provides
 | Import                     | Needs Next.js?      | Use for                                                   |
 | -------------------------- | ------------------- | --------------------------------------------------------- |
 | `next-ai-ready`            | No (CLI + config)   | `init`, `build`, `doctor`, `defineConfig`, `defineAction` |
-| `next-ai-ready/handlers/*` | Yes (`server-only`) | Route stubs in `app/_ai-ready/`                           |
+| `next-ai-ready/handlers/*` | Yes (`server-only`) | Route stubs in `app/%5Fai-ready/`                         |
 | `@next-ai-ready/next`      | Yes                 | Monorepo / advanced: same handlers + `withAiReady()`      |
 
 Install **one** meta package for typical apps: `pnpm add next-ai-ready@alpha`. The `@next-ai-ready/*` scoped packages are used internally; you do not need to add them separately.
@@ -1703,12 +1710,14 @@ This creates:
 
 - `ai-ready.config.mjs` — your site config (includes robots strategy notes)
 - `instrumentation.ts` + `instrumentation-node.ts` — optional observability hooks (`next-ai-ready/hooks`, Edge-safe split)
-- `app/_ai-ready/` — route handlers for `llms.txt`, `openapi.json`, etc.
+- `app/%5Fai-ready/` — route handlers for `llms.txt`, `openapi.json`, etc.
 - `app/api/actions/` — the action execution endpoint
 - `app/api/mcp/` — the MCP server endpoint
 - `actions/index.mjs` — a starter action file with a `ping` health check
 
 `init` also patches `next.config` with `withAiReady()` and adds `next-ai-ready build` to your build script when missing.
+
+`%5F` is the URL-encoded form of `_`. Next.js treats a literal `app/_ai-ready/` folder as private and excludes it from routing, while `app/%5Fai-ready/` correctly serves the `/_ai-ready/*` URL namespace. Do not rename the generated folder. When upgrading from alpha.10 or earlier, rerun `npx next-ai-ready init` and remove the obsolete `app/_ai-ready/` directory after reviewing local customizations.
 
 ## Configure
 
@@ -1762,7 +1771,7 @@ No. Install only the next-ai-ready meta package; it re-exports handlers and the 
 
 ### What does next-ai-ready init create?
 
-ai-ready.config, route stubs under app/_ai-ready/, action and MCP endpoints, and optional instrumentation files.
+ai-ready.config, route stubs under app/%5Fai-ready/, action and MCP endpoints, and optional instrumentation files.
 
 
 <!-- END /en/docs/installation -->
@@ -1778,7 +1787,7 @@ Traditional websites are built for browsers. `next-ai-ready` makes your Next.js 
 
 ## The problem
 
-Search is changing. Users increasingly get answers from AI — ChatGPT, Perplexity, Claude, Gemini, Google AI Overviews. If your content isn't structured for AI consumption, you're invisible to this new traffic.
+Search is changing. Users increasingly get answers from AI systems. Standard SEO remains essential, while clean machine-readable representations give AI consumers another reliable way to discover and retrieve your content.
 
 At the same time, AI agents are emerging. They need to **call your features** — not just read your pages. But there's no standard way to expose Next.js functionality to agents.
 
@@ -1792,25 +1801,28 @@ At the same time, AI agents are emerging. They need to **call your features** �
 ## How it works
 
 ```bash
-pnpm add next-ai-ready
+pnpm add next-ai-ready@alpha
 npx next-ai-ready init
 npx next-ai-ready build
 ```
 
 The `init` command scaffolds route handlers and a config file. The `build` command scans your MDX content and compiles everything into the artifacts AI consumers need.
 
+These artifacts improve technical accessibility. They do not guarantee indexing, ranking, citation, or inclusion in an AI-generated answer.
+
 Your existing UI is untouched. The framework adds **new routes** that serve AI-optimized representations of your content and capabilities.
 
 ## What you get
 
-| Artifact        | Consumer               |
-| --------------- | ---------------------- |
-| `/llms.txt`     | AI search crawlers     |
-| `/openapi.json` | Agent frameworks       |
-| `/api/mcp`      | Claude Desktop, Cursor |
-| `/<page>.md`    | RAG pipelines          |
-| `JSON-LD`       | Search engines         |
-| `/tools.json`   | OpenAI tool format     |
+| Artifact        | Consumer                      |
+| --------------- | ----------------------------- |
+| `/llms.txt`     | AI search crawlers            |
+| `/sitemap.md`   | Agent-readable page discovery |
+| `/openapi.json` | Agent frameworks              |
+| `/api/mcp`      | Claude Desktop, Cursor        |
+| `/<page>.md`    | RAG pipelines                 |
+| `JSON-LD`       | Search engines                |
+| `/tools.json`   | OpenAI tool format            |
 
 ## FAQ
 
@@ -1851,7 +1863,7 @@ npx next-ai-ready init
 创建：
 
 - `ai-ready.config.mjs` — 带占位值的站点配置。
-- `app/_ai-ready/` — route handler 桩文件（一行 re-export）。
+- `app/%5Fai-ready/` — route handler 桩文件（一行 re-export）。
 - `app/api/actions/[name]/route.ts` — action 执行端点。
 - `app/api/mcp/[transport]/route.ts` — MCP 服务器端点。
 - `actions/index.mjs` — 带 `ping` 健康检查的 starter action 文件。
@@ -1904,7 +1916,7 @@ npx next-ai-ready doctor --json    # 机器可读报告（含 actionItems）
 1. **配置** — `ai-ready.config.mjs` 及必填的 `site.name`、`site.baseUrl`、`site.description`。
 2. **Actions** — 公开/私有统计；公开 action 缺少 `whenToUse` 时警告。
 3. **构建产物** — graph、OpenAPI、`package.json` 是否含 prebuild。
-4. **路由桩文件** — `app/_ai-ready/*` 与 `next.config` 中的 `withAiReady()`。
+4. **路由桩文件** — `app/%5Fai-ready/*` 与 `next.config` 中的 `withAiReady()`。
 5. **Robots** — `public/robots.txt` **或** `app/robots.ts`（`emit.robots: false` 时不会因缺少静态文件误报）。
 6. **MCP** — 生产环境未设置 `NEXT_AI_READY_MCP_TOKEN` 时警告。
 7. **内容质量** — `noai`、JSON-LD helper、`updatedAt` / `author` 覆盖率。
@@ -2175,7 +2187,7 @@ Updated: 2026-06-02
 export const semantic = {
   topics: ["install", "quickstart", "pnpm"],
   questions: [
-    { q: "如何安装 next-ai-ready？", a: "运行 `pnpm add next-ai-ready`。" },
+    { q: "如何安装 next-ai-ready？", a: "运行 `pnpm add next-ai-ready@alpha`。" },
     { q: "需要 Zod 吗？", a: "是的，action 需要 Zod v4。" },
   ],
   entities: [
@@ -2283,15 +2295,22 @@ export default withAiReady()({
 
 ```ts
 interface WithAiReadyOptions {
-  rewrites?: boolean    // 默认: true
-  fileTracing?: boolean // 默认: true
+  rewrites?: boolean
+  fileTracing?: boolean
+  agentReadable?: boolean | {
+    accept?: boolean
+    userAgents?: boolean | string[]
+  }
 }
 ```
 
-| 选项            | 类型        | 默认值    | 说明                                                                                                   |
-| ------------- | --------- | ------ | ---------------------------------------------------------------------------------------------------- |
-| `rewrites`    | `boolean` | `true` | 为 AI 路由添加 URL rewrite。如果你想自行挂载路由，可禁用。                                                                |
-| `fileTracing` | `boolean` | `true` | 添加 `outputFileTracingIncludes` 使 `.next-ai-ready/*.json` 随 serverless bundle 部署。如果你的部署适配器打包整个项目，可禁用。 |
+| 选项              | 类型                  | 默认值     | 说明                                                                                                   |
+| --------------- | ------------------- | ------- | ---------------------------------------------------------------------------------------------------- |
+| `rewrites`      | `boolean`           | `true`  | 为 AI 路由添加 URL rewrite。如果你想自行挂载路由，可禁用。                                                                |
+| `fileTracing`   | `boolean`           | `true`  | 添加 `outputFileTracingIncludes` 使 `.next-ai-ready/*.json` 随 serverless bundle 部署。如果你的部署适配器打包整个项目，可禁用。 |
+| `agentReadable` | `boolean \| object` | `false` | 显式启用 `Accept: text/markdown` 内容协商，以及面向已知或自定义 Agent User-Agent 的 Markdown 响应；同时添加匹配的 `Vary` 响应头。      |
+
+设置 `agentReadable: true` 会同时开启 Accept 和内置 Agent User-Agent 协商。使用 `agentReadable: { accept: true }` 可只开启 Accept，也可以传入自定义 `userAgents` 列表。API 路径、Next.js 内部路径和带扩展名的路径不会被改写。
 
 ## 做了什么
 
@@ -2336,7 +2355,7 @@ export default withAiReady({ rewrites: false })({
 })
 ```
 
-你仍然需要 `app/_ai-ready/` 中的 route handler 文件——rewrite 只是将干净 URL 映射到它们。
+你仍然需要 `app/%5Fai-ready/` 中的 route handler 文件——rewrite 只是将干净 URL 映射到它们。
 
 ## FAQ
 
@@ -2346,7 +2365,7 @@ export default withAiReady({ rewrites: false })({
 
 ### 可以关闭自动 rewrite 吗？
 
-可以。传入 { rewrites: false }，手动在 app/_ai-ready/ 挂载路由。
+可以。传入 { rewrites: false }，手动在 app/%5Fai-ready/ 挂载路由。
 
 
 <!-- END /zh/docs/api-reference/with-ai-ready -->
@@ -2513,7 +2532,7 @@ export const semantic = {
   summary: "如何安装 CLI 工具。",
   topics: ["安装", "cli"],
   questions: [
-    { q: "如何安装？", a: "运行 pnpm add next-ai-ready。" }
+    { q: "如何安装？", a: "运行 pnpm add next-ai-ready@alpha。" }
   ],
 };
 ```
@@ -2690,12 +2709,12 @@ Updated: 2026-06-02
 
 由 `init` 创建在 `app/` 下。每个文件都是一行 re-export——可读、可审计、可自定义：
 
-- `app/_ai-ready/llms-txt/route.ts` — 提供 `/llms.txt`
-- `app/_ai-ready/llms-full/route.ts` — 提供 `/llms-full.txt`
-- `app/_ai-ready/md/[...path]/route.ts` — 提供 `/<route>.md`
-- `app/_ai-ready/ai-json/[...path]/route.ts` — 提供 `/<route>.ai.json`
-- `app/_ai-ready/openapi/route.ts` — 提供 `/openapi.json`
-- `app/_ai-ready/tools/route.ts` — 提供 `/tools.json`
+- `app/%5Fai-ready/llms-txt/route.ts` — 提供 `/llms.txt`
+- `app/%5Fai-ready/llms-full/route.ts` — 提供 `/llms-full.txt`
+- `app/%5Fai-ready/md/[...path]/route.ts` — 提供 `/<route>.md`
+- `app/%5Fai-ready/ai-json/[...path]/route.ts` — 提供 `/<route>.ai.json`
+- `app/%5Fai-ready/openapi/route.ts` — 提供 `/openapi.json`
+- `app/%5Fai-ready/tools/route.ts` — 提供 `/tools.json`
 - `app/api/actions/[name]/route.ts` — action 执行端点
 - `app/api/mcp/[transport]/route.ts` — MCP 服务器端点
 
@@ -2711,7 +2730,7 @@ Updated: 2026-06-02
 
 ### next-ai-ready 会在项目里添加哪些文件？
 
-ai-ready.config、app/_ai-ready/ 路由桩、actions/、instrumentation，以及 public/ 与 .next-ai-ready/ 下的构建产物。
+ai-ready.config、app/%5Fai-ready/ 路由桩、actions/、instrumentation，以及 public/ 与 .next-ai-ready/ 下的构建产物。
 
 ### 语义图谱保存在哪里？
 
@@ -3182,7 +3201,7 @@ author:
 export const semantic = {
   topics: ["install", "quickstart", "pnpm"],
   questions: [
-    { q: "如何安装 next-ai-ready？", a: "运行 `pnpm add next-ai-ready`。" },
+    { q: "如何安装 next-ai-ready？", a: "运行 `pnpm add next-ai-ready@alpha`。" },
     { q: "需要 Zod 吗？", a: "是的，action 需要 Zod v4。" },
   ],
   entities: [
@@ -3204,7 +3223,7 @@ export const semantic = {
 ```text
 ## 安装
 
-运行 `pnpm add next-ai-ready`。
+运行 `pnpm add next-ai-ready@alpha`。
 
 ## 配置
 
@@ -3218,7 +3237,7 @@ export const semantic = {
 使用带语言标签的围栏代码块。用三个反引号加语言标识符包裹代码：
 
 ```bash
-pnpm add next-ai-ready
+pnpm add next-ai-ready@alpha
 ```
 
 编译器在 Markdown body 中将代码块剥离为纯文本，但在 HTML 输出中保留。
@@ -3276,7 +3295,7 @@ pnpm install
 ```bash
 npx create-next-app@latest my-site --typescript --app --tailwind
 cd my-site
-pnpm add next-ai-ready zod@^4
+pnpm add next-ai-ready@alpha zod@^4
 npx next-ai-ready init
 ```
 
@@ -3482,7 +3501,7 @@ pnpm add next-ai-ready@alpha zod@^4
 | 导入                         | 需要 Next.js？      | 用途                                                    |
 | -------------------------- | ---------------- | ----------------------------------------------------- |
 | `next-ai-ready`            | 否（CLI + 配置）      | `init`、`build`、`doctor`、`defineConfig`、`defineAction` |
-| `next-ai-ready/handlers/*` | 是（`server-only`） | `app/_ai-ready/` 路由 stub                              |
+| `next-ai-ready/handlers/*` | 是（`server-only`） | `app/%5Fai-ready/` 路由 stub                            |
 | `@next-ai-ready/next`      | 是                | Monorepo / 高级用法                                       |
 
 典型应用只需：`pnpm add next-ai-ready@alpha`。`@next-ai-ready/*` 为内部包，无需单独安装。
@@ -3520,12 +3539,14 @@ npx next-ai-ready init
 
 - `ai-ready.config.mjs` — 站点配置（含 robots 策略说明）
 - `instrumentation.ts` + `instrumentation-node.ts` — 可选观测 hook（`next-ai-ready/hooks`，Edge 安全拆分）
-- `app/_ai-ready/` — `llms.txt`、`openapi.json` 等路由 handler
+- `app/%5Fai-ready/` — `llms.txt`、`openapi.json` 等路由 handler
 - `app/api/actions/` — action 执行端点
 - `app/api/mcp/` — MCP 服务端点
 - `actions/index.mjs` — 含 `ping` 健康检查的 starter action
 
 `init` 还会为 `next.config` 注入 `withAiReady()`，并在缺失时将 `next-ai-ready build` 加入 build 脚本。
+
+`%5F` 是 `_` 的 URL 编码。Next.js 会把字面量目录 `app/_ai-ready/` 当作私有目录并排除在路由系统之外；`app/%5Fai-ready/` 才会正确提供 `/_ai-ready/*` URL。请勿重命名生成的目录。从 alpha.10 或更早版本升级时，请重新运行 `npx next-ai-ready init`，确认没有本地定制后再删除旧的 `app/_ai-ready/` 目录。
 
 ## 配置
 
@@ -3579,7 +3600,7 @@ Node.js 20+、Next.js 15+ App Router，以及用于 action 的 Zod v4。
 
 ### next-ai-ready init 会生成什么？
 
-ai-ready.config、app/_ai-ready/ 路由桩、action/MCP 端点，以及可选的 instrumentation 文件。
+ai-ready.config、app/%5Fai-ready/ 路由桩、action/MCP 端点，以及可选的 instrumentation 文件。
 
 
 <!-- END /zh/docs/installation -->
@@ -3595,7 +3616,7 @@ Updated: 2026-06-02
 
 ## 问题
 
-搜索正在变革。用户越来越多地从 AI 获取答案 —— ChatGPT、Perplexity、Claude、Gemini、Google AI Overviews。如果你的内容没有为 AI 消费做好结构化，你就对这些新流量隐身了。
+搜索正在变化，用户越来越多地通过 AI 系统获取答案。传统 SEO 仍然是基础，而清晰的机器可读表示可以为 AI 消费者提供另一条稳定的内容发现与读取路径。
 
 与此同时，AI Agent 正在兴起。它们需要**调用你的功能** —— 而不只是阅读你的页面。但目前没有标准方式将 Next.js 功能暴露给 Agent。
 
@@ -3609,12 +3630,14 @@ Updated: 2026-06-02
 ## 工作原理
 
 ```bash
-pnpm add next-ai-ready
+pnpm add next-ai-ready@alpha
 npx next-ai-ready init
 npx next-ai-ready build
 ```
 
 `init` 命令生成路由处理器和配置文件。`build` 命令扫描你的 MDX 内容，将一切编译为 AI 消费者所需的产出物。
+
+这些产出物改善的是技术可访问性，不保证被索引、获得排名、被引用或出现在 AI 生成的回答中。
 
 你现有的 UI 不受影响。框架添加**新路由**来提供内容和能力的 AI 优化表示。
 
@@ -3623,6 +3646,7 @@ npx next-ai-ready build
 | 产出物             | 消费者                   |
 | --------------- | --------------------- |
 | `/llms.txt`     | AI 搜索爬虫               |
+| `/sitemap.md`   | Agent 可读的页面发现目录       |
 | `/openapi.json` | Agent 框架              |
 | `/api/mcp`      | Claude Desktop、Cursor |
 | `/<page>.md`    | RAG 管道                |

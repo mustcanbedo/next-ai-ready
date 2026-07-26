@@ -11,7 +11,7 @@ const en = {
     subtitle:
       "Make your site readable by AI search engines and callable by AI agents. One config file, zero changes to your UI.",
     cta: "Get Started",
-    install: "pnpm add next-ai-ready",
+    install: "pnpm add next-ai-ready@alpha",
   },
   features: {
     heading: "Everything AI needs from your site",
@@ -21,7 +21,7 @@ const en = {
       {
         title: "AI Search Discovery",
         description:
-          "Your content appears in ChatGPT, Perplexity, Google AI Overviews. Structured llms.txt and per-page Markdown make you citable.",
+          "Give AI consumers clean discovery and retrieval paths with llms.txt, per-page Markdown, and structured metadata.",
         icon: "search",
       },
       {

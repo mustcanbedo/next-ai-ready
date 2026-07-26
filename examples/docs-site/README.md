@@ -34,7 +34,7 @@ AI endpoints (after `next-ai-ready build` / prebuild):
 |------|---------|
 | `content/{en,zh}/docs/` | MDX scanned by `next-ai-ready build` (routes match `/en/docs/...` UI paths) |
 | `ai-ready.config.mjs` | Framework config |
-| `app/_ai-ready/**` | Thin handler re-exports |
+| `app/%5Fai-ready/**` | Thin handler re-exports |
 | `actions/` | Demo Capability-plane actions |
 | `instrumentation.ts` | Edge-safe entry — loads Node hooks when `NEXT_RUNTIME === "nodejs"` |
 | `instrumentation-node.ts` | `registerAiHooks` via `next-ai-ready/hooks` |

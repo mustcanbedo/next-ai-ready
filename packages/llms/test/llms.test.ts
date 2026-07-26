@@ -9,6 +9,7 @@ import { renderLlmsTxt } from "../src/llms-txt.js";
 import { renderLlmsFullTxt } from "../src/llms-full-txt.js";
 import { renderPageMarkdown } from "../src/page-md.js";
 import { renderPageAiJson } from "../src/page-ai-json.js";
+import { renderSitemapMarkdown } from "../src/sitemap-md.js";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const fixturesRoot = join(here, "..", "..", "mdx", "test", "fixtures");
@@ -84,6 +85,17 @@ describe("renderLlmsFullTxt()", () => {
   });
 });
 
+describe("renderSitemapMarkdown()", () => {
+  it("lists canonical page URLs in stable route order", async () => {
+    const graph = await makeGraph();
+    const out = renderSitemapMarkdown(graph);
+    expect(out).toContain("# Acme Sitemap");
+    expect(out).toContain("[Welcome](https://acme.com)");
+    expect(out).toContain("[Install Acme](https://acme.com/docs/install)");
+    expect(out.indexOf("[Welcome]")).toBeLessThan(out.indexOf("[Install Acme]"));
+  });
+});
+
 describe("renderPageMarkdown()", () => {
   it("emits a YAML-style header + body", async () => {
     const graph = await makeGraph();
@@ -92,7 +104,10 @@ describe("renderPageMarkdown()", () => {
     const text = md!;
     expect(text.startsWith("---\n")).toBe(true);
     expect(text).toContain("title: Install Acme");
+    expect(text).toContain("description: Install Acme in under 60 seconds.");
+    expect(text).toContain("canonical_url: https://acme.com/docs/install");
     expect(text).toContain("url: https://acme.com/docs/install");
+    expect(text).toContain("last_updated: 2026-05-01");
     expect(text).toContain("updated: 2026-05-01");
     expect(text).toContain("# Install Acme");
   });

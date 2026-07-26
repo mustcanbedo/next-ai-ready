@@ -203,7 +203,7 @@ summary: Install and run in under 60 seconds.
 
 export const semantic = {
   topics: ["install", "quickstart"],
-  questions: [{ q: "How do I install?", a: "Run pnpm add next-ai-ready." }],
+  questions: [{ q: "How do I install?", a: "Run pnpm add next-ai-ready@alpha." }],
 }
 
 # Getting Started

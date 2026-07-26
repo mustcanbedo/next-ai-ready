@@ -8,4 +8,4 @@ const nextConfig = {
   },
 };
 
-export default withAiReady()(nextConfig);
+export default withAiReady({ agentReadable: true })(nextConfig);

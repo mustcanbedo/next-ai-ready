@@ -65,14 +65,14 @@ export async function evaluateTactics(ctx: TacticsContext): Promise<TacticResult
   if (await fileExists(join(cwd, ROUTE_STUBS.PAGE_MD))) {
     results.push(pass("K2", "K", "Per-route Markdown", "page-md handler stub present."));
   } else {
-    results.push(warn("K2", "K", "Per-route Markdown", "Missing app/_ai-ready/md route stub."));
+    results.push(warn("K2", "K", "Per-route Markdown", "Missing app/%5Fai-ready/md route stub."));
   }
 
   // K3 ai.json stubs
   if (await fileExists(join(cwd, ROUTE_STUBS.PAGE_AI_JSON))) {
     results.push(pass("K3", "K", "Semantic JSON", "page-ai-json handler stub present."));
   } else {
-    results.push(warn("K3", "K", "Semantic JSON", "Missing app/_ai-ready/ai-json route stub."));
+    results.push(warn("K3", "K", "Semantic JSON", "Missing app/%5Fai-ready/ai-json route stub."));
   }
 
   // K4 JSON-LD — check app/ or graph author metadata as proxy

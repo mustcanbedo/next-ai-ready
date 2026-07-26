@@ -59,6 +59,12 @@ async function main() {
   }
   ok("llms-full.txt curated FAQ");
 
+  const sitemapMd = await readFile(join(ROOT, "public/sitemap.md"), "utf8");
+  if (!sitemapMd.includes("[Introduction](https://next-ai-ready.vercel.app/en/docs/introduction)")) {
+    fail("sitemap.md missing canonical introduction URL");
+  }
+  ok("sitemap.md canonical page directory");
+
   const openapi = await readFile(join(ROOT, "public/openapi.json"), "utf8");
   if (openapi.includes("/en/introduction'") || openapi.includes('/en/introduction"')) {
     fail("openapi.json still uses stale /en/introduction route example");

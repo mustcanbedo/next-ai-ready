@@ -7,7 +7,7 @@ import { resolveParams } from "../runtime/params.js";
 /**
  * `POST /<basePath>/[name]` — execute one action by name.
  *
- * Wire-up: `app/_ai-ready/actions/[name]/route.ts` should look like:
+ * Wire-up: `app/api/actions/[name]/route.ts` should look like:
  *
  *   import "@/actions"            // side-effect: populate the registry
  *   export { POST } from "@next-ai-ready/next/handlers/action"

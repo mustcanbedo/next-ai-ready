@@ -6,7 +6,7 @@ questions:
   - q: withAiReady() 在 next.config 里做什么？
     a: 包装 Next 配置，添加 AI 路由 rewrite，以及可选的 monorepo outputFileTracingRoot 默认值。
   - q: 可以关闭自动 rewrite 吗？
-    a: '可以。传入 { rewrites: false }，手动在 app/_ai-ready/ 挂载路由。'
+    a: '可以。传入 { rewrites: false }，手动在 app/%5Fai-ready/ 挂载路由。'
 tags:
   - api
   - reference
@@ -42,8 +42,12 @@ export default withAiReady()({
 
 ```ts
 interface WithAiReadyOptions {
-  rewrites?: boolean    // 默认: true
-  fileTracing?: boolean // 默认: true
+  rewrites?: boolean
+  fileTracing?: boolean
+  agentReadable?: boolean | {
+    accept?: boolean
+    userAgents?: boolean | string[]
+  }
 }
 ```
 
@@ -51,6 +55,9 @@ interface WithAiReadyOptions {
 |---|---|---|---|
 | `rewrites` | `boolean` | `true` | 为 AI 路由添加 URL rewrite。如果你想自行挂载路由，可禁用。 |
 | `fileTracing` | `boolean` | `true` | 添加 `outputFileTracingIncludes` 使 `.next-ai-ready/*.json` 随 serverless bundle 部署。如果你的部署适配器打包整个项目，可禁用。 |
+| `agentReadable` | `boolean \| object` | `false` | 显式启用 `Accept: text/markdown` 内容协商，以及面向已知或自定义 Agent User-Agent 的 Markdown 响应；同时添加匹配的 `Vary` 响应头。 |
+
+设置 `agentReadable: true` 会同时开启 Accept 和内置 Agent User-Agent 协商。使用 `agentReadable: { accept: true }` 可只开启 Accept，也可以传入自定义 `userAgents` 列表。API 路径、Next.js 内部路径和带扩展名的路径不会被改写。
 
 ## 做了什么
 
@@ -95,4 +102,4 @@ export default withAiReady({ rewrites: false })({
 })
 ```
 
-你仍然需要 `app/_ai-ready/` 中的 route handler 文件——rewrite 只是将干净 URL 映射到它们。
+你仍然需要 `app/%5Fai-ready/` 中的 route handler 文件——rewrite 只是将干净 URL 映射到它们。

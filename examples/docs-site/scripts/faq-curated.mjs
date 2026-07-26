@@ -29,7 +29,7 @@ export const CURATED_FAQ = {
       },
       {
         q: "What does next-ai-ready init create?",
-        a: "ai-ready.config, route stubs under app/_ai-ready/, action and MCP endpoints, and optional instrumentation files.",
+        a: "ai-ready.config, route stubs under app/%5Fai-ready/, action and MCP endpoints, and optional instrumentation files.",
       },
     ],
     "guides/quickstart": [
@@ -49,7 +49,7 @@ export const CURATED_FAQ = {
     "getting-started/project-structure": [
       {
         q: "What files does next-ai-ready add to my project?",
-        a: "ai-ready.config, app/_ai-ready/ route stubs, actions/, instrumentation files, and build outputs under public/ and .next-ai-ready/.",
+        a: "ai-ready.config, app/%5Fai-ready/ route stubs, actions/, instrumentation files, and build outputs under public/ and .next-ai-ready/.",
       },
       {
         q: "Where does the semantic graph live?",
@@ -203,7 +203,7 @@ export const CURATED_FAQ = {
       },
       {
         q: "Can I disable automatic rewrites?",
-        a: "Yes. Pass { rewrites: false } to mount AI routes manually under app/_ai-ready/.",
+        a: "Yes. Pass { rewrites: false } to mount AI routes manually under app/%5Fai-ready/.",
       },
     ],
     "decisions/adr-index": [
@@ -243,7 +243,7 @@ export const CURATED_FAQ = {
       },
       {
         q: "next-ai-ready init 会生成什么？",
-        a: "ai-ready.config、app/_ai-ready/ 路由桩、action/MCP 端点，以及可选的 instrumentation 文件。",
+        a: "ai-ready.config、app/%5Fai-ready/ 路由桩、action/MCP 端点，以及可选的 instrumentation 文件。",
       },
     ],
     "guides/quickstart": [
@@ -263,7 +263,7 @@ export const CURATED_FAQ = {
     "getting-started/project-structure": [
       {
         q: "next-ai-ready 会在项目里添加哪些文件？",
-        a: "ai-ready.config、app/_ai-ready/ 路由桩、actions/、instrumentation，以及 public/ 与 .next-ai-ready/ 下的构建产物。",
+        a: "ai-ready.config、app/%5Fai-ready/ 路由桩、actions/、instrumentation，以及 public/ 与 .next-ai-ready/ 下的构建产物。",
       },
       {
         q: "语义图谱保存在哪里？",
@@ -417,7 +417,7 @@ export const CURATED_FAQ = {
       },
       {
         q: "可以关闭自动 rewrite 吗？",
-        a: "可以。传入 { rewrites: false }，手动在 app/_ai-ready/ 挂载路由。",
+        a: "可以。传入 { rewrites: false }，手动在 app/%5Fai-ready/ 挂载路由。",
       },
     ],
     "decisions/adr-index": [

@@ -44,43 +44,43 @@ export default defineConfig({
 `,
     },
     {
-      relPath: "app/_ai-ready/llms-txt/route.ts",
+      relPath: "app/%5Fai-ready/llms-txt/route.ts",
       contents: `export { GET } from "next-ai-ready/handlers/llms-txt";
 export const runtime = "nodejs";
 `,
     },
     {
-      relPath: "app/_ai-ready/llms-full/route.ts",
+      relPath: "app/%5Fai-ready/llms-full/route.ts",
       contents: `export { GET } from "next-ai-ready/handlers/llms-full";
 export const runtime = "nodejs";
 `,
     },
     {
-      relPath: "app/_ai-ready/md/[...path]/route.ts",
+      relPath: "app/%5Fai-ready/md/[...path]/route.ts",
       contents: `export { GET } from "next-ai-ready/handlers/page-md";
 export const runtime = "nodejs";
 `,
     },
     {
-      relPath: "app/_ai-ready/ai-json/[...path]/route.ts",
+      relPath: "app/%5Fai-ready/ai-json/[...path]/route.ts",
       contents: `export { GET } from "next-ai-ready/handlers/page-ai-json";
 export const runtime = "nodejs";
 `,
     },
     {
-      relPath: "app/_ai-ready/openapi/route.ts",
+      relPath: "app/%5Fai-ready/openapi/route.ts",
       contents: `export { GET } from "next-ai-ready/handlers/openapi";
 export const runtime = "nodejs";
 `,
     },
     {
-      relPath: "app/_ai-ready/tools/route.ts",
+      relPath: "app/%5Fai-ready/tools/route.ts",
       contents: `export { GET } from "next-ai-ready/handlers/tools";
 export const runtime = "nodejs";
 `,
     },
     {
-      relPath: "app/_ai-ready/ai-plugin/route.ts",
+      relPath: "app/%5Fai-ready/ai-plugin/route.ts",
       contents: `export { GET } from "next-ai-ready/handlers/ai-plugin";
 export const runtime = "nodejs";
 `,

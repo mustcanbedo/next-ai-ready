@@ -18,8 +18,9 @@ describe("runInit()", () => {
     try {
       const result = await runInit({ cwd: dir, silent: true });
       expect(result.written).toContain("ai-ready.config.mjs");
-      expect(result.written).toContain("app/_ai-ready/llms-txt/route.ts");
-      expect(result.written).toContain("app/_ai-ready/md/[...path]/route.ts");
+      expect(result.written).toContain("app/%5Fai-ready/llms-txt/route.ts");
+      expect(result.written).toContain("app/%5Fai-ready/md/[...path]/route.ts");
+      expect(result.written.some((path) => path.startsWith("app/_ai-ready/"))).toBe(false);
       expect(result.written).toContain("app/api/actions/[name]/route.ts");
       expect(result.written).toContain("app/api/mcp/[transport]/route.ts");
       expect(result.written).toContain("actions/index.mjs");
@@ -31,7 +32,7 @@ describe("runInit()", () => {
       expect(actionRoute).not.toContain("@/actions");
       expect(result.skipped).toHaveLength(0);
 
-      const handler = await readFile(join(dir, "app/_ai-ready/llms-txt/route.ts"), "utf8");
+      const handler = await readFile(join(dir, "app/%5Fai-ready/llms-txt/route.ts"), "utf8");
       expect(handler).toContain('next-ai-ready/handlers/llms-txt');
 
       const mcp = await readFile(join(dir, "app/api/mcp/[transport]/route.ts"), "utf8");

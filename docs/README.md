@@ -30,6 +30,7 @@ Central map for **next-ai-ready** repository docs (not the live docs site — th
 |-----|---------|
 | [ga-readiness.md](./ga-readiness.md) | **0.1 GA** checklist — done vs remaining |
 | [release-alpha.md](./release-alpha.md) | Maintainer runbook for the guarded npm alpha workflow |
+| [public-api-stability.zh-CN.md](./public-api-stability.zh-CN.md) | `0.1` public API baseline, SemVer, and deprecation policy |
 | [completion-audit.md](./completion-audit.md) | Completion %, P0–P2 history, 0.1 DoD |
 | [backlog.md](./backlog.md) | Full tracked items (single source of truth) |
 | [post-ga.md](./post-ga.md) | **After GA** — product/DX optimizations |

@@ -84,6 +84,9 @@ pnpm dev   # then curl http://localhost:3000/llms.txt
 ## Versioning & releases
 
 We use [Changesets](https://github.com/changesets/changesets).
+The [`0.1` public API and versioning policy](./docs/public-api-stability.zh-CN.md)
+defines the protected entrypoints, SemVer rules, and deprecation process. Run
+`pnpm api:check` after `pnpm build` whenever exports or public types change.
 
 ### Pre-release (`@alpha`)
 

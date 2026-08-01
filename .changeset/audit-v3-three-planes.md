@@ -11,3 +11,5 @@ Vercel-compatible missing-page Markdown is scored separately from the stricter
 noindex and recovery-link quality enhancement.
 Generate dynamic route wrappers that pass Next.js 14, 15, and 16 production
 route validation.
+Freeze the 0.1 public entrypoints, runtime exports, TypeScript declarations,
+and CLI bins behind an explicit compatibility check.

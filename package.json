@@ -19,13 +19,14 @@
     "publish:alpha:interactive": "bash scripts/publish-alpha.sh",
     "pack:check": "node scripts/pack-check.mjs",
     "exports:check": "node scripts/exports-check.mjs",
+    "api:check": "node --test scripts/public-api-check.test.mjs && node scripts/public-api-check.mjs",
     "bin:smoke": "node scripts/bin-smoke.mjs",
     "audit:vercel": "agent-readability audit",
     "audit:vercel:site": "agent-readability audit https://next-ai-ready.vercel.app/en --min-score 100",
     "changeset:status": "node --test scripts/changeset-status.test.mjs && node scripts/changeset-status.mjs",
     "external:smoke": "node scripts/external-quickstart-smoke.mjs",
     "docs-site:smoke": "pnpm --filter docs-site smoke",
-    "verify:release": "pnpm build && pnpm test && pnpm typecheck && node scripts/e2e-smoke.mjs && pnpm pack:check && pnpm exports:check && pnpm bin:smoke && pnpm docs-site:smoke && pnpm changeset:status && pnpm external:smoke"
+    "verify:release": "pnpm build && pnpm test && pnpm typecheck && node scripts/e2e-smoke.mjs && pnpm pack:check && pnpm exports:check && pnpm api:check && pnpm bin:smoke && pnpm docs-site:smoke && pnpm changeset:status && pnpm external:smoke"
   },
   "devDependencies": {
     "@changesets/cli": "^2.27.9",

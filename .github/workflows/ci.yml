@@ -68,7 +68,7 @@ jobs:
         run: node scripts/e2e-smoke.mjs
 
       - name: Release checks
-        run: pnpm exports:check && pnpm pack:check && pnpm bin:smoke
+        run: pnpm exports:check && pnpm api:check && pnpm pack:check && pnpm bin:smoke
 
   external-install-matrix:
     name: External (${{ matrix.package-manager }}, Next ${{ matrix.next-version }})

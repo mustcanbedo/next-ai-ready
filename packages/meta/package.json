@@ -12,9 +12,17 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
     },
+    "./actions": {
+      "types": "./dist/actions.d.ts",
+      "import": "./dist/actions.js"
+    },
     "./config": {
       "types": "./dist/config.d.ts",
       "import": "./dist/config.js"
+    },
+    "./json-ld": {
+      "types": "./dist/json-ld.d.ts",
+      "import": "./dist/json-ld.js"
     },
     "./robots": {
       "types": "./dist/robots.d.ts",

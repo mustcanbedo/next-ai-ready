@@ -5,8 +5,12 @@ order: 8
 questions:
   - q: How do locale prefixes affect AI routes?
     a: >-
-      Each locale path (e.g. /en/docs/page) becomes a separate route in the
-      semantic graph.
+      Each recognized locale path becomes a separate route, and the graph adds
+      locale metadata plus a routesByLocale index.
+  - q: Can MCP page tools filter by locale?
+    a: >-
+      Not yet. MCP results include each page's locale, but list_pages and
+      search_pages do not currently accept a locale filter.
   - q: Should middleware redirect AI artifact URLs?
     a: >-
       No. Exclude paths with dots, /api, and _ai-ready from locale middleware so
@@ -14,7 +18,7 @@ questions:
 tags:
   - how-to
   - best-practices
-updatedAt: '2026-06-02'
+updatedAt: '2026-08-01'
 author: next-ai-ready team
 ---
 
@@ -43,7 +47,9 @@ export default defineConfig({
 });
 ```
 
-Each locale becomes a separate route in the SemanticGraph. There is **no built-in locale dimension** on nodes yet (Phase 6 P6-06) — treat `/en/...` and `/zh/...` as distinct pages.
+Recognized route prefixes such as `en` and `zh` are stored in each page node's `locale` field. The generated `SemanticGraph.routesByLocale` index also maps locale-relative routes back to their page ids, while the flat `routes` map remains available for compatibility.
+
+MCP page results expose the page locale. `list_pages` and `search_pages` do not yet accept a locale filter, so clients should use route prefixes when narrowing multilingual results.
 
 ## Middleware
 
@@ -67,6 +73,6 @@ Patterns to keep reachable:
 
 Use `sections` in config to prioritize one locale in `llms.txt`, or emit separate configs per deployment.
 
-## Future (Phase 6)
+## Current limits
 
-See [`docs/phase6-design.md`](../../../../docs/phase6-design.md) for planned `locale` metadata and cross-locale linking.
+Automatic `Available Languages` sections, alternate-language Markdown frontmatter, `hreflang` response links, and MCP locale filtering remain planned. See the [Phase 6 design](https://github.com/mustcanbedo/next-ai-ready/blob/main/docs/phase6-design.md) for the current boundary.

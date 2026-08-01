@@ -34,21 +34,21 @@ pnpm add next-ai-ready@alpha zod@^4
 
 这会安装 meta 包，重新导出全部 API 并提供 CLI。
 
+> **发布渠道：** 本站跟随 `main`，npm 当前为 `0.1.0-alpha.12`。alpha.12 存在已知的 TypeScript Action 模块加载问题，已在 `main` 修复并会随下一个预发布版本发布。以下导入示例使用已发布 alpha 的 API。
+
 ## 包导出说明（N-14）
 
 | 导入 | 需要 Next.js？ | 用途 |
 |------|----------------|------|
-| `next-ai-ready` | 否（编写期 + CLI） | `init`、`build`、`doctor`、`defineConfig`、`defineAction` |
-| `next-ai-ready/config` | 由 Next 配置加载 | 不引入构建期扫描器的 `withAiReady()` |
-| `next-ai-ready/robots` | 是 | 动态 `app/robots.ts` 策略 |
+| `next-ai-ready` | 编写期、配置与 CLI | `defineConfig`、`defineAction`、`withAiReady`、`aiRobots` 与 CLI 命令 |
 | `next-ai-ready/hooks` | 是 | 运行时观测 |
 | `next-ai-ready/handlers/*` | 是（`server-only`） | `app/%5Fai-ready/` 路由 stub |
-| `next-ai-ready/audit` | 否 | 以代码方式执行部署审计 |
-| `@next-ai-ready/next` | 是 | Monorepo / 高级用法 |
 
 典型应用只需：`pnpm add next-ai-ready@alpha`。`@next-ai-ready/*` 为内部包，无需单独安装。
 
 `jiti` 已是 `@next-ai-ready/next` 的运行时依赖，并会随 meta 包安装。因此使用 TypeScript `ai-ready.config.ts` 时无需自行添加 `jiti`。
+
+`main` 已提供 `next-ai-ready/actions`、`next-ai-ready/config`、`next-ai-ready/json-ld`、`next-ai-ready/robots` 与 `next-ai-ready/audit` 专用入口，但 npm alpha.12 尚未包含；下一个预发布版本上线前，它们会明确标为仅限 `main`。
 
 **可选 peer 与应用依赖：**
 
@@ -88,7 +88,7 @@ npx next-ai-ready init
 - `app/api/mcp/` — MCP 服务端点
 - TypeScript 项目中的 `actions/index.ts`，或 JavaScript 项目中的 `.mjs` — 含 `ping` 健康检查的 starter action
 
-`init` 还会从 `next-ai-ready/config` 为 `next.config` 注入 `withAiReady()`，并在缺失时将 `next-ai-ready build` 加入 build 脚本。
+`init` 还会从公共 meta 包为 `next.config` 注入 `withAiReady()`，并在缺失时将 `next-ai-ready build` 加入 build 脚本。
 
 `%5F` 是 `_` 的 URL 编码。Next.js 会把字面量目录 `app/_ai-ready/` 当作私有目录并排除在路由系统之外；`app/%5Fai-ready/` 才会正确提供 `/_ai-ready/*` URL。请勿重命名生成的目录。从 alpha.10 或更早版本升级时，请重新运行 `npx next-ai-ready init`，确认没有本地定制后再删除旧的 `app/_ai-ready/` 目录。
 
@@ -112,7 +112,7 @@ export default defineConfig({
 
 ### Robots 策略
 
-`next-ai-ready build` 默认生成 `public/robots.txt`；若设置 `emit: { robots: false }` 则跳过。动态策略请在 `app/robots.ts` 中使用来自 `next-ai-ready/robots` 的 `aiRobots()`。Doctor 认可该组合，不会误报缺少静态 `public/robots.txt`。
+`next-ai-ready build` 默认生成 `public/robots.txt`；若设置 `emit: { robots: false }` 则跳过。动态策略请在 `app/robots.ts` 中使用来自 `next-ai-ready` 的 `aiRobots()`。Doctor 认可该组合，不会误报缺少静态 `public/robots.txt`。
 
 ## 构建
 

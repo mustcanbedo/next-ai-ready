@@ -153,6 +153,10 @@
           "withAiReady",
           "withDefaults"
         ],
+        "./actions": [
+          "defineAction",
+          "defineActions"
+        ],
         "./audit": [
           "AUDIT_V2_SCHEMA",
           "AUDIT_V3_SCHEMA",
@@ -170,12 +174,20 @@
         "./handlers/mcp": ["createAiReadyMcpHandler"],
         "./handlers/ai-plugin": ["GET"],
         "./hooks": ["clearAiHooks", "registerAiHooks"],
+        "./json-ld": [
+          "getPageJsonLd",
+          "getSiteJsonLd",
+          "pageJsonLdFromGraph",
+          "siteJsonLdFromGraph"
+        ],
         "./robots": ["aiRobots", "buildRobotsTxt"]
       },
       "declarationHashes": {
         ".": "ceda34ab2f3d8e29158044b9971107bf6f01babdf8e1a4d324dd99b8acfdca2c",
-        "./audit": "296ea093abe3bf1ba86630c0b1326385fdbf4a2867f13ae8732629efdd8cde62",
+        "./actions": "9b564e558dceed67ef7a416ddf12ce1c9078645b0fdb9bd12daea7be4760f8ab",
+        "./audit": "571ad8e041dd770d7993dd7d902f11b60138d1798476223a23dbeae2fc8376ae",
         "./config": "d13b01351d47b7a2a21536b813086514806a8f5aed2510d68a812f832a877986",
+        "./json-ld": "0f448e6c747aaae37832f974826ab811e5e3f7c9ca912eeff47dca07c3d51c30",
         "./handlers/llms-txt": "b7548c7e1565a62a06d9eb7e0b6eb2e86471d9491123ed3b006ecf5ce0913290",
         "./handlers/llms-full": "13bbc71d6114675e61c39cab468ac55d69a3c964f63f987897d3d887058689f3",
         "./handlers/page-md": "b2f082660520a99c8f0906e531de0493992a92c20089420f329d2dd226106774",
@@ -244,12 +256,19 @@
         "./handlers/action": ["POST"],
         "./handlers/mcp": ["createAiReadyMcpHandler"],
         "./handlers/ai-plugin": ["GET"],
+        "./json-ld": [
+          "getPageJsonLd",
+          "getSiteJsonLd",
+          "pageJsonLdFromGraph",
+          "siteJsonLdFromGraph"
+        ],
         "./hooks": ["clearAiHooks", "emitAiRequest", "emitInvoke", "registerAiHooks"]
       },
       "declarationHashes": {
-        ".": "2aaa77be182368496c0fddefb078e2763ffd53602820122bb88fc7a395468058",
+        ".": "866bda2100f89e9d45f27ebae37b5fbc5aa8766879c99b6456303bbb0ccadb17",
         "./cli": "778f8fe0513aafd21f21fa5bd1134cdcbf8907d84bc23764dadd73bf6028cc0a",
         "./audit": "ec027b1c663e6331fc22d9238d7b220ec3a01af00598fae40158e51475f3d33d",
+        "./json-ld": "ffe01b02c7b2bef72819ebaa5e2b9a2492072cd82c8f289eeb557c897028b4f3",
         "./handlers/llms-txt": "68c993fa8d705a770123744d7ff14ff42576a06d1fac39bbd15fe600ba5ef9dc",
         "./handlers/llms-full": "ae579d4293ffef7ed2c3f666625776164d56f3df774c780bd5aa99b7cb7b65d5",
         "./handlers/page-md": "0ff2cfa2b6081d84d89ecae5ca782df29b33c2307c72cb0f98ead80a4835c98c",

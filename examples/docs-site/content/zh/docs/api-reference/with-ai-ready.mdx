@@ -21,7 +21,7 @@ author: next-ai-ready 团队
 ## 导入
 
 ```ts
-import { withAiReady } from "next-ai-ready/config"
+import { withAiReady } from "next-ai-ready"
 ```
 
 消费者应用只需安装 `next-ai-ready`。使用专用 `/config` 子路径，可避免 Next.js 读取配置时加载构建期扫描器与 CLI 模块。
@@ -30,7 +30,7 @@ import { withAiReady } from "next-ai-ready/config"
 
 ```ts
 // next.config.mjs
-import { withAiReady } from "next-ai-ready/config"
+import { withAiReady } from "next-ai-ready"
 
 export default withAiReady()({
   // 你正常的 Next.js 配置

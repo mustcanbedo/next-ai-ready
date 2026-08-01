@@ -1,2 +1,2 @@
-export { GET } from "@next-ai-ready/next/handlers/openapi";
+export { GET } from "next-ai-ready/handlers/openapi";
 export const runtime = "nodejs";

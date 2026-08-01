@@ -1,5 +1,5 @@
 import "@/actions";
-import { createAiReadyMcpHandler } from "@next-ai-ready/next/handlers/mcp";
+import { createAiReadyMcpHandler } from "next-ai-ready/handlers/mcp";
 
 const handler = await createAiReadyMcpHandler();
 

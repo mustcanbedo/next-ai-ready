@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getPageJsonLd } from "@next-ai-ready/next";
+import { getPageJsonLd } from "next-ai-ready/json-ld";
 import { JsonLd } from "../../../components/json-ld";
 import { getDoc, getAllDocs } from "@/lib/docs";
 import { MdxContent } from "../../components/mdx-content";

@@ -5,7 +5,7 @@
  *   node scripts/docs-site-smoke.mjs
  */
 
-import { readFile, access } from "node:fs/promises";
+import { readFile, access, readdir } from "node:fs/promises";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { spawnSync } from "node:child_process";
@@ -28,8 +28,42 @@ function ok(msg) {
   console.log(`  ✓ ${msg}`);
 }
 
+async function sourceFiles(path) {
+  const entries = await readdir(path, { withFileTypes: true });
+  const files = await Promise.all(entries.map(async (entry) => {
+    const entryPath = join(path, entry.name);
+    if (entry.isDirectory()) return sourceFiles(entryPath);
+    return /\.(?:mjs|ts|tsx)$/.test(entry.name) ? [entryPath] : [];
+  }));
+  return files.flat();
+}
+
 async function main() {
   console.log("[docs-site-smoke] checking artifacts…");
+
+  const packageJson = JSON.parse(await readFile(join(ROOT, "package.json"), "utf8"));
+  const internalDependencies = Object.keys({
+    ...packageJson.dependencies,
+    ...packageJson.devDependencies,
+  }).filter((name) => name.startsWith("@next-ai-ready/"));
+  if (internalDependencies.length > 0) {
+    fail(`docs site depends on internal packages: ${internalDependencies.join(", ")}`);
+  }
+
+  const runtimeFiles = [
+    join(ROOT, "ai-ready.config.mjs"),
+    join(ROOT, "next.config.mjs"),
+    join(ROOT, "instrumentation-node.ts"),
+    ...await sourceFiles(join(ROOT, "actions")),
+    ...await sourceFiles(join(ROOT, "app")),
+  ];
+  for (const path of runtimeFiles) {
+    const source = await readFile(path, "utf8");
+    if (/from ["']@next-ai-ready\//.test(source)) {
+      fail(`docs runtime imports an internal package: ${path.slice(ROOT.length + 1)}`);
+    }
+  }
+  ok("docs site dogfoods the public meta package only");
 
   await mustExist(".next-ai-ready/graph.json");
   ok("graph.json exists");

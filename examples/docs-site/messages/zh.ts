@@ -6,12 +6,22 @@ const zh = {
     github: "GitHub",
   },
   hero: {
-    badge: "v0.1.0-alpha.11 — 已发布至 npm",
+    badge: "npm alpha.12 · 文档跟随 main",
     title: "Next.js 的\nAI 基础设施层",
     subtitle:
       "让 AI 更容易发现和读取你的内容，并通过明确授权的接口调用功能。一个配置文件，UI 零改动。",
     cta: "开始使用",
     install: "pnpm add next-ai-ready@alpha",
+  },
+  verification: {
+    label: "第三方工具基线",
+    score: "100/100",
+    title: "Vercel Agent Readability",
+    description:
+      "生产文档站于 2026 年 8 月 1 日使用固定版本的开源 CLI v0.5.0，通过全部 25 项检查。",
+    evidence: "查看机器可读原始结果",
+    workflow: "查看定期审计",
+    disclaimer: "该分数仅衡量技术可读性，不保证排名、收录或引用。",
   },
   features: {
     heading: "AI 从你的站点获取一切所需",

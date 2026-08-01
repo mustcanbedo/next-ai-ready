@@ -25,7 +25,7 @@ author: next-ai-ready team
 ## Import
 
 ```ts
-import { defineAction, defineActions } from "@next-ai-ready/actions"
+import { defineAction, defineActions } from "next-ai-ready"
 ```
 
 ## `defineAction<I, O>(def)`
@@ -78,7 +78,7 @@ The second argument to `handler`:
 Registers an array of actions. Returns the same array. Used as the default export of your actions module:
 
 ```js
-import { defineActions } from "@next-ai-ready/actions"
+import { defineActions } from "next-ai-ready"
 import search from "./search.js"
 import getOrder from "./get-order.js"
 

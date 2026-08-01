@@ -1,4 +1,4 @@
-import { defineConfig } from "@next-ai-ready/core";
+import { defineConfig } from "next-ai-ready";
 
 function siteBaseUrl() {
   if (process.env.SITE_URL) {

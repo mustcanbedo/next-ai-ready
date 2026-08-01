@@ -31,8 +31,11 @@ const HANDLER_PACKAGES = [
 ];
 
 const EXTRA_EXPORTS = [
+  { name: "@next-ai-ready/next", dir: join(ROOT, "packages", "next"), key: "./json-ld", js: "jsonld.js", dts: "jsonld.d.ts" },
   { name: "@next-ai-ready/next", dir: join(ROOT, "packages", "next"), key: "./hooks", js: "runtime/observability.js", dts: "runtime/observability.d.ts" },
+  { name: "next-ai-ready", dir: join(ROOT, "packages", "meta"), key: "./actions", js: "actions.js", dts: "actions.d.ts" },
   { name: "next-ai-ready", dir: join(ROOT, "packages", "meta"), key: "./hooks", js: "hooks.js", dts: "hooks.d.ts" },
+  { name: "next-ai-ready", dir: join(ROOT, "packages", "meta"), key: "./json-ld", js: "json-ld.js", dts: "json-ld.d.ts" },
   { name: "next-ai-ready", dir: join(ROOT, "packages", "meta"), key: "./audit", js: "audit.js", dts: "audit.d.ts" },
   { name: "next-ai-ready", dir: join(ROOT, "packages", "meta"), key: "./config", js: "config.js", dts: "config.d.ts" },
   { name: "next-ai-ready", dir: join(ROOT, "packages", "meta"), key: "./robots", js: "robots.js", dts: "robots.d.ts" },
@@ -112,7 +115,7 @@ async function main() {
     console.error(`[exports-check] ${failures} check(s) failed`);
     process.exit(1);
   }
-  console.log("[exports-check] all handler exports OK");
+  console.log("[exports-check] all package exports OK");
 }
 
 main().catch((err) => {

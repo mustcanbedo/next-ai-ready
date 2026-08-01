@@ -6,12 +6,23 @@ const en = {
     github: "GitHub",
   },
   hero: {
-    badge: "v0.1.0-alpha.11 — now on npm",
+    badge: "npm alpha.12 · docs track main",
     title: "The AI Layer\nfor Next.js",
     subtitle:
       "Make your site readable by AI search engines and callable by AI agents. One config file, zero changes to your UI.",
     cta: "Get Started",
     install: "pnpm add next-ai-ready@alpha",
+  },
+  verification: {
+    label: "Third-party tool baseline",
+    score: "100/100",
+    title: "Vercel Agent Readability",
+    description:
+      "The production documentation passed all 25 checks with the pinned open-source CLI v0.5.0 on August 1, 2026.",
+    evidence: "View machine-readable evidence",
+    workflow: "View recurring audit",
+    disclaimer:
+      "Technical readability score only. It does not guarantee ranking, indexing, or citation.",
   },
   features: {
     heading: "Everything AI needs from your site",

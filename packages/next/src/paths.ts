@@ -17,7 +17,7 @@ import { join } from "node:path";
 export const AI_READY_DIR = ".next-ai-ready";
 
 export function graphPath(projectRoot: string): string {
-  return join(projectRoot, AI_READY_DIR, "graph.json");
+  return join(/* turbopackIgnore: true */ projectRoot, AI_READY_DIR, "graph.json");
 }
 
 export function actionsManifestPath(projectRoot: string): string {

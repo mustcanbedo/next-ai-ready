@@ -91,6 +91,41 @@ export default async function HomePage({ params }: PageProps) {
         </div>
       </section>
 
+      {/* Reproducible third-party quality baseline */}
+      <section className="border-y border-white/[0.06] bg-white/[0.015]">
+        <div className="mx-auto grid max-w-7xl gap-8 px-6 py-12 md:grid-cols-[180px_1fr_auto] md:items-center">
+          <div>
+            <div className="text-[11px] font-semibold uppercase tracking-[0.2em] text-text-tertiary">
+              {t.verification.label}
+            </div>
+            <div className="mt-2 text-4xl font-bold text-text">{t.verification.score}</div>
+          </div>
+          <div className="max-w-2xl">
+            <h2 className="text-xl font-semibold text-text">{t.verification.title}</h2>
+            <p className="mt-2 text-sm leading-6 text-text-secondary">
+              {t.verification.description}
+            </p>
+            <p className="mt-2 text-xs leading-5 text-text-tertiary">
+              {t.verification.disclaimer}
+            </p>
+          </div>
+          <div className="flex flex-col items-start gap-3 text-sm md:items-end">
+            <a
+              href="https://github.com/mustcanbedo/next-ai-ready/blob/main/docs/audit-baselines/vercel-agent-readability-0.5.0-2026-08-01.json"
+              className="font-medium text-accent hover:text-accent-hover transition-colors"
+            >
+              {t.verification.evidence}
+            </a>
+            <a
+              href="https://github.com/mustcanbedo/next-ai-ready/actions/workflows/agent-readability.yml"
+              className="text-text-secondary hover:text-text transition-colors"
+            >
+              {t.verification.workflow}
+            </a>
+          </div>
+        </div>
+      </section>
+
       {/* Features grid */}
       <section className="relative border-t border-white/[0.04] py-32">
         <div className="mx-auto max-w-7xl px-6">

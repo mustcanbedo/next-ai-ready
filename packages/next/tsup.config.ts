@@ -3,6 +3,7 @@ import { defineConfig } from "tsup";
 export default defineConfig({
   entry: [
     "src/index.ts",
+    "src/jsonld.ts",
     "src/audit.ts",
     "src/cli-bin.ts",
     "src/cli/index.ts",

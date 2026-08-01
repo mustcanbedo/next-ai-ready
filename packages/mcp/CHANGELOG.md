@@ -1,5 +1,15 @@
 # @next-ai-ready/mcp
 
+## 0.1.0-alpha.13
+
+### Patch Changes
+
+- Updated dependencies [5a45ab0]
+  - @next-ai-ready/semantic@0.1.0-alpha.12
+  - @next-ai-ready/core@0.1.0-alpha.12
+  - @next-ai-ready/llms@0.1.0-alpha.13
+  - @next-ai-ready/actions@0.1.0-alpha.12
+
 ## 0.1.0-alpha.12
 
 ### Minor Changes

@@ -1,6 +1,6 @@
 {
   "name": "@next-ai-ready/actions",
-  "version": "0.1.0-alpha.11",
+  "version": "0.1.0-alpha.12",
   "description": "defineAction registry, Zod validation, schema emission.",
   "license": "MIT",
   "type": "module",

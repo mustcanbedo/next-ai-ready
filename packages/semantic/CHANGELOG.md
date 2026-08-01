@@ -1,5 +1,13 @@
 # @next-ai-ready/semantic
 
+## 0.1.0-alpha.12
+
+### Patch Changes
+
+- 5a45ab0: Publish the focused Core runtime subpaths and the `@next-ai-ready/semantic/jsonld` export already used by the Next.js runtime entrypoints.
+- Updated dependencies [5a45ab0]
+  - @next-ai-ready/core@0.1.0-alpha.12
+
 ## 0.1.0-alpha.11
 
 ### Patch Changes

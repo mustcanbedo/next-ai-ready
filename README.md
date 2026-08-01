@@ -11,7 +11,7 @@
 
 > **Third-party tool baseline:** the production documentation scored **100/100** with Vercel's open-source `@vercel/agent-readability@0.5.0` on 2026-08-01. [Review the machine-readable result](./docs/audit-baselines/vercel-agent-readability-0.5.0-2026-08-01.json) or reproduce it with `pnpm audit:vercel:site`. This measures technical agent readability, not search ranking, indexing, or citation.
 
-> **Release channels:** this repository and the documentation site track `main`. npm currently serves `0.1.0-alpha.12`; the TypeScript Action loader fix and focused `/actions`, `/config`, `/json-ld`, `/robots`, and `/audit` entrypoints on `main` will ship in the next prerelease. Code examples remain compatible with the published alpha unless explicitly marked as main-only.
+> **Release channels:** this repository and the documentation site track `main`. npm currently serves `0.1.0-alpha.14`, including the TypeScript Action loader fix, focused runtime entrypoints, Audit v3, and MCP page discovery. The published dependency chain was verified with a clean registry install and a Next.js 15 production build on 2026-08-02.
 
 > Traditional websites are built for browsers.
 > **next-ai-ready** makes your Next.js site **readable** by AI and **callable** by agents.
@@ -168,19 +168,19 @@ Use `next-ai-ready/hooks` — not the main package entry — so Turbopack does n
 
 ### Package imports
 
-Install only `next-ai-ready` in consumer apps. The published `alpha.12` supports these imports:
+Install only `next-ai-ready` in consumer apps. The published `alpha.14` supports these imports:
 
 | Import | Use for |
 |---|---|
 | `next-ai-ready` | `defineConfig()`, `defineAction()`, `withAiReady()`, and `aiRobots()` |
 | `next-ai-ready/hooks` | Runtime observability hooks |
 | `next-ai-ready/handlers/*` | Generated App Router handlers |
-
-`main` also contains focused `next-ai-ready/actions`, `next-ai-ready/config`, `next-ai-ready/json-ld`, `next-ai-ready/robots`, and `next-ai-ready/audit` entrypoints. They reduce runtime tracing and expose programmatic Audit without loading the CLI, but they are **not in npm alpha.12** and must not be used until the next prerelease is published.
+| `next-ai-ready/actions`, `/config`, `/json-ld`, `/robots` | Focused runtime APIs with smaller tracing surfaces |
+| `next-ai-ready/audit` | Programmatic Audit without loading the CLI dispatcher |
 
 ## Status
 
-🚧 **Pre-alpha** (`0.1.0-alpha.12` published on npm `@alpha`). `main` contains additional unreleased runtime entrypoints, Audit v3 hardening, TypeScript Action loading, and MCP discovery work; see the [current improvement ledger](./docs/improvement-plan.zh-CN.md).
+🚧 **Pre-alpha** (`0.1.0-alpha.14` published on npm `@alpha`). The public package now includes the runtime entrypoints, Audit v3 hardening, TypeScript Action loading, and MCP discovery work described above; see the [current improvement ledger](./docs/improvement-plan.zh-CN.md) for the remaining production validation and GA work.
 
 - ✅ **Knowledge plane** — MDX → semantic graph → `llms.txt` / `*.md` / `*.ai.json` / JSON-LD
 - ✅ **Capability plane** — `defineAction` → `/api/actions/<name>` + OpenAPI 3.1 / `tools.json` / `ai-plugin.json`

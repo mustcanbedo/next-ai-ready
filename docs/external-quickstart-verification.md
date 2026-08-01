@@ -1,7 +1,7 @@
 # External quickstart verification
 
 > Records how a user **outside this monorepo** can install `next-ai-ready@alpha` and reach AI endpoints.  
-> Last verified: **2026-08-01** (`scripts/external-quickstart-smoke.mjs`).
+> Last verified: **2026-08-02** (`scripts/external-quickstart-smoke.mjs`).
 
 ## 0.1 Definition of Done (target)
 
@@ -109,9 +109,10 @@ curl -sS http://localhost:3000/openapi.json | head -c 200
 
 ### Registry status
 
-As of 2026-08-01:
+As of 2026-08-02:
 
-- **npm `@alpha`:** `0.1.0-alpha.12` — registry single-package installation verified.
+- **npm `@alpha`:** `0.1.0-alpha.14` — registry single-package installation, CLI workflow, and Next.js 15 production build verified.
+- **alpha.13:** superseded after registry smoke exposed an incomplete published Semantic/Core export chain; use alpha.14 or newer.
 - **alpha.4:** deprecated for pnpm users (scoped import bug); use ≥ alpha.5
 
 ## Troubleshooting
@@ -119,6 +120,7 @@ As of 2026-08-01:
 | Issue | Fix |
 |-------|-----|
 | `Cannot find package '@next-ai-ready/core'` | Upgrade to `@alpha` ≥ alpha.5; only install `next-ai-ready`, not scoped packages |
+| `Package subpath './jsonld' is not defined by exports` | Upgrade to `next-ai-ready@alpha` ≥ alpha.14; alpha.13 referenced an older Semantic manifest |
 | `pnpm publish` 403 | Granular Token + Bypass 2FA; see [CONTRIBUTING.md](../CONTRIBUTING.md) |
 | Per-route `.md` 404 | `withAiReady()` + route stubs from `init` |
 | Stale graph in dev | Re-run `next-ai-ready build` (no `dev` watch yet — R-07) |

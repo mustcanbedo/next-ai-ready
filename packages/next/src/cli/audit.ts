@@ -22,7 +22,114 @@ export interface AuditResult {
   passed: number;
 }
 
+export const AUDIT_V2_SCHEMA = "next-ai-ready.audit.v2" as const;
+
+export type AuditDimensionId =
+  | "discovery"
+  | "content-citation"
+  | "structured-data"
+  | "agent-access"
+  | "capabilities";
+
+export interface AuditV2Check extends AuditCheck {
+  dimension: AuditDimensionId;
+  /** Relative contribution to the score for this check's dimension. */
+  weight: number;
+  /** A targeted fix for warn/fail results; null when the check passes. */
+  recommendation: string | null;
+}
+
+export interface AuditDimensionResult {
+  id: AuditDimensionId;
+  name: string;
+  score: number;
+  /** Contribution of this dimension to the overall 100-point score. */
+  weight: number;
+  status: AuditStatus;
+  errors: number;
+  warnings: number;
+  passed: number;
+  checks: string[];
+}
+
+export interface AuditV2Result {
+  schema: typeof AUDIT_V2_SCHEMA;
+  version: "2";
+  timestamp: string;
+  target: string;
+  pageUrl: string;
+  score: number;
+  dimensions: AuditDimensionResult[];
+  checks: AuditV2Check[];
+  errors: number;
+  warnings: number;
+  passed: number;
+}
+
+export const AUDIT_V3_SCHEMA = "next-ai-ready.audit.v3" as const;
+export const VERCEL_AGENT_READABILITY_VERSION = "0.5.0" as const;
+
+export type AuditPlaneId = "agent-readability" | "semantic-aeo-quality" | "agent-capability";
+export type AuditCheckSource = "external-standard" | "next-ai-ready-enhancement";
+export type AuditCheckTier = "required" | "recommended" | "enhancement";
+
+export interface AuditV3Check extends AuditCheck {
+  planes: AuditPlaneId[];
+  source: AuditCheckSource;
+  tier: AuditCheckTier;
+  points: number;
+  recommendation: string | null;
+}
+
+export interface AuditPlaneResult {
+  id: AuditPlaneId;
+  name: string;
+  score: number;
+  status: AuditStatus;
+  errors: number;
+  warnings: number;
+  passed: number;
+  checks: string[];
+}
+
+export interface AuditV3Result {
+  schema: typeof AUDIT_V3_SCHEMA;
+  version: "3";
+  timestamp: string;
+  target: string;
+  pageUrl: string;
+  /** Compatibility score: the local Agent Readability preflight score. */
+  score: number;
+  methodology: {
+    name: "next-ai-ready three-plane preflight";
+    package: "@vercel/agent-readability";
+    version: typeof VERCEL_AGENT_READABILITY_VERSION;
+    scoring: "required=3,recommended=2,strict-pass-only";
+    coverage: "local-subset-official-cli-is-source-of-truth";
+    officialCommand: string;
+    referenceUrl: string;
+  };
+  planes: AuditPlaneResult[];
+  checks: AuditV3Check[];
+  errors: number;
+  warnings: number;
+  passed: number;
+}
+
 export interface AuditOptions {
+  version?: "1";
+  timeoutMs?: number;
+  fetch?: typeof globalThis.fetch;
+}
+
+export interface AuditV2Options {
+  version: "2";
+  timeoutMs?: number;
+  fetch?: typeof globalThis.fetch;
+}
+
+export interface AuditV3Options {
+  version: "3";
   timeoutMs?: number;
   fetch?: typeof globalThis.fetch;
 }
@@ -57,8 +164,221 @@ const WEIGHTS = {
   agentNotFound: 0,
 } as const;
 
+interface AuditV2CheckConfig {
+  dimension: AuditDimensionId;
+  weight: number;
+  recommendation: string;
+}
+
+interface AuditV2DimensionConfig {
+  name: string;
+  weight: number;
+}
+
+const AUDIT_V2_DIMENSIONS: Record<AuditDimensionId, AuditV2DimensionConfig> = {
+  discovery: { name: "Discovery", weight: 20 },
+  "content-citation": { name: "Content and citation", weight: 25 },
+  "structured-data": { name: "Structured data", weight: 15 },
+  "agent-access": { name: "Agent access", weight: 30 },
+  capabilities: { name: "Capabilities", weight: 10 },
+};
+
+const AUDIT_V2_CHECKS: Record<string, AuditV2CheckConfig> = {
+  "html-response": {
+    dimension: "content-citation",
+    weight: 4,
+    recommendation: "Return a successful text/html response for the audited browser URL.",
+  },
+  "llms-txt": {
+    dimension: "discovery",
+    weight: 4,
+    recommendation: "Publish a non-empty /llms.txt with content-type text/plain and links to important pages.",
+  },
+  "sitemap-xml": {
+    dimension: "discovery",
+    weight: 2,
+    recommendation: "Publish a valid, non-empty /sitemap.xml with an XML content type.",
+  },
+  "sitemap-md": {
+    dimension: "discovery",
+    weight: 2,
+    recommendation: "Publish a non-empty /sitemap.md with content-type text/markdown for agent navigation.",
+  },
+  "robots-txt": {
+    dimension: "discovery",
+    weight: 2,
+    recommendation: "Publish a non-empty /robots.txt with content-type text/plain and advertise the XML sitemap.",
+  },
+  "accept-markdown": {
+    dimension: "agent-access",
+    weight: 4,
+    recommendation: "Serve the page as text/markdown when the request sends Accept: text/markdown.",
+  },
+  "agent-user-agent": {
+    dimension: "agent-access",
+    weight: 2,
+    recommendation: "Serve Markdown to supported AI user agents, or document that agents must use explicit Markdown URLs.",
+  },
+  "explicit-markdown": {
+    dimension: "capabilities",
+    weight: 3,
+    recommendation: "Expose a stable explicit Markdown URL, using /index.md for the root page and <path>.md elsewhere.",
+  },
+  "markdown-headers": {
+    dimension: "agent-access",
+    weight: 2,
+    recommendation: "Advertise the Markdown relation and include Vary: Accept and Vary: User-Agent whenever those headers change the representation.",
+  },
+  "markdown-frontmatter": {
+    dimension: "content-citation",
+    weight: 2,
+    recommendation: "Begin the Markdown representation with YAML frontmatter containing stable title, description, and canonical metadata.",
+  },
+  "html-canonical": {
+    dimension: "content-citation",
+    weight: 2,
+    recommendation: 'Add a non-empty <link rel="canonical"> to the HTML page.',
+  },
+  "meta-description": {
+    dimension: "content-citation",
+    weight: 1,
+    recommendation: "Add a concise, non-empty meta description that identifies the page's purpose.",
+  },
+  "json-ld": {
+    dimension: "structured-data",
+    weight: 1,
+    recommendation: "Add valid application/ld+json using the most specific Schema.org type for this page.",
+  },
+  "page-h1": {
+    dimension: "content-citation",
+    weight: 1,
+    recommendation: "Add one descriptive H1 that clearly states the page's primary subject.",
+  },
+  "real-404": {
+    dimension: "agent-access",
+    weight: 2,
+    recommendation: "Return HTTP 404 for a missing URL requested as a browser document so crawlers do not index soft 404s.",
+  },
+  "agent-markdown-404": {
+    dimension: "capabilities",
+    weight: 1,
+    recommendation: "For missing Markdown requests, return actionable recovery Markdown with noindex and a link to /llms.txt, /sitemap.md, or a relevant page.",
+  },
+};
+
+interface AuditV3CheckConfig {
+  planes: AuditPlaneId[];
+  source: AuditCheckSource;
+  tier: AuditCheckTier;
+  recommendation: string;
+}
+
+const AUDIT_V3_PLANES: Record<AuditPlaneId, string> = {
+  "agent-readability": "Agent Readability",
+  "semantic-aeo-quality": "Semantic/AEO Quality",
+  "agent-capability": "Agent Capability",
+};
+
+const AUDIT_V3_CHECKS: Record<string, AuditV3CheckConfig> = {
+  "html-response": standard(["agent-readability"], "required", "Return successful server-rendered HTML."),
+  "llms-txt": standard(["agent-readability"], "required", "Publish a non-empty /llms.txt."),
+  "sitemap-xml": standard(["agent-readability"], "required", "Publish /sitemap.xml with lastmod dates."),
+  "sitemap-md": standard(["agent-readability"], "recommended", "Publish a structured Markdown sitemap."),
+  "robots-txt": standard(["agent-readability"], "required", "Allow major AI crawlers in robots.txt."),
+  "accept-markdown": standard(
+    ["agent-readability"],
+    "recommended",
+    "Serve Markdown for Accept: text/markdown.",
+  ),
+  "agent-user-agent": standard(
+    ["agent-readability"],
+    "required",
+    "Serve Markdown to supported AI user agents.",
+  ),
+  "explicit-markdown": standard(
+    ["agent-readability"],
+    "required",
+    "Expose a stable .md representation for the page.",
+  ),
+  "markdown-headers": standard(
+    ["agent-readability"],
+    "recommended",
+    "Advertise Markdown and set cache-safe Vary headers.",
+  ),
+  "markdown-frontmatter": standard(
+    ["agent-readability", "semantic-aeo-quality"],
+    "recommended",
+    "Include title, description, canonical URL, and freshness metadata in Markdown frontmatter.",
+  ),
+  "html-canonical": standard(
+    ["agent-readability", "semantic-aeo-quality"],
+    "recommended",
+    "Add a canonical URL to the HTML page.",
+  ),
+  "meta-description": standard(
+    ["agent-readability", "semantic-aeo-quality"],
+    "recommended",
+    "Add a descriptive meta description.",
+  ),
+  "json-ld": standard(
+    ["agent-readability", "semantic-aeo-quality"],
+    "recommended",
+    "Add valid Schema.org JSON-LD.",
+  ),
+  "page-h1": standard(
+    ["agent-readability", "semantic-aeo-quality"],
+    "recommended",
+    "Use a clear primary heading and structured subsections.",
+  ),
+  "real-404": standard(
+    ["agent-readability"],
+    "required",
+    "Return a real browser HTTP 404 for missing pages.",
+  ),
+  "agent-markdown-404": standard(
+    ["agent-readability"],
+    "recommended",
+    "Return HTTP 200 with Markdown for missing Agent requests.",
+  ),
+  "agent-markdown-recovery-quality": enhancement(
+    "Add noindex plus a discovery or navigation link to Agent missing-page Markdown.",
+    ["semantic-aeo-quality"],
+  ),
+  "tools-manifest": enhancement("Publish a valid /tools.json manifest for callable actions."),
+  "openapi-spec": enhancement("Publish a valid OpenAPI 3.x document for callable actions."),
+  "mcp-endpoint": enhancement(
+    "Configure MCP authentication and verify an authenticated protocol response at /api/mcp/mcp.",
+  ),
+};
+
+function standard(
+  planes: AuditPlaneId[],
+  tier: "required" | "recommended",
+  recommendation: string,
+): AuditV3CheckConfig {
+  return { planes, source: "external-standard", tier, recommendation };
+}
+
+function enhancement(
+  recommendation: string,
+  planes: AuditPlaneId[] = ["agent-capability"],
+): AuditV3CheckConfig {
+  return {
+    planes,
+    source: "next-ai-ready-enhancement",
+    tier: "enhancement",
+    recommendation,
+  };
+}
+
 /** Audit the deployed behavior that crawlers and agents actually receive. */
-export async function runAudit(target: string, options: AuditOptions = {}): Promise<AuditResult> {
+export function runAudit(target: string, options: AuditV2Options): Promise<AuditV2Result>;
+export function runAudit(target: string, options: AuditV3Options): Promise<AuditV3Result>;
+export function runAudit(target: string, options?: AuditOptions): Promise<AuditResult>;
+export async function runAudit(
+  target: string,
+  options: AuditOptions | AuditV2Options | AuditV3Options = {},
+): Promise<AuditResult | AuditV2Result | AuditV3Result> {
   const requestedUrl = parseTarget(target);
   const fetchImpl = options.fetch ?? globalThis.fetch;
   if (!fetchImpl) {
@@ -287,38 +607,303 @@ export async function runAudit(target: string, options: AuditOptions = {}): Prom
     isRecoveryMarkdown(agentRecoveryBody) &&
     hasNoIndex &&
     (hasRecoveryLink || hasDiscoveryPath);
-  add(
-    "agent-markdown-404",
-    "Agent missing-page recovery",
-    agentNotFoundOk ? "pass" : "warn",
-    agentNotFoundOk
+  const agentNotFoundMarkdownOk = agentNotFound.status === 200 && isMarkdown(agentNotFound);
+  const agentNotFoundStatus = options.version === "3"
+    ? agentNotFoundMarkdownOk
+      ? "pass"
+      : "warn"
+    : agentNotFoundOk
+      ? "pass"
+      : "warn";
+  const agentNotFoundMessage = options.version === "3"
+    ? agentNotFoundMarkdownOk
+      ? "An agent requesting a missing URL receives Markdown with HTTP 200."
+      : responseFailure(agentNotFound, "Expected HTTP 200 Markdown for an Agent missing-page request.")
+    : agentNotFoundOk
       ? "An agent requesting a missing URL receives actionable Markdown with HTTP 200."
       : responseFailure(
           agentNotFound,
           "Expected HTTP 200 recovery Markdown with noindex and a navigation or discovery link. This is advisory in audit report v1.",
-        ),
+        );
+  add(
+    "agent-markdown-404",
+    "Agent missing-page recovery",
+    agentNotFoundStatus,
+    agentNotFoundMessage,
     missingUrl,
     WEIGHTS.agentNotFound,
   );
 
-  const earned = weightedChecks.reduce(
-    (sum, check) => sum + (check.status === "pass" ? check.weight : check.status === "warn" ? check.weight / 2 : 0),
-    0,
-  );
+  if (options.version === "3") {
+    add(
+      "agent-markdown-recovery-quality",
+      "Agent missing-page recovery quality",
+      agentNotFoundOk ? "pass" : "warn",
+      agentNotFoundOk
+        ? "Missing-page Markdown includes noindex plus an actionable discovery or navigation link."
+        : "Add X-Robots-Tag: noindex plus a discovery or navigation link to missing-page Markdown.",
+      missingUrl,
+      0,
+    );
+  }
+
+  const timestamp = new Date().toISOString();
+  if (options.version === "3") {
+    const capabilityChecks = await buildCapabilityChecks(fetchImpl, origin, timeoutMs);
+    return buildAuditV3Result(
+      [...weightedChecks, ...capabilityChecks],
+      requestedUrl,
+      pageUrl,
+      timestamp,
+    );
+  }
+  if (options.version === "2") {
+    return buildAuditV2Result(weightedChecks, requestedUrl, pageUrl, timestamp);
+  }
+  return buildAuditV1Result(weightedChecks, requestedUrl, pageUrl, timestamp);
+}
+
+function buildAuditV1Result(
+  weightedChecks: Array<AuditCheck & { weight: number }>,
+  requestedUrl: URL,
+  pageUrl: URL,
+  timestamp: string,
+): AuditResult {
+  const earned = weightedChecks.reduce((sum, check) => sum + statusScore(check.status) * check.weight, 0);
   const total = weightedChecks.reduce((sum, check) => sum + check.weight, 0);
   const checks = weightedChecks.map(({ weight: _weight, ...check }) => check);
 
   return {
     version: "1",
-    timestamp: new Date().toISOString(),
+    timestamp,
     target: requestedUrl.toString(),
     pageUrl: pageUrl.toString(),
     score: Math.round((earned / total) * 100),
     checks,
-    errors: checks.filter((check) => check.status === "fail").length,
-    warnings: checks.filter((check) => check.status === "warn").length,
-    passed: checks.filter((check) => check.status === "pass").length,
+    errors: countStatus(checks, "fail"),
+    warnings: countStatus(checks, "warn"),
+    passed: countStatus(checks, "pass"),
   };
+}
+
+function buildAuditV2Result(
+  weightedChecks: Array<AuditCheck & { weight: number }>,
+  requestedUrl: URL,
+  pageUrl: URL,
+  timestamp: string,
+): AuditV2Result {
+  const checks = weightedChecks.map(({ weight: _legacyWeight, ...check }): AuditV2Check => {
+    const config = AUDIT_V2_CHECKS[check.id];
+    if (!config) {
+      throw new AiReadyError("unsupported_audit_v2_check", `Audit v2 has no scoring metadata for check "${check.id}".`, [
+        "Add the check to AUDIT_V2_CHECKS before including it in an Audit v2 report.",
+      ]);
+    }
+    return {
+      ...check,
+      dimension: config.dimension,
+      weight: config.weight,
+      recommendation: check.status === "pass" ? null : config.recommendation,
+    };
+  });
+
+  const dimensions = (Object.entries(AUDIT_V2_DIMENSIONS) as Array<[AuditDimensionId, AuditV2DimensionConfig]>).map(
+    ([id, config]): AuditDimensionResult => {
+      const dimensionChecks = checks.filter((check) => check.dimension === id);
+      const totalWeight = dimensionChecks.reduce((sum, check) => sum + check.weight, 0);
+      const earnedWeight = dimensionChecks.reduce(
+        (sum, check) => sum + statusScore(check.status) * check.weight,
+        0,
+      );
+      const errors = countStatus(dimensionChecks, "fail");
+      const warnings = countStatus(dimensionChecks, "warn");
+      return {
+        id,
+        name: config.name,
+        score: totalWeight > 0 ? Math.round((earnedWeight / totalWeight) * 100) : 0,
+        weight: config.weight,
+        status: errors > 0 ? "fail" : warnings > 0 ? "warn" : "pass",
+        errors,
+        warnings,
+        passed: countStatus(dimensionChecks, "pass"),
+        checks: dimensionChecks.map((check) => check.id),
+      };
+    },
+  );
+
+  const weightedDimensionScore = dimensions.reduce(
+    (sum, dimension) => sum + dimension.score * dimension.weight,
+    0,
+  );
+  const totalDimensionWeight = dimensions.reduce((sum, dimension) => sum + dimension.weight, 0);
+
+  return {
+    schema: AUDIT_V2_SCHEMA,
+    version: "2",
+    timestamp,
+    target: requestedUrl.toString(),
+    pageUrl: pageUrl.toString(),
+    score: Math.round(weightedDimensionScore / totalDimensionWeight),
+    dimensions,
+    checks,
+    errors: countStatus(checks, "fail"),
+    warnings: countStatus(checks, "warn"),
+    passed: countStatus(checks, "pass"),
+  };
+}
+
+async function buildCapabilityChecks(
+  fetchImpl: typeof globalThis.fetch,
+  origin: string,
+  timeoutMs: number,
+): Promise<Array<AuditCheck & { weight: number }>> {
+  const urls = {
+    tools: new URL("/tools.json", origin),
+    openapi: new URL("/openapi.json", origin),
+    mcp: new URL("/api/mcp/mcp", origin),
+  };
+  const [tools, openapi, mcp] = await Promise.all([
+    fetchText(fetchImpl, urls.tools, {}, timeoutMs),
+    fetchText(fetchImpl, urls.openapi, {}, timeoutMs),
+    fetchText(fetchImpl, urls.mcp, {}, timeoutMs),
+  ]);
+
+  const checks: Array<AuditCheck & { weight: number }> = [];
+  const add = (id: string, name: string, status: AuditStatus, message: string, url: URL) => {
+    checks.push({ id, name, status, message, url: url.toString(), weight: 0 });
+  };
+
+  const toolsJson = parseJsonObject(tools.body);
+  const toolEntries = Array.isArray(toolsJson?.tools) ? toolsJson.tools : [];
+  const toolsOk = tools.ok && toolEntries.length > 0 && toolEntries.every(isToolDefinition);
+  add(
+    "tools-manifest",
+    "Agent tool manifest",
+    toolsOk ? "pass" : "warn",
+    toolsOk
+      ? `/tools.json advertises ${toolEntries.length} valid callable tool(s).`
+      : "No non-empty, valid tools manifest was found.",
+    urls.tools,
+  );
+
+  const openapiJson = parseJsonObject(openapi.body);
+  const openapiVersion = typeof openapiJson?.openapi === "string" ? openapiJson.openapi : "";
+  const openapiPaths = isRecord(openapiJson?.paths) ? openapiJson.paths : {};
+  const openapiOk =
+    openapi.ok &&
+    openapiVersion.startsWith("3.") &&
+    Object.values(openapiPaths).some(hasOpenApiOperation);
+  add(
+    "openapi-spec",
+    "OpenAPI capability contract",
+    openapiOk ? "pass" : "warn",
+    openapiOk ? `OpenAPI ${openapiVersion} describes callable HTTP actions.` : "No valid OpenAPI 3.x action contract was found.",
+    urls.openapi,
+  );
+
+  const mcpAuthResponse = mcp.status === 401 || mcp.status === 403;
+  const mcpConfigurationMissing =
+    mcp.status === 503 && mcp.body.includes("NEXT_AI_READY_MCP_TOKEN is not set");
+  const mcpProtocolSignal =
+    contentType(mcp).includes("text/event-stream") ||
+    mcp.headers.has("mcp-session-id") ||
+    /"jsonrpc"\s*:\s*"2\.0"/i.test(mcp.body);
+  const mcpReachable = mcpAuthResponse || mcp.ok || [400, 405, 406, 415].includes(mcp.status);
+  add(
+    "mcp-endpoint",
+    "MCP endpoint",
+    mcpProtocolSignal ? "pass" : "warn",
+    mcpProtocolSignal
+      ? `MCP protocol response was detected (HTTP ${mcp.status}).`
+      : mcpConfigurationMissing
+        ? "MCP route exists, but NEXT_AI_READY_MCP_TOKEN is not configured in the deployment."
+        : mcpReachable
+          ? `MCP route is reachable (HTTP ${mcp.status}), but the protocol cannot be verified without credentials.`
+          : `MCP endpoint was not found (HTTP ${mcp.status || "network error"}); this enhancement is optional.`,
+    urls.mcp,
+  );
+
+  return checks;
+}
+
+function buildAuditV3Result(
+  rawChecks: Array<AuditCheck & { weight: number }>,
+  requestedUrl: URL,
+  pageUrl: URL,
+  timestamp: string,
+): AuditV3Result {
+  const checks = rawChecks.map(({ weight: _legacyWeight, ...check }): AuditV3Check => {
+    const config = AUDIT_V3_CHECKS[check.id];
+    if (!config) {
+      throw new AiReadyError("unsupported_audit_v3_check", `Audit v3 has no metadata for check "${check.id}".`, [
+        "Add the check to AUDIT_V3_CHECKS before including it in an Audit v3 report.",
+      ]);
+    }
+    return {
+      ...check,
+      planes: config.planes,
+      source: config.source,
+      tier: config.tier,
+      points: tierPoints(config.tier),
+      recommendation: check.status === "pass" ? null : config.recommendation,
+    };
+  });
+
+  const planes = (Object.entries(AUDIT_V3_PLANES) as Array<[AuditPlaneId, string]>).map(
+    ([id, name]): AuditPlaneResult => {
+      const planeChecks = checks.filter((check) => check.planes.includes(id));
+      const total = planeChecks.reduce((sum, check) => sum + check.points, 0);
+      const earned = planeChecks.reduce((sum, check) => sum + (check.status === "pass" ? check.points : 0), 0);
+      const errors = countStatus(planeChecks, "fail");
+      const warnings = countStatus(planeChecks, "warn");
+      return {
+        id,
+        name,
+        score: total > 0 ? Math.round((earned / total) * 100) : 0,
+        status: errors > 0 ? "fail" : warnings > 0 ? "warn" : "pass",
+        errors,
+        warnings,
+        passed: countStatus(planeChecks, "pass"),
+        checks: planeChecks.map((check) => check.id),
+      };
+    },
+  );
+  const readability = planes.find((plane) => plane.id === "agent-readability");
+
+  return {
+    schema: AUDIT_V3_SCHEMA,
+    version: "3",
+    timestamp,
+    target: requestedUrl.toString(),
+    pageUrl: pageUrl.toString(),
+    score: readability?.score ?? 0,
+    methodology: {
+      name: "next-ai-ready three-plane preflight",
+      package: "@vercel/agent-readability",
+      version: VERCEL_AGENT_READABILITY_VERSION,
+      scoring: "required=3,recommended=2,strict-pass-only",
+      coverage: "local-subset-official-cli-is-source-of-truth",
+      officialCommand: "pnpm audit:vercel:site",
+      referenceUrl: "https://vercel.com/kb/guide/agent-readability-spec",
+    },
+    planes,
+    checks,
+    errors: countStatus(checks, "fail"),
+    warnings: countStatus(checks, "warn"),
+    passed: countStatus(checks, "pass"),
+  };
+}
+
+function tierPoints(tier: AuditCheckTier): number {
+  return tier === "required" ? 3 : tier === "recommended" ? 2 : 1;
+}
+
+function statusScore(status: AuditStatus): number {
+  return status === "pass" ? 1 : status === "warn" ? 0.5 : 0;
+}
+
+function countStatus(checks: AuditCheck[], status: AuditStatus): number {
+  return checks.filter((check) => check.status === status).length;
 }
 
 function parseTarget(target: string): URL {
@@ -480,6 +1065,29 @@ function findMetaDescription(html: string): string | null {
     if (attrs.name?.toLowerCase() === "description" && attrs.content?.trim()) return attrs.content.trim();
   }
   return null;
+}
+
+function parseJsonObject(value: string): Record<string, unknown> | null {
+  try {
+    const parsed: unknown = JSON.parse(value);
+    return isRecord(parsed) ? parsed : null;
+  } catch {
+    return null;
+  }
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+function isToolDefinition(value: unknown): boolean {
+  if (!isRecord(value) || value.type !== "function" || !isRecord(value.function)) return false;
+  return typeof value.function.name === "string" && value.function.name.trim().length > 0;
+}
+
+function hasOpenApiOperation(value: unknown): boolean {
+  if (!isRecord(value)) return false;
+  return ["get", "post", "put", "patch", "delete"].some((method) => isRecord(value[method]));
 }
 
 function parseAttributes(tag: string): Record<string, string> {

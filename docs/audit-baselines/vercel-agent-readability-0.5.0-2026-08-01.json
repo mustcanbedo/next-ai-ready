@@ -1,0 +1,65 @@
+{
+  "schema": "next-ai-ready.external-audit-baseline.v1",
+  "tool": "@vercel/agent-readability",
+  "version": "0.5.0",
+  "command": "pnpm audit:vercel:site",
+  "target": "https://next-ai-ready.vercel.app/en",
+  "auditedAt": "2026-08-01",
+  "score": 100,
+  "rating": "Excellent",
+  "categories": {
+    "can_agents_reach_you": {
+      "passed": 3,
+      "total": 3,
+      "skipped": 0,
+      "checks": [
+        { "name": "Soft 404 detection", "tier": "required", "passed": true },
+        { "name": "Auth gate detection", "tier": "required", "passed": true },
+        { "name": "Redirect behavior", "tier": "recommended", "passed": true }
+      ]
+    },
+    "can_agents_find_you": {
+      "passed": 8,
+      "total": 8,
+      "skipped": 0,
+      "checks": [
+        { "name": "llms.txt", "tier": "required", "passed": true },
+        { "name": "llms.txt links resolve", "tier": "required", "passed": true },
+        { "name": "llms.txt size", "tier": "recommended", "passed": true },
+        { "name": "llms.txt valid", "tier": "recommended", "passed": true },
+        { "name": "sitemap.xml", "tier": "required", "passed": true },
+        { "name": "sitemap.md", "tier": "recommended", "passed": true },
+        { "name": "robots.txt", "tier": "required", "passed": true },
+        { "name": "Structured data", "tier": "recommended", "passed": true }
+      ]
+    },
+    "can_agents_read_you": {
+      "passed": 9,
+      "total": 9,
+      "skipped": 0,
+      "checks": [
+        { "name": "Agent UA -> markdown", "tier": "required", "passed": true },
+        { "name": "Accept header -> markdown", "tier": "recommended", "passed": true },
+        { "name": "Vary: Accept", "tier": "recommended", "passed": true },
+        { "name": ".md URL -> markdown", "tier": "required", "passed": true },
+        { "name": "Markdown link alternate", "tier": "recommended", "passed": true },
+        { "name": "Frontmatter", "tier": "recommended", "passed": true },
+        { "name": "Missing page -> markdown", "tier": "recommended", "passed": true },
+        { "name": "Page size (markdown)", "tier": "recommended", "passed": true },
+        { "name": "Code fence validity", "tier": "recommended", "passed": true }
+      ]
+    },
+    "is_your_html_agent_friendly": {
+      "passed": 5,
+      "total": 5,
+      "skipped": 0,
+      "checks": [
+        { "name": "Server-rendered content", "tier": "required", "passed": true },
+        { "name": "Page size (HTML text)", "tier": "required", "passed": true },
+        { "name": "Heading structure", "tier": "recommended", "passed": true },
+        { "name": "Meta description", "tier": "recommended", "passed": true },
+        { "name": "Canonical URL", "tier": "recommended", "passed": true }
+      ]
+    }
+  }
+}

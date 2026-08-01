@@ -1,0 +1,271 @@
+{
+  "schemaVersion": 1,
+  "releaseLine": "0.1",
+  "packages": {
+    "@next-ai-ready/actions": {
+      "directory": "packages/actions",
+      "entrypoints": {
+        ".": [
+          "buildActionContext",
+          "buildActionsManifest",
+          "clearRegistry",
+          "defineAction",
+          "defineActions",
+          "getAction",
+          "invokeAction",
+          "isZodSchema",
+          "listActions",
+          "registerActions",
+          "schemaToJsonSchema"
+        ]
+      },
+      "declarationHashes": {
+        ".": "b9c780da65eacf08acd89112f4022e3fb1e3a0c47c98ac360dc8b07a6ea9b947"
+      }
+    },
+    "@next-ai-ready/core": {
+      "directory": "packages/core",
+      "entrypoints": {
+        ".": [
+          "AI_BOTS",
+          "absoluteUrl",
+          "actionsModulePath",
+          "aiRobots",
+          "buildRobotsTxt",
+          "buildRoutesByLocale",
+          "defineConfig",
+          "defineContentSource",
+          "fileToRoute",
+          "filesystemContentSource",
+          "identifyAiBot",
+          "parseLocaleFromRoute",
+          "scanContent",
+          "serializeStable",
+          "stableId",
+          "stripLocaleFromRoute",
+          "withDefaults"
+        ],
+        "./scanner": ["fileToRoute", "scanContent"],
+        "./bots": ["AI_BOTS", "identifyAiBot"]
+      },
+      "declarationHashes": {
+        ".": "c8f72e905b3d2c056e1d13d6e534698549e6c2b63a94c478795377fc07efd47c",
+        "./scanner": "c41b941cffee8aff37c49c39e39270d1c224b9cc562af66805c7b6defe5c281c",
+        "./bots": "0d234e6db05918d2782bd66ed2a333ef52939c9c70a5f47363d7ecec9e7d4bb3"
+      }
+    },
+    "create-next-ai-ready": {
+      "directory": "packages/create-next-ai-ready",
+      "entrypoints": {},
+      "bin": {
+        "create-next-ai-ready": "./index.js"
+      }
+    },
+    "@next-ai-ready/llms": {
+      "directory": "packages/llms",
+      "entrypoints": {
+        ".": [
+          "renderLlmsFullTxt",
+          "renderLlmsTxt",
+          "renderPageAiJson",
+          "renderPageMarkdown",
+          "renderPageMarkdownRecovery",
+          "renderSitemapMarkdown"
+        ]
+      },
+      "declarationHashes": {
+        ".": "a8d6df9c42ff34044b7667dee6e2bcf84aa477548b91cc9d6df3b996a09fd621"
+      }
+    },
+    "@next-ai-ready/mcp": {
+      "directory": "packages/mcp",
+      "entrypoints": {
+        ".": [
+          "MCP_PAGE_URI_PREFIX",
+          "mcpPageUri",
+          "readMcpResource",
+          "registerAiReady",
+          "routeFromMcpPageUri",
+          "safeMcpPageRoute",
+          "toMcpPageToolDefinitions",
+          "toMcpResourceDefinitions",
+          "toMcpToolDefinitions"
+        ]
+      },
+      "declarationHashes": {
+        ".": "1ead1e0d40d5552283b93df206fd43bb4ce6635b28d7d60f00a3a0991b9c6589"
+      }
+    },
+    "@next-ai-ready/mdx": {
+      "directory": "packages/mdx",
+      "entrypoints": {
+        ".": [
+          "chunkSections",
+          "compile",
+          "deriveSummary",
+          "extractFaq",
+          "parseMdx",
+          "renderMarkdown",
+          "sectionize"
+        ]
+      },
+      "declarationHashes": {
+        ".": "5a12a8b10c3d0589a72ff0c95b28847a008375482bec2f5d346eb5140763cb62"
+      }
+    },
+    "next-ai-ready": {
+      "directory": "packages/meta",
+      "entrypoints": {
+        ".": [
+          "AI_BOTS",
+          "absoluteUrl",
+          "actionsModulePath",
+          "aiRobots",
+          "buildRobotsTxt",
+          "buildRoutesByLocale",
+          "clearAiHooks",
+          "createEdgeGraphLoader",
+          "defineAction",
+          "defineActions",
+          "defineConfig",
+          "defineContentSource",
+          "fileToRoute",
+          "filesystemContentSource",
+          "getPageJsonLd",
+          "getSiteJsonLd",
+          "identifyAiBot",
+          "invalidateEdgeGraphCache",
+          "loadGraphFromFetch",
+          "pageJsonLdFromGraph",
+          "parseLocaleFromRoute",
+          "registerAiHooks",
+          "scanContent",
+          "serializeStable",
+          "siteJsonLdFromGraph",
+          "stableId",
+          "stripLocaleFromRoute",
+          "withAiReady",
+          "withDefaults"
+        ],
+        "./audit": [
+          "AUDIT_V2_SCHEMA",
+          "AUDIT_V3_SCHEMA",
+          "AiReadyError",
+          "VERCEL_AGENT_READABILITY_VERSION",
+          "formatCliError",
+          "main",
+          "runAudit",
+          "runCli"
+        ],
+        "./handlers/llms-txt": ["GET"],
+        "./handlers/llms-full": ["GET"],
+        "./handlers/page-md": ["GET"],
+        "./handlers/page-ai-json": ["GET"],
+        "./handlers/openapi": ["GET"],
+        "./handlers/tools": ["GET"],
+        "./handlers/action": ["POST"],
+        "./handlers/mcp": ["createAiReadyMcpHandler"],
+        "./handlers/ai-plugin": ["GET"],
+        "./hooks": ["clearAiHooks", "registerAiHooks"]
+      },
+      "declarationHashes": {
+        ".": "ceda34ab2f3d8e29158044b9971107bf6f01babdf8e1a4d324dd99b8acfdca2c",
+        "./audit": "e43f8ce9eb72495f8d77a93a06f7e7aaaeaa156984323ca33a266c83b5afcd31",
+        "./handlers/llms-txt": "b7548c7e1565a62a06d9eb7e0b6eb2e86471d9491123ed3b006ecf5ce0913290",
+        "./handlers/llms-full": "13bbc71d6114675e61c39cab468ac55d69a3c964f63f987897d3d887058689f3",
+        "./handlers/page-md": "b2f082660520a99c8f0906e531de0493992a92c20089420f329d2dd226106774",
+        "./handlers/page-ai-json": "44896220bd61f700cbb9a5daa5c9b2f0254f98742e6cc7662d5ec9287f2dd31b",
+        "./handlers/openapi": "4f63e0cafa291d4efcff93f9b5d5be886e8d0fc78982a6cea9573ce289d25a4a",
+        "./handlers/tools": "36940a6478d097600dd44355d9ab235b6b1d47d70a37f879be0b1da7057fcdb3",
+        "./handlers/action": "61b4ef11cae13b1426a0c27813d977e9d0d8593091e1d3a8d58f68aee9793068",
+        "./handlers/mcp": "073cbbeca2b71fafd73d0c6a3ffe6879080308ce871f4eb4cff2b7964929ccea",
+        "./handlers/ai-plugin": "56e58086f10fc8eb3bb785e57d360c88ede5e2b5cbe2c079c2b1e610d33a3083",
+        "./hooks": "bea87b0dcd1917d19c4b27db009aec8a48e61386251e76e09fe4b55a3dd09325"
+      },
+      "bin": {
+        "next-ai-ready": "./dist/cli.js"
+      }
+    },
+    "@next-ai-ready/next": {
+      "directory": "packages/next",
+      "entrypoints": {
+        ".": [
+          "AI_READY_DIR",
+          "ROUTE_STUBS",
+          "actionsManifestPath",
+          "aiRobots",
+          "clearAiHooks",
+          "createEdgeGraphLoader",
+          "getPageJsonLd",
+          "getSiteJsonLd",
+          "graphPath",
+          "invalidateEdgeGraphCache",
+          "loadGraphFromFetch",
+          "pageJsonLdFromGraph",
+          "publicAiPluginPath",
+          "publicLlmsFullTxtPath",
+          "publicLlmsTxtPath",
+          "publicOpenApiPath",
+          "publicRobotsTxtPath",
+          "publicSitemapMdPath",
+          "publicToolsJsonPath",
+          "registerAiHooks",
+          "siteJsonLdFromGraph",
+          "withAiReady"
+        ],
+        "./cli": [
+          "AUDIT_V2_SCHEMA",
+          "AUDIT_V3_SCHEMA",
+          "AiReadyError",
+          "VERCEL_AGENT_READABILITY_VERSION",
+          "formatCliError",
+          "main",
+          "runAudit",
+          "runCli"
+        ],
+        "./handlers/llms-txt": ["GET"],
+        "./handlers/llms-full": ["GET"],
+        "./handlers/page-md": ["GET"],
+        "./handlers/page-ai-json": ["GET"],
+        "./handlers/openapi": ["GET"],
+        "./handlers/tools": ["GET"],
+        "./handlers/action": ["POST"],
+        "./handlers/mcp": ["createAiReadyMcpHandler"],
+        "./handlers/ai-plugin": ["GET"],
+        "./hooks": ["clearAiHooks", "emitAiRequest", "emitInvoke", "registerAiHooks"]
+      },
+      "declarationHashes": {
+        ".": "658e79c87ecc21b1da228147fb61d5c9b4e33f951e8d90e3b22ace36da7e2770",
+        "./cli": "cc35ed52f515d505004871a2cb649b4754c20bb5bb85c76cbbae5f5310c3b650",
+        "./handlers/llms-txt": "68c993fa8d705a770123744d7ff14ff42576a06d1fac39bbd15fe600ba5ef9dc",
+        "./handlers/llms-full": "ae579d4293ffef7ed2c3f666625776164d56f3df774c780bd5aa99b7cb7b65d5",
+        "./handlers/page-md": "0ff2cfa2b6081d84d89ecae5ca782df29b33c2307c72cb0f98ead80a4835c98c",
+        "./handlers/page-ai-json": "38e8e7dd50788aa10fcd1ffb0ac9be677993eb5f6b5661eea9fd08d1b983442b",
+        "./handlers/openapi": "44e1c66e536e6dbe116a505043237d9cda9716fd75160e6b3458e97f801592b8",
+        "./handlers/tools": "ae579d4293ffef7ed2c3f666625776164d56f3df774c780bd5aa99b7cb7b65d5",
+        "./handlers/action": "6ec5b9a918b385e734fcbec876ab8d1fa66b16e4ab91ee42a25a32142a50058f",
+        "./handlers/mcp": "a688f89fe4f76f267cabefb259062887b04ed4f9798e7fecdaa26196b0988007",
+        "./handlers/ai-plugin": "776adab9f0c18770da87dc30e6a69f31e13633abbc20fb5097cf9302bd75309d",
+        "./hooks": "83a62872585b56c662d4c07882dd7546af0f5433e141d8a95360ad64cd75b251"
+      }
+    },
+    "@next-ai-ready/openapi": {
+      "directory": "packages/openapi",
+      "entrypoints": {
+        ".": ["buildAiPlugin", "buildOpenApi", "buildToolsJson"]
+      },
+      "declarationHashes": {
+        ".": "6132b736c1bf1e97d90788fe104883d3b0a901030be5a3e65e6c90402444f158"
+      }
+    },
+    "@next-ai-ready/semantic": {
+      "directory": "packages/semantic",
+      "entrypoints": {
+        ".": ["buildGraph", "defineSemantic", "getPageNodes", "pageJsonLd", "siteJsonLd"]
+      },
+      "declarationHashes": {
+        ".": "ecd09827e39af0a0c97c6e54529eabaedf0ce3a2c0d0e1c66406d7dbe98fd61f"
+      }
+    }
+  }
+}

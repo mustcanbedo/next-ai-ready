@@ -18,4 +18,10 @@ describe("next-ai-ready meta package", () => {
     expect(typeof mod.registerAiHooks).toBe("function");
     expect(typeof mod.clearAiHooks).toBe("function");
   });
+
+  it("exports the programmatic audit API from the public audit subpath", async () => {
+    const mod = await import("../src/audit.js");
+    expect(typeof mod.runAudit).toBe("function");
+    expect(mod.AUDIT_V3_SCHEMA).toBe("next-ai-ready.audit.v3");
+  });
 });

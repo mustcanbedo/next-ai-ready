@@ -34,6 +34,8 @@ interface FixtureOptions {
   nuxtStyleHeaders?: boolean;
   agentMissingFallback?: boolean;
   emptyAgentMissingFallback?: boolean;
+  llmsTxt?: boolean;
+  capabilityMode?: "valid" | "invalid" | "missing" | "unconfigured";
 }
 
 function startFixtureServer(options: FixtureOptions = {}): Promise<{ server: Server; target: string }> {
@@ -42,7 +44,7 @@ function startFixtureServer(options: FixtureOptions = {}): Promise<{ server: Ser
       const url = new URL(request.url ?? "/", "http://127.0.0.1");
       const origin = `http://127.0.0.1:${(server.address() as { port: number }).port}`;
 
-      if (url.pathname === "/llms.txt") {
+      if (url.pathname === "/llms.txt" && options.llmsTxt !== false) {
         response.writeHead(200, { "content-type": "text/plain; charset=utf-8" });
         response.end("# Audit fixture\n\n- [Guide](http://example.test/guide)\n");
         return;
@@ -63,6 +65,51 @@ function startFixtureServer(options: FixtureOptions = {}): Promise<{ server: Ser
       if (url.pathname === "/robots.txt") {
         response.writeHead(200, { "content-type": "text/plain; charset=utf-8" });
         response.end("User-agent: *\nAllow: /\nSitemap: " + origin + "/sitemap.xml\n");
+        return;
+      }
+
+      if (url.pathname === "/tools.json" && options.capabilityMode !== "missing") {
+        response.writeHead(200, { "content-type": "application/json; charset=utf-8" });
+        response.end(
+          JSON.stringify(
+            options.capabilityMode === "invalid"
+              ? { tools: [null] }
+              : { tools: [{ type: "function", function: { name: "search_docs" } }] },
+          ),
+        );
+        return;
+      }
+
+      if (url.pathname === "/openapi.json" && options.capabilityMode !== "missing") {
+        response.writeHead(200, { "content-type": "application/json; charset=utf-8" });
+        response.end(
+          JSON.stringify(
+            options.capabilityMode === "invalid"
+              ? { openapi: "3.1.0", paths: {} }
+              : { openapi: "3.1.0", paths: { "/api/actions/search_docs": { post: {} } } },
+          ),
+        );
+        return;
+      }
+
+      if (url.pathname === "/api/mcp/mcp" && options.capabilityMode !== "missing") {
+        const status = options.capabilityMode === "invalid"
+          ? 401
+          : options.capabilityMode === "unconfigured"
+            ? 503
+            : 200;
+        response.writeHead(status, {
+          "content-type": "application/json; charset=utf-8",
+        });
+        response.end(
+          JSON.stringify(
+            options.capabilityMode === "invalid"
+              ? { error: "unauthorized" }
+              : options.capabilityMode === "unconfigured"
+                ? { error: "NEXT_AI_READY_MCP_TOKEN is not set" }
+                : { jsonrpc: "2.0", result: { capabilities: {} } },
+          ),
+        );
         return;
       }
 
@@ -157,6 +204,18 @@ describe("runAudit()", () => {
     expect(result.errors).toBe(0);
     expect(result.warnings).toBe(0);
     expect(result.score).toBe(100);
+    expect(Object.keys(result)).toEqual([
+      "version",
+      "timestamp",
+      "target",
+      "pageUrl",
+      "score",
+      "checks",
+      "errors",
+      "warnings",
+      "passed",
+    ]);
+    expect(result.checks.every((check) => Object.keys(check).join(",") === "id,name,status,message,url")).toBe(true);
 
     const checks = new Map(result.checks.map((check) => [check.id, check]));
     for (const id of [
@@ -247,4 +306,164 @@ describe("runAudit()", () => {
       code: "invalid_audit_url",
     });
   });
+
+  it("emits the stable Audit v2 schema and five weighted dimensions when explicitly enabled", async () => {
+    const { target } = await startFixtureServer();
+    const result = await runAudit(target, { version: "2", timeoutMs: 2_000 });
+
+    expect(result.schema).toBe("next-ai-ready.audit.v2");
+    expect(result.version).toBe("2");
+    expect(result.score).toBe(100);
+    expect(result.errors).toBe(0);
+    expect(result.warnings).toBe(0);
+    expect(result.passed).toBe(16);
+    expect(result.dimensions.map((dimension) => dimension.id)).toEqual([
+      "discovery",
+      "content-citation",
+      "structured-data",
+      "agent-access",
+      "capabilities",
+    ]);
+    expect(result.dimensions.reduce((sum, dimension) => sum + dimension.weight, 0)).toBe(100);
+    expect(result.dimensions.every((dimension) => dimension.score === 100 && dimension.status === "pass")).toBe(true);
+    expect(result.checks.every((check) => check.recommendation === null)).toBe(true);
+    expect(new Set(result.checks.map((check) => check.dimension))).toEqual(
+      new Set(["discovery", "content-citation", "structured-data", "agent-access", "capabilities"]),
+    );
+  });
+
+  it("scores Audit v2 dimensions independently and gives targeted fixes for every issue", async () => {
+    const { target } = await startFixtureServer({
+      llmsTxt: false,
+      nuxtStyleHeaders: true,
+      agentMissingFallback: false,
+    });
+    const result = await runAudit(target, { version: "2", timeoutMs: 2_000 });
+    const dimensions = new Map(result.dimensions.map((dimension) => [dimension.id, dimension]));
+    const checks = new Map(result.checks.map((check) => [check.id, check]));
+
+    expect(result.score).toBe(88);
+    expect(result.errors).toBe(1);
+    expect(result.warnings).toBe(2);
+    expect(dimensions.get("discovery")).toMatchObject({ score: 60, status: "fail", errors: 1 });
+    expect(dimensions.get("content-citation")).toMatchObject({ score: 100, status: "pass" });
+    expect(dimensions.get("structured-data")).toMatchObject({ score: 100, status: "pass" });
+    expect(dimensions.get("agent-access")).toMatchObject({ score: 90, status: "warn", warnings: 1 });
+    expect(dimensions.get("capabilities")).toMatchObject({ score: 88, status: "warn", warnings: 1 });
+
+    expect(checks.get("llms-txt")).toMatchObject({
+      dimension: "discovery",
+      status: "fail",
+      recommendation: expect.stringContaining("/llms.txt"),
+    });
+    expect(checks.get("markdown-headers")).toMatchObject({
+      dimension: "agent-access",
+      status: "warn",
+      recommendation: expect.stringContaining("Vary: User-Agent"),
+    });
+    expect(checks.get("agent-markdown-404")).toMatchObject({
+      dimension: "capabilities",
+      status: "warn",
+      recommendation: expect.stringContaining("recovery Markdown"),
+    });
+    expect(
+      result.checks.every((check) =>
+        check.status === "pass" ? check.recommendation === null : Boolean(check.recommendation),
+      ),
+    ).toBe(true);
+  });
+
+  it("emits three independent Audit v3 planes with strict Vercel-tier scoring", async () => {
+    const { target } = await startFixtureServer();
+    const result = await runAudit(target, { version: "3", timeoutMs: 2_000 });
+
+    expect(result.schema).toBe("next-ai-ready.audit.v3");
+    expect(result.methodology).toMatchObject({
+      package: "@vercel/agent-readability",
+      version: "0.5.0",
+      scoring: "required=3,recommended=2,strict-pass-only",
+    });
+    expect(result.score).toBe(100);
+    expect(result.planes.map((plane) => plane.id)).toEqual([
+      "agent-readability",
+      "semantic-aeo-quality",
+      "agent-capability",
+    ]);
+    expect(result.planes.every((plane) => plane.score === 100 && plane.status === "pass")).toBe(true);
+    expect(result.checks).toHaveLength(20);
+    expect(result.checks.find((check) => check.id === "llms-txt")).toMatchObject({
+      source: "external-standard",
+      tier: "required",
+      points: 3,
+    });
+    expect(result.checks.find((check) => check.id === "mcp-endpoint")).toMatchObject({
+      source: "next-ai-ready-enhancement",
+      tier: "enhancement",
+      status: "pass",
+    });
+  });
+
+  it("distinguishes an unconfigured MCP deployment from invalid client credentials", async () => {
+    const { target } = await startFixtureServer({ capabilityMode: "unconfigured" });
+    const result = await runAudit(target, { version: "3", timeoutMs: 2_000 });
+
+    expect(result.checks.find((check) => check.id === "mcp-endpoint")).toMatchObject({
+      status: "warn",
+      message: expect.stringContaining("NEXT_AI_READY_MCP_TOKEN is not configured"),
+    });
+  });
+
+  it("gives no partial credit to Audit v3 warnings", async () => {
+    const { target } = await startFixtureServer({
+      llmsTxt: false,
+      nuxtStyleHeaders: true,
+      agentMissingFallback: false,
+    });
+    const result = await runAudit(target, { version: "3", timeoutMs: 2_000 });
+    const planes = new Map(result.planes.map((plane) => [plane.id, plane]));
+
+    expect(result.score).toBe(82);
+    expect(planes.get("agent-readability")).toMatchObject({ score: 82, status: "fail" });
+    expect(planes.get("semantic-aeo-quality")).toMatchObject({ score: 91, status: "warn" });
+    expect(planes.get("agent-capability")).toMatchObject({ score: 100, status: "pass" });
+  });
+
+  it("keeps Vercel-compatible missing-page Markdown separate from recovery-quality enhancements", async () => {
+    const { target } = await startFixtureServer({ emptyAgentMissingFallback: true });
+    const result = await runAudit(target, { version: "3", timeoutMs: 2_000 });
+    const checks = new Map(result.checks.map((check) => [check.id, check]));
+    const readability = result.planes.find((plane) => plane.id === "agent-readability");
+    const semantic = result.planes.find((plane) => plane.id === "semantic-aeo-quality");
+
+    expect(checks.get("agent-markdown-404")).toMatchObject({
+      source: "external-standard",
+      status: "pass",
+    });
+    expect(checks.get("agent-markdown-recovery-quality")).toMatchObject({
+      source: "next-ai-ready-enhancement",
+      status: "warn",
+    });
+    expect(readability).toMatchObject({ score: 100, status: "pass" });
+    expect(semantic).toMatchObject({ status: "warn", warnings: 1 });
+  });
+
+  it.each(["invalid", "missing"] as const)(
+    "keeps %s capability enhancements non-blocking and rejects weak manifests",
+    async (capabilityMode) => {
+      const { target } = await startFixtureServer({ capabilityMode });
+      const result = await runAudit(target, { version: "3", timeoutMs: 2_000 });
+      const capability = result.planes.find((plane) => plane.id === "agent-capability");
+
+      expect(result.score).toBe(100);
+      expect(result.errors).toBe(0);
+      expect(capability).toMatchObject({ score: 0, status: "warn", errors: 0, warnings: 3 });
+      expect(result.checks.filter((check) => check.planes.includes("agent-capability"))).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({ id: "tools-manifest", status: "warn" }),
+          expect.objectContaining({ id: "openapi-spec", status: "warn" }),
+          expect.objectContaining({ id: "mcp-endpoint", status: "warn" }),
+        ]),
+      );
+    },
+  );
 });

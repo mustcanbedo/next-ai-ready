@@ -7,6 +7,12 @@
   "bin": {
     "create-next-ai-ready": "./index.js"
   },
-  "files": ["index.js", "README.md"],
+  "files": [
+    "index.js",
+    "README.md"
+  ],
+  "scripts": {
+    "test": "node --test"
+  },
   "engines": { "node": ">=20" }
 }

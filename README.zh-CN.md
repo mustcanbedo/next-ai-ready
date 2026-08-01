@@ -97,6 +97,8 @@ npx next-ai-ready init     # 生成配置 + 路由桩文件 + 示例 action
 npx next-ai-ready build    # 产出 llms.txt、sitemap.md、语义图、OpenAPI、tools、robots
 npx next-ai-ready doctor   # 验证配置、action 暴露规则、路由接线（CI 友好）
 npx next-ai-ready audit https://example.com/about  # 验证 Agent 实际收到的线上页面
+npx next-ai-ready audit https://example.com/about --version 2 --json  # 五维审计报告
+npx next-ai-ready audit https://example.com/about --version 3 --json  # 三平面严格预检
 npx next-ai-ready mcp      # 通过 stdio 运行 MCP 服务器（Claude Desktop / Cursor）
 ```
 
@@ -110,7 +112,7 @@ export default withAiReady({ agentReadable: true })(nextConfig)
 
 带有 `Accept: text/markdown` 或已知 Agent User-Agent 的页面请求会得到 Markdown，普通浏览器请求仍然获得 HTML。浏览器访问不存在页面时仍返回真实 HTTP `404`；不存在的 Markdown 表示则返回 `200` 恢复文档，其中包含请求路径、发现入口和最多五个相关页面，便于 Agent 继续导航。
 
-`next-ai-ready audit <url>` 会独立验证浏览器与 Agent 的行为。它保持 JSON 契约向后兼容，同时接受其他实现中符合标准的等价响应元数据。
+`next-ai-ready audit <url>` 会独立验证浏览器与 Agent 的行为。Audit v1 仍是默认版本，保持原有 JSON 结构、评分和 CI 退出行为不变；Audit v2 继续保留原有五维报告。使用 `--version 3` 可分别查看 Agent Readability、Semantic/AEO Quality 与 Agent Capability，采用严格的通过项分层计分。v3 是快速的本地子集预检，仓库固定的 `@vercel/agent-readability` 命令仍是 Readability 的官方外部质量门。
 
 **10 分钟上手：** [`docs/quickstart-10min.zh-CN.md`](./docs/quickstart-10min.zh-CN.md) · [English](./docs/quickstart-10min.md)
 
@@ -118,7 +120,13 @@ export default withAiReady({ agentReadable: true })(nextConfig)
 
 ```bash
 npm create next-ai-ready@alpha my-app
+cd my-app
+npm install
+npx next-ai-ready init
+npm run dev
 ```
+
+脚手架会生成可直接运行的最小 Next.js App Router TypeScript 项目和初始 `content/index.mdx`。AI-ready 配置、路由 handler、actions 与 `withAiReady()` 接线会留给随后执行的 `next-ai-ready init`，不会由模板预置。
 
 ### 分析钩子
 
@@ -146,16 +154,17 @@ registerAiHooks({
 
 ## 状态
 
-🚧 **Pre-alpha**（`0.1.0-alpha.11` 已发布到 npm `@alpha`），但核心功能已实现并测试（9 个包共 145+ 个测试）：
+🚧 **Pre-alpha**（`0.1.0-alpha.12` 已发布到 npm `@alpha`）。开发分支还包含尚未发布的 Audit v2/v3 与 MCP 页面发现改动，详见[当前改进台账](./docs/improvement-plan.zh-CN.md)。
 
 - ✅ **知识平面** — MDX → 语义图 → `llms.txt` / `*.md` / `*.ai.json` / JSON-LD
 - ✅ **能力平面** — `defineAction` → `/api/actions/<name>` + OpenAPI 3.1 / `tools.json` / `ai-plugin.json`
-- ✅ **MCP 服务器** — action 作为 MCP 工具 + 页面作为资源（HTTP + stdio）
-- ✅ **开发工具** — `build` / `init` / `doctor` / `audit` / `mcp` CLI，`robots.txt`，分析钩子
+- ✅ **MCP 服务器** — action 作为工具、页面作为资源，并提供基于 graph 的 `list_pages` / `get_page` / `search_pages` 页面发现（HTTP + stdio）
+- ✅ **开发工具** — `build` / `init` / `doctor` / 版本化 `audit` / `mcp` CLI，`robots.txt`，分析钩子
 - ✅ **文档站** — 线上 [next-ai-ready.vercel.app](https://next-ai-ready.vercel.app/zh)（[源码](./examples/docs-site)）
 
 详见 [`docs/`](./docs)（[**文档索引**](./docs/README.md)）：
 
+- [`docs/improvement-plan.zh-CN.md`](./docs/improvement-plan.zh-CN.md) — 当前改进台账、验收标准与待商榷事项
 - [`docs/goals.md`](./docs/goals.md) — 北极星：AEO + Agent 能力
 - [`docs/ga-readiness.md`](./docs/ga-readiness.md) — 0.1 GA 清单
 - [`docs/post-ga.md`](./docs/post-ga.md) — GA 之后规划

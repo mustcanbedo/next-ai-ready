@@ -8,6 +8,7 @@ Central map for **next-ai-ready** repository docs (not the live docs site — th
 |----------|------------|
 | New adopter | [quickstart-10min.md](./quickstart-10min.md) · [中文](./quickstart-10min.zh-CN.md) |
 | Maintainer / release | [ga-readiness.md](./ga-readiness.md) → [completion-audit.md](./completion-audit.md) |
+| Current improvement status | [improvement-plan.zh-CN.md](./improvement-plan.zh-CN.md) |
 | Long-term backlog | [backlog.md](./backlog.md) |
 | After 0.1 GA | [post-ga.md](./post-ga.md) |
 
@@ -20,6 +21,7 @@ Central map for **next-ai-ready** repository docs (not the live docs site — th
 | [decisions.md](./decisions.md) | ADR index |
 | [research.md](./research.md) | Competitive landscape |
 | [roadmap.md](./roadmap.md) | Phased delivery (Phase 0–6) |
+| [improvement-plan.zh-CN.md](./improvement-plan.zh-CN.md) | Current priorities, acceptance criteria, and open product decisions |
 | [phase6-design.md](./phase6-design.md) | Post-MVP foundation design |
 
 ## Release & quality
@@ -28,6 +30,8 @@ Central map for **next-ai-ready** repository docs (not the live docs site — th
 |-----|---------|
 | [ga-readiness.md](./ga-readiness.md) | **0.1 GA** checklist — done vs remaining |
 | [release-alpha.md](./release-alpha.md) | Maintainer runbook for the guarded npm alpha workflow |
+| [public-api-stability.zh-CN.md](./public-api-stability.zh-CN.md) | `0.1` public API baseline, SemVer, and deprecation policy |
+| [release-rollback.zh-CN.md](./release-rollback.zh-CN.md) | npm, Git, and Vercel incident rollback runbook |
 | [completion-audit.md](./completion-audit.md) | Completion %, P0–P2 history, 0.1 DoD |
 | [backlog.md](./backlog.md) | Full tracked items (single source of truth) |
 | [post-ga.md](./post-ga.md) | **After GA** — product/DX optimizations |
@@ -52,7 +56,8 @@ Central map for **next-ai-ready** repository docs (not the live docs site — th
 
 ## Maintenance rules
 
-1. **Shipped work** → mark `[x]` in `backlog.md` with date.
-2. **GA scope** → update `ga-readiness.md` and `completion-audit.md` §1 / §9 only (not full rewrites).
-3. **New ideas after GA** → add to `post-ga.md` (and optional ID in `backlog.md` §13).
-4. **User-facing install** → keep `README.md` + quickstart in sync with npm `@alpha` version.
+1. **Current priority and status** → update `improvement-plan.zh-CN.md`; code on a branch is not `completed`.
+2. **Shipped work** → mark `[x]` in `backlog.md` with date.
+3. **GA scope** → update `ga-readiness.md` and `completion-audit.md` §1 / §9 only (not full rewrites).
+4. **New ideas after GA** → record an open decision before adding them to `post-ga.md`.
+5. **User-facing install** → keep `README.md` + quickstart in sync with the published npm version.

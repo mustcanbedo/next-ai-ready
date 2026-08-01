@@ -30,13 +30,26 @@ describe("runInit()", () => {
       const actionRoute = await readFile(join(dir, "app/api/actions/[name]/route.ts"), "utf8");
       expect(actionRoute).toContain('../../../../actions/index.mjs');
       expect(actionRoute).not.toContain("@/actions");
+      expect(actionRoute).toContain("POST(request: Request, context: any)");
+      expect(actionRoute).toContain("handleAction(request, context)");
       expect(result.skipped).toHaveLength(0);
+
+      const markdownRoute = await readFile(join(dir, "app/%5Fai-ready/md/[...path]/route.ts"), "utf8");
+      expect(markdownRoute).toContain("GET(request: Request, context: any)");
+      expect(markdownRoute).toContain("handlePageMarkdown(request, context)");
+
+      const aiJsonRoute = await readFile(join(dir, "app/%5Fai-ready/ai-json/[...path]/route.ts"), "utf8");
+      expect(aiJsonRoute).toContain("GET(request: Request, context: any)");
+      expect(aiJsonRoute).toContain("handlePageAiJson(request, context)");
 
       const handler = await readFile(join(dir, "app/%5Fai-ready/llms-txt/route.ts"), "utf8");
       expect(handler).toContain('next-ai-ready/handlers/llms-txt');
 
       const mcp = await readFile(join(dir, "app/api/mcp/[transport]/route.ts"), "utf8");
       expect(mcp).toContain("next-ai-ready/handlers/mcp");
+      expect(mcp).toContain("handlerPromise ??= createAiReadyMcpHandler()");
+      expect(mcp).toContain("handlerPromise = undefined");
+      expect(mcp).not.toContain("const handler = await createAiReadyMcpHandler()");
     } finally {
       await cleanup();
     }
@@ -166,7 +179,7 @@ describe("runInit()", () => {
         JSON.stringify({ scripts: { build: "next-ai-ready build && next build" } }, null, 2) + "\n",
         "utf8",
       );
-      const result = await runInit({ cwd: dir, silent: true });
+      await runInit({ cwd: dir, silent: true });
       // Should still patch for typecheck, but build is unchanged
       const pkg = JSON.parse(await readFile(join(dir, "package.json"), "utf8"));
       expect(pkg.scripts.build).toBe("next-ai-ready build && next build");

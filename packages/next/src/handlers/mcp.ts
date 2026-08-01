@@ -9,7 +9,10 @@ export interface AiReadyMcpOptions {
    * Default: `true`. Set `false` for an actions-only server.
    */
   resources?: boolean;
-  /** Base path the handler is mounted at. Passed through to `mcp-handler`. */
+  /**
+   * Base path containing the generated `[transport]` route. Defaults to
+   * `/api/mcp`, matching `app/api/mcp/[transport]/route.ts`.
+   */
   basePath?: string;
   /**
    * Custom auth gate. Called before the MCP handler; return a `Response` to
@@ -50,13 +53,14 @@ export interface AiReadyMcpOptions {
 export async function createAiReadyMcpHandler(opts: AiReadyMcpOptions = {}) {
   const { createMcpHandler } = await importMcpHandler();
   const graph = opts.resources === false ? undefined : await loadGraph().catch(() => undefined);
+  const basePath = opts.basePath ?? "/api/mcp";
 
   const innerHandler = createMcpHandler(
     (server: McpServerLike) => {
       registerAiReady(server, { graph });
     },
     undefined,
-    opts.basePath ? { basePath: opts.basePath } : undefined,
+    { basePath },
   );
 
   // Wrap with auth gate (R-01).
@@ -71,7 +75,6 @@ export async function createAiReadyMcpHandler(opts: AiReadyMcpOptions = {}) {
   };
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function importMcpHandler(): Promise<{ createMcpHandler: (...args: any[]) => any }> {
   try {
     // Indirect specifier: keeps TS/bundlers from statically resolving a

@@ -1,0 +1,34 @@
+name: Agent Readability
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "23 3 * * 1"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: agent-readability-production
+  cancel-in-progress: true
+
+jobs:
+  production-audit:
+    name: Production score 100
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: pnpm/action-setup@v4.4.0
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Audit deployed documentation
+        run: pnpm audit:vercel:site

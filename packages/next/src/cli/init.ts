@@ -57,13 +57,23 @@ export const runtime = "nodejs";
     },
     {
       relPath: "app/%5Fai-ready/md/[...path]/route.ts",
-      contents: `export { GET } from "next-ai-ready/handlers/page-md";
+      contents: `import { GET as handlePageMarkdown } from "next-ai-ready/handlers/page-md";
+
+export async function GET(request: Request, context: any) {
+  return handlePageMarkdown(request, context);
+}
+
 export const runtime = "nodejs";
 `,
     },
     {
       relPath: "app/%5Fai-ready/ai-json/[...path]/route.ts",
-      contents: `export { GET } from "next-ai-ready/handlers/page-ai-json";
+      contents: `import { GET as handlePageAiJson } from "next-ai-ready/handlers/page-ai-json";
+
+export async function GET(request: Request, context: any) {
+  return handlePageAiJson(request, context);
+}
+
 export const runtime = "nodejs";
 `,
     },
@@ -87,7 +97,12 @@ export const runtime = "nodejs";
     },
     {
       relPath: "app/api/actions/[name]/route.ts",
-      contents: `${registerImport}export { POST } from "next-ai-ready/handlers/action";
+      contents: `${registerImport}import { POST as handleAction } from "next-ai-ready/handlers/action";
+
+export async function POST(request: Request, context: any) {
+  return handleAction(request, context);
+}
+
 export const runtime = "nodejs";
 `,
     },
@@ -95,9 +110,27 @@ export const runtime = "nodejs";
       relPath: "app/api/mcp/[transport]/route.ts",
       contents: `${registerImport}import { createAiReadyMcpHandler } from "next-ai-ready/handlers/mcp";
 
-const handler = await createAiReadyMcpHandler();
+let handlerPromise: ReturnType<typeof createAiReadyMcpHandler> | undefined;
+function getHandler() {
+  handlerPromise ??= createAiReadyMcpHandler().catch((error) => {
+    handlerPromise = undefined;
+    throw error;
+  });
+  return handlerPromise;
+}
 
-export { handler as GET, handler as POST, handler as DELETE };
+export async function GET(request: Request) {
+  return (await getHandler())(request);
+}
+
+export async function POST(request: Request) {
+  return (await getHandler())(request);
+}
+
+export async function DELETE(request: Request) {
+  return (await getHandler())(request);
+}
+
 export const runtime = "nodejs";
 `,
     },

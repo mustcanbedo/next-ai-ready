@@ -17,7 +17,7 @@ tags:
   - installation
   - next.js
   - zod
-updatedAt: '2026-06-02'
+updatedAt: '2026-08-01'
 author: next-ai-ready team
 ---
 
@@ -48,12 +48,13 @@ This installs the meta package which re-exports everything you need and provides
 
 Install **one** meta package for typical apps: `pnpm add next-ai-ready@alpha`. The `@next-ai-ready/*` scoped packages are used internally; you do not need to add them separately.
 
-**Optional peers** (install only when needed):
+`jiti` is a runtime dependency of `@next-ai-ready/next` and is installed through the meta package. TypeScript `ai-ready.config.ts` files therefore work without adding `jiti` yourself.
+
+**Optional peers and app dependencies** (install only when needed):
 
 | Package | When |
 |---------|------|
 | `zod@^4` | Actions (required for real projects) |
-| `jiti` | `ai-ready.config.ts` (included as dependency of `@next-ai-ready/next`) |
 | `mcp-handler`, `@modelcontextprotocol/sdk` | MCP HTTP / stdio |
 | `next` | Route handlers only — not required for CLI |
 
@@ -64,14 +65,15 @@ Only **`next-ai-ready`** exposes the `next-ai-ready` CLI binary. `@next-ai-ready
 ```bash
 npm create next-ai-ready@alpha my-site
 cd my-site
-pnpm install
+npm install
+npx next-ai-ready init
 ```
 
-The template includes config and handler stubs. Skip to [Configure](#configure) if you already have a project.
+The scaffold creates a runnable minimal Next.js App Router TypeScript app with `app/layout.tsx`, `app/page.tsx`, TypeScript and Next.js configuration, and starter `content/index.mdx`. It intentionally does not include AI-ready config or handler stubs; the final `next-ai-ready init` command creates and wires them after dependencies are installed.
 
 ## Initialize
 
-For an existing Next.js app:
+For a scaffolded or existing Next.js app that has not been initialized yet:
 
 ```bash
 npx next-ai-ready init
@@ -79,12 +81,12 @@ npx next-ai-ready init
 
 This creates:
 
-- `ai-ready.config.mjs` — your site config (includes robots strategy notes)
+- `ai-ready.config.ts` in TypeScript apps, or `.mjs` in JavaScript apps — your site config (includes robots strategy notes)
 - `instrumentation.ts` + `instrumentation-node.ts` — optional observability hooks (`next-ai-ready/hooks`, Edge-safe split)
 - `app/%5Fai-ready/` — route handlers for `llms.txt`, `openapi.json`, etc.
 - `app/api/actions/` — the action execution endpoint
 - `app/api/mcp/` — the MCP server endpoint
-- `actions/index.mjs` — a starter action file with a `ping` health check
+- `actions/index.ts` in TypeScript apps, or `.mjs` in JavaScript apps — a starter action file with a `ping` health check
 
 `init` also patches `next.config` with `withAiReady()` and adds `next-ai-ready build` to your build script when missing.
 

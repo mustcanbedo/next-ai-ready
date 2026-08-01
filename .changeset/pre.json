@@ -17,6 +17,7 @@
   },
   "changesets": [
     "adopter-ux-alpha10",
+    "agent-markdown-recovery",
     "audit-deployed-pages",
     "fix-escaped-ai-routes"
   ]

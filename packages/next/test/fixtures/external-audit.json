@@ -1,0 +1,71 @@
+[
+  {
+    "id": "nuxt-ai-ready-docs",
+    "profile": "ai-ready",
+    "sourceUrl": "https://nuxtseo.com/docs/ai-ready/getting-started/introduction",
+    "capturedAt": "2026-08-01",
+    "officialAudit": {
+      "packageVersion": "0.5.0",
+      "target": "https://nuxtseo.com",
+      "score": 100
+    },
+    "expected": {
+      "readabilityScore": 100,
+      "readabilityStatus": "pass",
+      "failedChecks": [],
+      "warningChecks": ["agent-markdown-recovery-quality"]
+    }
+  },
+  {
+    "id": "nextjs-docs",
+    "profile": "explicit-markdown-only",
+    "sourceUrl": "https://nextjs.org/docs",
+    "capturedAt": "2026-08-01",
+    "officialAudit": {
+      "packageVersion": "0.5.0",
+      "target": "https://nextjs.org/docs",
+      "score": 78
+    },
+    "expected": {
+      "readabilityScore": 77,
+      "readabilityStatus": "fail",
+      "failedChecks": ["accept-markdown"],
+      "warningChecks": [
+        "sitemap-md",
+        "agent-user-agent",
+        "markdown-headers",
+        "agent-markdown-recovery-quality"
+      ]
+    }
+  },
+  {
+    "id": "html-only",
+    "profile": "html-only",
+    "sourceUrl": "https://example.com",
+    "capturedAt": "2026-08-01",
+    "officialAudit": {
+      "packageVersion": "0.5.0",
+      "target": "https://example.com",
+      "score": 24
+    },
+    "expected": {
+      "readabilityScore": 21,
+      "readabilityStatus": "fail",
+      "failedChecks": ["llms-txt", "accept-markdown"],
+      "warningChecks": [
+        "sitemap-xml",
+        "sitemap-md",
+        "robots-txt",
+        "agent-user-agent",
+        "explicit-markdown",
+        "markdown-headers",
+        "markdown-frontmatter",
+        "html-canonical",
+        "meta-description",
+        "json-ld",
+        "agent-markdown-404",
+        "agent-markdown-recovery-quality"
+      ]
+    }
+  }
+]

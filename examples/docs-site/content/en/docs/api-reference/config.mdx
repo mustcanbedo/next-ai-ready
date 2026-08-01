@@ -8,11 +8,11 @@ questions:
       The central config for site metadata, content globs, actions path, llms
       curation, robots policy, and emit toggles.
   - q: Can I use TypeScript for config?
-    a: Yes. ai-ready.config.ts is supported via jiti loading.
+    a: Yes. ai-ready.config.ts is supported via the bundled jiti runtime dependency; no separate install is needed.
 tags:
   - api
   - reference
-updatedAt: '2026-06-02'
+updatedAt: '2026-08-01'
 author: next-ai-ready team
 ---
 
@@ -20,10 +20,12 @@ author: next-ai-ready team
 
 The `ai-ready.config.mjs` file is the single entry point for configuring `next-ai-ready`. It lives in your project root.
 
+You may use `ai-ready.config.ts` instead. The loader uses `jiti`, which is installed as a runtime dependency of `@next-ai-ready/next` through the meta package, so consumers must not install it separately.
+
 ## defineConfig
 
 ```js
-import { defineConfig } from "@next-ai-ready/core";
+import { defineConfig } from "next-ai-ready";
 
 export default defineConfig({
   site: { ... },

@@ -97,6 +97,8 @@ npx next-ai-ready init     # scaffold config + route stubs + starter action
 npx next-ai-ready build    # emit llms.txt, sitemap.md, graph, OpenAPI, tools, robots
 npx next-ai-ready doctor   # validate config, action exposure, route wiring (CI-friendly)
 npx next-ai-ready audit https://example.com/about  # verify the deployed page agents receive
+npx next-ai-ready audit https://example.com/about --version 2 --json  # five-dimensional report
+npx next-ai-ready audit https://example.com/about --version 3 --json  # three-plane strict preflight
 npx next-ai-ready mcp      # run an MCP server over stdio (Claude Desktop / Cursor)
 ```
 
@@ -110,7 +112,7 @@ export default withAiReady({ agentReadable: true })(nextConfig)
 
 This serves page Markdown for `Accept: text/markdown` and known agent User-Agents, while normal browser requests continue to receive HTML. Missing browser pages keep a real HTTP `404`; missing Markdown representations return a `200` recovery document with the requested path, discovery links, and up to five relevant pages so agents can continue navigating.
 
-`next-ai-ready audit <url>` verifies those browser and agent behaviors independently. Its JSON contract remains backward compatible while the checks accept standards-compatible response metadata from other implementations.
+`next-ai-ready audit <url>` verifies those browser and agent behaviors independently. Audit v1 remains the default, preserving its JSON shape, score, and CI exit behavior. Audit v2 remains available for its original five weighted dimensions. Use `--version 3` for separate Agent Readability, Semantic/AEO Quality, and Agent Capability planes with strict pass-only tier scoring. V3 is a fast local subset preflight, while the repository's pinned `@vercel/agent-readability` command remains the official external Readability quality gate.
 
 **Get started in 10 minutes:** [`docs/quickstart-10min.md`](./docs/quickstart-10min.md) · [中文](./docs/quickstart-10min.zh-CN.md)
 
@@ -118,7 +120,13 @@ Or scaffold with:
 
 ```bash
 npm create next-ai-ready@alpha my-app
+cd my-app
+npm install
+npx next-ai-ready init
+npm run dev
 ```
+
+The scaffold creates a runnable minimal Next.js App Router TypeScript project and starter `content/index.mdx`. It deliberately leaves AI-ready config, route handlers, actions, and `withAiReady()` wiring to the following `next-ai-ready init` step.
 
 ### Analytics hooks
 
@@ -146,12 +154,12 @@ Use `next-ai-ready/hooks` (or `@next-ai-ready/next/hooks`) — not the main pack
 
 ## Status
 
-🚧 **Pre-alpha** (`0.1.0-alpha.11` published on npm `@alpha`), core stack implemented and tested (145+ tests across 9 packages):
+🚧 **Pre-alpha** (`0.1.0-alpha.12` published on npm `@alpha`). The development branch contains additional unreleased Audit v2/v3 and MCP discovery work; see the [current improvement ledger](./docs/improvement-plan.zh-CN.md).
 
 - ✅ **Knowledge plane** — MDX → semantic graph → `llms.txt` / `*.md` / `*.ai.json` / JSON-LD
 - ✅ **Capability plane** — `defineAction` → `/api/actions/<name>` + OpenAPI 3.1 / `tools.json` / `ai-plugin.json`
-- ✅ **MCP server** — actions as MCP tools + pages as resources (HTTP + stdio)
-- ✅ **Dev tooling** — `build` / `init` / `doctor` / `audit` / `mcp` CLIs, `robots.txt`, analytics hooks
+- ✅ **MCP server** — actions as tools, pages as resources, and graph-backed `list_pages` / `get_page` / `search_pages` discovery (HTTP + stdio)
+- ✅ **Dev tooling** — `build` / `init` / `doctor` / versioned `audit` / `mcp` CLIs, `robots.txt`, analytics hooks
 - ✅ **Docs site** — live at [next-ai-ready.vercel.app](https://next-ai-ready.vercel.app/en) ([source](./examples/docs-site))
 
 See [`docs/`](./docs) ([**full index**](./docs/README.md)):

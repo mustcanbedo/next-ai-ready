@@ -12,7 +12,7 @@ questions:
 tags:
   - how-to
   - best-practices
-updatedAt: '2026-06-02'
+updatedAt: '2026-08-01'
 author: next-ai-ready 团队
 ---
 
@@ -24,6 +24,7 @@ author: next-ai-ready 团队
 
 - **工具发现** — MCP 客户端将你的公开 action 视为可调用的工具。
 - **资源访问** — 你的页面作为 MCP 资源暴露（Markdown 内容）。
+- **页面发现** — 客户端无需预先知道资源 URI，即可列出、读取和搜索 graph 页面。
 - **两种传输方式** — Streamable HTTP（生产环境）和 stdio（本地桌面客户端）。
 
 ## HTTP 端点（生产环境）
@@ -53,7 +54,7 @@ npx next-ai-ready mcp
 }
 ```
 
-使用 `--no-resources` 跳过页面资源注册（启动更快）：
+使用 `--no-resources` 跳过基于 graph 的页面资源和发现工具（启动更快）：
 
 ```bash
 npx next-ai-ready mcp --no-resources
@@ -66,7 +67,20 @@ MCP 包（`@next-ai-ready/mcp`）是一个薄适配器：
 1. 读取 action 注册表（由 `defineActions()` 填充）。
 2. 每个公开 action 成为一个 MCP 工具，包含名称、描述和输入 schema。
 3. SemanticGraph 中的每个页面成为 MCP 资源，URI 为 `airead://page/<route>`。
-4. 工具调用通过 `invokeAction()` —— 与 HTTP 端点相同的验证、认证和错误处理。
+4. 传入 graph 时还会自动注册 `list_pages`、`get_page` 和 `search_pages`。
+5. action 工具调用通过 `invokeAction()` —— 与 HTTP 端点相同的验证、认证和错误处理。
+
+## 页面发现工具
+
+只要 `registerAiReady(server, { graph })` 收到 SemanticGraph，就会提供三个只读工具：
+
+| 工具 | 参数 | 行为与限制 |
+|---|---|---|
+| `list_pages` | `cursor?`、`limit?` | 按稳定路由顺序进行游标分页。默认返回 20 条，最多 50 条；游标必须是长度不超过 512 字符的安全绝对路由。 |
+| `get_page` | `route` | 返回页面元数据和完整 AI-ready Markdown；路由必须是长度 1–512 字符的安全绝对路由。 |
+| `search_pages` | `query`、`limit?` | 确定性的本地词法搜索。查询长度为 1–200 字符，默认返回 5 条，最多 20 条。 |
+
+搜索只读取预构建的 SemanticGraph，不需要外部 API、Embedding 服务或向量数据库。将 `list_pages` 或 `search_pages` 返回的路由传给 `get_page` 即可读取全文。
 
 ## 前置条件
 
@@ -86,4 +100,3 @@ pnpm add @modelcontextprotocol/sdk mcp-handler
 - stdio 服务器在本地运行，不需要 token 认证。
 - **Stdio 与 auth action：** stdio 使用合成 `Request`，无浏览器 cookie/会话。依赖 HTTP 上下文的 `auth` 钩子在 stdio 下可能返回 401 — 本地测试请用 HTTP MCP 或将 demo action 设为 `public: true`（C-70）。
 - 可通过 `createAiReadyMcpHandler({ auth: false })` 关闭 HTTP 鉴权，生产环境不推荐。
-- 可以通过传递 `auth: false` 给 `createAiReadyMcpHandler()` 完全禁用认证，但不建议在生产环境中这样做。

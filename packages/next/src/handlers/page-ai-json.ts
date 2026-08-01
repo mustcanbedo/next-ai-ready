@@ -5,9 +5,12 @@ import { loadGraph } from "../runtime/graph-loader.js";
 import { emitAiRequest } from "../runtime/observability.js";
 import { resolveParams } from "../runtime/params.js";
 
-export async function GET(req: Request, ctx: { params: Promise<{ path?: string[] }> | { path?: string[] } }) {
+// Next 14 passes params directly while Next 15+ passes a Promise. `any` keeps
+// the exported route signature acceptable to both framework type generators.
+export async function GET(req: Request, ctx: any) {
+  const routeContext = ctx as { params: Promise<{ path?: string[] }> | { path?: string[] } };
   await emitAiRequest(req, "page.ai.json");
-  const { path = [] } = await resolveParams(ctx.params);
+  const { path = [] } = await resolveParams(routeContext.params);
   const route = path.length === 0 ? "/" : "/" + path.join("/");
   const graph = await loadGraph();
   const data = renderPageAiJson(graph, route);

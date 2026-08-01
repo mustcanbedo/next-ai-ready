@@ -152,6 +152,8 @@ Audits a deployed page as browsers, crawlers, and AI agents actually receive it.
 ```bash
 npx next-ai-ready audit https://example.com/about
 npx next-ai-ready audit https://example.com/about --json
+npx next-ai-ready audit https://example.com/about --version 2 --json
+npx next-ai-ready audit https://example.com/about --version 3 --json
 ```
 
 The 100-point report checks the HTML response, `llms.txt`, both sitemap formats,
@@ -166,9 +168,37 @@ a useful `200 text/markdown` recovery document. The audit also accepts equivalen
 standards-compatible discovery metadata instead of requiring one framework-specific
 combination of `Vary`, `Link`, and `Content-Location` headers.
 
-In report schema v1, agent missing-page recovery is an advisory check with zero
-score weight, so adding it does not break an existing CI gate. Audit v2 will make
-it part of a separately versioned standards score.
+Audit v1 remains the default. Its JSON fields, score calculation, and error-based
+exit behavior are unchanged, and agent missing-page recovery remains an advisory
+zero-weight check. This keeps existing parsers and CI thresholds compatible.
+
+Pass `--version 2` to opt into the stable `next-ai-ready.audit.v2` schema. It
+groups the same deployed checks into five independently scored dimensions:
+
+| Dimension          | Overall weight |
+| ------------------ | -------------: |
+| `discovery`        |            20% |
+| `content-citation` |            25% |
+| `structured-data`  |            15% |
+| `agent-access`     |            30% |
+| `capabilities`     |            10% |
+
+Every v2 warning or failure includes a targeted `recommendation`; passing checks
+set it to `null`. The top-level score is the weighted total of the five dimension
+scores. Select v2 explicitly in CI until you have adopted its schema and rubric.
+
+Pass `--version 3` for the `next-ai-ready.audit.v3` schema. It reports Agent
+Readability, Semantic/AEO Quality, and Agent Capability separately, gives no
+partial credit to warnings, and marks each check as either `external-standard` or
+`next-ai-ready-enhancement`. The top-level compatibility score is the local
+Readability preflight score; run the pinned `pnpm audit:vercel:site` command for
+the official external Vercel score. V3 is intentionally a smaller local preflight,
+not a reimplementation of all 25 official checks.
+
+For missing pages, v3 scores the Vercel-compatible `200 text/markdown` behavior
+in Agent Readability. The stricter `noindex` plus recovery-link guidance is a
+separate `next-ai-ready-enhancement` in Semantic/AEO Quality, so it cannot create
+a false failure against the external standard.
 
 The command exits with code 1 when a required check fails, so the JSON form can
 act as a post-deployment CI gate. Warnings reduce the score without failing CI.
@@ -183,9 +213,9 @@ npx next-ai-ready mcp
 
 Options:
 
-| Flag             | Description                                       |
-| ---------------- | ------------------------------------------------- |
-| `--no-resources` | Skip page resource registration (faster startup). |
+| Flag             | Description                                                            |
+| ---------------- | ---------------------------------------------------------------------- |
+| `--no-resources` | Skip graph-backed page resources and discovery tools (faster startup). |
 
 Use with Claude Desktop:
 
@@ -224,16 +254,18 @@ The next-ai-ready meta package. Use npx next-ai-ready or pnpm exec next-ai-ready
 <!-- BEGIN /en/docs/api-reference/config -->
 # Configuration
 URL: https://next-ai-ready.vercel.app/en/docs/api-reference/config
-Updated: 2026-06-02
+Updated: 2026-08-01
 
 # Configuration
 
 The `ai-ready.config.mjs` file is the single entry point for configuring `next-ai-ready`. It lives in your project root.
 
+You may use `ai-ready.config.ts` instead. The loader uses `jiti`, which is installed as a runtime dependency of `@next-ai-ready/next` through the meta package, so consumers must not install it separately.
+
 ## defineConfig
 
 ```js
-import { defineConfig } from "@next-ai-ready/core";
+import { defineConfig } from "next-ai-ready";
 
 export default defineConfig({
   site: { ... },
@@ -294,7 +326,7 @@ The central config for site metadata, content globs, actions path, llms curation
 
 ### Can I use TypeScript for config?
 
-Yes. ai-ready.config.ts is supported via jiti loading.
+Yes. ai-ready.config.ts is supported via the bundled jiti runtime dependency; no separate install is needed.
 
 
 <!-- END /en/docs/api-reference/config -->
@@ -1320,7 +1352,7 @@ No. Exclude paths with dots, /api, and _ai-ready from locale middleware so crawl
 <!-- BEGIN /en/docs/guides/mcp-integration -->
 # MCP Integration
 URL: https://next-ai-ready.vercel.app/en/docs/guides/mcp-integration
-Updated: 2026-06-02
+Updated: 2026-08-01
 
 # MCP Integration
 
@@ -1330,6 +1362,7 @@ The Model Context Protocol (MCP) lets AI clients like Claude Desktop and Cursor 
 
 - **Tool discovery** — MCP clients see your public actions as callable tools.
 - **Resource access** — your pages are exposed as MCP resources (Markdown content).
+- **Page discovery** — clients can list, read, and search graph pages without knowing resource URIs in advance.
 - **Two transports** — Streamable HTTP (production) and stdio (local desktop clients).
 
 ## HTTP endpoint (production)
@@ -1359,7 +1392,7 @@ This starts an MCP server over stdin/stdout. Add it to your Claude Desktop confi
 }
 ```
 
-Use `--no-resources` to skip page resource registration (faster startup):
+Use `--no-resources` to skip graph-backed page resources and discovery tools (faster startup):
 
 ```bash
 npx next-ai-ready mcp --no-resources
@@ -1372,7 +1405,20 @@ The MCP package (`@next-ai-ready/mcp`) is a thin adapter:
 1. It reads the action registry (populated by `defineActions()`).
 2. Each public action becomes an MCP tool with its name, description, and input schema.
 3. Each page in the SemanticGraph becomes an MCP resource with `airead://page/<route>` URI.
-4. Tool invocations go through `invokeAction()` — same validation, auth, and error handling as the HTTP endpoint.
+4. Supplying the graph also registers `list_pages`, `get_page`, and `search_pages` automatically.
+5. Action tool invocations go through `invokeAction()` — same validation, auth, and error handling as the HTTP endpoint.
+
+## Page discovery tools
+
+The three read-only tools are available whenever `registerAiReady(server, { graph })` receives a SemanticGraph:
+
+| Tool           | Parameters          | Behavior and limits                                                                                                                                              |
+| -------------- | ------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `list_pages`   | `cursor?`, `limit?` | Stable route order with cursor pagination. The default limit is 20, the maximum is 50, and a cursor must be a safe absolute route no longer than 512 characters. |
+| `get_page`     | `route`             | Returns metadata and full AI-ready Markdown for a safe absolute route of 1–512 characters.                                                                       |
+| `search_pages` | `query`, `limit?`   | Deterministic local lexical search. Queries are 1–200 characters; the default result limit is 5 and the maximum is 20.                                           |
+
+Search runs only over the pre-built SemanticGraph and does not require an external API, embedding service, or vector database. Use routes returned by `list_pages` or `search_pages` as input to `get_page`.
 
 ## Prerequisites
 
@@ -1531,7 +1577,7 @@ No. This site uses a simplified Markdown renderer for UI; the build pipeline run
 <!-- BEGIN /en/docs/guides/quickstart -->
 # Quickstart
 URL: https://next-ai-ready.vercel.app/en/docs/guides/quickstart
-Updated: 2026-06-02
+Updated: 2026-08-01
 
 # Quickstart
 
@@ -1544,8 +1590,11 @@ This guide takes you from zero to a fully AI-ready Next.js site in under 5 minut
 ```bash
 npm create next-ai-ready@alpha my-site
 cd my-site
-pnpm install
+npm install
+npx next-ai-ready init
 ```
+
+The scaffold supplies a runnable minimal App Router TypeScript app and starter MDX content. It does not pre-generate AI-ready config or handlers; the explicit `init` step adds that wiring after installation.
 
 **Option B — existing Next.js app:**
 
@@ -1734,7 +1783,7 @@ Yes. The build adds comments pointing crawlers to /llms.txt and /llms-full.txt w
 <!-- BEGIN /en/docs/installation -->
 # Installation
 URL: https://next-ai-ready.vercel.app/en/docs/installation
-Updated: 2026-06-02
+Updated: 2026-08-01
 
 # Installation
 
@@ -1763,14 +1812,15 @@ This installs the meta package which re-exports everything you need and provides
 
 Install **one** meta package for typical apps: `pnpm add next-ai-ready@alpha`. The `@next-ai-ready/*` scoped packages are used internally; you do not need to add them separately.
 
-**Optional peers** (install only when needed):
+`jiti` is a runtime dependency of `@next-ai-ready/next` and is installed through the meta package. TypeScript `ai-ready.config.ts` files therefore work without adding `jiti` yourself.
 
-| Package                                    | When                                                                   |
-| ------------------------------------------ | ---------------------------------------------------------------------- |
-| `zod@^4`                                   | Actions (required for real projects)                                   |
-| `jiti`                                     | `ai-ready.config.ts` (included as dependency of `@next-ai-ready/next`) |
-| `mcp-handler`, `@modelcontextprotocol/sdk` | MCP HTTP / stdio                                                       |
-| `next`                                     | Route handlers only — not required for CLI                             |
+**Optional peers and app dependencies** (install only when needed):
+
+| Package                                    | When                                       |
+| ------------------------------------------ | ------------------------------------------ |
+| `zod@^4`                                   | Actions (required for real projects)       |
+| `mcp-handler`, `@modelcontextprotocol/sdk` | MCP HTTP / stdio                           |
+| `next`                                     | Route handlers only — not required for CLI |
 
 Only **`next-ai-ready`** exposes the `next-ai-ready` CLI binary. `@next-ai-ready/next` also ships a bin for monorepo dogfooding — use the meta package in consumer apps (C-01).
 
@@ -1779,14 +1829,15 @@ Only **`next-ai-ready`** exposes the `next-ai-ready` CLI binary. `@next-ai-ready
 ```bash
 npm create next-ai-ready@alpha my-site
 cd my-site
-pnpm install
+npm install
+npx next-ai-ready init
 ```
 
-The template includes config and handler stubs. Skip to [Configure](#configure) if you already have a project.
+The scaffold creates a runnable minimal Next.js App Router TypeScript app with `app/layout.tsx`, `app/page.tsx`, TypeScript and Next.js configuration, and starter `content/index.mdx`. It intentionally does not include AI-ready config or handler stubs; the final `next-ai-ready init` command creates and wires them after dependencies are installed.
 
 ## Initialize
 
-For an existing Next.js app:
+For a scaffolded or existing Next.js app that has not been initialized yet:
 
 ```bash
 npx next-ai-ready init
@@ -1794,12 +1845,12 @@ npx next-ai-ready init
 
 This creates:
 
-- `ai-ready.config.mjs` — your site config (includes robots strategy notes)
+- `ai-ready.config.ts` in TypeScript apps, or `.mjs` in JavaScript apps — your site config (includes robots strategy notes)
 - `instrumentation.ts` + `instrumentation-node.ts` — optional observability hooks (`next-ai-ready/hooks`, Edge-safe split)
 - `app/%5Fai-ready/` — route handlers for `llms.txt`, `openapi.json`, etc.
 - `app/api/actions/` — the action execution endpoint
 - `app/api/mcp/` — the MCP server endpoint
-- `actions/index.mjs` — a starter action file with a `ping` health check
+- `actions/index.ts` in TypeScript apps, or `.mjs` in JavaScript apps — a starter action file with a `ping` health check
 
 `init` also patches `next.config` with `withAiReady()` and adds `next-ai-ready build` to your build script when missing.
 
@@ -2077,6 +2128,8 @@ npx next-ai-ready doctor --json    # 机器可读报告（含 actionItems）
 ```bash
 npx next-ai-ready audit https://example.com/about
 npx next-ai-ready audit https://example.com/about --json
+npx next-ai-ready audit https://example.com/about --version 2 --json
+npx next-ai-ready audit https://example.com/about --version 3 --json
 ```
 
 100 分报告会检查 HTML、`llms.txt`、两种 sitemap、`robots.txt`、Markdown
@@ -2089,8 +2142,35 @@ frontmatter、JSON-LD、description、H1、浏览器 404 语义和 Agent Markdow
 审计也会接受符合标准的等价发现元数据，而不是强制某个框架专用的
 `Vary`、`Link` 与 `Content-Location` 组合。
 
-在 v1 报告契约中，Agent 缺失页恢复是权重为零的建议项，因此新增检查不会
-破坏已有 CI 门禁。Audit v2 会将它纳入单独版本化的 standards 分数。
+Audit v1 仍是默认版本，其 JSON 字段、分数计算和基于错误的退出行为保持不变；
+Agent 缺失页恢复仍是权重为零的建议项，因此已有解析器和 CI 阈值无需调整。
+
+使用 `--version 2` 可显式启用稳定的 `next-ai-ready.audit.v2` schema。它将同一组
+线上检查拆分为五个独立评分维度：
+
+| 维度                 | 总分权重 |
+| ------------------ | ---: |
+| `discovery`        |  20% |
+| `content-citation` |  25% |
+| `structured-data`  |  15% |
+| `agent-access`     |  30% |
+| `capabilities`     |  10% |
+
+v2 中每个警告或失败项都会返回针对性的 `recommendation`，通过项则为 `null`。
+顶层分数是五个维度分数的加权总和。在 CI 已明确采用新 schema 和评分规则之前，
+应始终显式传入 `--version 2`。
+
+使用 `--version 3` 可启用 `next-ai-ready.audit.v3` schema。它会分别报告
+Agent Readability、Semantic/AEO Quality 与 Agent Capability，警告不再获得
+部分分数，并将检查标记为 `external-standard` 或
+`next-ai-ready-enhancement`。顶层兼容分数是本地 Readability 预检结果；
+官方 Vercel 外部评分以仓库固定的 `pnpm audit:vercel:site` 命令为准。v3
+有意只做更小的本地预检，并不重新实现官方全部 25 项检查。
+
+对于缺失页，v3 在 Agent Readability 中只评估与 Vercel 一致的
+`200 text/markdown` 行为；更严格的 `noindex` 与恢复链接要求会作为
+Semantic/AEO Quality 中独立的 `next-ai-ready-enhancement`，不会造成相对
+外部标准的假失败。
 
 必需项失败时命令以代码 1 退出，因此 JSON 输出可作为部署后的 CI 门禁。
 警告只降低分数，不会让 CI 失败。
@@ -2105,9 +2185,9 @@ npx next-ai-ready mcp
 
 选项：
 
-| 标志               | 说明              |
-| ---------------- | --------------- |
-| `--no-resources` | 跳过页面资源注册（启动更快）。 |
+| 标志               | 说明                           |
+| ---------------- | ---------------------------- |
+| `--no-resources` | 跳过基于 graph 的页面资源和发现工具（启动更快）。 |
 
 配合 Claude Desktop 使用：
 
@@ -2146,16 +2226,18 @@ next-ai-ready 聚合包。使用 npx next-ai-ready 或 pnpm exec next-ai-ready�
 <!-- BEGIN /zh/docs/api-reference/config -->
 # 配置
 URL: https://next-ai-ready.vercel.app/zh/docs/api-reference/config
-Updated: 2026-06-02
+Updated: 2026-08-01
 
 # 配置
 
 `ai-ready.config.mjs` 是配置 `next-ai-ready` 的唯一入口文件，位于项目根目录。
 
+也可以使用 `ai-ready.config.ts`。加载器使用 `jiti`，它会作为 `@next-ai-ready/next` 的运行时依赖随 meta 包安装，消费者无需单独添加。
+
 ## defineConfig
 
 ```js
-import { defineConfig } from "@next-ai-ready/core";
+import { defineConfig } from "next-ai-ready";
 
 export default defineConfig({
   site: { ... },
@@ -2216,7 +2298,7 @@ export default defineActions([ ... ]);
 
 ### 可以用 TypeScript 写配置吗？
 
-可以。支持 ai-ready.config.ts，通过 jiti 加载。
+可以。ai-ready.config.ts 通过随运行时依赖提供的 jiti 加载，无需单独安装。
 
 
 <!-- END /zh/docs/api-reference/config -->
@@ -3230,7 +3312,7 @@ export const config = {
 <!-- BEGIN /zh/docs/guides/mcp-integration -->
 # MCP 集成
 URL: https://next-ai-ready.vercel.app/zh/docs/guides/mcp-integration
-Updated: 2026-06-02
+Updated: 2026-08-01
 
 # MCP 集成
 
@@ -3240,6 +3322,7 @@ Updated: 2026-06-02
 
 - **工具发现** — MCP 客户端将你的公开 action 视为可调用的工具。
 - **资源访问** — 你的页面作为 MCP 资源暴露（Markdown 内容）。
+- **页面发现** — 客户端无需预先知道资源 URI，即可列出、读取和搜索 graph 页面。
 - **两种传输方式** — Streamable HTTP（生产环境）和 stdio（本地桌面客户端）。
 
 ## HTTP 端点（生产环境）
@@ -3269,7 +3352,7 @@ npx next-ai-ready mcp
 }
 ```
 
-使用 `--no-resources` 跳过页面资源注册（启动更快）：
+使用 `--no-resources` 跳过基于 graph 的页面资源和发现工具（启动更快）：
 
 ```bash
 npx next-ai-ready mcp --no-resources
@@ -3282,7 +3365,20 @@ MCP 包（`@next-ai-ready/mcp`）是一个薄适配器：
 1. 读取 action 注册表（由 `defineActions()` 填充）。
 2. 每个公开 action 成为一个 MCP 工具，包含名称、描述和输入 schema。
 3. SemanticGraph 中的每个页面成为 MCP 资源，URI 为 `airead://page/<route>`。
-4. 工具调用通过 `invokeAction()` —— 与 HTTP 端点相同的验证、认证和错误处理。
+4. 传入 graph 时还会自动注册 `list_pages`、`get_page` 和 `search_pages`。
+5. action 工具调用通过 `invokeAction()` —— 与 HTTP 端点相同的验证、认证和错误处理。
+
+## 页面发现工具
+
+只要 `registerAiReady(server, { graph })` 收到 SemanticGraph，就会提供三个只读工具：
+
+| 工具             | 参数                 | 行为与限制                                                     |
+| -------------- | ------------------ | --------------------------------------------------------- |
+| `list_pages`   | `cursor?`、`limit?` | 按稳定路由顺序进行游标分页。默认返回 20 条，最多 50 条；游标必须是长度不超过 512 字符的安全绝对路由。 |
+| `get_page`     | `route`            | 返回页面元数据和完整 AI-ready Markdown；路由必须是长度 1–512 字符的安全绝对路由。     |
+| `search_pages` | `query`、`limit?`   | 确定性的本地词法搜索。查询长度为 1–200 字符，默认返回 5 条，最多 20 条。               |
+
+搜索只读取预构建的 SemanticGraph，不需要外部 API、Embedding 服务或向量数据库。将 `list_pages` 或 `search_pages` 返回的路由传给 `get_page` 即可读取全文。
 
 ## 前置条件
 
@@ -3302,7 +3398,6 @@ pnpm add @modelcontextprotocol/sdk mcp-handler
 - stdio 服务器在本地运行，不需要 token 认证。
 - **Stdio 与 auth action：** stdio 使用合成 `Request`，无浏览器 cookie/会话。依赖 HTTP 上下文的 `auth` 钩子在 stdio 下可能返回 401 — 本地测试请用 HTTP MCP 或将 demo action 设为 `public: true`（C-70）。
 - 可通过 `createAiReadyMcpHandler({ auth: false })` 关闭 HTTP 鉴权，生产环境不推荐。
-- 可以通过传递 `auth: false` 给 `createAiReadyMcpHandler()` 完全禁用认证，但不建议在生产环境中这样做。
 
 ## FAQ
 
@@ -3442,7 +3537,7 @@ summary、questions、tags、updatedAt、author 可提升 llms.txt、FAQ 节点�
 <!-- BEGIN /zh/docs/guides/quickstart -->
 # 快速开始
 URL: https://next-ai-ready.vercel.app/zh/docs/guides/quickstart
-Updated: 2026-06-02
+Updated: 2026-08-01
 
 # 快速开始
 
@@ -3455,8 +3550,11 @@ Updated: 2026-06-02
 ```bash
 npm create next-ai-ready@alpha my-site
 cd my-site
-pnpm install
+npm install
+npx next-ai-ready init
 ```
+
+脚手架会提供可运行的最小 App Router TypeScript 应用和初始 MDX 内容，但不会预生成 AI-ready 配置或 handler；安装后显式执行 `init` 才会添加这些接线。
 
 **方式 B — 已有 Next.js 项目：**
 
@@ -3645,7 +3743,7 @@ build 可生成含 GPTBot、ClaudeBot 等规则的 robots.txt，或在 app/robot
 <!-- BEGIN /zh/docs/installation -->
 # 安装
 URL: https://next-ai-ready.vercel.app/zh/docs/installation
-Updated: 2026-06-02
+Updated: 2026-08-01
 
 # 安装
 
@@ -3674,12 +3772,13 @@ pnpm add next-ai-ready@alpha zod@^4
 
 典型应用只需：`pnpm add next-ai-ready@alpha`。`@next-ai-ready/*` 为内部包，无需单独安装。
 
-**可选 peer 依赖：**
+`jiti` 已是 `@next-ai-ready/next` 的运行时依赖，并会随 meta 包安装。因此使用 TypeScript `ai-ready.config.ts` 时无需自行添加 `jiti`。
+
+**可选 peer 与应用依赖：**
 
 | 包                                         | 场景                        |
 | ----------------------------------------- | ------------------------- |
 | `zod@^4`                                  | Actions（实际项目必需）           |
-| `jiti`                                    | `ai-ready.config.ts`      |
 | `mcp-handler`、`@modelcontextprotocol/sdk` | MCP                       |
 | `next`                                    | 仅 route handler — CLI 不需要 |
 
@@ -3690,14 +3789,15 @@ pnpm add next-ai-ready@alpha zod@^4
 ```bash
 npm create next-ai-ready@alpha my-site
 cd my-site
-pnpm install
+npm install
+npx next-ai-ready init
 ```
 
-模板已包含配置与 handler stub。若已有项目，可直接跳到 [配置](#配置)。
+脚手架会生成可直接运行的最小 Next.js App Router TypeScript 应用，其中包含 `app/layout.tsx`、`app/page.tsx`、TypeScript/Next.js 配置和初始 `content/index.mdx`。模板不会预置 AI-ready 配置或 handler stub；安装依赖后，最后一条 `next-ai-ready init` 命令会生成并接好这些文件。
 
 ## 初始化
 
-在已有 Next.js 项目中：
+在尚未初始化的脚手架项目或已有 Next.js 项目中：
 
 ```bash
 npx next-ai-ready init
@@ -3705,12 +3805,12 @@ npx next-ai-ready init
 
 将创建：
 
-- `ai-ready.config.mjs` — 站点配置（含 robots 策略说明）
+- TypeScript 项目中的 `ai-ready.config.ts`，或 JavaScript 项目中的 `.mjs` — 站点配置（含 robots 策略说明）
 - `instrumentation.ts` + `instrumentation-node.ts` — 可选观测 hook（`next-ai-ready/hooks`，Edge 安全拆分）
 - `app/%5Fai-ready/` — `llms.txt`、`openapi.json` 等路由 handler
 - `app/api/actions/` — action 执行端点
 - `app/api/mcp/` — MCP 服务端点
-- `actions/index.mjs` — 含 `ping` 健康检查的 starter action
+- TypeScript 项目中的 `actions/index.ts`，或 JavaScript 项目中的 `.mjs` — 含 `ping` 健康检查的 starter action
 
 `init` 还会为 `next.config` 注入 `withAiReady()`，并在缺失时将 `next-ai-ready build` 加入 build 脚本。
 

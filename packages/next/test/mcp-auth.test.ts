@@ -18,10 +18,13 @@ describe("mcpAuthGate (X-07)", () => {
     await expect(mcpAuthGate(new Request("http://localhost/api/mcp"))).resolves.toBeUndefined();
   });
 
-  it("rejects production requests when token env is missing", async () => {
+  it("keeps the production endpoint unavailable when token env is missing", async () => {
     delete process.env.NEXT_AI_READY_MCP_TOKEN;
     const res = await mcpAuthGate(new Request("http://localhost/api/mcp"));
-    expect(res?.status).toBe(401);
+    expect(res?.status).toBe(503);
+    await expect(res?.json()).resolves.toMatchObject({
+      error: expect.stringContaining("NEXT_AI_READY_MCP_TOKEN is not set"),
+    });
   });
 
   it("rejects invalid bearer token", async () => {

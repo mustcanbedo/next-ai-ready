@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it } from "vitest";
 import { z } from "zod";
 import { defineAction, defineActions, clearRegistry } from "@next-ai-ready/actions";
 import type { SemanticGraph } from "@next-ai-ready/core";
-import { toMcpToolDefinitions } from "../src/tools.js";
+import { toMcpPageToolDefinitions, toMcpToolDefinitions } from "../src/tools.js";
 import { toMcpResourceDefinitions, readMcpResource } from "../src/resources.js";
 import { registerAiReady, type McpServerLike } from "../src/server.js";
 
@@ -103,6 +103,76 @@ describe("resources", () => {
   });
 });
 
+describe("page discovery tools", () => {
+  it("lists pages deterministically with bounded cursor pagination", async () => {
+    const [list] = toMcpPageToolDefinitions(GRAPH);
+    const first = JSON.parse((await list.execute({ limit: 1 })).content[0].text);
+    expect(first).toMatchObject({
+      pages: [{ route: "/", uri: "airead://page/index", title: "Home", url: "https://acme.com/" }],
+      nextCursor: "/",
+      total: 2,
+    });
+
+    const second = JSON.parse((await list.execute({ cursor: first.nextCursor, limit: 1 })).content[0].text);
+    expect(second.pages.map((page: { route: string }) => page.route)).toEqual(["/docs/install"]);
+    expect(second.nextCursor).toBeNull();
+    expect((await list.execute({ limit: 51 })).isError).toBe(true);
+    expect((await list.execute({ cursor: "/../secret" })).isError).toBe(true);
+  });
+
+  it("gets full page Markdown and rejects unknown or unsafe routes", async () => {
+    const [, get] = toMcpPageToolDefinitions(GRAPH);
+    const result = JSON.parse((await get.execute({ route: "/docs/install" })).content[0].text);
+    expect(result).toMatchObject({ route: "/docs/install", title: "Install" });
+    expect(result.markdown).toContain("Run npm i.");
+    expect((await get.execute({ route: "/missing" })).isError).toBe(true);
+    expect((await get.execute({ route: "/docs/%2e%2e/secret" })).isError).toBe(true);
+  });
+
+  it("searches locally with deterministic scoring, normalization, and result caps", async () => {
+    const [, , search] = toMcpPageToolDefinitions(GRAPH);
+    const first = await search.execute({ query: "ＩＮＳＴＡＬＬ", limit: 1 });
+    const second = await search.execute({ query: "ＩＮＳＴＡＬＬ", limit: 1 });
+    expect(first).toEqual(second);
+    const result = JSON.parse(first.content[0].text);
+    expect(result.results).toHaveLength(1);
+    expect(result.results[0]).toMatchObject({ route: "/docs/install", title: "Install" });
+    expect(result.results[0].score).toBeGreaterThan(0);
+    expect((await search.execute({ query: "---" })).isError).toBe(true);
+    expect((await search.execute({ query: "x", limit: 21 })).isError).toBe(true);
+    expect((await search.execute({ query: "x".repeat(201) })).isError).toBe(true);
+  });
+
+  it("keeps only top-k search results while reporting every match", async () => {
+    const graph: SemanticGraph = {
+      ...GRAPH,
+      routes: {},
+      nodes: {},
+    };
+    for (let index = 0; index < 25; index += 1) {
+      const route = `/guide/${String(index).padStart(2, "0")}`;
+      const id = `n_${index}`;
+      graph.routes[route] = id;
+      graph.nodes[id] = {
+        id,
+        route,
+        kind: "page",
+        title: `Guide ${index}`,
+        summary: "Shared discovery term",
+        source: { file: `guide/${index}.md` },
+      };
+    }
+
+    const [, , search] = toMcpPageToolDefinitions(graph);
+    const result = JSON.parse((await search.execute({ query: "discovery", limit: 20 })).content[0].text);
+    expect(result.results).toHaveLength(20);
+    expect(result.totalMatches).toBe(25);
+    expect(result.results.map((page: { route: string }) => page.route)).toEqual(
+      Array.from({ length: 20 }, (_, index) => `/guide/${String(index).padStart(2, "0")}`),
+    );
+  });
+});
+
 describe("registerAiReady()", () => {
   it("registers public tools and graph resources onto a server-like object", () => {
     seedActions();
@@ -118,9 +188,9 @@ describe("registerAiReady()", () => {
     };
 
     const counts = registerAiReady(server, { graph: GRAPH });
-    expect(counts.tools).toBe(1);
+    expect(counts.tools).toBe(4);
     expect(counts.resources).toBe(2);
-    expect(toolCalls).toEqual(["search"]);
+    expect(toolCalls).toEqual(["search", "list_pages", "get_page", "search_pages"]);
     expect(resourceCalls).toEqual(["Home", "Install"]);
   });
 
@@ -130,5 +200,21 @@ describe("registerAiReady()", () => {
     const counts = registerAiReady(server, { includeTool: () => false });
     expect(counts.tools).toBe(0);
     expect(counts.resources).toBe(0);
+  });
+
+  it("keeps a user action when its name collides with a page discovery tool", () => {
+    defineAction({
+      name: "list_pages",
+      description: "A user-defined page list.",
+      public: true,
+      input: z.object({}),
+      handler: async () => ({ source: "user" }),
+    });
+    const toolCalls: string[] = [];
+    const server: McpServerLike = { tool: (name) => toolCalls.push(name), resource: () => {} };
+
+    const counts = registerAiReady(server, { graph: GRAPH });
+    expect(toolCalls.filter((name) => name === "list_pages")).toHaveLength(1);
+    expect(counts.tools).toBe(3);
   });
 });

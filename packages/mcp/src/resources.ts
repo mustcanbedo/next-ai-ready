@@ -14,17 +14,73 @@ export interface McpResourceDefinition {
 
 export const MCP_PAGE_URI_PREFIX = "airead://page";
 
+const MAX_ROUTE_LENGTH = 512;
+
+/**
+ * Validate an MCP page route without changing the graph key the caller supplied.
+ * Encoded path separators and traversal segments are rejected before lookup.
+ */
+export function safeMcpPageRoute(route: string): string | null {
+  if (route.length === 0 || route.length > MAX_ROUTE_LENGTH || route === "/") return route === "/" ? route : null;
+  if (!route.startsWith("/") || route.startsWith("//") || route.endsWith("/")) return null;
+  if (/[\\?#]/u.test(route) || hasControlCharacter(route) || route.includes("//")) return null;
+
+  for (const segment of route.slice(1).split("/")) {
+    if (!segment) return null;
+    let decoded: string;
+    try {
+      decoded = decodeURIComponent(segment);
+    } catch {
+      return null;
+    }
+    if (decoded === "." || decoded === ".." || /[\\/?#]/u.test(decoded) || hasControlCharacter(decoded)) return null;
+    try {
+      encodeURIComponent(decoded);
+    } catch {
+      return null;
+    }
+  }
+
+  return route;
+}
+
+function hasControlCharacter(value: string): boolean {
+  for (let index = 0; index < value.length; index += 1) {
+    const code = value.charCodeAt(index);
+    if (code <= 0x1f || code === 0x7f) return true;
+  }
+  return false;
+}
+
 /** Build MCP resource URI for a site route (C-72). */
 export function mcpPageUri(route: string): string {
-  return `${MCP_PAGE_URI_PREFIX}${route === "/" ? "/index" : route}`;
+  const safeRoute = safeMcpPageRoute(route);
+  if (safeRoute === null) throw new TypeError(`Invalid MCP page route: ${JSON.stringify(route)}`);
+  if (safeRoute === "/") return `${MCP_PAGE_URI_PREFIX}/index`;
+  const encoded = safeRoute
+    .slice(1)
+    .split("/")
+    .map((segment, index) => (index === 0 && safeRoute === "/index" ? "%69ndex" : encodeURIComponent(segment)))
+    .join("/");
+  return `${MCP_PAGE_URI_PREFIX}/${encoded}`;
 }
 
 /** Parse MCP page URI back to a site route, or `null` if not a page resource. */
 export function routeFromMcpPageUri(uri: string): string | null {
-  if (!uri.startsWith(MCP_PAGE_URI_PREFIX)) return null;
-  let route = uri.slice(MCP_PAGE_URI_PREFIX.length);
-  if (route === "/index") route = "/";
-  return route;
+  if (uri.length > MCP_PAGE_URI_PREFIX.length + MAX_ROUTE_LENGTH * 12 || !uri.startsWith(`${MCP_PAGE_URI_PREFIX}/`)) return null;
+  const rawRoute = uri.slice(MCP_PAGE_URI_PREFIX.length);
+  if (rawRoute === "/index") return "/";
+  let route: string;
+  try {
+    route = `/${rawRoute
+      .slice(1)
+      .split("/")
+      .map((segment) => decodeURIComponent(segment))
+      .join("/")}`;
+  } catch {
+    return null;
+  }
+  return safeMcpPageRoute(route);
 }
 
 /**
@@ -34,6 +90,7 @@ export function routeFromMcpPageUri(uri: string): string | null {
  */
 export function toMcpResourceDefinitions(graph: SemanticGraph): McpResourceDefinition[] {
   return Object.keys(graph.routes)
+    .filter((route) => safeMcpPageRoute(route) !== null)
     .sort()
     .map((route) => {
       const rootId = graph.routes[route];

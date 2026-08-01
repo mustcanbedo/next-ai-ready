@@ -13,7 +13,7 @@ const handlers = [
 ]
 
 export default defineConfig({
-  entry: ['src/index.ts', 'src/cli.ts', 'src/hooks.ts', ...handlers.map((h) => `src/handlers/${h}.ts`)],
+  entry: ['src/index.ts', 'src/cli.ts', 'src/audit.ts', 'src/hooks.ts', ...handlers.map((h) => `src/handlers/${h}.ts`)],
   format: ['esm'],
   dts: true,
   clean: true,

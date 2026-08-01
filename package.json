@@ -19,16 +19,21 @@
     "publish:alpha:interactive": "bash scripts/publish-alpha.sh",
     "pack:check": "node scripts/pack-check.mjs",
     "exports:check": "node scripts/exports-check.mjs",
+    "api:check": "node --test scripts/public-api-check.test.mjs && node scripts/public-api-check.mjs",
+    "rollback:plan": "node --test scripts/release-rollback-plan.test.mjs && node scripts/release-rollback-plan.mjs",
     "bin:smoke": "node scripts/bin-smoke.mjs",
-    "changeset:status": "node scripts/changeset-status.mjs",
+    "audit:vercel": "agent-readability audit",
+    "audit:vercel:site": "agent-readability audit https://next-ai-ready.vercel.app/en --min-score 100",
+    "changeset:status": "node --test scripts/changeset-status.test.mjs && node scripts/changeset-status.mjs",
     "external:smoke": "node scripts/external-quickstart-smoke.mjs",
     "docs-site:smoke": "pnpm --filter docs-site smoke",
-    "verify:release": "pnpm build && pnpm test && pnpm typecheck && node scripts/e2e-smoke.mjs && pnpm pack:check && pnpm exports:check && pnpm bin:smoke && pnpm docs-site:smoke && pnpm changeset:status && pnpm external:smoke"
+    "verify:release": "pnpm build && pnpm test && pnpm typecheck && node scripts/e2e-smoke.mjs && pnpm pack:check && pnpm exports:check && pnpm api:check && pnpm bin:smoke && pnpm docs-site:smoke && pnpm changeset:status && pnpm external:smoke"
   },
   "devDependencies": {
     "@changesets/cli": "^2.27.9",
     "@eslint/js": "^10.0.1",
     "@types/node": "^20.19.41",
+    "@vercel/agent-readability": "0.5.0",
     "eslint": "^10.4.1",
     "tsup": "^8.3.0",
     "turbo": "^2.3.0",

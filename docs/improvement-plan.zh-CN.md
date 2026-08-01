@@ -3,7 +3,7 @@
 > 最后更新：2026-08-01  
 > 维护者视角：`next-ai-ready` 原始作者与技术负责人  
 > 当前发布：npm `0.1.0-alpha.12`  
-> 当前主分支基线：`4965734`（PR #3 已合并）
+> 当前主分支基线：`4eea4a9`（PR #4 已合并）
 
 本文是后续优化的**执行状态与决策记录**。`roadmap.md` 保留工程阶段历史，
 `post-ga.md` 保留候选方向；当它们与本文的当前优先级冲突时，以本文为准。
@@ -58,9 +58,9 @@
 | 能力 | 状态 | 说明 |
 |---|---|---|
 | Agent Markdown 缺页恢复 | `已完成` | Agent Markdown 请求返回 `200`、`noindex`、发现入口和相似页面；浏览器仍返回真实 `404` |
-| Audit 三层报告 | `待验证` | v1/v2 保持兼容；v3 已拆分 Readability、Semantic/AEO 与 Capability，并使用严格分层计分 |
-| MCP 页面发现 | `进行中` | 功能分支已有 `list_pages`、`get_page`、`search_pages` 和分页；尚缺 locale 过滤及 HTTP 共用接口 |
-| Next.js 兼容验证 | `待验证` | npm/pnpm × Next.js 14/15/16 已进入 CI；本地抽样的 14、15、16 均完成真实生产构建，待 `main` 首次矩阵验证 |
+| Audit 三层报告 | `待验证` | v1/v2 保持兼容；v3 已合入 `main` 并拆分 Readability、Semantic/AEO 与 Capability，待从下一版 npm 包完成外部验证 |
+| MCP 页面发现 | `待验证` | `list_pages`、`get_page`、`search_pages` 和确定性分页已合入 `main`；待从下一版 npm 包连接真实 MCP Client，locale 过滤及 HTTP 共用接口进入后续迭代 |
+| Next.js 兼容验证 | `待验证` | npm/pnpm × Next.js 14/15/16 已在 PR CI 通过；待下一版 npm 包完成 registry 安装矩阵 |
 | Vercel 官方 Readability 基线 | `已完成` | `main` 部署后已使用固定的 `@vercel/agent-readability@0.5.0` 复测生产站，25 项全部通过并保持 `100/100`；每周/手动工作流仍单独跟踪 |
 | npm GA | `待开始` | 当前仅发布 `0.1.0-alpha.12`，尚未发布 `0.1.0` |
 | i18n 与 Content Adapter | `待开始` | graph 有基础字段和 ContentSource 接口，但没有完整接入体验 |
@@ -75,14 +75,14 @@
 
 | ID | 任务 | 状态 | 验收标准 |
 |---|---|---|---|
-| A0-01 | 将 Audit 输出重构为 `Agent Readability`、`Semantic/AEO Quality`、`Agent Capability` 三层 | `待验证` | JSON schema、CLI 和文档使用同一模型；旧版兼容路径有迁移说明 |
-| A0-02 | 为每条检查标记 `standard` 或 `enhancement` | `待验证` | 用户能区分外部标准要求与 next-ai-ready 增强建议 |
-| A0-03 | 建立 Vercel Agent Readability Spec 对照表 | `待验证` | 已按官方 `0.5.0` 的 25 项检查标注直接覆盖、部分覆盖或仅官方门禁；详见[版本化对照表](./vercel-agent-readability-mapping.zh-CN.md) |
-| A0-04 | 增加外部站点回归夹具 | `待验证` | 已用离线响应夹具覆盖 Nuxt SEO、普通 Next.js 文档站和缺少 AI 输出的网站；来源 URL、采样日期和官方分数均已记录，本地分数与固定官方基线偏差不得超过 3 分 |
+| A0-01 | 将 Audit 输出重构为 `Agent Readability`、`Semantic/AEO Quality`、`Agent Capability` 三层 | `已完成` | JSON schema、CLI 和文档使用同一模型；旧版兼容路径有迁移说明 |
+| A0-02 | 为每条检查标记 `standard` 或 `enhancement` | `已完成` | 用户能区分外部标准要求与 next-ai-ready 增强建议 |
+| A0-03 | 建立 Vercel Agent Readability Spec 对照表 | `已完成` | 已按官方 `0.5.0` 的 25 项检查标注直接覆盖、部分覆盖或仅官方门禁；详见[版本化对照表](./vercel-agent-readability-mapping.zh-CN.md) |
+| A0-04 | 增加外部站点回归夹具 | `已完成` | 已用离线响应夹具覆盖 Nuxt SEO、普通 Next.js 文档站和缺少 AI 输出的网站；来源 URL、采样日期和官方分数均已记录，本地分数与固定官方基线偏差不得超过 3 分 |
 | A0-05 | 固化双 404 行为测试 | `已完成` | 浏览器 `404`；Agent Markdown `200` + `noindex` + 请求路径 + 发现入口 + 相似页面 |
 | A0-06 | 进行独立线上复测 | `已完成` | 官方 `0.5.0` 对生产 URL 得分 `100/100`；工具、日期、URL 与 25 项结果已保存为[机器可读基线](./audit-baselines/vercel-agent-readability-0.5.0-2026-08-01.json) |
-| A0-07 | 引入 Vercel 官方 Agent Readability 质量门 | `待验证` | 固定官方依赖版本；提供本地与 CI 命令；线上站低于 `100/100` 时质量门失败 |
-| A0-08 | 在 README 与网站公开第三方评分证据 | `待验证` | 首屏展示工具、版本、URL、日期、原始结果与复现入口，并明确不代表排名或引用 |
+| A0-07 | 引入 Vercel 官方 Agent Readability 质量门 | `已完成` | 固定官方依赖版本；提供本地与 CI 命令；线上站低于 `100/100` 时质量门失败 |
+| A0-08 | 在 README 与网站公开第三方评分证据 | `已完成` | README 与生产网站已展示工具、版本、URL、日期、原始结果与复现入口，并明确不代表排名或引用 |
 
 P0 完成条件：
 
@@ -118,15 +118,22 @@ Semantic/AEO Quality `100/100`、Agent Capability `67/100`。Capability 的
 
 | ID | 任务 | 状态 | 验收标准 |
 |---|---|---|---|
-| G1-01 | 合入并发布当前 Audit/MCP 功能 | `待验证` | 功能分支通过审查后进入 `main`，npm 包与仓库版本一致 |
-| G1-02 | 配置生产 MCP Token | `待验证` | Vercel Production Sensitive Token 已保存并部署，错误凭据仍为 401、正确凭据已通过鉴权；线上复测发现生成路由缺少默认 `/api/mcp` basePath，修复待合入 `main` 后完成初始化握手 |
-| G1-03 | 固化真实安装矩阵 | `待验证` | 当前分支 tarball 已通过 npm/pnpm × Next.js 14/15/16 六组合；并抽样通过 pnpm 9.12 与 11.9；`init` 已覆盖标识符、对象字面量、括号表达式和 `defineConfig()` 默认导出；待 `main` 首次矩阵通过 |
-| G1-04 | 冻结 0.1 公共 API | `待验证` | 已增加十个发布包的 entrypoint、命名导出、类型声明哈希与 bin 基线；程序化 Audit 已收口到独立入口，不再暴露 CLI 调度 API；待 `main` 首次通过 |
+| G1-01 | 合入并发布当前 Audit/MCP 功能 | `进行中` | 功能已通过 PR #2-#4 合入 `main`；下一步发布 npm alpha 并消除 registry 漂移 |
+| G1-02 | 配置生产 MCP Token | `待验证` | Vercel Production Sensitive Token 已保存并部署，MCP basePath 修复已合入 `main`；待下一版 npm 包完成带凭据初始化握手 |
+| G1-03 | 固化真实安装矩阵 | `已完成` | main 代码基线的 tarball 已通过 npm/pnpm × Next.js 14/15/16 六组合，并抽样通过 pnpm 9.12 与 11.9；registry 矩阵由 G1-07 单独跟踪 |
+| G1-04 | 冻结 0.1 公共 API | `已完成` | 十个发布包的 entrypoint、命名导出、类型声明哈希与 bin 基线均已通过；程序化 Audit 已收口到独立入口，不再暴露 CLI 调度 API |
 | G1-05 | 建立最小回滚流程 | `待验证` | npm 计划器仅生成精确 deprecate/dist-tag 命令；Git revert、Vercel rollback/promote 和三层验证已进入手册，待 GA 前演练 |
 | G1-06 | 更新 GA 文案并发布 `0.1.0` | `待开始` | README 不再写 Pre-alpha；十分钟流程无错误 |
-| G1-07 | 消除 `main`、npm 与网站文档的发布漂移 | `进行中` | registry 真实安装验证使用正确 dist-tag；网站标明渠道；下一个 alpha 发布后专用入口与 TypeScript Action 加载均可用 |
+| G1-07 | 消除 `main`、npm 与网站文档的发布漂移 | `进行中` | 网站已标明 npm 与 docs 渠道；下一个 alpha 发布后验证专用入口、TypeScript Action 加载与 registry 真实安装 |
 
 GA 之前不加入数据库、IndexNow、大型 DevTools 或托管后台。
+
+2026-08-01 alpha 发布准备：
+
+- `verify:release` 全部门禁通过：构建、测试、类型检查、端到端生成、pack、exports、公共 API、CLI、文档站和外部 Next.js tarball 安装。
+- ESLint 无错误、无警告；`git diff --check` 通过。
+- Changesets 计划：`next-ai-ready@0.1.0-alpha.13`、`@next-ai-ready/next@0.1.0-alpha.13`、`@next-ai-ready/mcp@0.1.0-alpha.12`、`create-next-ai-ready@0.1.0-alpha.11`。
+- 真正执行 `npm publish --tag alpha` 前仍需确认 npm 身份与二次验证；发布后再把 G1-01、G1-07 和 S2-01 更新为最终状态。
 
 2026-08-01 分支审查修复：Audit v3 的 required 检查现在统一产生 failure 并使 CLI
 非零退出；`create-next-ai-ready` 已移出 Changesets ignore 列表；公开 Audit 只确认 MCP
@@ -137,7 +144,7 @@ GA 之前不加入数据库、IndexNow、大型 DevTools 或托管后台。
 
 | ID | 任务 | 状态 | 验收标准 |
 |---|---|---|---|
-| S2-01 | `list_pages`、`get_page`、`search_pages` | `待验证` | 从已发布 npm 包连接真实 MCP Client 后通过 |
+| S2-01 | `list_pages`、`get_page`、`search_pages` | `待验证` | 已合入 `main`；从下一版 npm 包连接真实 MCP Client 后通过 |
 | S2-02 | locale 过滤和确定性分页 | `待开始` | 中英文结果不混淆；cursor 行为有回归测试 |
 | S2-03 | 统一 Search Provider | `待开始` | MCP 与 HTTP 搜索调用同一实现，不复制排序逻辑 |
 | S2-04 | 补齐页面元数据 | `进行中` | title、summary、canonical URL、locale、updatedAt 均有类型和测试 |
@@ -192,11 +199,13 @@ P0、P1 完成后再开始。
 
 ## 7. 下一轮执行顺序
 
-P0 的功能分支实现已完成，当前按以下顺序收敛 GA：
+P0 已完成并部署，当前按以下顺序收敛 alpha 与 GA：
 
-1. `G1-01` / `G1-02`：合入 MCP basePath 修复并在生产完成认证初始化握手。
-2. `G1-03` / `G1-04`：在 `main` 验证安装矩阵与公共 API 基线。
-3. `G1-06`：完成 GA 文案、发布检查和 `0.1.0` 发布。
+1. `G1-01` / `G1-07`：补充有效 Changeset，执行发布前门禁并发布下一版 npm alpha。
+2. `G1-02` / `S2-01`：用已发布包完成生产 MCP 认证初始化握手和三个页面发现工具验证。
+3. `G1-03` / `G1-04`：从 npm Registry 运行 npm/pnpm × Next.js 14/15/16 安装矩阵与公共 API 基线。
+4. `G1-05`：演练一次 npm、Git 与 Vercel 回滚计划，不执行破坏性回滚。
+5. `G1-06`：完成十分钟首次接入验证、GA 文案和 `0.1.0` 发布。
 
 ## 8. 维护规则
 

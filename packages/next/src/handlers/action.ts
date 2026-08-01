@@ -16,8 +16,11 @@ import { resolveParams } from "../runtime/params.js";
  * The import-for-side-effects pattern keeps user code and our handler
  * decoupled — we never reach into the user's project to find their actions.
  */
-export async function POST(req: Request, ctx: { params: Promise<{ name?: string }> | { name?: string } }) {
-  const { name } = await resolveParams(ctx.params);
+// Next 14 passes params directly while Next 15+ passes a Promise. `any` keeps
+// the exported route signature acceptable to both framework type generators.
+export async function POST(req: Request, ctx: any) {
+  const routeContext = ctx as { params: Promise<{ name?: string }> | { name?: string } };
+  const { name } = await resolveParams(routeContext.params);
   if (!name) return jsonResponse({ ok: false, code: "not_found", message: "Missing action name." }, 404);
 
   let input: unknown = {};

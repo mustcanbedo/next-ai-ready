@@ -22,7 +22,58 @@ export interface AuditResult {
   passed: number;
 }
 
+export const AUDIT_V2_SCHEMA = "next-ai-ready.audit.v2" as const;
+
+export type AuditDimensionId =
+  | "discovery"
+  | "content-citation"
+  | "structured-data"
+  | "agent-access"
+  | "capabilities";
+
+export interface AuditV2Check extends AuditCheck {
+  dimension: AuditDimensionId;
+  /** Relative contribution to the score for this check's dimension. */
+  weight: number;
+  /** A targeted fix for warn/fail results; null when the check passes. */
+  recommendation: string | null;
+}
+
+export interface AuditDimensionResult {
+  id: AuditDimensionId;
+  name: string;
+  score: number;
+  /** Contribution of this dimension to the overall 100-point score. */
+  weight: number;
+  status: AuditStatus;
+  errors: number;
+  warnings: number;
+  passed: number;
+  checks: string[];
+}
+
+export interface AuditV2Result {
+  schema: typeof AUDIT_V2_SCHEMA;
+  version: "2";
+  timestamp: string;
+  target: string;
+  pageUrl: string;
+  score: number;
+  dimensions: AuditDimensionResult[];
+  checks: AuditV2Check[];
+  errors: number;
+  warnings: number;
+  passed: number;
+}
+
 export interface AuditOptions {
+  version?: "1";
+  timeoutMs?: number;
+  fetch?: typeof globalThis.fetch;
+}
+
+export interface AuditV2Options {
+  version: "2";
   timeoutMs?: number;
   fetch?: typeof globalThis.fetch;
 }
@@ -57,8 +108,115 @@ const WEIGHTS = {
   agentNotFound: 0,
 } as const;
 
+interface AuditV2CheckConfig {
+  dimension: AuditDimensionId;
+  weight: number;
+  recommendation: string;
+}
+
+interface AuditV2DimensionConfig {
+  name: string;
+  weight: number;
+}
+
+const AUDIT_V2_DIMENSIONS: Record<AuditDimensionId, AuditV2DimensionConfig> = {
+  discovery: { name: "Discovery", weight: 20 },
+  "content-citation": { name: "Content and citation", weight: 25 },
+  "structured-data": { name: "Structured data", weight: 15 },
+  "agent-access": { name: "Agent access", weight: 30 },
+  capabilities: { name: "Capabilities", weight: 10 },
+};
+
+const AUDIT_V2_CHECKS: Record<string, AuditV2CheckConfig> = {
+  "html-response": {
+    dimension: "content-citation",
+    weight: 4,
+    recommendation: "Return a successful text/html response for the audited browser URL.",
+  },
+  "llms-txt": {
+    dimension: "discovery",
+    weight: 4,
+    recommendation: "Publish a non-empty /llms.txt with content-type text/plain and links to important pages.",
+  },
+  "sitemap-xml": {
+    dimension: "discovery",
+    weight: 2,
+    recommendation: "Publish a valid, non-empty /sitemap.xml with an XML content type.",
+  },
+  "sitemap-md": {
+    dimension: "discovery",
+    weight: 2,
+    recommendation: "Publish a non-empty /sitemap.md with content-type text/markdown for agent navigation.",
+  },
+  "robots-txt": {
+    dimension: "discovery",
+    weight: 2,
+    recommendation: "Publish a non-empty /robots.txt with content-type text/plain and advertise the XML sitemap.",
+  },
+  "accept-markdown": {
+    dimension: "agent-access",
+    weight: 4,
+    recommendation: "Serve the page as text/markdown when the request sends Accept: text/markdown.",
+  },
+  "agent-user-agent": {
+    dimension: "agent-access",
+    weight: 2,
+    recommendation: "Serve Markdown to supported AI user agents, or document that agents must use explicit Markdown URLs.",
+  },
+  "explicit-markdown": {
+    dimension: "capabilities",
+    weight: 3,
+    recommendation: "Expose a stable explicit Markdown URL, using /index.md for the root page and <path>.md elsewhere.",
+  },
+  "markdown-headers": {
+    dimension: "agent-access",
+    weight: 2,
+    recommendation: "Advertise the Markdown relation and include Vary: Accept and Vary: User-Agent whenever those headers change the representation.",
+  },
+  "markdown-frontmatter": {
+    dimension: "content-citation",
+    weight: 2,
+    recommendation: "Begin the Markdown representation with YAML frontmatter containing stable title, description, and canonical metadata.",
+  },
+  "html-canonical": {
+    dimension: "content-citation",
+    weight: 2,
+    recommendation: 'Add a non-empty <link rel="canonical"> to the HTML page.',
+  },
+  "meta-description": {
+    dimension: "content-citation",
+    weight: 1,
+    recommendation: "Add a concise, non-empty meta description that identifies the page's purpose.",
+  },
+  "json-ld": {
+    dimension: "structured-data",
+    weight: 1,
+    recommendation: "Add valid application/ld+json using the most specific Schema.org type for this page.",
+  },
+  "page-h1": {
+    dimension: "content-citation",
+    weight: 1,
+    recommendation: "Add one descriptive H1 that clearly states the page's primary subject.",
+  },
+  "real-404": {
+    dimension: "agent-access",
+    weight: 2,
+    recommendation: "Return HTTP 404 for a missing URL requested as a browser document so crawlers do not index soft 404s.",
+  },
+  "agent-markdown-404": {
+    dimension: "capabilities",
+    weight: 1,
+    recommendation: "For missing Markdown requests, return actionable recovery Markdown with noindex and a link to /llms.txt, /sitemap.md, or a relevant page.",
+  },
+};
+
 /** Audit the deployed behavior that crawlers and agents actually receive. */
-export async function runAudit(target: string, options: AuditOptions = {}): Promise<AuditResult> {
+export function runAudit(target: string, options: AuditV2Options): Promise<AuditV2Result>;
+export function runAudit(target: string, options?: AuditOptions): Promise<AuditResult>;
+export async function runAudit(
+  target: string,
+  options: AuditOptions | AuditV2Options = {},
+): Promise<AuditResult | AuditV2Result> {
   const requestedUrl = parseTarget(target);
   const fetchImpl = options.fetch ?? globalThis.fetch;
   if (!fetchImpl) {
@@ -301,24 +459,108 @@ export async function runAudit(target: string, options: AuditOptions = {}): Prom
     WEIGHTS.agentNotFound,
   );
 
-  const earned = weightedChecks.reduce(
-    (sum, check) => sum + (check.status === "pass" ? check.weight : check.status === "warn" ? check.weight / 2 : 0),
-    0,
-  );
+  const timestamp = new Date().toISOString();
+  if (options.version === "2") {
+    return buildAuditV2Result(weightedChecks, requestedUrl, pageUrl, timestamp);
+  }
+  return buildAuditV1Result(weightedChecks, requestedUrl, pageUrl, timestamp);
+}
+
+function buildAuditV1Result(
+  weightedChecks: Array<AuditCheck & { weight: number }>,
+  requestedUrl: URL,
+  pageUrl: URL,
+  timestamp: string,
+): AuditResult {
+  const earned = weightedChecks.reduce((sum, check) => sum + statusScore(check.status) * check.weight, 0);
   const total = weightedChecks.reduce((sum, check) => sum + check.weight, 0);
   const checks = weightedChecks.map(({ weight: _weight, ...check }) => check);
 
   return {
     version: "1",
-    timestamp: new Date().toISOString(),
+    timestamp,
     target: requestedUrl.toString(),
     pageUrl: pageUrl.toString(),
     score: Math.round((earned / total) * 100),
     checks,
-    errors: checks.filter((check) => check.status === "fail").length,
-    warnings: checks.filter((check) => check.status === "warn").length,
-    passed: checks.filter((check) => check.status === "pass").length,
+    errors: countStatus(checks, "fail"),
+    warnings: countStatus(checks, "warn"),
+    passed: countStatus(checks, "pass"),
   };
+}
+
+function buildAuditV2Result(
+  weightedChecks: Array<AuditCheck & { weight: number }>,
+  requestedUrl: URL,
+  pageUrl: URL,
+  timestamp: string,
+): AuditV2Result {
+  const checks = weightedChecks.map(({ weight: _legacyWeight, ...check }): AuditV2Check => {
+    const config = AUDIT_V2_CHECKS[check.id];
+    if (!config) {
+      throw new AiReadyError("unsupported_audit_v2_check", `Audit v2 has no scoring metadata for check "${check.id}".`, [
+        "Add the check to AUDIT_V2_CHECKS before including it in an Audit v2 report.",
+      ]);
+    }
+    return {
+      ...check,
+      dimension: config.dimension,
+      weight: config.weight,
+      recommendation: check.status === "pass" ? null : config.recommendation,
+    };
+  });
+
+  const dimensions = (Object.entries(AUDIT_V2_DIMENSIONS) as Array<[AuditDimensionId, AuditV2DimensionConfig]>).map(
+    ([id, config]): AuditDimensionResult => {
+      const dimensionChecks = checks.filter((check) => check.dimension === id);
+      const totalWeight = dimensionChecks.reduce((sum, check) => sum + check.weight, 0);
+      const earnedWeight = dimensionChecks.reduce(
+        (sum, check) => sum + statusScore(check.status) * check.weight,
+        0,
+      );
+      const errors = countStatus(dimensionChecks, "fail");
+      const warnings = countStatus(dimensionChecks, "warn");
+      return {
+        id,
+        name: config.name,
+        score: totalWeight > 0 ? Math.round((earnedWeight / totalWeight) * 100) : 0,
+        weight: config.weight,
+        status: errors > 0 ? "fail" : warnings > 0 ? "warn" : "pass",
+        errors,
+        warnings,
+        passed: countStatus(dimensionChecks, "pass"),
+        checks: dimensionChecks.map((check) => check.id),
+      };
+    },
+  );
+
+  const weightedDimensionScore = dimensions.reduce(
+    (sum, dimension) => sum + dimension.score * dimension.weight,
+    0,
+  );
+  const totalDimensionWeight = dimensions.reduce((sum, dimension) => sum + dimension.weight, 0);
+
+  return {
+    schema: AUDIT_V2_SCHEMA,
+    version: "2",
+    timestamp,
+    target: requestedUrl.toString(),
+    pageUrl: pageUrl.toString(),
+    score: Math.round(weightedDimensionScore / totalDimensionWeight),
+    dimensions,
+    checks,
+    errors: countStatus(checks, "fail"),
+    warnings: countStatus(checks, "warn"),
+    passed: countStatus(checks, "pass"),
+  };
+}
+
+function statusScore(status: AuditStatus): number {
+  return status === "pass" ? 1 : status === "warn" ? 0.5 : 0;
+}
+
+function countStatus(checks: AuditCheck[], status: AuditStatus): number {
+  return checks.filter((check) => check.status === status).length;
 }
 
 function parseTarget(target: string): URL {

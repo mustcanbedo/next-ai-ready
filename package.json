@@ -20,7 +20,7 @@
     "pack:check": "node scripts/pack-check.mjs",
     "exports:check": "node scripts/exports-check.mjs",
     "bin:smoke": "node scripts/bin-smoke.mjs",
-    "changeset:status": "node scripts/changeset-status.mjs",
+    "changeset:status": "node --test scripts/changeset-status.test.mjs && node scripts/changeset-status.mjs",
     "external:smoke": "node scripts/external-quickstart-smoke.mjs",
     "docs-site:smoke": "pnpm --filter docs-site smoke",
     "verify:release": "pnpm build && pnpm test && pnpm typecheck && node scripts/e2e-smoke.mjs && pnpm pack:check && pnpm exports:check && pnpm bin:smoke && pnpm docs-site:smoke && pnpm changeset:status && pnpm external:smoke"

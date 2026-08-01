@@ -17,7 +17,7 @@ tags:
   - quickstart
   - tutorial
   - getting-started
-updatedAt: '2026-06-02'
+updatedAt: '2026-08-01'
 author: next-ai-ready team
 ---
 
@@ -32,8 +32,11 @@ This guide takes you from zero to a fully AI-ready Next.js site in under 5 minut
 ```bash
 npm create next-ai-ready@alpha my-site
 cd my-site
-pnpm install
+npm install
+npx next-ai-ready init
 ```
+
+The scaffold supplies a runnable minimal App Router TypeScript app and starter MDX content. It does not pre-generate AI-ready config or handlers; the explicit `init` step adds that wiring after installation.
 
 **Option B — existing Next.js app:**
 

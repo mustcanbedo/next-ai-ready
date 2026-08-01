@@ -65,6 +65,22 @@ async function main() {
         2,
       ) + "\n",
     );
+    await writeFile(
+      join(dir, "tsconfig.json"),
+      JSON.stringify(
+        {
+          compilerOptions: {
+            target: "ES2022",
+            module: "ESNext",
+            moduleResolution: "Bundler",
+            jsx: "preserve",
+            strict: true,
+          },
+        },
+        null,
+        2,
+      ) + "\n",
+    );
 
     if (process.env.USE_NPM === "1") {
       console.log("[external] installing next-ai-ready@alpha from npm …");
@@ -94,7 +110,7 @@ async function main() {
     console.log("[external] init …");
     await run(dir, "node", [cli, "init"]);
 
-    const config = await readFile(join(dir, "ai-ready.config.mjs"), "utf8");
+    const config = await readFile(join(dir, "ai-ready.config.ts"), "utf8");
     if (config.includes("@next-ai-ready/")) {
       throw new Error("init still imports @next-ai-ready/* — use next-ai-ready only");
     }

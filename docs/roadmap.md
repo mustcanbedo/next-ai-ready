@@ -2,6 +2,22 @@
 
 Phased delivery. Each phase produces a usable, shippable slice.
 
+## Current iteration
+
+Completed feature work:
+
+- [x] Agent-readable missing-page recovery that preserves real browser `404` behavior.
+- [x] Opt-in Audit v2 with five weighted dimensions and per-issue recommendations; Audit v1 remains the compatibility default.
+- [x] Graph-backed MCP page discovery with bounded `list_pages`, `get_page`, and local lexical `search_pages` tools.
+
+Next stage:
+
+1. Run the release verification matrix and publish the prepared packages through the alpha workflow.
+2. Test installation from npm in a clean external Next.js application, including both audit schemas and a real MCP client session.
+3. Measure first-time adopter setup and reduce the path to a useful audit result to ten minutes or less.
+4. Design optional runtime index providers only after large or frequently changing sites demonstrate a build-time graph limitation.
+5. Add small, opt-in ecosystem integrations such as IndexNow and Content Signals with external compatibility tests.
+
 ## Phase 0 — Repo bootstrap (0.5 day)
 
 **Goal:** Empty monorepo skeleton that `pnpm install && pnpm build` works on.
@@ -97,7 +113,8 @@ Phased delivery. Each phase produces a usable, shippable slice.
 ### Deliverables
 - `@next-ai-ready/mcp`
   - Bridge: `ActionRegistry` → MCP tools (via `vercel/mcp-handler`).
-  - Bridge: `SemanticGraph` → MCP resources (`ai-ready://route` URIs returning page.md).
+  - Bridge: `SemanticGraph` → MCP resources (`airead://page/*` URIs returning page Markdown).
+  - Graph-backed page tools: bounded `list_pages`, `get_page`, and deterministic local `search_pages`.
   - HTTP/Streamable transport mounted at `/api/mcp`.
   - stdio CLI: `npx next-ai-ready mcp` for desktop clients (Claude Desktop config snippet in docs).
 - Auth: token gate on production endpoint.
@@ -115,6 +132,7 @@ Phased delivery. Each phase produces a usable, shippable slice.
 ### Deliverables
 - [x] `next-ai-ready doctor` — audits a site against the 24 tactics in [`goals.md`](./goals.md). Outputs JSON + colored CLI report.
   - Checks: `llms.txt` present, JSON-LD valid, `robots.txt` allows GPTBot, action schemas have `whenToUse`, etc.
+- [x] `next-ai-ready audit <url>` — validates deployed browser and Agent responses with compatible v1 output and an opt-in five-dimension v2 report.
 - [x] `aiRobots()` helper for `app/robots.ts`.
 - [x] Dev watcher CLI (`next-ai-ready dev`).
 - [ ] Error messages with action items. *(R-08 — optional for 0.1)*
@@ -131,6 +149,7 @@ Phased delivery. Each phase produces a usable, shippable slice.
 
 Candidates, ordered roughly:
 
+- Release verification and clean-project installation regression for versioned Audit and MCP page discovery.
 - LLM-backed `SemanticProvider` adapter (OpenAI, Anthropic, local).
 - Content source adapters: `fumadocs-mdx`, `velite`, Notion, Sanity.
 - Embedding-ready output (`chunks[].embedding` opt-in).

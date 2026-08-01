@@ -95,9 +95,27 @@ export const runtime = "nodejs";
       relPath: "app/api/mcp/[transport]/route.ts",
       contents: `${registerImport}import { createAiReadyMcpHandler } from "next-ai-ready/handlers/mcp";
 
-const handler = await createAiReadyMcpHandler();
+let handlerPromise: ReturnType<typeof createAiReadyMcpHandler> | undefined;
+function getHandler() {
+  handlerPromise ??= createAiReadyMcpHandler().catch((error) => {
+    handlerPromise = undefined;
+    throw error;
+  });
+  return handlerPromise;
+}
 
-export { handler as GET, handler as POST, handler as DELETE };
+export async function GET(request: Request) {
+  return (await getHandler())(request);
+}
+
+export async function POST(request: Request) {
+  return (await getHandler())(request);
+}
+
+export async function DELETE(request: Request) {
+  return (await getHandler())(request);
+}
+
 export const runtime = "nodejs";
 `,
     },

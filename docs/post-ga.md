@@ -6,6 +6,15 @@ Items **intentionally deferred** until after **0.1 GA**. Not blockers for recomm
 
 ---
 
+## Shipped ahead of GA
+
+| ID | Topic | Result |
+|----|-------|--------|
+| PG-18 | **Audit v2 dimensions** | Implemented as the opt-in `next-ai-ready.audit.v2` schema with `discovery`, `content-citation`, `structured-data`, `agent-access`, and `capabilities` scores. Audit v1 remains the default compatibility path. |
+| PG-19 | **MCP page list/search tools** | Implemented bounded `list_pages`, `get_page`, and deterministic local `search_pages` over SemanticGraph; tools register automatically when a graph is supplied. |
+
+---
+
 ## P1 — High value (0.2.x)
 
 | ID | Topic | Why | Suggested approach |
@@ -15,8 +24,6 @@ Items **intentionally deferred** until after **0.1 GA**. Not blockers for recomm
 | PG-03 | **Optional `ACTION_API_KEY` gate** | HTTP actions lack global env gate (MCP has token) | Env + middleware recipe promoted to core docs; optional `actions.globalAuth` |
 | PG-04 | **CI artifact drift everywhere** | Only docs-site has `check-artifacts-drift.mjs` | Reusable script in `next-ai-ready` CLI: `doctor --check-artifacts` |
 | PG-05 | **npm GA tag `0.1.0`** | Drop `@alpha` install path | Changeset + README status “stable 0.1” |
-| PG-18 | **Audit v2 dimensions** | A single score mixes portable standards with next-ai-ready enhancements | Versioned JSON rubric with independent standards, semantic, and capability scores; keep a v1 compatibility path |
-| PG-19 | **MCP page list/search tools** | Resources alone are awkward for large sites | Deterministic `list_pages`, `get_page`, and lexical `search_pages` over SemanticGraph; no database required |
 
 ---
 

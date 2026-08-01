@@ -13,14 +13,11 @@ This guide gets a new Next.js App Router project AI-ready with `next-ai-ready@al
 ```bash
 npm create next-ai-ready@alpha my-app
 cd my-app
-pnpm install
+npm install
+npx next-ai-ready init
 ```
 
-The template may already include `ai-ready.config.mjs` and handler stubs. If not:
-
-```bash
-pnpm exec next-ai-ready init
-```
+The scaffold creates a runnable minimal Next.js App Router TypeScript app, including `app/layout.tsx`, `app/page.tsx`, and starter `content/index.mdx`. It does not pre-generate AI-ready config or handlers; `next-ai-ready init` adds those files and wiring after dependencies are installed.
 
 ## 2. Configure your site
 
@@ -78,8 +75,8 @@ Your page body here.
 Run:
 
 ```bash
-pnpm exec next-ai-ready build
-pnpm dev
+npx next-ai-ready build
+npm run dev
 ```
 
 ## 5. Verify AI endpoints
@@ -97,7 +94,7 @@ Open or curl:
 ## 6. Run doctor
 
 ```bash
-pnpm exec next-ai-ready doctor --score
+npx next-ai-ready doctor --score
 ```
 
 Aim for **90+**. Common fixes to reach **100**:

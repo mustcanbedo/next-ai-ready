@@ -13,14 +13,11 @@
 ```bash
 npm create next-ai-ready@alpha my-app
 cd my-app
-pnpm install
+npm install
+npx next-ai-ready init
 ```
 
-模板可能已包含 `ai-ready.config.mjs` 与 handler stub。若没有：
-
-```bash
-pnpm exec next-ai-ready init
-```
+脚手架会生成可直接运行的最小 Next.js App Router TypeScript 应用，包括 `app/layout.tsx`、`app/page.tsx` 和初始 `content/index.mdx`。模板不会预生成 AI-ready 配置或 handler；依赖安装完成后，由 `next-ai-ready init` 添加这些文件与接线。
 
 ## 2. 配置站点
 
@@ -78,8 +75,8 @@ export const semantic = {
 执行：
 
 ```bash
-pnpm exec next-ai-ready build
-pnpm dev
+npx next-ai-ready build
+npm run dev
 ```
 
 ## 5. 验证 AI 端点
@@ -97,7 +94,7 @@ pnpm dev
 ## 6. 运行 doctor
 
 ```bash
-pnpm exec next-ai-ready doctor --score
+npx next-ai-ready doctor --score
 ```
 
 建议 **90+**。常见 **100 分**修复项：

@@ -14,7 +14,7 @@ questions:
 tags:
   - how-to
   - best-practices
-updatedAt: '2026-06-02'
+updatedAt: '2026-08-01'
 author: next-ai-ready team
 ---
 
@@ -26,6 +26,7 @@ The Model Context Protocol (MCP) lets AI clients like Claude Desktop and Cursor 
 
 - **Tool discovery** — MCP clients see your public actions as callable tools.
 - **Resource access** — your pages are exposed as MCP resources (Markdown content).
+- **Page discovery** — clients can list, read, and search graph pages without knowing resource URIs in advance.
 - **Two transports** — Streamable HTTP (production) and stdio (local desktop clients).
 
 ## HTTP endpoint (production)
@@ -55,7 +56,7 @@ This starts an MCP server over stdin/stdout. Add it to your Claude Desktop confi
 }
 ```
 
-Use `--no-resources` to skip page resource registration (faster startup):
+Use `--no-resources` to skip graph-backed page resources and discovery tools (faster startup):
 
 ```bash
 npx next-ai-ready mcp --no-resources
@@ -68,7 +69,20 @@ The MCP package (`@next-ai-ready/mcp`) is a thin adapter:
 1. It reads the action registry (populated by `defineActions()`).
 2. Each public action becomes an MCP tool with its name, description, and input schema.
 3. Each page in the SemanticGraph becomes an MCP resource with `airead://page/<route>` URI.
-4. Tool invocations go through `invokeAction()` — same validation, auth, and error handling as the HTTP endpoint.
+4. Supplying the graph also registers `list_pages`, `get_page`, and `search_pages` automatically.
+5. Action tool invocations go through `invokeAction()` — same validation, auth, and error handling as the HTTP endpoint.
+
+## Page discovery tools
+
+The three read-only tools are available whenever `registerAiReady(server, { graph })` receives a SemanticGraph:
+
+| Tool | Parameters | Behavior and limits |
+|---|---|---|
+| `list_pages` | `cursor?`, `limit?` | Stable route order with cursor pagination. The default limit is 20, the maximum is 50, and a cursor must be a safe absolute route no longer than 512 characters. |
+| `get_page` | `route` | Returns metadata and full AI-ready Markdown for a safe absolute route of 1–512 characters. |
+| `search_pages` | `query`, `limit?` | Deterministic local lexical search. Queries are 1–200 characters; the default result limit is 5 and the maximum is 20. |
+
+Search runs only over the pre-built SemanticGraph and does not require an external API, embedding service, or vector database. Use routes returned by `list_pages` or `search_pages` as input to `get_page`.
 
 ## Prerequisites
 

@@ -13,7 +13,7 @@ tags:
   - installation
   - next.js
   - zod
-updatedAt: '2026-06-02'
+updatedAt: '2026-08-01'
 author: next-ai-ready 团队
 ---
 
@@ -44,12 +44,13 @@ pnpm add next-ai-ready@alpha zod@^4
 
 典型应用只需：`pnpm add next-ai-ready@alpha`。`@next-ai-ready/*` 为内部包，无需单独安装。
 
-**可选 peer 依赖：**
+`jiti` 已是 `@next-ai-ready/next` 的运行时依赖，并会随 meta 包安装。因此使用 TypeScript `ai-ready.config.ts` 时无需自行添加 `jiti`。
+
+**可选 peer 与应用依赖：**
 
 | 包 | 场景 |
 |----|------|
 | `zod@^4` | Actions（实际项目必需） |
-| `jiti` | `ai-ready.config.ts` |
 | `mcp-handler`、`@modelcontextprotocol/sdk` | MCP |
 | `next` | 仅 route handler — CLI 不需要 |
 
@@ -60,14 +61,15 @@ pnpm add next-ai-ready@alpha zod@^4
 ```bash
 npm create next-ai-ready@alpha my-site
 cd my-site
-pnpm install
+npm install
+npx next-ai-ready init
 ```
 
-模板已包含配置与 handler stub。若已有项目，可直接跳到 [配置](#配置)。
+脚手架会生成可直接运行的最小 Next.js App Router TypeScript 应用，其中包含 `app/layout.tsx`、`app/page.tsx`、TypeScript/Next.js 配置和初始 `content/index.mdx`。模板不会预置 AI-ready 配置或 handler stub；安装依赖后，最后一条 `next-ai-ready init` 命令会生成并接好这些文件。
 
 ## 初始化
 
-在已有 Next.js 项目中：
+在尚未初始化的脚手架项目或已有 Next.js 项目中：
 
 ```bash
 npx next-ai-ready init
@@ -75,12 +77,12 @@ npx next-ai-ready init
 
 将创建：
 
-- `ai-ready.config.mjs` — 站点配置（含 robots 策略说明）
+- TypeScript 项目中的 `ai-ready.config.ts`，或 JavaScript 项目中的 `.mjs` — 站点配置（含 robots 策略说明）
 - `instrumentation.ts` + `instrumentation-node.ts` — 可选观测 hook（`next-ai-ready/hooks`，Edge 安全拆分）
 - `app/%5Fai-ready/` — `llms.txt`、`openapi.json` 等路由 handler
 - `app/api/actions/` — action 执行端点
 - `app/api/mcp/` — MCP 服务端点
-- `actions/index.mjs` — 含 `ping` 健康检查的 starter action
+- TypeScript 项目中的 `actions/index.ts`，或 JavaScript 项目中的 `.mjs` — 含 `ping` 健康检查的 starter action
 
 `init` 还会为 `next.config` 注入 `withAiReady()`，并在缺失时将 `next-ai-ready build` 加入 build 脚本。
 

@@ -107,6 +107,7 @@ npx next-ai-ready doctor --json    # 机器可读报告（含 actionItems）
 ```bash
 npx next-ai-ready audit https://example.com/about
 npx next-ai-ready audit https://example.com/about --json
+npx next-ai-ready audit https://example.com/about --version 2 --json
 ```
 
 100 分报告会检查 HTML、`llms.txt`、两种 sitemap、`robots.txt`、Markdown
@@ -119,8 +120,23 @@ frontmatter、JSON-LD、description、H1、浏览器 404 语义和 Agent Markdow
 审计也会接受符合标准的等价发现元数据，而不是强制某个框架专用的
 `Vary`、`Link` 与 `Content-Location` 组合。
 
-在 v1 报告契约中，Agent 缺失页恢复是权重为零的建议项，因此新增检查不会
-破坏已有 CI 门禁。Audit v2 会将它纳入单独版本化的 standards 分数。
+Audit v1 仍是默认版本，其 JSON 字段、分数计算和基于错误的退出行为保持不变；
+Agent 缺失页恢复仍是权重为零的建议项，因此已有解析器和 CI 阈值无需调整。
+
+使用 `--version 2` 可显式启用稳定的 `next-ai-ready.audit.v2` schema。它将同一组
+线上检查拆分为五个独立评分维度：
+
+| 维度 | 总分权重 |
+|---|---:|
+| `discovery` | 20% |
+| `content-citation` | 25% |
+| `structured-data` | 15% |
+| `agent-access` | 30% |
+| `capabilities` | 10% |
+
+v2 中每个警告或失败项都会返回针对性的 `recommendation`，通过项则为 `null`。
+顶层分数是五个维度分数的加权总和。在 CI 已明确采用新 schema 和评分规则之前，
+应始终显式传入 `--version 2`。
 
 必需项失败时命令以代码 1 退出，因此 JSON 输出可作为部署后的 CI 门禁。
 警告只降低分数，不会让 CI 失败。
@@ -137,7 +153,7 @@ npx next-ai-ready mcp
 
 | 标志 | 说明 |
 |---|---|
-| `--no-resources` | 跳过页面资源注册（启动更快）。 |
+| `--no-resources` | 跳过基于 graph 的页面资源和发现工具（启动更快）。 |
 
 配合 Claude Desktop 使用：
 

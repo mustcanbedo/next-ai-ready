@@ -37,6 +37,9 @@ describe("runInit()", () => {
 
       const mcp = await readFile(join(dir, "app/api/mcp/[transport]/route.ts"), "utf8");
       expect(mcp).toContain("next-ai-ready/handlers/mcp");
+      expect(mcp).toContain("handlerPromise ??= createAiReadyMcpHandler()");
+      expect(mcp).toContain("handlerPromise = undefined");
+      expect(mcp).not.toContain("const handler = await createAiReadyMcpHandler()");
     } finally {
       await cleanup();
     }

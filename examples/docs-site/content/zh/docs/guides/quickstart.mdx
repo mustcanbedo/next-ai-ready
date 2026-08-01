@@ -13,7 +13,7 @@ tags:
   - quickstart
   - tutorial
   - getting-started
-updatedAt: '2026-06-02'
+updatedAt: '2026-08-01'
 author: next-ai-ready 团队
 ---
 
@@ -28,8 +28,11 @@ author: next-ai-ready 团队
 ```bash
 npm create next-ai-ready@alpha my-site
 cd my-site
-pnpm install
+npm install
+npx next-ai-ready init
 ```
+
+脚手架会提供可运行的最小 App Router TypeScript 应用和初始 MDX 内容，但不会预生成 AI-ready 配置或 handler；安装后显式执行 `init` 才会添加这些接线。
 
 **方式 B — 已有 Next.js 项目：**
 

@@ -1,5 +1,5 @@
 import type { SemanticGraph } from "@next-ai-ready/core";
-import { toMcpToolDefinitions, type McpToolResult } from "./tools.js";
+import { toMcpPageToolDefinitions, toMcpToolDefinitions, type McpToolResult } from "./tools.js";
 import { toMcpResourceDefinitions } from "./resources.js";
 
 /**
@@ -41,9 +41,15 @@ export interface RegisterOptions {
  */
 export function registerAiReady(server: McpServerLike, opts: RegisterOptions = {}): { tools: number; resources: number } {
   let tools = 0;
-  for (const def of toMcpToolDefinitions()) {
+  const definitions = [...toMcpToolDefinitions(), ...(opts.graph ? toMcpPageToolDefinitions(opts.graph) : [])];
+  const registeredNames = new Set<string>();
+  for (const def of definitions) {
     if (opts.includeTool && !opts.includeTool(def.name)) continue;
+    // Public user actions keep their established names. A colliding built-in
+    // page helper is skipped instead of preventing the MCP server from starting.
+    if (registeredNames.has(def.name)) continue;
     server.tool(def.name, def.description, def.inputShape, (args) => def.execute(args));
+    registeredNames.add(def.name);
     tools += 1;
   }
 

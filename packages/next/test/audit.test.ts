@@ -34,6 +34,7 @@ interface FixtureOptions {
   nuxtStyleHeaders?: boolean;
   agentMissingFallback?: boolean;
   emptyAgentMissingFallback?: boolean;
+  llmsTxt?: boolean;
 }
 
 function startFixtureServer(options: FixtureOptions = {}): Promise<{ server: Server; target: string }> {
@@ -42,7 +43,7 @@ function startFixtureServer(options: FixtureOptions = {}): Promise<{ server: Ser
       const url = new URL(request.url ?? "/", "http://127.0.0.1");
       const origin = `http://127.0.0.1:${(server.address() as { port: number }).port}`;
 
-      if (url.pathname === "/llms.txt") {
+      if (url.pathname === "/llms.txt" && options.llmsTxt !== false) {
         response.writeHead(200, { "content-type": "text/plain; charset=utf-8" });
         response.end("# Audit fixture\n\n- [Guide](http://example.test/guide)\n");
         return;
@@ -157,6 +158,18 @@ describe("runAudit()", () => {
     expect(result.errors).toBe(0);
     expect(result.warnings).toBe(0);
     expect(result.score).toBe(100);
+    expect(Object.keys(result)).toEqual([
+      "version",
+      "timestamp",
+      "target",
+      "pageUrl",
+      "score",
+      "checks",
+      "errors",
+      "warnings",
+      "passed",
+    ]);
+    expect(result.checks.every((check) => Object.keys(check).join(",") === "id,name,status,message,url")).toBe(true);
 
     const checks = new Map(result.checks.map((check) => [check.id, check]));
     for (const id of [
@@ -246,5 +259,71 @@ describe("runAudit()", () => {
       name: "AiReadyError",
       code: "invalid_audit_url",
     });
+  });
+
+  it("emits the stable Audit v2 schema and five weighted dimensions when explicitly enabled", async () => {
+    const { target } = await startFixtureServer();
+    const result = await runAudit(target, { version: "2", timeoutMs: 2_000 });
+
+    expect(result.schema).toBe("next-ai-ready.audit.v2");
+    expect(result.version).toBe("2");
+    expect(result.score).toBe(100);
+    expect(result.errors).toBe(0);
+    expect(result.warnings).toBe(0);
+    expect(result.passed).toBe(16);
+    expect(result.dimensions.map((dimension) => dimension.id)).toEqual([
+      "discovery",
+      "content-citation",
+      "structured-data",
+      "agent-access",
+      "capabilities",
+    ]);
+    expect(result.dimensions.reduce((sum, dimension) => sum + dimension.weight, 0)).toBe(100);
+    expect(result.dimensions.every((dimension) => dimension.score === 100 && dimension.status === "pass")).toBe(true);
+    expect(result.checks.every((check) => check.recommendation === null)).toBe(true);
+    expect(new Set(result.checks.map((check) => check.dimension))).toEqual(
+      new Set(["discovery", "content-citation", "structured-data", "agent-access", "capabilities"]),
+    );
+  });
+
+  it("scores Audit v2 dimensions independently and gives targeted fixes for every issue", async () => {
+    const { target } = await startFixtureServer({
+      llmsTxt: false,
+      nuxtStyleHeaders: true,
+      agentMissingFallback: false,
+    });
+    const result = await runAudit(target, { version: "2", timeoutMs: 2_000 });
+    const dimensions = new Map(result.dimensions.map((dimension) => [dimension.id, dimension]));
+    const checks = new Map(result.checks.map((check) => [check.id, check]));
+
+    expect(result.score).toBe(88);
+    expect(result.errors).toBe(1);
+    expect(result.warnings).toBe(2);
+    expect(dimensions.get("discovery")).toMatchObject({ score: 60, status: "fail", errors: 1 });
+    expect(dimensions.get("content-citation")).toMatchObject({ score: 100, status: "pass" });
+    expect(dimensions.get("structured-data")).toMatchObject({ score: 100, status: "pass" });
+    expect(dimensions.get("agent-access")).toMatchObject({ score: 90, status: "warn", warnings: 1 });
+    expect(dimensions.get("capabilities")).toMatchObject({ score: 88, status: "warn", warnings: 1 });
+
+    expect(checks.get("llms-txt")).toMatchObject({
+      dimension: "discovery",
+      status: "fail",
+      recommendation: expect.stringContaining("/llms.txt"),
+    });
+    expect(checks.get("markdown-headers")).toMatchObject({
+      dimension: "agent-access",
+      status: "warn",
+      recommendation: expect.stringContaining("Vary: User-Agent"),
+    });
+    expect(checks.get("agent-markdown-404")).toMatchObject({
+      dimension: "capabilities",
+      status: "warn",
+      recommendation: expect.stringContaining("recovery Markdown"),
+    });
+    expect(
+      result.checks.every((check) =>
+        check.status === "pass" ? check.recommendation === null : Boolean(check.recommendation),
+      ),
+    ).toBe(true);
   });
 });

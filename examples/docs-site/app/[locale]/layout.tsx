@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Analytics } from "@vercel/analytics/next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { notFound } from "next/navigation";
 import { getSiteJsonLd } from "@next-ai-ready/next";
@@ -52,6 +53,7 @@ export default async function LocaleLayout({
       <body>
         <JsonLd data={siteJsonLd} />
         {children}
+        <Analytics />
       </body>
     </html>
   );

@@ -17,6 +17,7 @@
     "@next-ai-ready/actions": "workspace:*",
     "@next-ai-ready/core": "workspace:*",
     "@next-ai-ready/next": "workspace:*",
+    "@vercel/analytics": "^2.0.1",
     "gray-matter": "^4.0.3",
     "lucide-react": "^1.17.0",
     "next": "16.2.6",

@@ -107,6 +107,11 @@ Then run `next build` to expose the generated discovery, retrieval, and capabili
 Opt in to Markdown content negotiation in `next.config.mjs`:
 
 ```js
+// next.config.mjs
+import { withAiReady } from "next-ai-ready/config"
+
+const nextConfig = {}
+
 export default withAiReady({ agentReadable: true })(nextConfig)
 ```
 
@@ -152,6 +157,20 @@ registerAiHooks({
 
 Use `next-ai-ready/hooks` (or `@next-ai-ready/next/hooks`) — not the main package entry — so Turbopack does not pull Node-only build code into the Edge instrumentation bundle.
 
+### Runtime-safe imports
+
+Install only `next-ai-ready` in consumer apps. Use its focused subpaths from Next.js runtime and configuration files so build-time scanners and CLI dependencies stay out of server and Edge bundles:
+
+| Import | Use for |
+|---|---|
+| `next-ai-ready/config` | `withAiReady()` in `next.config` |
+| `next-ai-ready/robots` | `aiRobots()` and `buildRobotsTxt()` |
+| `next-ai-ready/hooks` | Runtime observability hooks |
+| `next-ai-ready/handlers/*` | Generated App Router handlers |
+| `next-ai-ready/audit` | Programmatic deployment audits |
+
+The main `next-ai-ready` entry remains the authoring/build-time API for helpers such as `defineConfig()` and `defineAction()`.
+
 ## Status
 
 🚧 **Pre-alpha** (`0.1.0-alpha.12` published on npm `@alpha`). The development branch contains additional unreleased Audit v2/v3 and MCP discovery work; see the [current improvement ledger](./docs/improvement-plan.zh-CN.md).
@@ -186,7 +205,7 @@ See [`docs/`](./docs) ([**full index**](./docs/README.md)):
 
 Consumer apps should install **`next-ai-ready`** (meta package) only. It re-exports APIs, handler subpaths, and the CLI. The `@next-ai-ready/next` scoped package duplicates the CLI bin for monorepo development — do not install both in the same app.
 
-See [installation — package exports](./examples/docs-site/content/en/installation.mdx#package-exports-n-14).
+See [installation — package exports](./examples/docs-site/content/en/docs/installation.mdx#package-exports-n-14).
 
 ## License
 

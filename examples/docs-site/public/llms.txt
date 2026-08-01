@@ -59,14 +59,14 @@
 
 - [CLI](https://next-ai-ready.vercel.app/en/docs/api-reference/cli): Command-line interface — init, build, doctor, audit, and mcp.
 - [Configuration](https://next-ai-ready.vercel.app/en/docs/api-reference/config): Full reference for ai-ready.config.mjs options.
+- [withAiReady](https://next-ai-ready.vercel.app/en/docs/api-reference/with-ai-ready): API reference for the Next.js config wrapper.
 - [CLI](https://next-ai-ready.vercel.app/zh/docs/api-reference/cli): 命令行接口——init、build、doctor、audit 和 mcp。
 - [配置](https://next-ai-ready.vercel.app/zh/docs/api-reference/config): ai-ready.config.mjs 的完整参考。
+- [withAiReady](https://next-ai-ready.vercel.app/zh/docs/api-reference/with-ai-ready): Next.js 配置包装器的 API 参考。
 - [defineAction](https://next-ai-ready.vercel.app/en/docs/api-reference/define-action): API reference for defineAction() and defineActions().
 - [Semantic Metadata](https://next-ai-ready.vercel.app/en/docs/api-reference/define-semantic): How to add structured metadata to your MDX content for richer AI extraction.
-- [withAiReady](https://next-ai-ready.vercel.app/en/docs/api-reference/with-ai-ready): API reference for the Next.js config wrapper.
 - [defineAction](https://next-ai-ready.vercel.app/zh/docs/api-reference/define-action): defineAction() 和 defineActions() 的 API 参考。
 - [语义元数据](https://next-ai-ready.vercel.app/zh/docs/api-reference/define-semantic): 如何为 MDX 内容添加结构化元数据以获得更丰富的 AI 提取。
-- [withAiReady](https://next-ai-ready.vercel.app/zh/docs/api-reference/with-ai-ready): Next.js 配置包装器的 API 参考。
 
 ## Architecture
 

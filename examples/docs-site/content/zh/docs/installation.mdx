@@ -4,7 +4,7 @@ summary: 安装 next-ai-ready 并生成首个配置。
 order: 2
 questions:
   - q: 安装 next-ai-ready 需要什么环境？
-    a: Node.js 20+、Next.js 15+ App Router，以及用于 action 的 Zod v4。
+    a: Node.js 20+、Next.js 14.2+ App Router，以及用于 action 的 Zod v4；推荐 Next.js 15+。
   - q: 需要单独安装 @next-ai-ready/* 包吗？
     a: 不需要。只安装 next-ai-ready 聚合包即可，已包含 handler 与 CLI。
   - q: next-ai-ready init 会生成什么？
@@ -22,7 +22,7 @@ author: next-ai-ready 团队
 ## 前置要求
 
 - **Node.js** 20 或更高版本
-- **Next.js** 15+ 且使用 App Router（必需 — 路由 handler 使用异步 `params`；不支持 Next 14）
+- **Next.js** 14.2+ 且使用 App Router（推荐 Next.js 15+；兼容矩阵覆盖 14.2、15 和 16）
 - **pnpm**、npm 或 yarn
 - **Zod v4**（`zod@^4`）— actions 必需（使用 `z.toJSONSchema()`）
 
@@ -38,8 +38,12 @@ pnpm add next-ai-ready@alpha zod@^4
 
 | 导入 | 需要 Next.js？ | 用途 |
 |------|----------------|------|
-| `next-ai-ready` | 否（CLI + 配置） | `init`、`build`、`doctor`、`defineConfig`、`defineAction` |
+| `next-ai-ready` | 否（编写期 + CLI） | `init`、`build`、`doctor`、`defineConfig`、`defineAction` |
+| `next-ai-ready/config` | 由 Next 配置加载 | 不引入构建期扫描器的 `withAiReady()` |
+| `next-ai-ready/robots` | 是 | 动态 `app/robots.ts` 策略 |
+| `next-ai-ready/hooks` | 是 | 运行时观测 |
 | `next-ai-ready/handlers/*` | 是（`server-only`） | `app/%5Fai-ready/` 路由 stub |
+| `next-ai-ready/audit` | 否 | 以代码方式执行部署审计 |
 | `@next-ai-ready/next` | 是 | Monorepo / 高级用法 |
 
 典型应用只需：`pnpm add next-ai-ready@alpha`。`@next-ai-ready/*` 为内部包，无需单独安装。
@@ -84,7 +88,7 @@ npx next-ai-ready init
 - `app/api/mcp/` — MCP 服务端点
 - TypeScript 项目中的 `actions/index.ts`，或 JavaScript 项目中的 `.mjs` — 含 `ping` 健康检查的 starter action
 
-`init` 还会为 `next.config` 注入 `withAiReady()`，并在缺失时将 `next-ai-ready build` 加入 build 脚本。
+`init` 还会从 `next-ai-ready/config` 为 `next.config` 注入 `withAiReady()`，并在缺失时将 `next-ai-ready build` 加入 build 脚本。
 
 `%5F` 是 `_` 的 URL 编码。Next.js 会把字面量目录 `app/_ai-ready/` 当作私有目录并排除在路由系统之外；`app/%5Fai-ready/` 才会正确提供 `/_ai-ready/*` URL。请勿重命名生成的目录。从 alpha.10 或更早版本升级时，请重新运行 `npx next-ai-ready init`，确认没有本地定制后再删除旧的 `app/_ai-ready/` 目录。
 
@@ -93,7 +97,7 @@ npx next-ai-ready init
 编辑 `ai-ready.config.mjs`：
 
 ```js
-import { defineConfig } from "@next-ai-ready/core";
+import { defineConfig } from "next-ai-ready";
 
 export default defineConfig({
   site: {
@@ -108,7 +112,7 @@ export default defineConfig({
 
 ### Robots 策略
 
-`next-ai-ready build` 默认生成 `public/robots.txt`；若设置 `emit: { robots: false }` 则跳过。动态策略请用 `app/robots.ts` + `aiRobots()` — Next.js 运行时优先 `app/robots.ts`。Doctor 认可该组合，不会误报缺少静态 `public/robots.txt`。
+`next-ai-ready build` 默认生成 `public/robots.txt`；若设置 `emit: { robots: false }` 则跳过。动态策略请在 `app/robots.ts` 中使用来自 `next-ai-ready/robots` 的 `aiRobots()`。Doctor 认可该组合，不会误报缺少静态 `public/robots.txt`。
 
 ## 构建
 

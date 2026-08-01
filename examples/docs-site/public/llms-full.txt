@@ -538,7 +538,7 @@ No, but pages with questions and topics produce better FAQ JSON-LD and llms.txt 
 <!-- BEGIN /en/docs/api-reference/with-ai-ready -->
 # withAiReady
 URL: https://next-ai-ready.vercel.app/en/docs/api-reference/with-ai-ready
-Updated: 2026-06-02
+Updated: 2026-08-01
 
 # withAiReady
 
@@ -547,14 +547,16 @@ Updated: 2026-06-02
 ## Import
 
 ```ts
-import { withAiReady } from "@next-ai-ready/next"
+import { withAiReady } from "next-ai-ready/config"
 ```
+
+Consumer apps should install only `next-ai-ready`. The focused `/config` subpath avoids loading build-time scanning and CLI modules while Next.js evaluates its configuration.
 
 ## Usage
 
 ```ts
 // next.config.mjs
-import { withAiReady } from "@next-ai-ready/next"
+import { withAiReady } from "next-ai-ready/config"
 
 export default withAiReady()({
   // your normal Next.js config
@@ -1790,7 +1792,7 @@ Updated: 2026-08-01
 ## Prerequisites
 
 - **Node.js** 20 or later
-- **Next.js** 15+ with App Router (required — route handlers use async `params`; Next 14 is not supported)
+- **Next.js** 14.2+ with App Router (Next.js 15+ recommended; 14.2, 15, and 16 are covered by the compatibility matrix)
 - **pnpm**, npm, or yarn
 - **Zod v4** (`zod@^4`) — required for actions (uses `z.toJSONSchema()`)
 
@@ -1804,11 +1806,15 @@ This installs the meta package which re-exports everything you need and provides
 
 ## Package exports (N-14)
 
-| Import                     | Needs Next.js?      | Use for                                                   |
-| -------------------------- | ------------------- | --------------------------------------------------------- |
-| `next-ai-ready`            | No (CLI + config)   | `init`, `build`, `doctor`, `defineConfig`, `defineAction` |
-| `next-ai-ready/handlers/*` | Yes (`server-only`) | Route stubs in `app/%5Fai-ready/`                         |
-| `@next-ai-ready/next`      | Yes                 | Monorepo / advanced: same handlers + `withAiReady()`      |
+| Import                     | Needs Next.js?        | Use for                                                   |
+| -------------------------- | --------------------- | --------------------------------------------------------- |
+| `next-ai-ready`            | No (authoring + CLI)  | `init`, `build`, `doctor`, `defineConfig`, `defineAction` |
+| `next-ai-ready/config`     | Loaded by Next config | `withAiReady()` without build-time scanner imports        |
+| `next-ai-ready/robots`     | Yes                   | Dynamic `app/robots.ts` policies                          |
+| `next-ai-ready/hooks`      | Yes                   | Runtime observability                                     |
+| `next-ai-ready/handlers/*` | Yes (`server-only`)   | Route stubs in `app/%5Fai-ready/`                         |
+| `next-ai-ready/audit`      | No                    | Programmatic deployment audits                            |
+| `@next-ai-ready/next`      | Yes                   | Monorepo / advanced: same handlers + `withAiReady()`      |
 
 Install **one** meta package for typical apps: `pnpm add next-ai-ready@alpha`. The `@next-ai-ready/*` scoped packages are used internally; you do not need to add them separately.
 
@@ -1852,7 +1858,7 @@ This creates:
 - `app/api/mcp/` — the MCP server endpoint
 - `actions/index.ts` in TypeScript apps, or `.mjs` in JavaScript apps — a starter action file with a `ping` health check
 
-`init` also patches `next.config` with `withAiReady()` and adds `next-ai-ready build` to your build script when missing.
+`init` also patches `next.config` with `withAiReady()` from `next-ai-ready/config` and adds `next-ai-ready build` to your build script when missing.
 
 `%5F` is the URL-encoded form of `_`. Next.js treats a literal `app/_ai-ready/` folder as private and excludes it from routing, while `app/%5Fai-ready/` correctly serves the `/_ai-ready/*` URL namespace. Do not rename the generated folder. When upgrading from alpha.10 or earlier, rerun `npx next-ai-ready init` and remove the obsolete `app/_ai-ready/` directory after reviewing local customizations.
 
@@ -1861,7 +1867,7 @@ This creates:
 Edit `ai-ready.config.mjs` to match your site:
 
 ```js
-import { defineConfig } from "@next-ai-ready/core";
+import { defineConfig } from "next-ai-ready";
 
 export default defineConfig({
   site: {
@@ -1900,7 +1906,7 @@ For a full walkthrough see the monorepo [quickstart-10min](https://github.com/mu
 
 ### What are the prerequisites for next-ai-ready?
 
-Node.js 20+, Next.js 15+ with App Router, and Zod v4 for actions.
+Node.js 20+, Next.js 14.2+ with App Router, and Zod v4 for actions. Next.js 15+ is recommended.
 
 ### Do I need to install @next-ai-ready/* packages separately?
 
@@ -2510,7 +2516,7 @@ reviewedBy:
 <!-- BEGIN /zh/docs/api-reference/with-ai-ready -->
 # withAiReady
 URL: https://next-ai-ready.vercel.app/zh/docs/api-reference/with-ai-ready
-Updated: 2026-06-02
+Updated: 2026-08-01
 
 # withAiReady
 
@@ -2519,14 +2525,16 @@ Updated: 2026-06-02
 ## 导入
 
 ```ts
-import { withAiReady } from "@next-ai-ready/next"
+import { withAiReady } from "next-ai-ready/config"
 ```
+
+消费者应用只需安装 `next-ai-ready`。使用专用 `/config` 子路径，可避免 Next.js 读取配置时加载构建期扫描器与 CLI 模块。
 
 ## 用法
 
 ```ts
 // next.config.mjs
-import { withAiReady } from "@next-ai-ready/next"
+import { withAiReady } from "next-ai-ready/config"
 
 export default withAiReady()({
   // 你正常的 Next.js 配置
@@ -3750,7 +3758,7 @@ Updated: 2026-08-01
 ## 前置要求
 
 - **Node.js** 20 或更高版本
-- **Next.js** 15+ 且使用 App Router（必需 — 路由 handler 使用异步 `params`；不支持 Next 14）
+- **Next.js** 14.2+ 且使用 App Router（推荐 Next.js 15+；兼容矩阵覆盖 14.2、15 和 16）
 - **pnpm**、npm 或 yarn
 - **Zod v4**（`zod@^4`）— actions 必需（使用 `z.toJSONSchema()`）
 
@@ -3766,8 +3774,12 @@ pnpm add next-ai-ready@alpha zod@^4
 
 | 导入                         | 需要 Next.js？      | 用途                                                    |
 | -------------------------- | ---------------- | ----------------------------------------------------- |
-| `next-ai-ready`            | 否（CLI + 配置）      | `init`、`build`、`doctor`、`defineConfig`、`defineAction` |
+| `next-ai-ready`            | 否（编写期 + CLI）     | `init`、`build`、`doctor`、`defineConfig`、`defineAction` |
+| `next-ai-ready/config`     | 由 Next 配置加载      | 不引入构建期扫描器的 `withAiReady()`                            |
+| `next-ai-ready/robots`     | 是                | 动态 `app/robots.ts` 策略                                 |
+| `next-ai-ready/hooks`      | 是                | 运行时观测                                                 |
 | `next-ai-ready/handlers/*` | 是（`server-only`） | `app/%5Fai-ready/` 路由 stub                            |
+| `next-ai-ready/audit`      | 否                | 以代码方式执行部署审计                                           |
 | `@next-ai-ready/next`      | 是                | Monorepo / 高级用法                                       |
 
 典型应用只需：`pnpm add next-ai-ready@alpha`。`@next-ai-ready/*` 为内部包，无需单独安装。
@@ -3812,7 +3824,7 @@ npx next-ai-ready init
 - `app/api/mcp/` — MCP 服务端点
 - TypeScript 项目中的 `actions/index.ts`，或 JavaScript 项目中的 `.mjs` — 含 `ping` 健康检查的 starter action
 
-`init` 还会为 `next.config` 注入 `withAiReady()`，并在缺失时将 `next-ai-ready build` 加入 build 脚本。
+`init` 还会从 `next-ai-ready/config` 为 `next.config` 注入 `withAiReady()`，并在缺失时将 `next-ai-ready build` 加入 build 脚本。
 
 `%5F` 是 `_` 的 URL 编码。Next.js 会把字面量目录 `app/_ai-ready/` 当作私有目录并排除在路由系统之外；`app/%5Fai-ready/` 才会正确提供 `/_ai-ready/*` URL。请勿重命名生成的目录。从 alpha.10 或更早版本升级时，请重新运行 `npx next-ai-ready init`，确认没有本地定制后再删除旧的 `app/_ai-ready/` 目录。
 
@@ -3821,7 +3833,7 @@ npx next-ai-ready init
 编辑 `ai-ready.config.mjs`：
 
 ```js
-import { defineConfig } from "@next-ai-ready/core";
+import { defineConfig } from "next-ai-ready";
 
 export default defineConfig({
   site: {
@@ -3836,7 +3848,7 @@ export default defineConfig({
 
 ### Robots 策略
 
-`next-ai-ready build` 默认生成 `public/robots.txt`；若设置 `emit: { robots: false }` 则跳过。动态策略请用 `app/robots.ts` + `aiRobots()` — Next.js 运行时优先 `app/robots.ts`。Doctor 认可该组合，不会误报缺少静态 `public/robots.txt`。
+`next-ai-ready build` 默认生成 `public/robots.txt`；若设置 `emit: { robots: false }` 则跳过。动态策略请在 `app/robots.ts` 中使用来自 `next-ai-ready/robots` 的 `aiRobots()`。Doctor 认可该组合，不会误报缺少静态 `public/robots.txt`。
 
 ## 构建
 
@@ -3860,7 +3872,7 @@ Doctor 检查配置、action 暴露、`noai`、robots 策略与路由接线。`-
 
 ### 安装 next-ai-ready 需要什么环境？
 
-Node.js 20+、Next.js 15+ App Router，以及用于 action 的 Zod v4。
+Node.js 20+、Next.js 14.2+ App Router，以及用于 action 的 Zod v4；推荐 Next.js 15+。
 
 ### 需要单独安装 @next-ai-ready/* 包吗？
 

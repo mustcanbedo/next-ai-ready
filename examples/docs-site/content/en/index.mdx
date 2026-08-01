@@ -1,0 +1,48 @@
+---
+title: next-ai-ready
+summary: AEO and Agent-API infrastructure for Next.js applications.
+description: Make a Next.js site readable by AI search engines and callable by AI agents without changing its existing UI.
+questions:
+  - q: What does next-ai-ready add to a Next.js site?
+    a: It adds AI-readable content artifacts, structured metadata, OpenAPI actions, and an MCP server alongside the existing website.
+  - q: Does next-ai-ready replace SEO?
+    a: No. It complements technical SEO with machine-readable discovery, retrieval, and agent capability interfaces.
+  - q: Does installation require a UI rewrite?
+    a: No. The generated knowledge and capability routes run alongside the existing App Router pages.
+tags:
+  - next.js
+  - aeo
+  - agent-api
+updatedAt: '2026-08-01'
+author: next-ai-ready team
+---
+
+# next-ai-ready
+
+`next-ai-ready` is the **AEO and Agent-API infrastructure layer for Next.js**. It makes an existing site easier for AI systems to discover and retrieve, while exposing explicitly authorized application features to agents.
+
+## What it provides
+
+- **AI-readable knowledge** through `llms.txt`, `sitemap.md`, per-page Markdown, JSON-LD, and a semantic graph.
+- **Agent-callable capabilities** through typed actions, OpenAPI 3.1, `tools.json`, and MCP.
+- **Deployment checks** through `next-ai-ready doctor` and `next-ai-ready audit <url>`.
+- **Open standards** with no dependency on a single AI provider.
+
+## Install
+
+```bash
+pnpm add next-ai-ready@alpha
+npx next-ai-ready init
+npx next-ai-ready build
+```
+
+The framework adds machine-readable routes and build artifacts without replacing the site's visual pages.
+
+## Start here
+
+- [Introduction](/en/docs/introduction)
+- [Installation](/en/docs/installation)
+- [Quickstart](/en/docs/guides/quickstart)
+- [Configuration reference](/en/docs/api-reference/config)
+
+The generated artifacts improve technical accessibility for AI consumers. They do not guarantee ranking, indexing, citation, or inclusion in AI-generated answers.

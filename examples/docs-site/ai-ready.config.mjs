@@ -26,6 +26,7 @@ export default defineConfig({
   actions: "./actions/index.mjs",
   llms: {
     sections: [
+      { title: "Home", include: "/*", priority: "high" },
       { title: "Introduction", include: "/**/docs/introduction", priority: "high" },
       { title: "Installation", include: "/**/docs/installation", priority: "high" },
       { title: "Project Structure", include: "/**/docs/getting-started/**", priority: "high" },

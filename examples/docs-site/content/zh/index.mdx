@@ -1,0 +1,48 @@
+---
+title: next-ai-ready
+summary: 面向 Next.js 应用的 AEO 与 Agent-API 基础设施。
+description: 在不改动现有 UI 的前提下，让 Next.js 站点更容易被 AI 搜索引擎读取，并让 Agent 调用经明确授权的功能。
+questions:
+  - q: next-ai-ready 会为 Next.js 站点增加什么？
+    a: 它在现有网站之外增加 AI 可读内容产物、结构化元数据、OpenAPI Action 和 MCP 服务。
+  - q: next-ai-ready 会取代 SEO 吗？
+    a: 不会。它用机器可读的发现、检索和 Agent 能力接口来补充技术 SEO。
+  - q: 安装后需要重写 UI 吗？
+    a: 不需要。生成的知识与能力路由会和现有 App Router 页面并行运行。
+tags:
+  - next.js
+  - aeo
+  - agent-api
+updatedAt: '2026-08-01'
+author: next-ai-ready 团队
+---
+
+# next-ai-ready
+
+`next-ai-ready` 是**面向 Next.js 的 AEO 与 Agent-API 基础设施层**。它让现有站点更容易被 AI 系统发现和读取，同时将经明确授权的应用功能暴露给 Agent。
+
+## 它提供什么
+
+- 通过 `llms.txt`、`sitemap.md`、逐页 Markdown、JSON-LD 和语义图谱提供 **AI 可读知识**。
+- 通过类型安全的 Action、OpenAPI 3.1、`tools.json` 和 MCP 提供 **Agent 可调用能力**。
+- 通过 `next-ai-ready doctor` 和 `next-ai-ready audit <url>` 提供**部署检查**。
+- 使用开放标准，不锁定单一 AI 提供商。
+
+## 安装
+
+```bash
+pnpm add next-ai-ready@alpha
+npx next-ai-ready init
+npx next-ai-ready build
+```
+
+框架会在不替换可视页面的前提下，增加机器可读路由与构建产物。
+
+## 开始使用
+
+- [简介](/zh/docs/introduction)
+- [安装](/zh/docs/installation)
+- [快速开始](/zh/docs/guides/quickstart)
+- [配置参考](/zh/docs/api-reference/config)
+
+生成的产物改善的是 AI 消费者的技术可访问性，不保证排名、收录、引用或出现在 AI 生成的回答中。

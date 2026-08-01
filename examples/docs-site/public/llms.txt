@@ -2,7 +2,12 @@
 
 > AEO + Agent-API layer for Next.js App Router. Make your site readable by AI and callable by agents.
 
-<!-- Last updated: 2026-07-26 -->
+<!-- Last updated: 2026-08-01 -->
+
+## Home
+
+- [next-ai-ready](https://next-ai-ready.vercel.app/en): AEO and Agent-API infrastructure for Next.js applications.
+- [next-ai-ready](https://next-ai-ready.vercel.app/zh): 面向 Next.js 应用的 AEO 与 Agent-API 基础设施。
 
 ## Introduction
 

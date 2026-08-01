@@ -93,6 +93,27 @@ async function main() {
     contentType: "text/plain",
     includes: "# next-ai-ready",
   });
+  await expectResponse("/en.md", {
+    contentType: "text/markdown",
+    headerIncludes: {
+      link: '<https://next-ai-ready.vercel.app/en>; rel="canonical"',
+    },
+    includes: "# next-ai-ready",
+  });
+  await expectResponse("/zh.md", {
+    contentType: "text/markdown",
+    includes: "# next-ai-ready",
+  });
+  await expectResponse("/en", {
+    contentType: "text/markdown",
+    includes: "# next-ai-ready",
+    requestHeaders: { accept: "text/markdown" },
+  });
+  await expectResponse("/en", {
+    contentType: "text/markdown",
+    includes: "# next-ai-ready",
+    requestHeaders: { "user-agent": "Vercel-Agent/1.0" },
+  });
   await expectResponse("/en/docs/introduction.md", {
     contentType: "text/markdown",
     headerIncludes: {

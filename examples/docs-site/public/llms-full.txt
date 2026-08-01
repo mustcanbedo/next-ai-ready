@@ -2,6 +2,58 @@
 
 > AEO + Agent-API layer for Next.js App Router. Make your site readable by AI and callable by agents.
 
+<!-- BEGIN /en -->
+# next-ai-ready
+URL: https://next-ai-ready.vercel.app/en
+Updated: 2026-08-01
+
+# next-ai-ready
+
+`next-ai-ready` is the **AEO and Agent-API infrastructure layer for Next.js**. It makes an existing site easier for AI systems to discover and retrieve, while exposing explicitly authorized application features to agents.
+
+## What it provides
+
+- **AI-readable knowledge** through `llms.txt`, `sitemap.md`, per-page Markdown, JSON-LD, and a semantic graph.
+- **Agent-callable capabilities** through typed actions, OpenAPI 3.1, `tools.json`, and MCP.
+- **Deployment checks** through `next-ai-ready doctor` and `next-ai-ready audit <url>`.
+- **Open standards** with no dependency on a single AI provider.
+
+## Install
+
+```bash
+pnpm add next-ai-ready@alpha
+npx next-ai-ready init
+npx next-ai-ready build
+```
+
+The framework adds machine-readable routes and build artifacts without replacing the site's visual pages.
+
+## Start here
+
+- [Introduction](/en/docs/introduction)
+- [Installation](/en/docs/installation)
+- [Quickstart](/en/docs/guides/quickstart)
+- [Configuration reference](/en/docs/api-reference/config)
+
+The generated artifacts improve technical accessibility for AI consumers. They do not guarantee ranking, indexing, citation, or inclusion in AI-generated answers.
+
+## FAQ
+
+### What does next-ai-ready add to a Next.js site?
+
+It adds AI-readable content artifacts, structured metadata, OpenAPI actions, and an MCP server alongside the existing website.
+
+### Does next-ai-ready replace SEO?
+
+No. It complements technical SEO with machine-readable discovery, retrieval, and agent capability interfaces.
+
+### Does installation require a UI rewrite?
+
+No. The generated knowledge and capability routes run alongside the existing App Router pages.
+
+
+<!-- END /en -->
+
 <!-- BEGIN /en/docs/api-reference/cli -->
 # CLI
 URL: https://next-ai-ready.vercel.app/en/docs/api-reference/cli
@@ -1857,6 +1909,58 @@ No. The framework adds AI routes and build artifacts alongside your current App 
 
 
 <!-- END /en/docs/introduction -->
+
+<!-- BEGIN /zh -->
+# next-ai-ready
+URL: https://next-ai-ready.vercel.app/zh
+Updated: 2026-08-01
+
+# next-ai-ready
+
+`next-ai-ready` 是**面向 Next.js 的 AEO 与 Agent-API 基础设施层**。它让现有站点更容易被 AI 系统发现和读取，同时将经明确授权的应用功能暴露给 Agent。
+
+## 它提供什么
+
+- 通过 `llms.txt`、`sitemap.md`、逐页 Markdown、JSON-LD 和语义图谱提供 **AI 可读知识**。
+- 通过类型安全的 Action、OpenAPI 3.1、`tools.json` 和 MCP 提供 **Agent 可调用能力**。
+- 通过 `next-ai-ready doctor` 和 `next-ai-ready audit <url>` 提供**部署检查**。
+- 使用开放标准，不锁定单一 AI 提供商。
+
+## 安装
+
+```bash
+pnpm add next-ai-ready@alpha
+npx next-ai-ready init
+npx next-ai-ready build
+```
+
+框架会在不替换可视页面的前提下，增加机器可读路由与构建产物。
+
+## 开始使用
+
+- [简介](/zh/docs/introduction)
+- [安装](/zh/docs/installation)
+- [快速开始](/zh/docs/guides/quickstart)
+- [配置参考](/zh/docs/api-reference/config)
+
+生成的产物改善的是 AI 消费者的技术可访问性，不保证排名、收录、引用或出现在 AI 生成的回答中。
+
+## FAQ
+
+### next-ai-ready 会为 Next.js 站点增加什么？
+
+它在现有网站之外增加 AI 可读内容产物、结构化元数据、OpenAPI Action 和 MCP 服务。
+
+### next-ai-ready 会取代 SEO 吗？
+
+不会。它用机器可读的发现、检索和 Agent 能力接口来补充技术 SEO。
+
+### 安装后需要重写 UI 吗？
+
+不需要。生成的知识与能力路由会和现有 App Router 页面并行运行。
+
+
+<!-- END /zh -->
 
 <!-- BEGIN /zh/docs/api-reference/cli -->
 # CLI

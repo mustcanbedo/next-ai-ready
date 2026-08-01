@@ -6,7 +6,7 @@ const en = {
     github: "GitHub",
   },
   hero: {
-    badge: "v0.1.0-alpha.10 — now on npm",
+    badge: "v0.1.0-alpha.11 — now on npm",
     title: "The AI Layer\nfor Next.js",
     subtitle:
       "Make your site readable by AI search engines and callable by AI agents. One config file, zero changes to your UI.",

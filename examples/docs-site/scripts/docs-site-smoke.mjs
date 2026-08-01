@@ -63,6 +63,9 @@ async function main() {
   if (!sitemapMd.includes("[Introduction](https://next-ai-ready.vercel.app/en/docs/introduction)")) {
     fail("sitemap.md missing canonical introduction URL");
   }
+  if (!sitemapMd.includes("[next-ai-ready](https://next-ai-ready.vercel.app/en)")) {
+    fail("sitemap.md missing canonical English homepage URL");
+  }
   ok("sitemap.md canonical page directory");
 
   const openapi = await readFile(join(ROOT, "public/openapi.json"), "utf8");

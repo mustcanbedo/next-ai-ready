@@ -1,5 +1,16 @@
 # next-ai-ready
 
+## 0.1.0-alpha.12
+
+### Patch Changes
+
+- 8d0f5df: Return a noindex Markdown recovery document for missing agent-readable pages while
+  preserving browser HTML 404 semantics. Harden the deployed audit so it verifies
+  both paths independently and accepts standards-compatible negotiation metadata.
+- Updated dependencies [8d0f5df]
+  - @next-ai-ready/llms@0.1.0-alpha.12
+  - @next-ai-ready/next@0.1.0-alpha.12
+
 ## 0.1.0-alpha.11
 
 ### Minor Changes

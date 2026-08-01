@@ -57,7 +57,7 @@ No. The generated knowledge and capability routes run alongside the existing App
 <!-- BEGIN /en/docs/api-reference/cli -->
 # CLI
 URL: https://next-ai-ready.vercel.app/en/docs/api-reference/cli
-Updated: 2026-07-26
+Updated: 2026-08-01
 
 # CLI
 
@@ -156,8 +156,19 @@ npx next-ai-ready audit https://example.com/about --json
 
 The 100-point report checks the HTML response, `llms.txt`, both sitemap formats,
 `robots.txt`, Markdown content negotiation, known AI User-Agents, explicit `.md`
-URLs, canonical and response metadata, frontmatter, JSON-LD, description, H1, and
-real 404 semantics. Each check includes its evidence URL and a concrete message.
+URLs, canonical and response metadata, frontmatter, JSON-LD, description, H1,
+browser `404` semantics, and agent Markdown recovery. Each check includes its
+evidence URL and a concrete message.
+
+Browser and agent missing-page behavior are deliberately separate: browser-style
+HTML requests must return `404`, while an agent requesting Markdown should receive
+a useful `200 text/markdown` recovery document. The audit also accepts equivalent
+standards-compatible discovery metadata instead of requiring one framework-specific
+combination of `Vary`, `Link`, and `Content-Location` headers.
+
+In report schema v1, agent missing-page recovery is an advisory check with zero
+score weight, so adding it does not break an existing CI gate. Audit v2 will make
+it part of a separately versioned standards score.
 
 The command exits with code 1 when a required check fails, so the JSON form can
 act as a post-deployment CI gate. Warnings reduce the score without failing CI.
@@ -736,7 +747,7 @@ The build CLI runs outside the bundler. This is deliberate (ADR-006): Turbopack 
 <!-- BEGIN /en/docs/concepts/knowledge-plane -->
 # Knowledge Plane
 URL: https://next-ai-ready.vercel.app/en/docs/concepts/knowledge-plane
-Updated: 2026-06-02
+Updated: 2026-08-01
 
 # Knowledge Plane
 
@@ -756,6 +767,12 @@ The Knowledge Plane is responsible for making your content **citable** by AI sea
 - **`/<page>.md`** — each page rendered as clean Markdown with YAML header
 - **`/<page>.ai.json`** — structured JSON with the semantic node and all descendants
 - **JSON-LD** — `Article`, `FAQPage`, `WebPage` markup embedded in your pages
+
+When a requested Markdown page is missing, the handler returns a machine-readable
+recovery document with HTTP `200`, `X-Robots-Tag: noindex`, the requested path,
+`llms.txt`, `sitemap.md`, and up to five relevant pages. Normal browser requests
+still use the application's real HTML `404`, so agent recovery does not weaken SEO
+error semantics.
 
 ## Semantic metadata
 
@@ -1965,7 +1982,7 @@ npx next-ai-ready build
 <!-- BEGIN /zh/docs/api-reference/cli -->
 # CLI
 URL: https://next-ai-ready.vercel.app/zh/docs/api-reference/cli
-Updated: 2026-07-26
+Updated: 2026-08-01
 
 # CLI
 
@@ -2064,8 +2081,16 @@ npx next-ai-ready audit https://example.com/about --json
 
 100 分报告会检查 HTML、`llms.txt`、两种 sitemap、`robots.txt`、Markdown
 内容协商、已知 AI User-Agent、显式 `.md` URL、canonical 与响应头、
-frontmatter、JSON-LD、description、H1 和真实 404。每项都会返回证据 URL
-与明确说明。
+frontmatter、JSON-LD、description、H1、浏览器 404 语义和 Agent Markdown
+恢复。每项都会返回证据 URL 与明确说明。
+
+浏览器和 Agent 的缺失页行为会被独立验证：浏览器式 HTML 请求必须返回
+`404`，而请求 Markdown 的 Agent 应获得有用的 `200 text/markdown` 恢复文档。
+审计也会接受符合标准的等价发现元数据，而不是强制某个框架专用的
+`Vary`、`Link` 与 `Content-Location` 组合。
+
+在 v1 报告契约中，Agent 缺失页恢复是权重为零的建议项，因此新增检查不会
+破坏已有 CI 门禁。Audit v2 会将它纳入单独版本化的 standards 分数。
 
 必需项失败时命令以代码 1 退出，因此 JSON 输出可作为部署后的 CI 门禁。
 警告只降低分数，不会让 CI 失败。
@@ -2640,7 +2665,7 @@ Updated: 2026-06-02
 <!-- BEGIN /zh/docs/concepts/knowledge-plane -->
 # 知识平面
 URL: https://next-ai-ready.vercel.app/zh/docs/concepts/knowledge-plane
-Updated: 2026-06-02
+Updated: 2026-08-01
 
 # 知识平面
 
@@ -2660,6 +2685,11 @@ Updated: 2026-06-02
 - **`/<page>.md`** — 每个页面渲染为干净的 Markdown（含 YAML header）
 - **`/<page>.ai.json`** — 结构化 JSON，包含语义节点和所有后代
 - **JSON-LD** — `Article`、`FAQPage`、`WebPage` 标记嵌入你的页面
+
+请求的 Markdown 页面不存在时，handler 会返回机器可读的 HTTP `200` 恢复文档，
+并设置 `X-Robots-Tag: noindex`；文档包含请求路径、`llms.txt`、`sitemap.md`
+以及最多五个相关页面。普通浏览器请求仍使用应用真实的 HTML `404`，因此
+Agent 恢复不会削弱 SEO 的错误页语义。
 
 ## 语义元数据
 

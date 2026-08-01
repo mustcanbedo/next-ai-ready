@@ -30,7 +30,13 @@ const HTML = `<!doctype html>
 
 let servers: Server[] = [];
 
-function startFixtureServer(): Promise<{ server: Server; target: string }> {
+interface FixtureOptions {
+  nuxtStyleHeaders?: boolean;
+  agentMissingFallback?: boolean;
+  emptyAgentMissingFallback?: boolean;
+}
+
+function startFixtureServer(options: FixtureOptions = {}): Promise<{ server: Server; target: string }> {
   return new Promise((resolve, reject) => {
     const server = createServer((request, response) => {
       const url = new URL(request.url ?? "/", "http://127.0.0.1");
@@ -67,14 +73,26 @@ function startFixtureServer(): Promise<{ server: Server; target: string }> {
         ) {
           response.writeHead(200, {
             "content-type": "text/markdown; charset=utf-8",
-            vary: "Accept, User-Agent",
-            link: `<${origin}${url.pathname}>; rel="canonical"`,
-            "content-location": `${url.pathname === "/" ? "/index" : url.pathname}.md`,
+            vary: options.nuxtStyleHeaders ? "Accept, Sec-Fetch-Dest" : "Accept, User-Agent",
+            ...(options.nuxtStyleHeaders
+              ? {}
+              : {
+                  link: `<${origin}${url.pathname}>; rel="canonical"`,
+                  "content-location": `${url.pathname === "/" ? "/index" : url.pathname}.md`,
+                }),
           });
           response.end(MARKDOWN);
           return;
         }
-        response.writeHead(200, { "content-type": "text/html; charset=utf-8" });
+        response.writeHead(200, {
+          "content-type": "text/html; charset=utf-8",
+          ...(options.nuxtStyleHeaders
+            ? {
+                vary: "Accept, Sec-Fetch-Dest",
+                link: `<${origin}${url.pathname === "/" ? "/index.md" : `${url.pathname}.md`}>; rel="alternate"; type="text/markdown"`,
+              }
+            : {}),
+        });
         response.end(HTML.replaceAll("__ORIGIN__", origin));
         return;
       }
@@ -82,6 +100,20 @@ function startFixtureServer(): Promise<{ server: Server; target: string }> {
       if (url.pathname === "/index.md" || url.pathname === "/guide.md") {
         response.writeHead(200, { "content-type": "text/markdown; charset=utf-8" });
         response.end(MARKDOWN);
+        return;
+      }
+
+      if (
+        url.pathname === "/ai-ready-audit-missing-page-9f8e7d6c" &&
+        options.agentMissingFallback !== false &&
+        request.headers.accept?.includes("text/markdown")
+      ) {
+        response.writeHead(200, {
+          "content-type": "text/markdown; charset=utf-8",
+          vary: options.nuxtStyleHeaders ? "Accept, Sec-Fetch-Dest" : "Accept",
+          "x-robots-tag": "noindex",
+        });
+        response.end(options.emptyAgentMissingFallback ? "# Page not found\n" : "# Page not found\n\nTry the [sitemap](/sitemap.md).\n");
         return;
       }
 
@@ -118,9 +150,10 @@ describe("runAudit()", () => {
     const { target } = await startFixtureServer();
     const result = await runAudit(target, { timeoutMs: 2_000 });
 
+    expect(result.version).toBe("1");
     expect(result.target).toBe(target);
     expect(result.pageUrl).toBe(target);
-    expect(result.passed).toBe(15);
+    expect(result.passed).toBe(16);
     expect(result.errors).toBe(0);
     expect(result.warnings).toBe(0);
     expect(result.score).toBe(100);
@@ -142,6 +175,7 @@ describe("runAudit()", () => {
       "json-ld",
       "page-h1",
       "real-404",
+      "agent-markdown-404",
     ]) {
       expect(checks.get(id), `missing check: ${id}`).toMatchObject({
         id,
@@ -150,6 +184,61 @@ describe("runAudit()", () => {
         url: expect.stringMatching(/^http:\/\/127\.0\.0\.1:/),
       });
     }
+  });
+
+  it("recognizes Nuxt-style alternate metadata while warning about unsafe user-agent caching", async () => {
+    const { target } = await startFixtureServer({ nuxtStyleHeaders: true });
+    const result = await runAudit(target, { timeoutMs: 2_000 });
+    const checks = new Map(result.checks.map((check) => [check.id, check]));
+
+    expect(checks.get("markdown-headers")).toMatchObject({
+      status: "warn",
+      message: expect.stringContaining("Vary: User-Agent"),
+    });
+    expect(checks.get("real-404")).toMatchObject({ status: "pass" });
+    expect(checks.get("agent-markdown-404")).toMatchObject({ status: "pass" });
+    expect(result.errors).toBe(0);
+    expect(result.warnings).toBe(1);
+    expect(result.score).toBeLessThan(100);
+  });
+
+  it("reports agent Markdown recovery independently from a correct HTML 404", async () => {
+    const { target } = await startFixtureServer({ agentMissingFallback: false });
+    const result = await runAudit(target, { timeoutMs: 2_000 });
+    const checks = new Map(result.checks.map((check) => [check.id, check]));
+
+    expect(checks.get("real-404")).toMatchObject({ status: "pass" });
+    expect(checks.get("agent-markdown-404")).toMatchObject({ status: "warn" });
+    expect(result.errors).toBe(0);
+    expect(result.warnings).toBe(1);
+    expect(result.score).toBe(100);
+  });
+
+  it("rejects a non-actionable Markdown missing-page response", async () => {
+    const { target } = await startFixtureServer({ emptyAgentMissingFallback: true });
+    const result = await runAudit(target, { timeoutMs: 2_000 });
+    const check = result.checks.find((item) => item.id === "agent-markdown-404");
+
+    expect(check).toMatchObject({ status: "warn" });
+    expect(check?.message).toContain("recovery Markdown with noindex");
+  });
+
+  it("does not mistake a recovery document for the requested page", async () => {
+    const recovery = `---\ndocument_status: not_found\nrecovery: true\n---\n\n# Page not found\n\n- [Sitemap](/sitemap.md)\n`;
+    const response = new Response(recovery, {
+      status: 200,
+      headers: { "content-type": "text/markdown; charset=utf-8", "x-robots-tag": "noindex" },
+    });
+    const fetchImpl: typeof fetch = async (input) => {
+      const url = new URL(String(input));
+      if (url.pathname === "/" || url.pathname === "/index.md") return response.clone();
+      return new Response("Not found", { status: 404, headers: { "content-type": "text/html" } });
+    };
+
+    const result = await runAudit("https://example.test/", { fetch: fetchImpl });
+    const checks = new Map(result.checks.map((check) => [check.id, check]));
+    expect(checks.get("accept-markdown")).toMatchObject({ status: "fail" });
+    expect(checks.get("explicit-markdown")).toMatchObject({ status: "warn" });
   });
 
   it("rejects an invalid URL with an actionable structured error", async () => {

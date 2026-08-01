@@ -15,7 +15,7 @@ tags:
   - architecture
   - knowledge-plane
   - capability-plane
-updatedAt: '2026-06-02'
+updatedAt: '2026-08-01'
 author: next-ai-ready team
 ---
 
@@ -37,6 +37,12 @@ The Knowledge Plane is responsible for making your content **citable** by AI sea
 - **`/<page>.md`** — each page rendered as clean Markdown with YAML header
 - **`/<page>.ai.json`** — structured JSON with the semantic node and all descendants
 - **JSON-LD** — `Article`, `FAQPage`, `WebPage` markup embedded in your pages
+
+When a requested Markdown page is missing, the handler returns a machine-readable
+recovery document with HTTP `200`, `X-Robots-Tag: noindex`, the requested path,
+`llms.txt`, `sitemap.md`, and up to five relevant pages. Normal browser requests
+still use the application's real HTML `404`, so agent recovery does not weaken SEO
+error semantics.
 
 ## Semantic metadata
 

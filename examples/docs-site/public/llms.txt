@@ -31,13 +31,13 @@
 
 ## Concepts
 
+- [Knowledge Plane](https://next-ai-ready.vercel.app/en/docs/concepts/knowledge-plane): How next-ai-ready makes your content readable by AI.
+- [知识平面](https://next-ai-ready.vercel.app/zh/docs/concepts/knowledge-plane): next-ai-ready 如何让你的内容被 AI 可读。
 - [Capability Plane](https://next-ai-ready.vercel.app/en/docs/concepts/capability-plane): How next-ai-ready exposes your features as AI-callable tools.
 - [How It Works](https://next-ai-ready.vercel.app/en/docs/concepts/how-it-works): The build pipeline, runtime data flow, and what happens under the hood.
-- [Knowledge Plane](https://next-ai-ready.vercel.app/en/docs/concepts/knowledge-plane): How next-ai-ready makes your content readable by AI.
 - [Two Planes](https://next-ai-ready.vercel.app/en/docs/concepts/two-planes): The Knowledge plane and Capability plane — what each one does and why they are separate.
 - [能力平面](https://next-ai-ready.vercel.app/zh/docs/concepts/capability-plane): next-ai-ready 如何将你的功能暴露为 AI 可调用的工具。
 - [工作原理](https://next-ai-ready.vercel.app/zh/docs/concepts/how-it-works): 构建管线、运行时数据流和底层机制。
-- [知识平面](https://next-ai-ready.vercel.app/zh/docs/concepts/knowledge-plane): next-ai-ready 如何让你的内容被 AI 可读。
 - [双平面](https://next-ai-ready.vercel.app/zh/docs/concepts/two-planes): 知识平面和能力平面——各自的作用及分离的原因。
 
 ## Guides

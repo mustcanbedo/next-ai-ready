@@ -108,7 +108,9 @@ npx next-ai-ready mcp      # 通过 stdio 运行 MCP 服务器（Claude Desktop 
 export default withAiReady({ agentReadable: true })(nextConfig)
 ```
 
-带有 `Accept: text/markdown` 或已知 Agent User-Agent 的页面请求会得到 Markdown，普通浏览器请求仍然获得 HTML。
+带有 `Accept: text/markdown` 或已知 Agent User-Agent 的页面请求会得到 Markdown，普通浏览器请求仍然获得 HTML。浏览器访问不存在页面时仍返回真实 HTTP `404`；不存在的 Markdown 表示则返回 `200` 恢复文档，其中包含请求路径、发现入口和最多五个相关页面，便于 Agent 继续导航。
+
+`next-ai-ready audit <url>` 会独立验证浏览器与 Agent 的行为。它保持 JSON 契约向后兼容，同时接受其他实现中符合标准的等价响应元数据。
 
 **10 分钟上手：** [`docs/quickstart-10min.zh-CN.md`](./docs/quickstart-10min.zh-CN.md) · [English](./docs/quickstart-10min.md)
 

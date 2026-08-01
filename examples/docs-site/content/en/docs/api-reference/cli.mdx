@@ -15,7 +15,7 @@ questions:
 tags:
   - api
   - reference
-updatedAt: '2026-07-26'
+updatedAt: '2026-08-01'
 author: next-ai-ready team
 ---
 
@@ -116,8 +116,19 @@ npx next-ai-ready audit https://example.com/about --json
 
 The 100-point report checks the HTML response, `llms.txt`, both sitemap formats,
 `robots.txt`, Markdown content negotiation, known AI User-Agents, explicit `.md`
-URLs, canonical and response metadata, frontmatter, JSON-LD, description, H1, and
-real 404 semantics. Each check includes its evidence URL and a concrete message.
+URLs, canonical and response metadata, frontmatter, JSON-LD, description, H1,
+browser `404` semantics, and agent Markdown recovery. Each check includes its
+evidence URL and a concrete message.
+
+Browser and agent missing-page behavior are deliberately separate: browser-style
+HTML requests must return `404`, while an agent requesting Markdown should receive
+a useful `200 text/markdown` recovery document. The audit also accepts equivalent
+standards-compatible discovery metadata instead of requiring one framework-specific
+combination of `Vary`, `Link`, and `Content-Location` headers.
+
+In report schema v1, agent missing-page recovery is an advisory check with zero
+score weight, so adding it does not break an existing CI gate. Audit v2 will make
+it part of a separately versioned standards score.
 
 The command exits with code 1 when a required check fails, so the JSON form can
 act as a post-deployment CI gate. Warnings reduce the score without failing CI.

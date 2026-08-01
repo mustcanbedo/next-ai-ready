@@ -144,7 +144,24 @@ async function main() {
     includes: "# Introduction",
     requestHeaders: { "user-agent": "Vercel-Agent/1.0" },
   });
-  await expectResponse("/en/docs/does-not-exist.md", { status: 404 });
+  await expectResponse("/en/docs/does-not-exist.md", {
+    status: 200,
+    contentType: "text/markdown",
+    headerIncludes: { "x-robots-tag": "noindex" },
+    includes: "document_status: \"not_found\"",
+  });
+  await expectResponse("/en/docs/does-not-exist", {
+    status: 200,
+    contentType: "text/markdown",
+    headerIncludes: { "x-robots-tag": "noindex" },
+    includes: "document_status: \"not_found\"",
+    requestHeaders: { accept: "text/markdown" },
+  });
+  await expectResponse("/en/docs/does-not-exist", {
+    status: 404,
+    contentType: "text/html",
+    requestHeaders: { accept: "text/html" },
+  });
 
   console.log("[docs-site-route-smoke] ALL CHECKS PASSED");
 }

@@ -15,6 +15,8 @@ Items **intentionally deferred** until after **0.1 GA**. Not blockers for recomm
 | PG-03 | **Optional `ACTION_API_KEY` gate** | HTTP actions lack global env gate (MCP has token) | Env + middleware recipe promoted to core docs; optional `actions.globalAuth` |
 | PG-04 | **CI artifact drift everywhere** | Only docs-site has `check-artifacts-drift.mjs` | Reusable script in `next-ai-ready` CLI: `doctor --check-artifacts` |
 | PG-05 | **npm GA tag `0.1.0`** | Drop `@alpha` install path | Changeset + README status “stable 0.1” |
+| PG-18 | **Audit v2 dimensions** | A single score mixes portable standards with next-ai-ready enhancements | Versioned JSON rubric with independent standards, semantic, and capability scores; keep a v1 compatibility path |
+| PG-19 | **MCP page list/search tools** | Resources alone are awkward for large sites | Deterministic `list_pages`, `get_page`, and lexical `search_pages` over SemanticGraph; no database required |
 
 ---
 
@@ -29,6 +31,8 @@ Items **intentionally deferred** until after **0.1 GA**. Not blockers for recomm
 | PG-10 | **Edge Knowledge handlers** | All handlers `nodejs` today | P6-04 full port when graph loader stable on Edge |
 | PG-11 | **MCP locale resources** | Agents may pull wrong locale page | Filter `airead://page` by `Accept-Language` or route prefix |
 | PG-12 | **HTTP action observability** | `onInvoke` exists; no first-party dashboard | Recipes only; stay out of SaaS scope |
+| PG-20 | **Optional runtime index providers** | Very large or frequently changing corpora may outgrow build-time graph search | Provider contract first; SQLite/Postgres adapters only after production evidence |
+| PG-21 | **IndexNow + Content Signals** | Useful ecosystem interoperability, but independent of core retrieval | Small opt-in emitters with external compatibility tests |
 
 ---
 

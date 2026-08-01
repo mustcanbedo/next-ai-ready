@@ -7,7 +7,7 @@ import { buildGraph } from "@next-ai-ready/semantic";
 import { fileToRoute } from "@next-ai-ready/core";
 import { renderLlmsTxt } from "../src/llms-txt.js";
 import { renderLlmsFullTxt } from "../src/llms-full-txt.js";
-import { renderPageMarkdown } from "../src/page-md.js";
+import { renderPageMarkdown, renderPageMarkdownRecovery } from "../src/page-md.js";
 import { renderPageAiJson } from "../src/page-ai-json.js";
 import { renderSitemapMarkdown } from "../src/sitemap-md.js";
 
@@ -115,6 +115,143 @@ describe("renderPageMarkdown()", () => {
   it("returns null for unknown routes", async () => {
     const graph = await makeGraph();
     expect(renderPageMarkdown(graph, "/nope")).toBeNull();
+  });
+});
+
+describe("renderPageMarkdownRecovery()", () => {
+  it("emits machine-readable recovery metadata and discovery links", async () => {
+    const graph = await makeGraph();
+    const md = renderPageMarkdownRecovery(graph, {
+      requestedRoute: "/docs/instal",
+      requestedPath: "/docs/instal.md",
+    });
+
+    expect(md).toContain('document_status: "not_found"');
+    expect(md).toContain("recovery: true");
+    expect(md).toContain('requested_path: "/docs/instal.md"');
+    expect(md).toContain('requested_route: "/docs/instal"');
+    expect(md).toContain('llms_txt: "https://acme.com/llms.txt"');
+    expect(md).toContain('sitemap_md: "https://acme.com/sitemap.md"');
+    expect(md).toContain("[Install Acme](https://acme.com/docs/install)");
+    expect(md).toContain("[LLM content index](https://acme.com/llms.txt)");
+    expect(md).toContain("[Markdown sitemap](https://acme.com/sitemap.md)");
+  });
+
+  it("ranks typo-adjacent routes first and caps deterministic suggestions at five", async () => {
+    const graph = await makeGraph();
+    const templateId = graph.routes["/docs/install"];
+    const template = graph.nodes[templateId];
+    for (const route of ["/about", "/docs/api", "/docs/config", "/docs/deploy", "/pricing", "/support"]) {
+      const id = `page:${route}`;
+      graph.routes[route] = id;
+      graph.nodes[id] = { ...template, id, route, title: route.slice(1) };
+    }
+
+    const first = renderPageMarkdownRecovery(graph, { requestedRoute: "/docs/instal", limit: 99 });
+    const second = renderPageMarkdownRecovery(graph, { requestedRoute: "/docs/instal", limit: 99 });
+    const suggestionLines = first
+      .slice(first.indexOf("## Suggested pages"), first.indexOf("## Site discovery"))
+      .split("\n")
+      .filter((line) => line.startsWith("- ["));
+
+    expect(first).toEqual(second);
+    expect(suggestionLines).toHaveLength(5);
+    expect(suggestionLines[0]).toContain("https://acme.com/docs/install");
+  });
+
+  it("sanitizes suggestion text and falls back from unsafe cite URLs", async () => {
+    const graph = await makeGraph();
+    const template = graph.nodes[graph.routes["/docs/install"]];
+    const route = "/docs/danger";
+    const id = `page:${route}`;
+    graph.routes[route] = id;
+    graph.nodes[id] = {
+      ...template,
+      id,
+      route,
+      title: "Danger](/escape)\n## Injected",
+      summary: "Summary\n- ![tracking](javascript:alert(1))",
+      citeUrl: "javascript:alert(1)\n## Injected",
+    };
+
+    const requestedPath = "/docs/missing.md`\n## Requested path injection";
+    const md = renderPageMarkdownRecovery(graph, {
+      requestedRoute: route,
+      requestedPath,
+      limit: 1,
+    });
+    const suggestion = md.split("\n").find((line) => line.startsWith("- ["));
+
+    expect(md).toContain(`requested_path: ${JSON.stringify(requestedPath)}`);
+    expect(md).not.toContain("\n## Requested path injection");
+    expect(md).not.toContain("](javascript:");
+    expect(suggestion).toContain("(https://acme.com/docs/danger)");
+    expect(suggestion).not.toContain("](/escape)");
+    expect(suggestion).not.toContain("\n");
+  });
+
+  it("bounds similarity work for very long requests and routes", async () => {
+    const graph = await makeGraph();
+    const template = graph.nodes[graph.routes["/docs/install"]];
+    const longRoute = `/docs/${"x".repeat(20_000)}`;
+    const id = "page:long-route";
+    graph.routes[longRoute] = id;
+    graph.nodes[id] = {
+      ...template,
+      id,
+      route: longRoute,
+      title: "Long route",
+      summary: "Bounded candidate",
+      citeUrl: "https://acme.com/docs/long-route",
+    };
+
+    const md = renderPageMarkdownRecovery(graph, {
+      requestedRoute: `${longRoute}tail`,
+      requestedPath: `${longRoute}.md`,
+      limit: 1,
+    });
+
+    expect(md).toContain("[Long route](https://acme.com/docs/long-route)");
+    expect(md.length).toBeLessThan(10_000);
+
+    delete graph.nodes[id].citeUrl;
+    const withoutSafeCite = renderPageMarkdownRecovery(graph, {
+      requestedRoute: longRoute,
+      requestedPath: `${longRoute}.md`,
+      limit: 1,
+    });
+    expect(withoutSafeCite).not.toContain("[Long route]");
+    expect(withoutSafeCite.length).toBeLessThan(10_000);
+  });
+
+  it("uses Unicode NFKC normalization when ranking routes", async () => {
+    const graph = await makeGraph();
+    const template = graph.nodes[graph.routes["/docs/install"]];
+    const routes = [
+      { route: "/docs/ﬁle", title: "Compatibility file", citeUrl: "https://acme.com/docs/file" },
+      { route: "/docs/filer", title: "Other file", citeUrl: "https://acme.com/docs/filer" },
+    ];
+    for (const candidate of routes) {
+      const id = `page:${candidate.route}`;
+      graph.routes[candidate.route] = id;
+      graph.nodes[id] = { ...template, id, ...candidate };
+    }
+
+    const compatibility = renderPageMarkdownRecovery(graph, { requestedRoute: "/docs/file", limit: 1 });
+    expect(compatibility).toContain("[Compatibility file](https://acme.com/docs/file)");
+
+    const composedRoute = "/docs/café";
+    const composedId = `page:${composedRoute}`;
+    graph.routes[composedRoute] = composedId;
+    graph.nodes[composedId] = {
+      ...template,
+      id: composedId,
+      route: composedRoute,
+      title: "Composed cafe",
+      citeUrl: "https://acme.com/docs/cafe",
+    };
+    const canonical = renderPageMarkdownRecovery(graph, { requestedRoute: "/docs/cafe\u0301", limit: 1 });
+    expect(canonical).toContain("[Composed cafe](https://acme.com/docs/cafe)");
   });
 });
 

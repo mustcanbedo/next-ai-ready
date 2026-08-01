@@ -13,7 +13,7 @@ tags:
   - architecture
   - knowledge-plane
   - capability-plane
-updatedAt: '2026-06-02'
+updatedAt: '2026-08-01'
 author: next-ai-ready 团队
 ---
 
@@ -35,6 +35,11 @@ author: next-ai-ready 团队
 - **`/<page>.md`** — 每个页面渲染为干净的 Markdown（含 YAML header）
 - **`/<page>.ai.json`** — 结构化 JSON，包含语义节点和所有后代
 - **JSON-LD** — `Article`、`FAQPage`、`WebPage` 标记嵌入你的页面
+
+请求的 Markdown 页面不存在时，handler 会返回机器可读的 HTTP `200` 恢复文档，
+并设置 `X-Robots-Tag: noindex`；文档包含请求路径、`llms.txt`、`sitemap.md`
+以及最多五个相关页面。普通浏览器请求仍使用应用真实的 HTML `404`，因此
+Agent 恢复不会削弱 SEO 的错误页语义。
 
 ## 语义元数据
 

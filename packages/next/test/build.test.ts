@@ -104,7 +104,11 @@ describe("runtime handlers (post-build)", () => {
     const missing = await pageMdGET(new Request("https://x/nope.md"), {
       params: Promise.resolve({ path: ["nope"] }),
     });
-    expect(missing.status).toBe(404);
+    expect(missing.status).toBe(200);
+    expect(missing.headers.get("content-type")).toContain("text/markdown");
+    expect(missing.headers.get("cache-control")).toBe("no-store");
+    expect(missing.headers.get("x-robots-tag")).toBe("noindex");
+    expect(await missing.text()).toContain('document_status: "not_found"');
     } finally {
       process.chdir(originalCwd);
     }

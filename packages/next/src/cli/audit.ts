@@ -52,6 +52,9 @@ const WEIGHTS = {
   jsonLd: 4,
   h1: 4,
   notFound: 6,
+  // Compatibility-only in report v1: expose the new check without changing
+  // legacy scores or turning previously passing CI gates into failures.
+  agentNotFound: 0,
 } as const;
 
 /** Audit the deployed behavior that crawlers and agents actually receive. */
@@ -71,7 +74,9 @@ export async function runAudit(target: string, options: AuditOptions = {}): Prom
 
   const origin = pageUrl.origin;
   const markdownUrl = toMarkdownUrl(pageUrl);
-  const missingUrl = new URL("/_next-ai-ready-audit-missing", origin);
+  // Keep the probe outside Next.js and next-ai-ready reserved namespaces so
+  // content negotiation can exercise the same rewrite as a normal page.
+  const missingUrl = new URL("/ai-ready-audit-missing-page-9f8e7d6c", origin);
   const discoveryUrls = {
     llms: new URL("/llms.txt", origin),
     sitemapXml: new URL("/sitemap.xml", origin),
@@ -79,7 +84,17 @@ export async function runAudit(target: string, options: AuditOptions = {}): Prom
     robots: new URL("/robots.txt", origin),
   };
 
-  const [llms, sitemapXml, sitemapMd, robots, acceptMarkdown, agentUserAgent, explicitMarkdown, notFound] =
+  const [
+    llms,
+    sitemapXml,
+    sitemapMd,
+    robots,
+    acceptMarkdown,
+    agentUserAgent,
+    explicitMarkdown,
+    htmlNotFound,
+    agentNotFound,
+  ] =
     await Promise.all([
       fetchText(fetchImpl, discoveryUrls.llms, {}, timeoutMs),
       fetchText(fetchImpl, discoveryUrls.sitemapXml, {}, timeoutMs),
@@ -88,7 +103,20 @@ export async function runAudit(target: string, options: AuditOptions = {}): Prom
       fetchText(fetchImpl, pageUrl, { headers: { Accept: "text/markdown" } }, timeoutMs),
       fetchText(fetchImpl, pageUrl, { headers: { "User-Agent": "GPTBot/1.0" } }, timeoutMs),
       fetchText(fetchImpl, markdownUrl, {}, timeoutMs),
-      fetchText(fetchImpl, missingUrl, {}, timeoutMs),
+      fetchText(
+        fetchImpl,
+        missingUrl,
+        {
+          headers: {
+            Accept: "text/html",
+            "Sec-Fetch-Dest": "document",
+            "Sec-Fetch-Mode": "navigate",
+            "User-Agent": "Mozilla/5.0 (compatible; next-ai-ready-audit/1.0)",
+          },
+        },
+        timeoutMs,
+      ),
+      fetchText(fetchImpl, missingUrl, { headers: { Accept: "text/markdown" } }, timeoutMs),
     ]);
 
   const weightedChecks: Array<AuditCheck & { weight: number }> = [];
@@ -119,7 +147,7 @@ export async function runAudit(target: string, options: AuditOptions = {}): Prom
   addDiscoveryCheck(add, "sitemap-md", "sitemap.md", sitemapMd, discoveryUrls.sitemapMd, "markdown", WEIGHTS.sitemapMd);
   addDiscoveryCheck(add, "robots-txt", "robots.txt", robots, discoveryUrls.robots, "text/plain", WEIGHTS.robots);
 
-  const acceptOk = isMarkdown(acceptMarkdown);
+  const acceptOk = isPageMarkdown(acceptMarkdown);
   add(
     "accept-markdown",
     "Accept negotiation",
@@ -131,7 +159,7 @@ export async function runAudit(target: string, options: AuditOptions = {}): Prom
     WEIGHTS.acceptMarkdown,
   );
 
-  const agentUaOk = isMarkdown(agentUserAgent);
+  const agentUaOk = isPageMarkdown(agentUserAgent);
   add(
     "agent-user-agent",
     "AI user-agent negotiation",
@@ -143,7 +171,7 @@ export async function runAudit(target: string, options: AuditOptions = {}): Prom
     WEIGHTS.agentUserAgent,
   );
 
-  const explicitOk = isMarkdown(explicitMarkdown);
+  const explicitOk = isPageMarkdown(explicitMarkdown);
   const rootCandidate = pageUrl.pathname === "/";
   add(
     "explicit-markdown",
@@ -156,18 +184,33 @@ export async function runAudit(target: string, options: AuditOptions = {}): Prom
     WEIGHTS.explicitMarkdown,
   );
 
-  const markdownResponse = acceptOk ? acceptMarkdown : explicitMarkdown;
-  const vary = markdownResponse.headers.get("vary")?.toLowerCase() ?? "";
-  const canonicalLink = markdownResponse.headers.get("link") ?? "";
+  const markdownResponse = acceptOk ? acceptMarkdown : explicitOk ? explicitMarkdown : acceptMarkdown;
+  const vary = headerTokens(markdownResponse.headers.get("vary"));
+  const negotiatedResponse = markdownResponse === acceptMarkdown;
+  const cacheSafe = !negotiatedResponse || vary.has("accept");
+  const agentVary = headerTokens(agentUserAgent.headers.get("vary"));
+  const agentCacheSafe = !agentUaOk || agentVary.has("user-agent");
+  const markdownLink = markdownResponse.headers.get("link") ?? "";
+  const htmlLink = initialPage.headers.get("link") ?? "";
   const contentLocation = markdownResponse.headers.get("content-location") ?? "";
-  const headersOk = vary.includes("accept") && vary.includes("user-agent") && /rel=["']?canonical/i.test(canonicalLink) && contentLocation.length > 0;
+  const relationSignals = [
+    hasLinkRelation(markdownLink, "canonical") ? "Markdown canonical Link" : null,
+    contentLocation.length > 0 ? "Content-Location" : null,
+    hasLinkRelation(htmlLink, "alternate", "text/markdown") ? "HTTP Markdown alternate" : null,
+    findMarkdownAlternate(initialPage.body) ? "HTML Markdown alternate" : null,
+  ].filter((signal): signal is string => signal !== null);
+  const headersOk = cacheSafe && agentCacheSafe && relationSignals.length > 0;
   add(
     "markdown-headers",
     "Markdown response metadata",
     headersOk ? "pass" : "warn",
     headersOk
-      ? "Markdown includes Vary, canonical Link, and Content-Location headers."
-      : "Add Vary: Accept, User-Agent plus canonical Link and Content-Location headers.",
+      ? `Markdown negotiation metadata is discoverable (${relationSignals.join(", ")}).`
+      : !cacheSafe
+        ? "Add Vary: Accept when the same URL negotiates HTML and Markdown."
+        : !agentCacheSafe
+          ? "Add Vary: User-Agent when the response changes for AI user agents."
+          : "Advertise the Markdown representation with a canonical Link, Content-Location, or text/markdown alternate link.",
     markdownResponse.url,
     WEIGHTS.markdownHeaders,
   );
@@ -222,14 +265,40 @@ export async function runAudit(target: string, options: AuditOptions = {}): Prom
     WEIGHTS.h1,
   );
 
-  const notFoundOk = notFound.status === 404;
+  const notFoundOk = htmlNotFound.status === 404;
   add(
     "real-404",
     "Missing-page semantics",
     notFoundOk ? "pass" : "fail",
-    notFoundOk ? "A missing URL returns HTTP 404." : `Expected HTTP 404, received ${notFound.status || "a network error"}.`,
+    notFoundOk
+      ? "A browser-style HTML request for a missing URL returns HTTP 404."
+      : `Expected an HTML HTTP 404, received ${htmlNotFound.status || "a network error"}.`,
     missingUrl,
     WEIGHTS.notFound,
+  );
+
+  const agentRecoveryBody = agentNotFound.body.trim();
+  const hasRecoveryLink = /(?<!!)\[[^\]]+\]\((?:https?:\/\/|\/)[^)]+\)/i.test(agentRecoveryBody);
+  const hasDiscoveryPath = /\/(?:llms\.txt|sitemap\.md)\b/i.test(agentRecoveryBody);
+  const hasNoIndex = headerTokens(agentNotFound.headers.get("x-robots-tag")).has("noindex");
+  const agentNotFoundOk =
+    agentNotFound.status === 200 &&
+    isMarkdown(agentNotFound) &&
+    isRecoveryMarkdown(agentRecoveryBody) &&
+    hasNoIndex &&
+    (hasRecoveryLink || hasDiscoveryPath);
+  add(
+    "agent-markdown-404",
+    "Agent missing-page recovery",
+    agentNotFoundOk ? "pass" : "warn",
+    agentNotFoundOk
+      ? "An agent requesting a missing URL receives actionable Markdown with HTTP 200."
+      : responseFailure(
+          agentNotFound,
+          "Expected HTTP 200 recovery Markdown with noindex and a navigation or discovery link. This is advisory in audit report v1.",
+        ),
+    missingUrl,
+    WEIGHTS.agentNotFound,
   );
 
   const earned = weightedChecks.reduce(
@@ -317,6 +386,19 @@ function isMarkdown(result: FetchResult): boolean {
   return result.ok && contentType(result).includes("text/markdown");
 }
 
+function isPageMarkdown(result: FetchResult): boolean {
+  return isMarkdown(result) && !isRecoveryMarkdown(result.body);
+}
+
+function isRecoveryMarkdown(body: string): boolean {
+  const frontmatter = body.match(/^---\s*\n([\s\S]*?)\n---(?:\s*\n|$)/)?.[1] ?? "";
+  return (
+    /^document_status\s*:\s*["']?not_found["']?\s*$/im.test(frontmatter) ||
+    /^recovery\s*:\s*true\s*$/im.test(frontmatter) ||
+    /^#\s+(?:page\s+)?not found\s*$/im.test(body)
+  );
+}
+
 function responseFailure(result: FetchResult, fallback: string): string {
   if (result.error) return `${fallback} Network error: ${result.error}`;
   return `${fallback} Received HTTP ${result.status} (${contentType(result) || "no content-type"}).`;
@@ -350,6 +432,46 @@ function findCanonical(html: string): string | null {
     if (attrs.rel?.toLowerCase().split(/\s+/).includes("canonical") && attrs.href) return attrs.href;
   }
   return null;
+}
+
+function findMarkdownAlternate(html: string): string | null {
+  for (const tag of html.match(/<link\b[^>]*>/gi) ?? []) {
+    const attrs = parseAttributes(tag);
+    const relations = attrs.rel?.toLowerCase().split(/\s+/) ?? [];
+    if (relations.includes("alternate") && attrs.type?.toLowerCase() === "text/markdown" && attrs.href) {
+      return attrs.href;
+    }
+  }
+  return null;
+}
+
+function headerTokens(value: string | null): Set<string> {
+  return new Set(
+    (value ?? "")
+      .split(",")
+      .map((token) => token.trim().toLowerCase())
+      .filter(Boolean),
+  );
+}
+
+function hasLinkRelation(value: string, relation: string, type?: string): boolean {
+  const expectedRelation = relation.toLowerCase();
+  const expectedType = type?.toLowerCase();
+
+  for (const match of value.matchAll(/<([^>]*)>((?:\s*;\s*[^,]*)*)/g)) {
+    const parameters: Record<string, string> = {};
+    const parameterText = match[2] ?? "";
+    const pattern = /;\s*([\w-]+)\s*=\s*(?:"([^"]*)"|'([^']*)'|([^;,\s]+))/g;
+    for (const parameter of parameterText.matchAll(pattern)) {
+      parameters[parameter[1]!.toLowerCase()] = parameter[2] ?? parameter[3] ?? parameter[4] ?? "";
+    }
+
+    const relations = parameters.rel?.toLowerCase().split(/\s+/) ?? [];
+    if (relations.includes(expectedRelation) && (!expectedType || parameters.type?.toLowerCase() === expectedType)) {
+      return true;
+    }
+  }
+  return false;
 }
 
 function findMetaDescription(html: string): string | null {

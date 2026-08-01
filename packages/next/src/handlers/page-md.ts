@@ -1,5 +1,5 @@
 import "server-only";
-import { renderPageMarkdown } from "@next-ai-ready/llms";
+import { renderPageMarkdown, renderPageMarkdownRecovery } from "@next-ai-ready/llms";
 import { loadGraph } from "../runtime/graph-loader.js";
 import { emitAiRequest } from "../runtime/observability.js";
 import { resolveParams } from "../runtime/params.js";
@@ -17,7 +17,20 @@ export async function GET(req: Request, ctx: { params: Promise<{ path?: string[]
   const route = path.length === 0 ? "/" : "/" + path.join("/");
   const graph = await loadGraph();
   const body = renderPageMarkdown(graph, route);
-  if (!body) return new Response("Not found", { status: 404 });
+  if (!body) {
+    const requestedPath = new URL(req.url).pathname;
+    const recovery = renderPageMarkdownRecovery(graph, { requestedRoute: route, requestedPath });
+    return new Response(recovery, {
+      status: 200,
+      headers: {
+        "content-type": "text/markdown; charset=utf-8",
+        "cache-control": "no-store",
+        "content-location": requestedPath,
+        "x-robots-tag": "noindex",
+        vary: "Accept, User-Agent",
+      },
+    });
+  }
   const canonical = new URL(route, graph.site.baseUrl).toString();
   return new Response(body, {
     headers: {

@@ -108,7 +108,9 @@ Opt in to Markdown content negotiation in `next.config.mjs`:
 export default withAiReady({ agentReadable: true })(nextConfig)
 ```
 
-This serves page Markdown for `Accept: text/markdown` and known agent User-Agents, while normal browser requests continue to receive HTML.
+This serves page Markdown for `Accept: text/markdown` and known agent User-Agents, while normal browser requests continue to receive HTML. Missing browser pages keep a real HTTP `404`; missing Markdown representations return a `200` recovery document with the requested path, discovery links, and up to five relevant pages so agents can continue navigating.
+
+`next-ai-ready audit <url>` verifies those browser and agent behaviors independently. Its JSON contract remains backward compatible while the checks accept standards-compatible response metadata from other implementations.
 
 **Get started in 10 minutes:** [`docs/quickstart-10min.md`](./docs/quickstart-10min.md) · [中文](./docs/quickstart-10min.zh-CN.md)
 

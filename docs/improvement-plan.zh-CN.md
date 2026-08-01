@@ -78,9 +78,9 @@
 | A0-01 | 将 Audit 输出重构为 `Agent Readability`、`Semantic/AEO Quality`、`Agent Capability` 三层 | `待验证` | JSON schema、CLI 和文档使用同一模型；旧版兼容路径有迁移说明 |
 | A0-02 | 为每条检查标记 `standard` 或 `enhancement` | `待验证` | 用户能区分外部标准要求与 next-ai-ready 增强建议 |
 | A0-03 | 建立 Vercel Agent Readability Spec 对照表 | `待验证` | 已按官方 `0.5.0` 的 25 项检查标注直接覆盖、部分覆盖或仅官方门禁；详见[版本化对照表](./vercel-agent-readability-mapping.zh-CN.md) |
-| A0-04 | 增加外部站点回归夹具 | `待开始` | 至少覆盖 Nuxt SEO、普通 Next.js 文档站和缺少 AI 输出的网站；结果可重复 |
+| A0-04 | 增加外部站点回归夹具 | `待验证` | 已用离线响应夹具覆盖 Nuxt SEO、普通 Next.js 文档站和缺少 AI 输出的网站；来源 URL、采样日期和官方分数均已记录 |
 | A0-05 | 固化双 404 行为测试 | `已完成` | 浏览器 `404`；Agent Markdown `200` + `noindex` + 请求路径 + 发现入口 + 相似页面 |
-| A0-06 | 进行独立线上复测 | `待开始` | 记录检测工具、日期、URL、原始结果；不能用自有 Audit 代替 |
+| A0-06 | 进行独立线上复测 | `待验证` | 官方 `0.5.0` 对生产 URL 得分 `100/100`；工具、日期、URL 与 25 项结果已保存为[机器可读基线](./audit-baselines/vercel-agent-readability-0.5.0-2026-08-01.json) |
 | A0-07 | 引入 Vercel 官方 Agent Readability 质量门 | `待验证` | 固定官方依赖版本；提供本地与 CI 命令；线上站低于 `100/100` 时质量门失败 |
 
 P0 完成条件：

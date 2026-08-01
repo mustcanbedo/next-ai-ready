@@ -383,7 +383,7 @@ describe("runAudit()", () => {
       "agent-capability",
     ]);
     expect(result.planes.every((plane) => plane.score === 100 && plane.status === "pass")).toBe(true);
-    expect(result.checks).toHaveLength(19);
+    expect(result.checks).toHaveLength(20);
     expect(result.checks.find((check) => check.id === "llms-txt")).toMatchObject({
       source: "external-standard",
       tier: "required",
@@ -407,8 +407,27 @@ describe("runAudit()", () => {
 
     expect(result.score).toBe(82);
     expect(planes.get("agent-readability")).toMatchObject({ score: 82, status: "fail" });
-    expect(planes.get("semantic-aeo-quality")).toMatchObject({ score: 100, status: "pass" });
+    expect(planes.get("semantic-aeo-quality")).toMatchObject({ score: 91, status: "warn" });
     expect(planes.get("agent-capability")).toMatchObject({ score: 100, status: "pass" });
+  });
+
+  it("keeps Vercel-compatible missing-page Markdown separate from recovery-quality enhancements", async () => {
+    const { target } = await startFixtureServer({ emptyAgentMissingFallback: true });
+    const result = await runAudit(target, { version: "3", timeoutMs: 2_000 });
+    const checks = new Map(result.checks.map((check) => [check.id, check]));
+    const readability = result.planes.find((plane) => plane.id === "agent-readability");
+    const semantic = result.planes.find((plane) => plane.id === "semantic-aeo-quality");
+
+    expect(checks.get("agent-markdown-404")).toMatchObject({
+      source: "external-standard",
+      status: "pass",
+    });
+    expect(checks.get("agent-markdown-recovery-quality")).toMatchObject({
+      source: "next-ai-ready-enhancement",
+      status: "warn",
+    });
+    expect(readability).toMatchObject({ score: 100, status: "pass" });
+    expect(semantic).toMatchObject({ status: "warn", warnings: 1 });
   });
 
   it.each(["invalid", "missing"] as const)(

@@ -195,6 +195,11 @@ Readability preflight score; run the pinned `pnpm audit:vercel:site` command for
 the official external Vercel score. V3 is intentionally a smaller local preflight,
 not a reimplementation of all 25 official checks.
 
+For missing pages, v3 scores the Vercel-compatible `200 text/markdown` behavior
+in Agent Readability. The stricter `noindex` plus recovery-link guidance is a
+separate `next-ai-ready-enhancement` in Semantic/AEO Quality, so it cannot create
+a false failure against the external standard.
+
 The command exits with code 1 when a required check fails, so the JSON form can
 act as a post-deployment CI gate. Warnings reduce the score without failing CI.
 
@@ -2161,6 +2166,11 @@ Agent Readability、Semantic/AEO Quality 与 Agent Capability，警告不再获�
 `next-ai-ready-enhancement`。顶层兼容分数是本地 Readability 预检结果；
 官方 Vercel 外部评分以仓库固定的 `pnpm audit:vercel:site` 命令为准。v3
 有意只做更小的本地预检，并不重新实现官方全部 25 项检查。
+
+对于缺失页，v3 在 Agent Readability 中只评估与 Vercel 一致的
+`200 text/markdown` 行为；更严格的 `noindex` 与恢复链接要求会作为
+Semantic/AEO Quality 中独立的 `next-ai-ready-enhancement`，不会造成相对
+外部标准的假失败。
 
 必需项失败时命令以代码 1 退出，因此 JSON 输出可作为部署后的 CI 门禁。
 警告只降低分数，不会让 CI 失败。

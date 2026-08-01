@@ -338,7 +338,11 @@ const AUDIT_V3_CHECKS: Record<string, AuditV3CheckConfig> = {
   "agent-markdown-404": standard(
     ["agent-readability"],
     "recommended",
-    "Return useful Markdown recovery for missing Agent requests.",
+    "Return HTTP 200 with Markdown for missing Agent requests.",
+  ),
+  "agent-markdown-recovery-quality": enhancement(
+    "Add noindex plus a discovery or navigation link to Agent missing-page Markdown.",
+    ["semantic-aeo-quality"],
   ),
   "tools-manifest": enhancement("Publish a valid /tools.json manifest for callable actions."),
   "openapi-spec": enhancement("Publish a valid OpenAPI 3.x document for callable actions."),
@@ -355,9 +359,12 @@ function standard(
   return { planes, source: "external-standard", tier, recommendation };
 }
 
-function enhancement(recommendation: string): AuditV3CheckConfig {
+function enhancement(
+  recommendation: string,
+  planes: AuditPlaneId[] = ["agent-capability"],
+): AuditV3CheckConfig {
   return {
-    planes: ["agent-capability"],
+    planes,
     source: "next-ai-ready-enhancement",
     tier: "enhancement",
     recommendation,
@@ -600,19 +607,45 @@ export async function runAudit(
     isRecoveryMarkdown(agentRecoveryBody) &&
     hasNoIndex &&
     (hasRecoveryLink || hasDiscoveryPath);
-  add(
-    "agent-markdown-404",
-    "Agent missing-page recovery",
-    agentNotFoundOk ? "pass" : "warn",
-    agentNotFoundOk
+  const agentNotFoundMarkdownOk = agentNotFound.status === 200 && isMarkdown(agentNotFound);
+  const agentNotFoundStatus = options.version === "3"
+    ? agentNotFoundMarkdownOk
+      ? "pass"
+      : "warn"
+    : agentNotFoundOk
+      ? "pass"
+      : "warn";
+  const agentNotFoundMessage = options.version === "3"
+    ? agentNotFoundMarkdownOk
+      ? "An agent requesting a missing URL receives Markdown with HTTP 200."
+      : responseFailure(agentNotFound, "Expected HTTP 200 Markdown for an Agent missing-page request.")
+    : agentNotFoundOk
       ? "An agent requesting a missing URL receives actionable Markdown with HTTP 200."
       : responseFailure(
           agentNotFound,
           "Expected HTTP 200 recovery Markdown with noindex and a navigation or discovery link. This is advisory in audit report v1.",
-        ),
+        );
+  add(
+    "agent-markdown-404",
+    "Agent missing-page recovery",
+    agentNotFoundStatus,
+    agentNotFoundMessage,
     missingUrl,
     WEIGHTS.agentNotFound,
   );
+
+  if (options.version === "3") {
+    add(
+      "agent-markdown-recovery-quality",
+      "Agent missing-page recovery quality",
+      agentNotFoundOk ? "pass" : "warn",
+      agentNotFoundOk
+        ? "Missing-page Markdown includes noindex plus an actionable discovery or navigation link."
+        : "Add X-Robots-Tag: noindex plus a discovery or navigation link to missing-page Markdown.",
+      missingUrl,
+      0,
+    );
+  }
 
   const timestamp = new Date().toISOString();
   if (options.version === "3") {

@@ -155,6 +155,11 @@ Readability preflight score; run the pinned `pnpm audit:vercel:site` command for
 the official external Vercel score. V3 is intentionally a smaller local preflight,
 not a reimplementation of all 25 official checks.
 
+For missing pages, v3 scores the Vercel-compatible `200 text/markdown` behavior
+in Agent Readability. The stricter `noindex` plus recovery-link guidance is a
+separate `next-ai-ready-enhancement` in Semantic/AEO Quality, so it cannot create
+a false failure against the external standard.
+
 The command exits with code 1 when a required check fails, so the JSON form can
 act as a post-deployment CI gate. Warnings reduce the score without failing CI.
 

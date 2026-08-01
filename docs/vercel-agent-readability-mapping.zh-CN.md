@@ -45,7 +45,7 @@ optional 每项 1 分，warning 不得分。当前 10 项 required、15 项 reco
 | Can agents read you | .md URL -> markdown | required | `explicit-markdown` | 部分覆盖 | 本地只验证当前目标页，官方会从站点发现结果抽样 |
 | Can agents read you | Markdown link alternate | recommended | `markdown-headers` | 部分覆盖 | 本地接受 alternate、canonical Link 或 Content-Location 中任一发现信号 |
 | Can agents read you | Frontmatter | recommended | `markdown-frontmatter` | 部分覆盖 | 本地确认 YAML frontmatter；字段完整性由官方门禁验证 |
-| Can agents read you | Missing page -> markdown | recommended | `agent-markdown-404` | 对应 | Agent 缺页返回 `200` Markdown；本地额外要求 `noindex` 和恢复入口 |
+| Can agents read you | Missing page -> markdown | recommended | `agent-markdown-404` | 对应 | Agent 缺页返回 `200` Markdown；`noindex` 和恢复入口由独立增强项评估 |
 | Can agents read you | Page size (markdown) | recommended | - | 仅官方门禁 | 官方 CLI 验证 Markdown 不会挤占 Agent 上下文 |
 | Can agents read you | Code fence validity | recommended | - | 仅官方门禁 | 官方 CLI 验证代码围栏闭合 |
 | Is your HTML agent-friendly | Server-rendered content | required | `html-response` | 部分覆盖 | 本地检查 SSR HTML 响应；官方 CLI 抽样正文可见性 |
@@ -66,6 +66,7 @@ Readability `100/100` 只能表示本地单页预检全通过，不能与官方 
 | 平面 | 本地检查 | 意义 |
 |---|---|---|
 | Semantic/AEO Quality | `markdown-frontmatter`、`html-canonical`、`meta-description`、`json-ld`、`page-h1` | 改善内容归因、语义理解和引用质量 |
+| Semantic/AEO Quality | `agent-markdown-recovery-quality` | 缺页 Markdown 提供 `noindex` 和可继续导航的恢复入口 |
 | Agent Capability | `tools-manifest` | Agent 能发现可调用工具 |
 | Agent Capability | `openapi-spec` | Agent 能理解 HTTP Action 契约 |
 | Agent Capability | `mcp-endpoint` | Agent 能通过受保护的 MCP 协议调用能力 |

@@ -9,6 +9,8 @@ questions:
     a: 不会。它用机器可读的发现、检索和 Agent 能力接口来补充技术 SEO。
   - q: 安装后需要重写 UI 吗？
     a: 不需要。生成的知识与能力路由会和现有 App Router 页面并行运行。
+  - q: next-ai-ready 如何验证 Agent 可读性？
+    a: 生产文档站于 2026 年 8 月 1 日使用固定版本的 Vercel 开源 Agent Readability CLI v0.5.0 获得 100/100；仓库同时保存原始结果和定期审计工作流。
 tags:
   - next.js
   - aeo
@@ -37,6 +39,16 @@ npx next-ai-ready build
 ```
 
 框架会在不替换可视页面的前提下，增加机器可读路由与构建产物。
+
+## 已验证的可读性基线
+
+生产文档站于 2026 年 8 月 1 日使用 Vercel 开源的 `@vercel/agent-readability@0.5.0`，在全部 25 项检查中获得 **100/100**。
+
+- [机器可读原始结果](https://github.com/mustcanbedo/next-ai-ready/blob/main/docs/audit-baselines/vercel-agent-readability-0.5.0-2026-08-01.json)
+- [定期 Agent Readability 工作流](https://github.com/mustcanbedo/next-ai-ready/actions/workflows/agent-readability.yml)
+- 本地运行 `pnpm audit:vercel:site` 可复现
+
+该第三方工具分数仅衡量技术层面的 Agent 可读性，不保证排名、收录或引用。
 
 ## 开始使用
 

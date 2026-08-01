@@ -28,6 +28,16 @@ npx next-ai-ready build
 
 The framework adds machine-readable routes and build artifacts without replacing the site's visual pages.
 
+## Verified readability baseline
+
+The production documentation scored **100/100** across all 25 checks in Vercel's open-source `@vercel/agent-readability@0.5.0` on August 1, 2026.
+
+- [Machine-readable result](https://github.com/mustcanbedo/next-ai-ready/blob/main/docs/audit-baselines/vercel-agent-readability-0.5.0-2026-08-01.json)
+- [Recurring Agent Readability workflow](https://github.com/mustcanbedo/next-ai-ready/actions/workflows/agent-readability.yml)
+- Reproduce locally with `pnpm audit:vercel:site`
+
+This third-party tool score measures technical agent readability. It does not guarantee ranking, indexing, or citation.
+
 ## Start here
 
 - [Introduction](/en/docs/introduction)
@@ -50,6 +60,10 @@ No. It complements technical SEO with machine-readable discovery, retrieval, and
 ### Does installation require a UI rewrite?
 
 No. The generated knowledge and capability routes run alongside the existing App Router pages.
+
+### How is next-ai-ready's agent readability verified?
+
+The production documentation scored 100/100 with the pinned open-source Vercel Agent Readability CLI v0.5.0 on August 1, 2026. The repository includes the raw result and a recurring workflow.
 
 
 <!-- END /en -->
@@ -2010,6 +2024,16 @@ npx next-ai-ready build
 
 框架会在不替换可视页面的前提下，增加机器可读路由与构建产物。
 
+## 已验证的可读性基线
+
+生产文档站于 2026 年 8 月 1 日使用 Vercel 开源的 `@vercel/agent-readability@0.5.0`，在全部 25 项检查中获得 **100/100**。
+
+- [机器可读原始结果](https://github.com/mustcanbedo/next-ai-ready/blob/main/docs/audit-baselines/vercel-agent-readability-0.5.0-2026-08-01.json)
+- [定期 Agent Readability 工作流](https://github.com/mustcanbedo/next-ai-ready/actions/workflows/agent-readability.yml)
+- 本地运行 `pnpm audit:vercel:site` 可复现
+
+该第三方工具分数仅衡量技术层面的 Agent 可读性，不保证排名、收录或引用。
+
 ## 开始使用
 
 - [简介](/zh/docs/introduction)
@@ -2032,6 +2056,10 @@ npx next-ai-ready build
 ### 安装后需要重写 UI 吗？
 
 不需要。生成的知识与能力路由会和现有 App Router 页面并行运行。
+
+### next-ai-ready 如何验证 Agent 可读性？
+
+生产文档站于 2026 年 8 月 1 日使用固定版本的 Vercel 开源 Agent Readability CLI v0.5.0 获得 100/100；仓库同时保存原始结果和定期审计工作流。
 
 
 <!-- END /zh -->

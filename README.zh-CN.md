@@ -4,6 +4,13 @@ English | [中文文档](./README.zh-CN.md)
 
 **在线文档：** [中文](https://next-ai-ready.vercel.app/zh) · [English](https://next-ai-ready.vercel.app/en)
 
+[![npm alpha](https://img.shields.io/npm/v/next-ai-ready/alpha.svg?label=npm%20alpha)](https://www.npmjs.com/package/next-ai-ready)
+[![CI](https://github.com/mustcanbedo/next-ai-ready/actions/workflows/ci.yml/badge.svg)](https://github.com/mustcanbedo/next-ai-ready/actions/workflows/ci.yml)
+[![Agent Readability](https://github.com/mustcanbedo/next-ai-ready/actions/workflows/agent-readability.yml/badge.svg)](https://github.com/mustcanbedo/next-ai-ready/actions/workflows/agent-readability.yml)
+[![Vercel Agent Readability: 100/100](https://img.shields.io/badge/Vercel%20Agent%20Readability-100%2F100-000000?logo=vercel)](./docs/audit-baselines/vercel-agent-readability-0.5.0-2026-08-01.json)
+
+> **第三方工具基线：** 生产文档站在 2026-08-01 使用 Vercel 开源的 `@vercel/agent-readability@0.5.0` 获得 **100/100**。[查看机器可读原始结果](./docs/audit-baselines/vercel-agent-readability-0.5.0-2026-08-01.json)，或运行 `pnpm audit:vercel:site` 复现。该分数衡量技术层面的 Agent 可读性，不代表搜索排名、收录或引用效果。
+
 > 传统网站为浏览器而建。
 > **next-ai-ready** 让你的 Next.js 站点被 AI **可读**、被 Agent **可调用**。
 >

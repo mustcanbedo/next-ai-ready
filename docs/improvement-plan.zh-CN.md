@@ -3,7 +3,7 @@
 > 最后更新：2026-08-01  
 > 维护者视角：`next-ai-ready` 原始作者与技术负责人  
 > 当前发布：npm `0.1.0-alpha.12`  
-> 当前功能分支：`codex/audit-v2-mcp-discovery`
+> 当前主分支基线：`4965734`（PR #3 已合并）
 
 本文是后续优化的**执行状态与决策记录**。`roadmap.md` 保留工程阶段历史，
 `post-ga.md` 保留候选方向；当它们与本文的当前优先级冲突时，以本文为准。
@@ -61,7 +61,7 @@
 | Audit 三层报告 | `待验证` | v1/v2 保持兼容；v3 已拆分 Readability、Semantic/AEO 与 Capability，并使用严格分层计分 |
 | MCP 页面发现 | `进行中` | 功能分支已有 `list_pages`、`get_page`、`search_pages` 和分页；尚缺 locale 过滤及 HTTP 共用接口 |
 | Next.js 兼容验证 | `待验证` | npm/pnpm × Next.js 14/15/16 已进入 CI；本地抽样的 14、15、16 均完成真实生产构建，待 `main` 首次矩阵验证 |
-| Vercel 官方 Readability 基线 | `待验证` | 已固定 `@vercel/agent-readability@0.5.0` 并建立每周/手动质量门；待合入 `main` 后验证首次工作流 |
+| Vercel 官方 Readability 基线 | `已完成` | `main` 部署后已使用固定的 `@vercel/agent-readability@0.5.0` 复测生产站，25 项全部通过并保持 `100/100`；每周/手动工作流仍单独跟踪 |
 | npm GA | `待开始` | 当前仅发布 `0.1.0-alpha.12`，尚未发布 `0.1.0` |
 | i18n 与 Content Adapter | `待开始` | graph 有基础字段和 ContentSource 接口，但没有完整接入体验 |
 | 动态索引 | `待商榷` | 只保留 Provider 方向，等待真实需求证据 |
@@ -80,8 +80,9 @@
 | A0-03 | 建立 Vercel Agent Readability Spec 对照表 | `待验证` | 已按官方 `0.5.0` 的 25 项检查标注直接覆盖、部分覆盖或仅官方门禁；详见[版本化对照表](./vercel-agent-readability-mapping.zh-CN.md) |
 | A0-04 | 增加外部站点回归夹具 | `待验证` | 已用离线响应夹具覆盖 Nuxt SEO、普通 Next.js 文档站和缺少 AI 输出的网站；来源 URL、采样日期和官方分数均已记录，本地分数与固定官方基线偏差不得超过 3 分 |
 | A0-05 | 固化双 404 行为测试 | `已完成` | 浏览器 `404`；Agent Markdown `200` + `noindex` + 请求路径 + 发现入口 + 相似页面 |
-| A0-06 | 进行独立线上复测 | `待验证` | 官方 `0.5.0` 对生产 URL 得分 `100/100`；工具、日期、URL 与 25 项结果已保存为[机器可读基线](./audit-baselines/vercel-agent-readability-0.5.0-2026-08-01.json) |
+| A0-06 | 进行独立线上复测 | `已完成` | 官方 `0.5.0` 对生产 URL 得分 `100/100`；工具、日期、URL 与 25 项结果已保存为[机器可读基线](./audit-baselines/vercel-agent-readability-0.5.0-2026-08-01.json) |
 | A0-07 | 引入 Vercel 官方 Agent Readability 质量门 | `待验证` | 固定官方依赖版本；提供本地与 CI 命令；线上站低于 `100/100` 时质量门失败 |
+| A0-08 | 在 README 与网站公开第三方评分证据 | `待验证` | 首屏展示工具、版本、URL、日期、原始结果与复现入口，并明确不代表排名或引用 |
 
 P0 完成条件：
 

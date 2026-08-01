@@ -9,6 +9,8 @@ questions:
     a: No. It complements technical SEO with machine-readable discovery, retrieval, and agent capability interfaces.
   - q: Does installation require a UI rewrite?
     a: No. The generated knowledge and capability routes run alongside the existing App Router pages.
+  - q: How is next-ai-ready's agent readability verified?
+    a: The production documentation scored 100/100 with the pinned open-source Vercel Agent Readability CLI v0.5.0 on August 1, 2026. The repository includes the raw result and a recurring workflow.
 tags:
   - next.js
   - aeo
@@ -37,6 +39,16 @@ npx next-ai-ready build
 ```
 
 The framework adds machine-readable routes and build artifacts without replacing the site's visual pages.
+
+## Verified readability baseline
+
+The production documentation scored **100/100** across all 25 checks in Vercel's open-source `@vercel/agent-readability@0.5.0` on August 1, 2026.
+
+- [Machine-readable result](https://github.com/mustcanbedo/next-ai-ready/blob/main/docs/audit-baselines/vercel-agent-readability-0.5.0-2026-08-01.json)
+- [Recurring Agent Readability workflow](https://github.com/mustcanbedo/next-ai-ready/actions/workflows/agent-readability.yml)
+- Reproduce locally with `pnpm audit:vercel:site`
+
+This third-party tool score measures technical agent readability. It does not guarantee ranking, indexing, or citation.
 
 ## Start here
 

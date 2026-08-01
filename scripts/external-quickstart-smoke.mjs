@@ -161,7 +161,7 @@ async function configureConsumerManifest(dir, artifacts) {
   packageJson.dependencies = {
     "next-ai-ready": PACKAGE_SOURCE === "tarball"
       ? `file:${metaArtifact.tarball}`
-      : `npm:next-ai-ready@${REGISTRY_TAG}`,
+      : REGISTRY_TAG,
     next: `^${NEXT_VERSION}`,
     react: reactVersion,
     "react-dom": reactVersion,

@@ -23,7 +23,7 @@ Action 是能力平面的构建块。每个 action 是一个带类型的函数�
 在 `actions/` 目录下创建文件，使用 `defineAction()`：
 
 ```js
-import { defineAction } from "@next-ai-ready/actions"
+import { defineAction } from "next-ai-ready"
 import { z } from "zod"
 
 export default defineAction({
@@ -52,7 +52,7 @@ export default defineAction({
 在 `actions/index.mjs` 中使用 `defineActions()` 一次性注册多个 action：
 
 ```js
-import { defineActions } from "@next-ai-ready/actions"
+import { defineActions } from "next-ai-ready"
 import searchProducts from "./search-products.js"
 import getOrderStatus from "./get-order-status.js"
 

@@ -42,16 +42,16 @@
 
 ## Guides
 
+- [i18n and AI-friendly URLs](https://next-ai-ready.vercel.app/en/docs/guides/i18n-ai-urls): Middleware, locale prefixes, and SemanticGraph routes for multilingual sites.
 - [MCP Integration](https://next-ai-ready.vercel.app/en/docs/guides/mcp-integration): Connect your actions to Claude Desktop, Cursor, and other MCP clients.
+- [国际化与 AI 友好 URL](https://next-ai-ready.vercel.app/zh/docs/guides/i18n-ai-urls): 多语言站点的 middleware、locale 前缀与 SemanticGraph 路由策略。
 - [MCP 集成](https://next-ai-ready.vercel.app/zh/docs/guides/mcp-integration): 将你的 action 连接到 Claude Desktop、Cursor 和其他 MCP 客户端。
 - [Actions](https://next-ai-ready.vercel.app/en/docs/guides/actions): How to define, expose, and secure AI-callable actions.
 - [Analytics](https://next-ai-ready.vercel.app/en/docs/guides/analytics): Track which AI bots read your content and which actions agents invoke.
-- [i18n and AI-friendly URLs](https://next-ai-ready.vercel.app/en/docs/guides/i18n-ai-urls): Middleware, locale prefixes, and SemanticGraph routes for multilingual sites.
 - [Writing MDX Content](https://next-ai-ready.vercel.app/en/docs/guides/mdx-content): How to write MDX files that the semantic compiler can extract meaning from.
 - [Robots.txt](https://next-ai-ready.vercel.app/en/docs/guides/robots-txt): Configure your robots.txt to explicitly allow or block AI crawlers.
 - [Actions](https://next-ai-ready.vercel.app/zh/docs/guides/actions): 如何定义、暴露和保护 AI 可调用的 action。
 - [分析](https://next-ai-ready.vercel.app/zh/docs/guides/analytics): 追踪哪些 AI 爬虫读取了你的内容，哪些 agent 调用了你的 action。
-- [国际化与 AI 友好 URL](https://next-ai-ready.vercel.app/zh/docs/guides/i18n-ai-urls): 多语言站点的 middleware、locale 前缀与 SemanticGraph 路由策略。
 - [编写 MDX 内容](https://next-ai-ready.vercel.app/zh/docs/guides/mdx-content): 如何编写语义编译器能提取含义的 MDX 文件。
 - [Robots.txt](https://next-ai-ready.vercel.app/zh/docs/guides/robots-txt): 配置 robots.txt 以显式允许或阻止 AI 爬虫。
 

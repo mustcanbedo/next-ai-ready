@@ -4,13 +4,15 @@ summary: 多语言站点的 middleware、locale 前缀与 SemanticGraph 路由�
 order: 8
 questions:
   - q: locale 前缀如何影响 AI 路由？
-    a: 每个 locale 路径（如 /zh/docs/page）在语义图谱中是独立路由。
+    a: 每个已识别的 locale 路径都是独立路由，graph 同时写入 locale 元数据和 routesByLocale 索引。
+  - q: MCP 页面工具可以按 locale 过滤吗？
+    a: 暂时不可以。MCP 结果包含页面 locale，但 list_pages 与 search_pages 还没有 locale 参数。
   - q: middleware 应 redirect AI 产物 URL 吗？
     a: 不应。matcher 需排除带点路径、/api、_ai-ready，避免爬虫被重定向。
 tags:
   - how-to
   - best-practices
-updatedAt: '2026-06-02'
+updatedAt: '2026-08-01'
 author: next-ai-ready 团队
 ---
 
@@ -38,7 +40,9 @@ export default defineConfig({
 });
 ```
 
-各 locale 在 SemanticGraph 中是独立路由。节点尚无内置 `locale` 字段（Phase 6 P6-06）——将 `/en/...` 与 `/zh/...` 视为不同页面。
+`en`、`zh` 等已识别的路由前缀会写入页面节点的 `locale` 字段。生成的 `SemanticGraph.routesByLocale` 还会将语言内相对路由映射回页面 id，同时保留扁平 `routes` 以兼容现有消费者。
+
+MCP 页面结果会返回 locale；`list_pages` 与 `search_pages` 暂无 locale 过滤参数，因此多语言客户端目前应使用路由前缀缩小结果范围。
 
 ## Middleware
 
@@ -60,6 +64,6 @@ export const config = {
 
 可用 config `sections` 在 `llms.txt` 中优先展示某一语言，或为每种语言单独部署。
 
-## 后续（Phase 6）
+## 当前限制
 
-见 [`docs/phase6-design.md`](../../../../docs/phase6-design.md)。
+自动生成 `Available Languages`、Markdown alternate frontmatter、`hreflang` 响应链接以及 MCP locale 过滤仍在规划中。当前边界见 [Phase 6 设计](https://github.com/mustcanbedo/next-ai-ready/blob/main/docs/phase6-design.md)。

@@ -27,7 +27,7 @@ Actions are the building blocks of the Capability Plane. Each action is a typed 
 Create a file in `actions/` and use `defineAction()`:
 
 ```js
-import { defineAction } from "@next-ai-ready/actions"
+import { defineAction } from "next-ai-ready"
 import { z } from "zod"
 
 export default defineAction({
@@ -56,7 +56,7 @@ export default defineAction({
 Use `defineActions()` in your `actions/index.mjs` to register multiple actions at once:
 
 ```js
-import { defineActions } from "@next-ai-ready/actions"
+import { defineActions } from "next-ai-ready"
 import searchProducts from "./search-products.js"
 import getOrderStatus from "./get-order-status.js"
 

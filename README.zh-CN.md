@@ -11,6 +11,8 @@ English | [中文文档](./README.zh-CN.md)
 
 > **第三方工具基线：** 生产文档站在 2026-08-01 使用 Vercel 开源的 `@vercel/agent-readability@0.5.0` 获得 **100/100**。[查看机器可读原始结果](./docs/audit-baselines/vercel-agent-readability-0.5.0-2026-08-01.json)，或运行 `pnpm audit:vercel:site` 复现。该分数衡量技术层面的 Agent 可读性，不代表搜索排名、收录或引用效果。
 
+> **发布渠道：** 本仓库与文档站跟随 `main`；npm 当前为 `0.1.0-alpha.12`。`main` 中的 TypeScript Action 加载修复及 `/actions`、`/config`、`/json-ld`、`/robots`、`/audit` 专用入口将在下一个预发布版本提供。除非明确标为仅限 `main`，代码示例均保持与已发布 alpha 兼容。
+
 > 传统网站为浏览器而建。
 > **next-ai-ready** 让你的 Next.js 站点被 AI **可读**、被 Agent **可调用**。
 >
@@ -82,7 +84,7 @@ export const semantic = {
 
 ```ts
 // actions/search-product.ts
-import { defineAction } from "@next-ai-ready/actions"
+import { defineAction } from "next-ai-ready"
 import { z } from "zod"
 
 export default defineAction({
@@ -115,7 +117,7 @@ npx next-ai-ready mcp      # 通过 stdio 运行 MCP 服务器（Claude Desktop 
 
 ```js
 // next.config.mjs
-import { withAiReady } from "next-ai-ready/config"
+import { withAiReady } from "next-ai-ready"
 
 const nextConfig = {}
 
@@ -164,23 +166,21 @@ registerAiHooks({
 
 请使用 `next-ai-ready/hooks` 子路径，避免在 Edge instrumentation 中加载 Node 专用模块。
 
-### 运行时安全导入
+### 包导入
 
-消费者应用只需安装 `next-ai-ready`。在 Next.js 运行时和配置文件中使用专用子路径，避免将构建期扫描器与 CLI 依赖打入服务端或 Edge bundle：
+消费者应用只需安装 `next-ai-ready`。已发布的 `alpha.12` 支持以下导入：
 
 | 导入 | 用途 |
 |---|---|
-| `next-ai-ready/config` | 在 `next.config` 中使用 `withAiReady()` |
-| `next-ai-ready/robots` | `aiRobots()` 与 `buildRobotsTxt()` |
+| `next-ai-ready` | `defineConfig()`、`defineAction()`、`withAiReady()` 与 `aiRobots()` |
 | `next-ai-ready/hooks` | 运行时观测 hook |
 | `next-ai-ready/handlers/*` | 生成的 App Router handler |
-| `next-ai-ready/audit` | 以代码方式执行部署审计 |
 
-主入口 `next-ai-ready` 仍用于 `defineConfig()`、`defineAction()` 等编写期与构建期 API。
+`main` 还包含 `next-ai-ready/actions`、`next-ai-ready/config`、`next-ai-ready/json-ld`、`next-ai-ready/robots` 与 `next-ai-ready/audit` 专用入口，用于减少运行时 tracing 并提供不加载 CLI 的程序化 Audit；它们**尚未进入 npm alpha.12**，发布下一个预览版本前不应在消费者项目中使用。
 
 ## 状态
 
-🚧 **Pre-alpha**（`0.1.0-alpha.12` 已发布到 npm `@alpha`）。开发分支还包含尚未发布的 Audit v2/v3 与 MCP 页面发现改动，详见[当前改进台账](./docs/improvement-plan.zh-CN.md)。
+🚧 **Pre-alpha**（`0.1.0-alpha.12` 已发布到 npm `@alpha`）。`main` 还包含尚未发布的运行时专用入口、Audit v3 加固、TypeScript Action 加载与 MCP 页面发现改动，详见[当前改进台账](./docs/improvement-plan.zh-CN.md)。
 
 - ✅ **知识平面** — MDX → 语义图 → `llms.txt` / `*.md` / `*.ai.json` / JSON-LD
 - ✅ **能力平面** — `defineAction` → `/api/actions/<name>` + OpenAPI 3.1 / `tools.json` / `ai-plugin.json`

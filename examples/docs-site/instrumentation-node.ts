@@ -1,5 +1,5 @@
 import "server-only";
-import { registerAiHooks } from "@next-ai-ready/next/hooks";
+import { registerAiHooks } from "next-ai-ready/hooks";
 
 /**
  * Node-only observability hooks for AI-bot analytics.

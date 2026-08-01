@@ -10,4 +10,4 @@
 "@next-ai-ready/mcp": patch
 ---
 
-Adopter UX: llms-full FAQ sections, doctor robots.ts + emit.robots fix, Top fixes actionItems, docs hub and GA/post-GA guides. Add lightweight config, JSON, robots, URL, and JSON-LD subpath exports so Next.js runtime tracing does not pull build-time content scanners into the dependency graph.
+Adopter UX: llms-full FAQ sections, doctor robots.ts + emit.robots fix, Top fixes actionItems, docs hub and GA/post-GA guides. Add lightweight Action, config, JSON, robots, URL, and JSON-LD subpath exports so Next.js runtime tracing does not pull build-time content scanners into the dependency graph.

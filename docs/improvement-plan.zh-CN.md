@@ -124,6 +124,7 @@ Semantic/AEO Quality `100/100`、Agent Capability `67/100`。Capability 的
 | G1-04 | 冻结 0.1 公共 API | `待验证` | 已增加十个发布包的 entrypoint、命名导出、类型声明哈希与 bin 基线；程序化 Audit 已收口到独立入口，不再暴露 CLI 调度 API；待 `main` 首次通过 |
 | G1-05 | 建立最小回滚流程 | `待验证` | npm 计划器仅生成精确 deprecate/dist-tag 命令；Git revert、Vercel rollback/promote 和三层验证已进入手册，待 GA 前演练 |
 | G1-06 | 更新 GA 文案并发布 `0.1.0` | `待开始` | README 不再写 Pre-alpha；十分钟流程无错误 |
+| G1-07 | 消除 `main`、npm 与网站文档的发布漂移 | `进行中` | registry 真实安装验证使用正确 dist-tag；网站标明渠道；下一个 alpha 发布后专用入口与 TypeScript Action 加载均可用 |
 
 GA 之前不加入数据库、IndexNow、大型 DevTools 或托管后台。
 

@@ -1,4 +1,4 @@
-import { defineActions, defineAction } from "@next-ai-ready/actions";
+import { defineActions, defineAction } from "next-ai-ready/actions";
 import { z } from "zod";
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";

@@ -61,6 +61,7 @@
 | Audit v2 基础实现 | `进行中` | 已有五维评分和建议，但尚未改为三层模型，也未完成 Vercel 规范对齐 |
 | MCP 页面发现 | `进行中` | 功能分支已有 `list_pages`、`get_page`、`search_pages` 和分页；尚缺 locale 过滤及 HTTP 共用接口 |
 | Next.js 兼容验证 | `待验证` | Next.js 14、15、16 构建已通过；需在发布候选上固化 CI 矩阵 |
+| Vercel 官方 Readability 基线 | `待验证` | 已固定 `@vercel/agent-readability@0.5.0` 并建立每周/手动质量门；待合入 `main` 后验证首次工作流 |
 | npm GA | `待开始` | 当前仅发布 `0.1.0-alpha.12`，尚未发布 `0.1.0` |
 | i18n 与 Content Adapter | `待开始` | graph 有基础字段和 ContentSource 接口，但没有完整接入体验 |
 | 动态索引 | `待商榷` | 只保留 Provider 方向，等待真实需求证据 |
@@ -80,12 +81,29 @@
 | A0-04 | 增加外部站点回归夹具 | `待开始` | 至少覆盖 Nuxt SEO、普通 Next.js 文档站和缺少 AI 输出的网站；结果可重复 |
 | A0-05 | 固化双 404 行为测试 | `已完成` | 浏览器 `404`；Agent Markdown `200` + `noindex` + 请求路径 + 发现入口 + 相似页面 |
 | A0-06 | 进行独立线上复测 | `待开始` | 记录检测工具、日期、URL、原始结果；不能用自有 Audit 代替 |
+| A0-07 | 引入 Vercel 官方 Agent Readability 质量门 | `待验证` | 固定官方依赖版本；提供本地与 CI 命令；线上站低于 `100/100` 时质量门失败 |
 
 P0 完成条件：
 
 1. 外部 Agent Readability 检测达到 `100/100`。
 2. 自有 Audit 不再对符合外部标准的网站给出相反结论。
 3. Capability 增强项不会伪装成网页可读性的标准缺陷。
+
+当前官方基线（2026-08-01）：
+
+```bash
+pnpm audit:vercel:site
+```
+
+- 工具：`@vercel/agent-readability@0.5.0`
+- URL：`https://next-ai-ready.vercel.app/en`
+- 总分：`100/100`（Excellent）
+- Can agents reach you：`3/3`
+- Can agents find you：`8/8`
+- Can agents read you：`9/9`
+- Is your HTML agent-friendly：`5/5`
+- 质量门：`--min-score 100`
+- CI：`.github/workflows/agent-readability.yml`，每周运行并支持手动触发
 
 ### P1：发布 0.1 GA
 
@@ -166,7 +184,8 @@ P0、P1 完成后再开始。
 3. `A0-03`：建立 Vercel Spec 对照测试。
 4. `A0-04`：加入外部站点固定夹具和回归测试。
 5. `A0-05`：在 Audit schema 调整后复跑既有缺页恢复边界测试。
-6. `A0-06`：部署候选版并进行独立复测。
+6. `A0-07`：固定 Vercel 官方 CLI 版本并建立线上 100 分质量门。
+7. `A0-06`：部署候选版并进行独立复测。
 
 只有 P0 验收后，才进入 GA 发布清单。
 

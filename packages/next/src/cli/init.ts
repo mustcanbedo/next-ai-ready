@@ -57,13 +57,23 @@ export const runtime = "nodejs";
     },
     {
       relPath: "app/%5Fai-ready/md/[...path]/route.ts",
-      contents: `export { GET } from "next-ai-ready/handlers/page-md";
+      contents: `import { GET as handlePageMarkdown } from "next-ai-ready/handlers/page-md";
+
+export async function GET(request: Request, context: any) {
+  return handlePageMarkdown(request, context);
+}
+
 export const runtime = "nodejs";
 `,
     },
     {
       relPath: "app/%5Fai-ready/ai-json/[...path]/route.ts",
-      contents: `export { GET } from "next-ai-ready/handlers/page-ai-json";
+      contents: `import { GET as handlePageAiJson } from "next-ai-ready/handlers/page-ai-json";
+
+export async function GET(request: Request, context: any) {
+  return handlePageAiJson(request, context);
+}
+
 export const runtime = "nodejs";
 `,
     },
@@ -87,7 +97,12 @@ export const runtime = "nodejs";
     },
     {
       relPath: "app/api/actions/[name]/route.ts",
-      contents: `${registerImport}export { POST } from "next-ai-ready/handlers/action";
+      contents: `${registerImport}import { POST as handleAction } from "next-ai-ready/handlers/action";
+
+export async function POST(request: Request, context: any) {
+  return handleAction(request, context);
+}
+
 export const runtime = "nodejs";
 `,
     },

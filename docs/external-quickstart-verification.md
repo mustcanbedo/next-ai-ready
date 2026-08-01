@@ -1,7 +1,7 @@
 # External quickstart verification
 
 > Records how a user **outside this monorepo** can install `next-ai-ready@alpha` and reach AI endpoints.  
-> Last verified: **2026-06-01** (CI + `scripts/external-quickstart-smoke.mjs`).
+> Last verified: **2026-08-01** (`scripts/external-quickstart-smoke.mjs`).
 
 ## 0.1 Definition of Done (target)
 
@@ -40,16 +40,36 @@ node scripts/e2e-smoke.mjs
 
 Uses workspace links; checks init → build → doctor --score.
 
-### npm install path smoke
+### Clean tarball install matrix
 
 After `pnpm build`:
 
 ```bash
 pnpm external:smoke
-# or: node scripts/external-quickstart-smoke.mjs
+# npm + Next.js 14
+PACKAGE_MANAGER=npm NEXT_VERSION=14 pnpm external:smoke
+# pnpm + Next.js 16
+PACKAGE_MANAGER=pnpm NEXT_VERSION=16 pnpm external:smoke
 ```
 
-Packs `next-ai-ready` locally, installs the tarball in a temp dir (simulates registry install), runs init → build → doctor.
+The smoke packs all publishable runtime packages from the current checkout. The
+consumer manifest directly depends only on the `next-ai-ready` meta tarball;
+npm/pnpm overrides resolve its scoped transitive dependencies to the other local
+tarballs. A deliberately unreachable scoped registry makes any accidental fallback
+to an older published package fail immediately. It then runs:
+
+1. `next-ai-ready init`
+2. `next-ai-ready build`
+3. `next-ai-ready doctor --score`
+4. a real `next build`
+
+GitHub Actions runs six combinations: npm and pnpm across Next.js 14, 15, and 16.
+This validates the current branch rather than silently fetching an older scoped
+package from the npm registry. Tarball manifests and lockfiles are also checked so
+`workspace:` ranges or registry-backed internal packages cannot slip through.
+
+Set `PACKAGE_SOURCE=registry` to test the published `next-ai-ready@alpha` package.
+The legacy `USE_NPM=1` switch remains an alias for registry source selection.
 
 ## Manual verification (npm registry)
 
@@ -83,9 +103,9 @@ curl -sS http://localhost:3000/openapi.json | head -c 200
 
 ### Registry status
 
-As of 2026-06-01:
+As of 2026-08-01:
 
-- **npm `@alpha`:** `0.1.0-alpha.5` — single-package install verified (`USE_NPM=1 pnpm external:smoke`)
+- **npm `@alpha`:** `0.1.0-alpha.12` — registry single-package installation verified.
 - **alpha.4:** deprecated for pnpm users (scoped import bug); use ≥ alpha.5
 
 ## Troubleshooting
@@ -100,7 +120,10 @@ As of 2026-06-01:
 
 ## Sign-off checklist
 
-- [x] `external-quickstart-smoke.mjs` (local link) — 2026-06-01
-- [x] `USE_NPM=1` npm `@alpha` install path — 2026-06-01 (doctor exit 0, score 88)
-- [x] `doctor` exit 0 on fresh init project — 2026-06-01
+- [x] Local current-branch tarball install — 2026-08-01
+- [x] npm + Next.js 14 production build — 2026-08-01
+- [x] pnpm + Next.js 15 production build — 2026-08-01
+- [x] pnpm + Next.js 16 production build — 2026-08-01
+- [x] `doctor` exit 0 on every sampled fresh project — 2026-08-01
+- [ ] Full npm/pnpm × Next.js 14/15/16 matrix on `main` CI
 - [ ] Manual `/tmp` + `create-next-app` + dev + curl (optional full UX)

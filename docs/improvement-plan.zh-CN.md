@@ -60,7 +60,7 @@
 | Agent Markdown 缺页恢复 | `已完成` | Agent Markdown 请求返回 `200`、`noindex`、发现入口和相似页面；浏览器仍返回真实 `404` |
 | Audit 三层报告 | `待验证` | v1/v2 保持兼容；v3 已拆分 Readability、Semantic/AEO 与 Capability，并使用严格分层计分 |
 | MCP 页面发现 | `进行中` | 功能分支已有 `list_pages`、`get_page`、`search_pages` 和分页；尚缺 locale 过滤及 HTTP 共用接口 |
-| Next.js 兼容验证 | `待验证` | Next.js 14、15、16 构建已通过；需在发布候选上固化 CI 矩阵 |
+| Next.js 兼容验证 | `待验证` | npm/pnpm × Next.js 14/15/16 已进入 CI；本地抽样的 14、15、16 均完成真实生产构建，待 `main` 首次矩阵验证 |
 | Vercel 官方 Readability 基线 | `待验证` | 已固定 `@vercel/agent-readability@0.5.0` 并建立每周/手动质量门；待合入 `main` 后验证首次工作流 |
 | npm GA | `待开始` | 当前仅发布 `0.1.0-alpha.12`，尚未发布 `0.1.0` |
 | i18n 与 Content Adapter | `待开始` | graph 有基础字段和 ContentSource 接口，但没有完整接入体验 |
@@ -116,7 +116,7 @@ Semantic/AEO Quality `100/100`、Agent Capability `67/100`。Capability 的
 |---|---|---|---|
 | G1-01 | 合入并发布当前 Audit/MCP 功能 | `待验证` | 功能分支通过审查后进入 `main`，npm 包与仓库版本一致 |
 | G1-02 | 配置生产 MCP Token | `待开始` | 生产 `doctor` 不再报告未保护的 MCP 警告 |
-| G1-03 | 固化真实安装矩阵 | `进行中` | npm/pnpm 干净安装，Next.js 14/15/16 均进入自动回归 |
+| G1-03 | 固化真实安装矩阵 | `待验证` | 当前分支 tarball 以 npm/pnpm 干净安装，Next.js 14/15/16 六组合已进入 CI；待 `main` 首次矩阵通过 |
 | G1-04 | 冻结 0.1 公共 API | `待开始` | 导出清单、SemVer 规则和弃用策略进入文档与测试 |
 | G1-05 | 建立最小回滚流程 | `待开始` | npm deprecate/dist-tag、Git 回退和 Vercel 回滚步骤可执行 |
 | G1-06 | 更新 GA 文案并发布 `0.1.0` | `待开始` | README 不再写 Pre-alpha；十分钟流程无错误 |
@@ -182,17 +182,13 @@ P0、P1 完成后再开始。
 
 ## 7. 下一轮执行顺序
 
-下一轮只推进 P0，不并行扩张到动态索引或商业后台：
+P0 的功能分支实现已完成，当前按以下顺序收敛 GA：
 
-1. `A0-01`：定义三层 Audit schema 和兼容策略。
-2. `A0-02`：为检查项增加标准来源与增强项分类。
-3. `A0-03`：建立 Vercel Spec 对照测试。
-4. `A0-04`：加入外部站点固定夹具和回归测试。
-5. `A0-05`：在 Audit schema 调整后复跑既有缺页恢复边界测试。
-6. `A0-07`：固定 Vercel 官方 CLI 版本并建立线上 100 分质量门。
-7. `A0-06`：部署候选版并进行独立复测。
-
-只有 P0 验收后，才进入 GA 发布清单。
+1. `G1-03`：在 `main` 验证 npm/pnpm × Next.js 14/15/16 安装矩阵。
+2. `G1-04`：冻结 0.1 公共 API、SemVer 和弃用规则。
+3. `G1-05`：建立 npm、Git 与 Vercel 最小回滚流程。
+4. `G1-02`：配置生产 MCP Token 并复跑 Capability 验证。
+5. `G1-06`：完成 GA 文案、发布检查和 `0.1.0` 发布。
 
 ## 8. 维护规则
 

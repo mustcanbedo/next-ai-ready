@@ -1,15 +1,12 @@
 import { readFile, stat } from "node:fs/promises";
 import { join, resolve } from "node:path";
-import { pathToFileURL } from "node:url";
 import { AI_BOTS, scanContent } from "@next-ai-ready/core";
 import {
   buildActionsManifest,
-  clearRegistry,
-  listActions,
-  registerActions,
 } from "@next-ai-ready/actions";
 import { graphPath, publicOpenApiPath, publicRobotsTxtPath, ROUTE_STUBS } from "../paths.js";
 import { loadConfig } from "./load-config.js";
+import { loadConfiguredActions } from "./load-actions.js";
 import { evaluateTactics, tacticsScore, type TacticResult } from "./tactics.js";
 
 export interface Diagnostic {
@@ -140,17 +137,7 @@ export async function runDoctor(opts: DoctorOptions = {}): Promise<DoctorResult>
   // 2. Actions: load + validate exposure rules (ADR-010).
   if (config.actions) {
     try {
-      clearRegistry();
-      if (Array.isArray(config.actions)) {
-        registerActions(config.actions);
-      } else if (typeof config.actions === "string") {
-        const mod = (await import(pathToFileURL(resolve(cwd, config.actions)).href)) as {
-          default?: unknown;
-        };
-        if (Array.isArray(mod.default) && listActions().length === 0) {
-          registerActions(mod.default);
-        }
-      }
+      await loadConfiguredActions(cwd, config.actions);
       const manifest = buildActionsManifest();
       add(CHECK.ACTIONS_LOAD, "ok", `Loaded ${manifest.actions.length} action(s)`, "Actions loaded");
 

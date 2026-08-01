@@ -1,6 +1,5 @@
 import { writeFile, mkdir } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
-import { pathToFileURL } from "node:url";
 import {
   buildRobotsTxt,
   filesystemContentSource,
@@ -14,9 +13,6 @@ import { buildGraph } from "@next-ai-ready/semantic";
 import { renderLlmsTxt, renderLlmsFullTxt, renderSitemapMarkdown } from "@next-ai-ready/llms";
 import {
   buildActionsManifest,
-  clearRegistry,
-  listActions,
-  registerActions,
 } from "@next-ai-ready/actions";
 import { buildOpenApi, buildToolsJson, buildAiPlugin } from "@next-ai-ready/openapi";
 import {
@@ -31,6 +27,7 @@ import {
   publicToolsJsonPath,
 } from "../paths.js";
 import { loadConfig } from "./load-config.js";
+import { loadConfiguredActions } from "./load-actions.js";
 
 export interface BuildOptions {
   cwd?: string;
@@ -139,23 +136,10 @@ export async function runBuild(opts: BuildOptions = {}): Promise<BuildResult> {
   // no actions configured — Knowledge-plane-only sites are first-class.
   let manifest: ActionsManifest | null = null;
   if (config.actions) {
-    clearRegistry();
-    if (Array.isArray(config.actions)) {
-      registerActions(config.actions);
-    } else if (typeof config.actions === "string") {
-      const modPath = resolve(cwd, config.actions);
+    if (typeof config.actions === "string") {
       log(`loading actions from ${config.actions}`);
-      // Dynamic import side-effect: the user's module may call
-      // `defineActions([...])` at top level (registers as side-effect AND returns
-      // the array). Only re-register the default export if the import did NOT
-      // already populate the registry (i.e. the user used plain `defineAction`
-      // without the `defineActions` wrapper).
-      const mod = (await import(pathToFileURL(modPath).href)) as { default?: unknown };
-      const defaultExport = mod.default;
-      if (Array.isArray(defaultExport) && listActions().length === 0) {
-        registerActions(defaultExport);
-      }
     }
+    await loadConfiguredActions(cwd, config.actions);
     manifest = buildActionsManifest();
     log(`compiled ${manifest.actions.length} actions`);
 

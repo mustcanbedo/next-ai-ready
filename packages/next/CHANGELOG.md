@@ -1,5 +1,38 @@
 # @next-ai-ready/next
 
+## 0.1.0-alpha.13
+
+### Minor Changes
+
+- dd4eb8d: Add an opt-in Audit v2 report with five independently weighted dimensions and targeted recommendations for every warning or failure. Audit v1 remains the default so its JSON shape, score, and CI exit behavior stay compatible.
+- 9ea6e6c: Add opt-in Audit v3 with independent Agent Readability, Semantic/AEO Quality,
+  and Agent Capability planes. Readability preflight checks use strict
+  required/recommended tier scoring while the official Vercel CLI remains the
+  external quality gate. Audit v1 and v2 remain unchanged.
+  Vercel-compatible missing-page Markdown is scored separately from the stricter
+  noindex and recovery-link quality enhancement.
+  Generate dynamic route wrappers that pass Next.js 14, 15, and 16 production
+  route validation.
+  Freeze the 0.1 public entrypoints, runtime exports, TypeScript declarations,
+  and CLI bins behind an explicit compatibility check.
+  Report an unconfigured production MCP token as service unavailable and surface
+  that deployment error separately from invalid client credentials in Audit v3.
+
+### Patch Changes
+
+- 5db1d14: Add focused Action and JSON-LD runtime entrypoints so applications can import public SDK helpers without pulling build-time scanners into the traced server dependency graph.
+- dd4eb8d: Initialize the optional MCP HTTP adapter on the first request instead of at
+  module evaluation time, so a default scaffold can build without installing
+  `mcp-handler` until the MCP endpoint is actually used.
+- dd4eb8d: Keep generated route handlers type-compatible across Next.js 14, 15, and 16
+  while accepting both synchronous and Promise-based route params at runtime.
+- fe966c1: Load TypeScript action modules consistently in build, doctor, and MCP stdio commands.
+- dd4eb8d: Install `jiti` as a runtime dependency so `next-ai-ready init` can immediately
+  load the generated `ai-ready.config.ts` in existing TypeScript Next.js apps.
+  The external quickstart smoke now exercises this TypeScript configuration path.
+- Updated dependencies [dd4eb8d]
+  - @next-ai-ready/mcp@0.1.0-alpha.12
+
 ## 0.1.0-alpha.12
 
 ### Patch Changes

@@ -1,6 +1,6 @@
 {
   "name": "create-next-ai-ready",
-  "version": "0.1.0-alpha.10",
+  "version": "0.1.0-alpha.11",
   "description": "Scaffold a Next.js app with next-ai-ready pre-wired.",
   "license": "MIT",
   "type": "module",
@@ -14,5 +14,7 @@
   "scripts": {
     "test": "node --test"
   },
-  "engines": { "node": ">=20" }
+  "engines": {
+    "node": ">=20"
+  }
 }

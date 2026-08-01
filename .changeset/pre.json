@@ -19,6 +19,15 @@
     "adopter-ux-alpha10",
     "agent-markdown-recovery",
     "audit-deployed-pages",
-    "fix-escaped-ai-routes"
+    "audit-v2-dimensions",
+    "audit-v3-three-planes",
+    "fix-escaped-ai-routes",
+    "focused-runtime-entrypoints",
+    "lazy-mcp-route",
+    "mcp-page-discovery-tools",
+    "next-route-context-compat",
+    "runnable-next-scaffold",
+    "typescript-actions-loader",
+    "typescript-config-runtime"
   ]
 }

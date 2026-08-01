@@ -107,15 +107,18 @@ pnpm audit:vercel:site
 
 同日使用未发布的 Audit v3 对该 URL 预检：Agent Readability `100/100`、
 Semantic/AEO Quality `100/100`、Agent Capability `67/100`。Capability 的
-唯一警告是生产 MCP Token 尚未配置，因此无法进行带凭证的协议验证。v3 结果
-用于验证三层报告实现，不能替代上方官方 CLI 的 25 项外部结果。
+当时唯一警告是生产 MCP Token 尚未配置，因此无法进行带凭证的协议验证。2026-08-01
+已将 Sensitive Token 写入 Vercel Production；线上鉴权由 `401` 变为进入 MCP handler，
+同时暴露出默认 `basePath` 与生成路由不一致导致的 transport `404`。修复已进入当前分支，
+待合入 `main` 并重新部署后完成协议验收。v3 结果用于验证三层报告实现，不能替代上方
+官方 CLI 的 25 项外部结果。
 
 ### P1：发布 0.1 GA
 
 | ID | 任务 | 状态 | 验收标准 |
 |---|---|---|---|
 | G1-01 | 合入并发布当前 Audit/MCP 功能 | `待验证` | 功能分支通过审查后进入 `main`，npm 包与仓库版本一致 |
-| G1-02 | 配置生产 MCP Token | `进行中` | 已修正未配置为 503、错误凭据为 401，并让 Audit 输出明确诊断；线上仍确认未设置，待写入 Vercel Production secret 后复测 |
+| G1-02 | 配置生产 MCP Token | `待验证` | Vercel Production Sensitive Token 已保存并部署，错误凭据仍为 401、正确凭据已通过鉴权；线上复测发现生成路由缺少默认 `/api/mcp` basePath，修复待合入 `main` 后完成初始化握手 |
 | G1-03 | 固化真实安装矩阵 | `待验证` | 当前分支 tarball 以 npm/pnpm 干净安装，Next.js 14/15/16 六组合已进入 CI；待 `main` 首次矩阵通过 |
 | G1-04 | 冻结 0.1 公共 API | `待验证` | 已增加十个发布包的 entrypoint、命名导出、类型声明哈希与 bin 基线，并将 SemVer/弃用策略纳入 CI；待 `main` 首次通过 |
 | G1-05 | 建立最小回滚流程 | `待验证` | npm 计划器仅生成精确 deprecate/dist-tag 命令；Git revert、Vercel rollback/promote 和三层验证已进入手册，待 GA 前演练 |
@@ -184,8 +187,8 @@ P0、P1 完成后再开始。
 
 P0 的功能分支实现已完成，当前按以下顺序收敛 GA：
 
-1. `G1-03`：在 `main` 验证 npm/pnpm × Next.js 14/15/16 安装矩阵。
-2. `G1-02`：配置生产 MCP Token 并复跑 Capability 验证。
+1. `G1-01` / `G1-02`：合入 MCP basePath 修复并在生产完成认证初始化握手。
+2. `G1-03` / `G1-04`：在 `main` 验证安装矩阵与公共 API 基线。
 3. `G1-06`：完成 GA 文案、发布检查和 `0.1.0` 发布。
 
 ## 8. 维护规则

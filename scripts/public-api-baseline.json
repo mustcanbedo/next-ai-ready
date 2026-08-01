@@ -244,7 +244,7 @@
         "./handlers/openapi": "44e1c66e536e6dbe116a505043237d9cda9716fd75160e6b3458e97f801592b8",
         "./handlers/tools": "ae579d4293ffef7ed2c3f666625776164d56f3df774c780bd5aa99b7cb7b65d5",
         "./handlers/action": "6ec5b9a918b385e734fcbec876ab8d1fa66b16e4ab91ee42a25a32142a50058f",
-        "./handlers/mcp": "f34c675b6aa8221699cfcc730f9cbcfa63abafc378d6c143a6fd38a201341625",
+        "./handlers/mcp": "a688f89fe4f76f267cabefb259062887b04ed4f9798e7fecdaa26196b0988007",
         "./handlers/ai-plugin": "776adab9f0c18770da87dc30e6a69f31e13633abbc20fb5097cf9302bd75309d",
         "./hooks": "83a62872585b56c662d4c07882dd7546af0f5433e141d8a95360ad64cd75b251"
       }

@@ -2,7 +2,7 @@
 
 **GA** for this project means the first **generally recommendable** release: **`0.1.0`** (or final **`0.1.0-alpha.N`** before dropping the alpha tag), where a Next.js team can install, build, deploy, and get predictable AI artifacts without reading the whole monorepo.
 
-**Current repo version:** `0.1.0-alpha.11` (deployed audit + agent readability batch). **npm `@alpha`:** `0.1.0-alpha.11` published → next milestone is the **`0.1.0`** GA tag.
+**Current development branch version:** `0.1.0-alpha.12`. **npm `@alpha`:** `0.1.0-alpha.12` published. Audit v2 and MCP page discovery remain unreleased branch work; see [improvement-plan.zh-CN.md](./improvement-plan.zh-CN.md) before the **`0.1.0`** GA tag.
 
 ---
 
@@ -38,6 +38,7 @@ See [post-ga.md](./post-ga.md) for improvements **after** GA.
 | # | Task | Owner | Notes |
 |---|------|-------|-------|
 | 1 | **Publish `0.1.0-alpha.11`** to npm `@alpha` | Maintainer | ✅ Published 2026-07-26; deployed audit + agent readability routes included |
+| 1a | **Publish `0.1.0-alpha.12`** baseline to npm `@alpha` | Maintainer | ✅ Published 2026-08-01; registry install smoke passed |
 | 2 | **Vercel env** `NEXT_AI_READY_MCP_TOKEN` | Maintainer | Docs-site production; clears last doctor warn (96→100) |
 | 3 | **Commit regenerated** `examples/docs-site/public/*` after the release build | Maintainer | Run build + `pnpm check:artifacts` in docs-site |
 | 4 | **Optional:** tag `v0.1.0` and README “stable 0.1” | Maintainer | When ready to drop `@alpha` install path |
@@ -54,7 +55,7 @@ Automated gate: `pnpm verify:release` (includes docs-site smoke).
 - [x] CI: build, test, typecheck, lint, e2e-smoke, docs-site-smoke
 - [x] Known limitations in README (Zod v4, Node-only, no static export, App Router)
 - [x] [quickstart-10min](./quickstart-10min.md) for new adopters
-- [x] npm **`@alpha` = alpha.11** published (2026-07-26)
+- [x] npm **`@alpha` = alpha.12** published (2026-08-01)
 - [ ] Production MCP token on Vercel (ops)
 - [ ] README status line updated to “0.1” when tag ships (pending GA tag)
 

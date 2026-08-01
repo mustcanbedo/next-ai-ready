@@ -153,7 +153,7 @@ registerAiHooks({
 
 ## 状态
 
-🚧 **Pre-alpha**（`0.1.0-alpha.11` 已发布到 npm `@alpha`），但核心功能已实现并测试（9 个包共 145+ 个测试）：
+🚧 **Pre-alpha**（`0.1.0-alpha.12` 已发布到 npm `@alpha`）。开发分支还包含尚未发布的 Audit v2 与 MCP 页面发现改动，详见[当前改进台账](./docs/improvement-plan.zh-CN.md)。
 
 - ✅ **知识平面** — MDX → 语义图 → `llms.txt` / `*.md` / `*.ai.json` / JSON-LD
 - ✅ **能力平面** — `defineAction` → `/api/actions/<name>` + OpenAPI 3.1 / `tools.json` / `ai-plugin.json`
@@ -163,6 +163,7 @@ registerAiHooks({
 
 详见 [`docs/`](./docs)（[**文档索引**](./docs/README.md)）：
 
+- [`docs/improvement-plan.zh-CN.md`](./docs/improvement-plan.zh-CN.md) — 当前改进台账、验收标准与待商榷事项
 - [`docs/goals.md`](./docs/goals.md) — 北极星：AEO + Agent 能力
 - [`docs/ga-readiness.md`](./docs/ga-readiness.md) — 0.1 GA 清单
 - [`docs/post-ga.md`](./docs/post-ga.md) — GA 之后规划

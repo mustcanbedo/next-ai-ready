@@ -153,7 +153,7 @@ Use `next-ai-ready/hooks` (or `@next-ai-ready/next/hooks`) — not the main pack
 
 ## Status
 
-🚧 **Pre-alpha** (`0.1.0-alpha.11` published on npm `@alpha`), core stack implemented and tested (145+ tests across 9 packages):
+🚧 **Pre-alpha** (`0.1.0-alpha.12` published on npm `@alpha`). The development branch contains additional unreleased Audit v2 and MCP discovery work; see the [current improvement ledger](./docs/improvement-plan.zh-CN.md).
 
 - ✅ **Knowledge plane** — MDX → semantic graph → `llms.txt` / `*.md` / `*.ai.json` / JSON-LD
 - ✅ **Capability plane** — `defineAction` → `/api/actions/<name>` + OpenAPI 3.1 / `tools.json` / `ai-plugin.json`

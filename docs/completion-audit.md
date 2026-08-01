@@ -4,7 +4,7 @@
 >
 > **审查日期：** 2026-07-26（alpha.11 + deployed audit + agent readability）
 >
-> **当前版本：** 仓库与 npm `@alpha` 均为 `0.1.0-alpha.11`
+> **当前发布补充（2026-08-01）：** npm `@alpha` 为 `0.1.0-alpha.12`；Audit v2 与 MCP 页面发现仍在功能分支，当前优先级见 [`improvement-plan.zh-CN.md`](./improvement-plan.zh-CN.md)。下方正文保留 alpha.11 审查快照。
 > **测试状态：** 145+ tests / 9 packages · CI 含 `docs-site-smoke`
 
 ### 相关文档（分工）
@@ -350,6 +350,7 @@ canonical = `/openapi.json`、`/tools.json`；`buildAiPlugin()` 默认已改。D
 - [x] 已知限制 documented（2026-05-31；i18n graph 表述 2026-06-02 修正）
 - [x] Adopter quickstart + doctor actionItems + llms-full FAQ（2026-06-02）
 - [x] npm `@alpha` → **0.1.0-alpha.11**（2026-07-26；registry install smoke 通过）
+- [x] npm `@alpha` → **0.1.0-alpha.12**（2026-08-01；registry install smoke 通过）
 - [ ] Vercel `NEXT_AI_READY_MCP_TOKEN`（ops）
 
 ---

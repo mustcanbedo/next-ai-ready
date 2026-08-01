@@ -20,6 +20,7 @@
     "pack:check": "node scripts/pack-check.mjs",
     "exports:check": "node scripts/exports-check.mjs",
     "api:check": "node --test scripts/public-api-check.test.mjs && node scripts/public-api-check.mjs",
+    "rollback:plan": "node --test scripts/release-rollback-plan.test.mjs && node scripts/release-rollback-plan.mjs",
     "bin:smoke": "node scripts/bin-smoke.mjs",
     "audit:vercel": "agent-readability audit",
     "audit:vercel:site": "agent-readability audit https://next-ai-ready.vercel.app/en --min-score 100",

@@ -118,7 +118,7 @@ Semantic/AEO Quality `100/100`、Agent Capability `67/100`。Capability 的
 | G1-02 | 配置生产 MCP Token | `待开始` | 生产 `doctor` 不再报告未保护的 MCP 警告 |
 | G1-03 | 固化真实安装矩阵 | `待验证` | 当前分支 tarball 以 npm/pnpm 干净安装，Next.js 14/15/16 六组合已进入 CI；待 `main` 首次矩阵通过 |
 | G1-04 | 冻结 0.1 公共 API | `待验证` | 已增加十个发布包的 entrypoint、命名导出、类型声明哈希与 bin 基线，并将 SemVer/弃用策略纳入 CI；待 `main` 首次通过 |
-| G1-05 | 建立最小回滚流程 | `待开始` | npm deprecate/dist-tag、Git 回退和 Vercel 回滚步骤可执行 |
+| G1-05 | 建立最小回滚流程 | `待验证` | npm 计划器仅生成精确 deprecate/dist-tag 命令；Git revert、Vercel rollback/promote 和三层验证已进入手册，待 GA 前演练 |
 | G1-06 | 更新 GA 文案并发布 `0.1.0` | `待开始` | README 不再写 Pre-alpha；十分钟流程无错误 |
 
 GA 之前不加入数据库、IndexNow、大型 DevTools 或托管后台。
@@ -185,9 +185,8 @@ P0、P1 完成后再开始。
 P0 的功能分支实现已完成，当前按以下顺序收敛 GA：
 
 1. `G1-03`：在 `main` 验证 npm/pnpm × Next.js 14/15/16 安装矩阵。
-2. `G1-05`：建立 npm、Git 与 Vercel 最小回滚流程。
-3. `G1-02`：配置生产 MCP Token 并复跑 Capability 验证。
-4. `G1-06`：完成 GA 文案、发布检查和 `0.1.0` 发布。
+2. `G1-02`：配置生产 MCP Token 并复跑 Capability 验证。
+3. `G1-06`：完成 GA 文案、发布检查和 `0.1.0` 发布。
 
 ## 8. 维护规则
 

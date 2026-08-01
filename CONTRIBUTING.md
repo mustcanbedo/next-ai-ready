@@ -87,6 +87,8 @@ We use [Changesets](https://github.com/changesets/changesets).
 The [`0.1` public API and versioning policy](./docs/public-api-stability.zh-CN.md)
 defines the protected entrypoints, SemVer rules, and deprecation process. Run
 `pnpm api:check` after `pnpm build` whenever exports or public types change.
+For incidents, follow the [npm/Git/Vercel rollback runbook](./docs/release-rollback.zh-CN.md);
+the `pnpm rollback:plan -- ...` helper only prints registry commands for review.
 
 ### Pre-release (`@alpha`)
 

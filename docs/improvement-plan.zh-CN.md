@@ -3,7 +3,7 @@
 > 最后更新：2026-08-01  
 > 维护者视角：`next-ai-ready` 原始作者与技术负责人  
 > 当前发布：npm `0.1.0-alpha.12`  
-> 当前功能分支：`codex/audit-v2-mcp-discovery`（`dd4eb8d`）
+> 当前功能分支：`codex/audit-v2-mcp-discovery`
 
 本文是后续优化的**执行状态与决策记录**。`roadmap.md` 保留工程阶段历史，
 `post-ga.md` 保留候选方向；当它们与本文的当前优先级冲突时，以本文为准。
@@ -77,7 +77,7 @@
 |---|---|---|---|
 | A0-01 | 将 Audit 输出重构为 `Agent Readability`、`Semantic/AEO Quality`、`Agent Capability` 三层 | `待验证` | JSON schema、CLI 和文档使用同一模型；旧版兼容路径有迁移说明 |
 | A0-02 | 为每条检查标记 `standard` 或 `enhancement` | `待验证` | 用户能区分外部标准要求与 next-ai-ready 增强建议 |
-| A0-03 | 建立 Vercel Agent Readability Spec 对照表 | `待开始` | 每条适用规范都有实现、测试或明确的“不适用”理由 |
+| A0-03 | 建立 Vercel Agent Readability Spec 对照表 | `待验证` | 已按官方 `0.5.0` 的 25 项检查标注直接覆盖、部分覆盖或仅官方门禁；详见[版本化对照表](./vercel-agent-readability-mapping.zh-CN.md) |
 | A0-04 | 增加外部站点回归夹具 | `待开始` | 至少覆盖 Nuxt SEO、普通 Next.js 文档站和缺少 AI 输出的网站；结果可重复 |
 | A0-05 | 固化双 404 行为测试 | `已完成` | 浏览器 `404`；Agent Markdown `200` + `noindex` + 请求路径 + 发现入口 + 相似页面 |
 | A0-06 | 进行独立线上复测 | `待开始` | 记录检测工具、日期、URL、原始结果；不能用自有 Audit 代替 |

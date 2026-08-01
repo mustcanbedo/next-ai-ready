@@ -802,6 +802,8 @@ async function buildCapabilityChecks(
   );
 
   const mcpAuthResponse = mcp.status === 401 || mcp.status === 403;
+  const mcpConfigurationMissing =
+    mcp.status === 503 && mcp.body.includes("NEXT_AI_READY_MCP_TOKEN is not set");
   const mcpProtocolSignal =
     contentType(mcp).includes("text/event-stream") ||
     mcp.headers.has("mcp-session-id") ||
@@ -813,9 +815,11 @@ async function buildCapabilityChecks(
     mcpProtocolSignal ? "pass" : "warn",
     mcpProtocolSignal
       ? `MCP protocol response was detected (HTTP ${mcp.status}).`
-      : mcpReachable
-        ? `MCP route is reachable (HTTP ${mcp.status}), but the protocol cannot be verified without credentials.`
-        : `MCP endpoint was not found (HTTP ${mcp.status || "network error"}); this enhancement is optional.`,
+      : mcpConfigurationMissing
+        ? "MCP route exists, but NEXT_AI_READY_MCP_TOKEN is not configured in the deployment."
+        : mcpReachable
+          ? `MCP route is reachable (HTTP ${mcp.status}), but the protocol cannot be verified without credentials.`
+          : `MCP endpoint was not found (HTTP ${mcp.status || "network error"}); this enhancement is optional.`,
     urls.mcp,
   );
 

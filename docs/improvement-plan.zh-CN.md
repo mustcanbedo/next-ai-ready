@@ -115,7 +115,7 @@ Semantic/AEO Quality `100/100`、Agent Capability `67/100`。Capability 的
 | ID | 任务 | 状态 | 验收标准 |
 |---|---|---|---|
 | G1-01 | 合入并发布当前 Audit/MCP 功能 | `待验证` | 功能分支通过审查后进入 `main`，npm 包与仓库版本一致 |
-| G1-02 | 配置生产 MCP Token | `待开始` | 生产 `doctor` 不再报告未保护的 MCP 警告 |
+| G1-02 | 配置生产 MCP Token | `进行中` | 已修正未配置为 503、错误凭据为 401，并让 Audit 输出明确诊断；线上仍确认未设置，待写入 Vercel Production secret 后复测 |
 | G1-03 | 固化真实安装矩阵 | `待验证` | 当前分支 tarball 以 npm/pnpm 干净安装，Next.js 14/15/16 六组合已进入 CI；待 `main` 首次矩阵通过 |
 | G1-04 | 冻结 0.1 公共 API | `待验证` | 已增加十个发布包的 entrypoint、命名导出、类型声明哈希与 bin 基线，并将 SemVer/弃用策略纳入 CI；待 `main` 首次通过 |
 | G1-05 | 建立最小回滚流程 | `待验证` | npm 计划器仅生成精确 deprecate/dist-tag 命令；Git revert、Vercel rollback/promote 和三层验证已进入手册，待 GA 前演练 |

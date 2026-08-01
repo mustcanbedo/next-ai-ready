@@ -14,7 +14,7 @@ export async function mcpAuthGate(req: Request): Promise<Response | undefined> {
         error:
           "NEXT_AI_READY_MCP_TOKEN is not set. Set it in your environment to enable the MCP endpoint in production.",
       }),
-      { status: 401, headers: { "content-type": "application/json" } },
+      { status: 503, headers: { "content-type": "application/json" } },
     );
   }
 

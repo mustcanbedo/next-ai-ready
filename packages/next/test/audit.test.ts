@@ -35,7 +35,7 @@ interface FixtureOptions {
   agentMissingFallback?: boolean;
   emptyAgentMissingFallback?: boolean;
   llmsTxt?: boolean;
-  capabilityMode?: "valid" | "invalid" | "missing";
+  capabilityMode?: "valid" | "invalid" | "missing" | "unconfigured";
 }
 
 function startFixtureServer(options: FixtureOptions = {}): Promise<{ server: Server; target: string }> {
@@ -93,14 +93,21 @@ function startFixtureServer(options: FixtureOptions = {}): Promise<{ server: Ser
       }
 
       if (url.pathname === "/api/mcp/mcp" && options.capabilityMode !== "missing") {
-        response.writeHead(options.capabilityMode === "invalid" ? 401 : 200, {
+        const status = options.capabilityMode === "invalid"
+          ? 401
+          : options.capabilityMode === "unconfigured"
+            ? 503
+            : 200;
+        response.writeHead(status, {
           "content-type": "application/json; charset=utf-8",
         });
         response.end(
           JSON.stringify(
             options.capabilityMode === "invalid"
               ? { error: "unauthorized" }
-              : { jsonrpc: "2.0", result: { capabilities: {} } },
+              : options.capabilityMode === "unconfigured"
+                ? { error: "NEXT_AI_READY_MCP_TOKEN is not set" }
+                : { jsonrpc: "2.0", result: { capabilities: {} } },
           ),
         );
         return;
@@ -393,6 +400,16 @@ describe("runAudit()", () => {
       source: "next-ai-ready-enhancement",
       tier: "enhancement",
       status: "pass",
+    });
+  });
+
+  it("distinguishes an unconfigured MCP deployment from invalid client credentials", async () => {
+    const { target } = await startFixtureServer({ capabilityMode: "unconfigured" });
+    const result = await runAudit(target, { version: "3", timeoutMs: 2_000 });
+
+    expect(result.checks.find((check) => check.id === "mcp-endpoint")).toMatchObject({
+      status: "warn",
+      message: expect.stringContaining("NEXT_AI_READY_MCP_TOKEN is not configured"),
     });
   });
 

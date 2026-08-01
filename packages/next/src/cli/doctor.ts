@@ -325,7 +325,7 @@ export async function runDoctor(opts: DoctorOptions = {}): Promise<DoctorResult>
     add(
       CHECK.MCP_TOKEN,
       "warn",
-      "NEXT_AI_READY_MCP_TOKEN is not set. The MCP HTTP endpoint will be unauthenticated in production.",
+      "NEXT_AI_READY_MCP_TOKEN is not set. The production MCP HTTP endpoint will reject requests until it is configured.",
       "MCP token",
     );
   } else {
@@ -544,7 +544,6 @@ function finalize(
   diagnostics: Diagnostic[],
   checks: DoctorReport["checks"],
   opts: DoctorOptions,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   config: any,
   tactics?: TacticResult[],
   tacticsScoreValue?: number,

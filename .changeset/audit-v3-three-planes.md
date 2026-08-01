@@ -13,3 +13,5 @@ Generate dynamic route wrappers that pass Next.js 14, 15, and 16 production
 route validation.
 Freeze the 0.1 public entrypoints, runtime exports, TypeScript declarations,
 and CLI bins behind an explicit compatibility check.
+Report an unconfigured production MCP token as service unavailable and surface
+that deployment error separately from invalid client credentials in Audit v3.

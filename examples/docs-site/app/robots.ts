@@ -1,5 +1,5 @@
 import type { MetadataRoute } from "next";
-import { aiRobots } from "@next-ai-ready/core";
+import { aiRobots } from "next-ai-ready/robots";
 import { getSiteBaseUrl, SITE_DESCRIPTION, SITE_NAME } from "@/lib/site";
 
 export default function robots(): MetadataRoute.Robots {

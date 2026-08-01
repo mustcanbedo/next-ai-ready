@@ -35,6 +35,7 @@ This fixture preserves protocol behavior without copying third-party page conten
 `;
 
 const MISSING_PATH = "/ai-ready-audit-missing-page-9f8e7d6c";
+const MAX_OFFICIAL_SCORE_DELTA = 3;
 
 describe("Audit v3 external compatibility fixtures", () => {
   it.each(fixtures as ExternalAuditFixture[])(
@@ -50,6 +51,7 @@ describe("Audit v3 external compatibility fixtures", () => {
 
       expect(fixture.officialAudit.packageVersion).toBe(result.methodology.version);
       expect(fixture.capturedAt).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+      expect(new URL(fixture.officialAudit.target).origin).toBe(new URL(fixture.sourceUrl).origin);
       expect(
         readability,
         JSON.stringify({ failedChecks, warningChecks }),
@@ -59,8 +61,24 @@ describe("Audit v3 external compatibility fixtures", () => {
       });
       expect(failedChecks).toEqual(expect.arrayContaining(fixture.expected.failedChecks));
       expect(warningChecks).toEqual(expect.arrayContaining(fixture.expected.warningChecks));
+      expect(result.checks.some((check) => check.tier === "required" && check.status === "warn")).toBe(false);
+      expect(Math.abs((readability?.score ?? 0) - fixture.officialAudit.score)).toBeLessThanOrEqual(
+        MAX_OFFICIAL_SCORE_DELTA,
+      );
     },
   );
+
+  it("recognizes a protected MCP route without sending deployment credentials", async () => {
+    const result = await runAudit("https://fixture.test/docs", {
+      version: "3",
+      fetch: createFixtureFetch("ai-ready"),
+    });
+
+    expect(result.checks.find((check) => check.id === "mcp-endpoint")).toMatchObject({
+      status: "pass",
+      message: expect.stringContaining("authentication gate"),
+    });
+  });
 });
 
 function createFixtureFetch(profile: FixtureProfile): typeof fetch {
@@ -94,6 +112,9 @@ function createFixtureFetch(profile: FixtureProfile): typeof fetch {
         `User-agent: *\nAllow: /\nSitemap: ${url.origin}/sitemap.xml\n`,
         "text/plain; charset=utf-8",
       );
+    }
+    if (url.pathname === "/api/mcp/mcp") {
+      return textResponse('{"error":"unauthorized"}', "application/json; charset=utf-8", 401);
     }
     if (url.pathname === MISSING_PATH) {
       if (profile === "html-only" || !wantsMarkdown) return textResponse("Not found", "text/html", 404);

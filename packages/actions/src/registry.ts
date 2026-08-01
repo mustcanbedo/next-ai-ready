@@ -6,7 +6,6 @@ import type { ActionDefinition } from "@next-ai-ready/core";
  * the handler is contravariant in its input parameter; `any` is the only
  * sound erasure that lets `ActionDefinition<X, Y>` widen on insertion.
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type AnyAction = ActionDefinition<any, any>;
 
 /**

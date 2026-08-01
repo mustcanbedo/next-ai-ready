@@ -102,7 +102,7 @@ export interface AuditV3Result {
   score: number;
   methodology: {
     name: "next-ai-ready three-plane preflight";
-    package: "@vercel/agent-readability";
+    referencePackage: "@vercel/agent-readability";
     version: typeof VERCEL_AGENT_READABILITY_VERSION;
     scoring: "required=3,recommended=2,strict-pass-only";
     coverage: "local-subset-official-cli-is-source-of-truth";
@@ -347,7 +347,7 @@ const AUDIT_V3_CHECKS: Record<string, AuditV3CheckConfig> = {
   "tools-manifest": enhancement("Publish a valid /tools.json manifest for callable actions."),
   "openapi-spec": enhancement("Publish a valid OpenAPI 3.x document for callable actions."),
   "mcp-endpoint": enhancement(
-    "Configure MCP authentication and verify an authenticated protocol response at /api/mcp/mcp.",
+    "Expose /api/mcp/mcp with an authentication gate; verify the authenticated protocol in a deployment-specific check.",
   ),
 };
 
@@ -812,9 +812,11 @@ async function buildCapabilityChecks(
   add(
     "mcp-endpoint",
     "MCP endpoint",
-    mcpProtocolSignal ? "pass" : "warn",
+    mcpProtocolSignal || mcpAuthResponse ? "pass" : "warn",
     mcpProtocolSignal
       ? `MCP protocol response was detected (HTTP ${mcp.status}).`
+      : mcpAuthResponse
+        ? `MCP endpoint is protected by an authentication gate (HTTP ${mcp.status}); protocol verification requires deployment-scoped credentials.`
       : mcpConfigurationMissing
         ? "MCP route exists, but NEXT_AI_READY_MCP_TOKEN is not configured in the deployment."
         : mcpReachable
@@ -839,13 +841,15 @@ function buildAuditV3Result(
         "Add the check to AUDIT_V3_CHECKS before including it in an Audit v3 report.",
       ]);
     }
+    const status = config.tier === "required" && check.status !== "pass" ? "fail" : check.status;
     return {
       ...check,
+      status,
       planes: config.planes,
       source: config.source,
       tier: config.tier,
       points: tierPoints(config.tier),
-      recommendation: check.status === "pass" ? null : config.recommendation,
+      recommendation: status === "pass" ? null : config.recommendation,
     };
   });
 
@@ -879,7 +883,7 @@ function buildAuditV3Result(
     score: readability?.score ?? 0,
     methodology: {
       name: "next-ai-ready three-plane preflight",
-      package: "@vercel/agent-readability",
+      referencePackage: "@vercel/agent-readability",
       version: VERCEL_AGENT_READABILITY_VERSION,
       scoring: "required=3,recommended=2,strict-pass-only",
       coverage: "local-subset-official-cli-is-source-of-truth",

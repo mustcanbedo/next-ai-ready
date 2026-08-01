@@ -14,7 +14,7 @@ questions:
 tags:
   - api
   - reference
-updatedAt: '2026-06-02'
+updatedAt: '2026-08-01'
 author: next-ai-ready team
 ---
 
@@ -25,14 +25,16 @@ author: next-ai-ready team
 ## Import
 
 ```ts
-import { withAiReady } from "@next-ai-ready/next"
+import { withAiReady } from "next-ai-ready/config"
 ```
+
+Consumer apps should install only `next-ai-ready`. The focused `/config` subpath avoids loading build-time scanning and CLI modules while Next.js evaluates its configuration.
 
 ## Usage
 
 ```ts
 // next.config.mjs
-import { withAiReady } from "@next-ai-ready/next"
+import { withAiReady } from "next-ai-ready/config"
 
 export default withAiReady()({
   // your normal Next.js config

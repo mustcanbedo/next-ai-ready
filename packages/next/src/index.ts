@@ -2,8 +2,8 @@
 export * from "./with-ai-ready.js";
 export * from "./paths.js";
 export { registerAiHooks, clearAiHooks } from "./runtime/observability.js";
-export { aiRobots } from "@next-ai-ready/core";
-export type { AiRobotsResult, AiRobotsRule } from "@next-ai-ready/core";
+export { aiRobots } from "@next-ai-ready/core/robots";
+export type { AiRobotsResult, AiRobotsRule } from "@next-ai-ready/core/robots";
 export {
   getPageJsonLd,
   getSiteJsonLd,

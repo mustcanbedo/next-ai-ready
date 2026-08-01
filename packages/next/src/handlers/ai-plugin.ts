@@ -1,6 +1,6 @@
 import "server-only";
 import { buildAiPlugin } from "@next-ai-ready/openapi";
-import { serializeStable } from "@next-ai-ready/core";
+import { serializeStable } from "@next-ai-ready/core/json";
 import { loadGraph } from "../runtime/graph-loader.js";
 import { emitAiRequest } from "../runtime/observability.js";
 

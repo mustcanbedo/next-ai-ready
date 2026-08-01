@@ -256,24 +256,23 @@ async function patchNextConfig(cwd: string): Promise<string | null> {
       const src = await readFile(filePath, "utf8");
       if (src.includes("withAiReady")) return null; // already configured
 
-      const importLine = `import { withAiReady } from "next-ai-ready";\n`;
+      const importLine = `import { withAiReady } from "next-ai-ready/config";\n`;
 
-      let updated = importLine + src;
-      // Pattern 1: export default <wrapper>({  or  export default ({
-      updated = updated.replace(
-        /export\s+default\s+(defineNextConfig\s*\(|defineConfig\s*\(|\()?\s*\{/g,
-        (match, fn) => fn
-          ? `export default withAiReady()(${fn}{`
-          : `export default withAiReady()({`,
-      );
-      // Pattern 2: export default <identifier>;  (e.g. "export default config;")
-      if (updated === importLine + src) {
-        updated = updated.replace(
-          /export\s+default\s+(\w+)\s*;/g,
-          (match, id) => id === "withAiReady" ? match : `export default withAiReady()(${id});`,
+      let updated: string | null = null;
+      const identifierExport = /export\s+default\s+([A-Za-z_$][\w$]*)\s*;/;
+      if (identifierExport.test(src)) {
+        updated = importLine + src.replace(
+          identifierExport,
+          (_match, id) => `export default withAiReady()(${id});`,
         );
+      } else if (/export\s+default\s+/.test(src)) {
+        // Preserve the complete default-export expression instead of trying to
+        // balance object/function call delimiters with a regular expression.
+        const binding = uniqueConfigBinding(src);
+        updated = importLine + src.replace(/export\s+default\s+/, `const ${binding} = `);
+        updated = `${updated.trimEnd()}\n\nexport default withAiReady()(${binding});\n`;
       }
-      if (updated === importLine + src) return null; // no match, skip
+      if (!updated) return null; // unsupported config export, skip without modifying it
 
       await writeFile(filePath, updated, "utf8");
       return name;
@@ -281,7 +280,7 @@ async function patchNextConfig(cwd: string): Promise<string | null> {
   }
 
   // No config file found — create a minimal one.
-  const newConfig = `import { withAiReady } from "next-ai-ready";
+  const newConfig = `import { withAiReady } from "next-ai-ready/config";
 
 export default withAiReady()({
   // Your Next.js config here.
@@ -289,6 +288,17 @@ export default withAiReady()({
 `;
   await writeFile(join(cwd, "next.config.mjs"), newConfig, "utf8");
   return "next.config.mjs (created)";
+}
+
+function uniqueConfigBinding(source: string): string {
+  const base = "nextAiReadyConfig";
+  let candidate = base;
+  let suffix = 2;
+  while (new RegExp(`\\b${candidate}\\b`).test(source)) {
+    candidate = `${base}${suffix}`;
+    suffix += 1;
+  }
+  return candidate;
 }
 
 // ---------------------------------------------------------------------------

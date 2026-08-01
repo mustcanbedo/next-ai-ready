@@ -1,7 +1,7 @@
 import { resolve } from "node:path";
-import { pathToFileURL } from "node:url";
 import { registerAiReady, type McpServerLike } from "@next-ai-ready/mcp";
 import { loadConfig } from "./load-config.js";
+import { loadConfiguredActions } from "./load-actions.js";
 import { loadGraph } from "../runtime/graph-loader.js";
 
 export interface McpStdioOptions {
@@ -32,12 +32,8 @@ export async function runMcpStdio(opts: McpStdioOptions = {}): Promise<void> {
   }
 
   // Populate the registry from the configured actions module (or inline array).
-  if (typeof config.actions === "string") {
-    const modPath = resolve(cwd, config.actions);
-    await import(pathToFileURL(modPath).href);
-  } else if (Array.isArray(config.actions)) {
-    const { registerActions } = await import("@next-ai-ready/actions");
-    registerActions(config.actions);
+  if (config.actions) {
+    await loadConfiguredActions(cwd, config.actions);
   }
 
   const { McpServer } = await importSdkServer();
@@ -60,7 +56,6 @@ export async function runMcpStdio(opts: McpStdioOptions = {}): Promise<void> {
   await server.connect(transport);
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function importSdkServer(): Promise<{ McpServer: any }> {
   try {
     const spec = "@modelcontextprotocol/sdk/server/mcp.js";
@@ -73,7 +68,6 @@ async function importSdkServer(): Promise<{ McpServer: any }> {
   }
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function importSdkStdio(): Promise<{ StdioServerTransport: any }> {
   try {
     const spec = "@modelcontextprotocol/sdk/server/stdio.js";

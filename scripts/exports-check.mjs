@@ -34,7 +34,13 @@ const EXTRA_EXPORTS = [
   { name: "@next-ai-ready/next", dir: join(ROOT, "packages", "next"), key: "./hooks", js: "runtime/observability.js", dts: "runtime/observability.d.ts" },
   { name: "next-ai-ready", dir: join(ROOT, "packages", "meta"), key: "./hooks", js: "hooks.js", dts: "hooks.d.ts" },
   { name: "next-ai-ready", dir: join(ROOT, "packages", "meta"), key: "./audit", js: "audit.js", dts: "audit.d.ts" },
+  { name: "next-ai-ready", dir: join(ROOT, "packages", "meta"), key: "./config", js: "config.js", dts: "config.d.ts" },
+  { name: "next-ai-ready", dir: join(ROOT, "packages", "meta"), key: "./robots", js: "robots.js", dts: "robots.d.ts" },
   { name: "@next-ai-ready/core", dir: join(ROOT, "packages", "core"), key: "./bots", js: "bots-entry.js", dts: "bots-entry.d.ts" },
+  { name: "@next-ai-ready/core", dir: join(ROOT, "packages", "core"), key: "./json", js: "json.js", dts: "json.d.ts" },
+  { name: "@next-ai-ready/core", dir: join(ROOT, "packages", "core"), key: "./robots", js: "robots.js", dts: "robots.d.ts" },
+  { name: "@next-ai-ready/core", dir: join(ROOT, "packages", "core"), key: "./url", js: "url.js", dts: "url.d.ts" },
+  { name: "@next-ai-ready/semantic", dir: join(ROOT, "packages", "semantic"), key: "./jsonld", js: "jsonld.js", dts: "jsonld.d.ts" },
 ];
 
 async function exists(p) {

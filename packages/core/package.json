@@ -19,6 +19,18 @@
     "./bots": {
       "types": "./dist/bots-entry.d.ts",
       "import": "./dist/bots-entry.js"
+    },
+    "./json": {
+      "types": "./dist/json.d.ts",
+      "import": "./dist/json.js"
+    },
+    "./robots": {
+      "types": "./dist/robots.d.ts",
+      "import": "./dist/robots.js"
+    },
+    "./url": {
+      "types": "./dist/url.d.ts",
+      "import": "./dist/url.js"
     }
   },
   "files": [

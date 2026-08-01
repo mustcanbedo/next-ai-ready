@@ -379,7 +379,7 @@ describe("runAudit()", () => {
 
     expect(result.schema).toBe("next-ai-ready.audit.v3");
     expect(result.methodology).toMatchObject({
-      package: "@vercel/agent-readability",
+      referencePackage: "@vercel/agent-readability",
       version: "0.5.0",
       scoring: "required=3,recommended=2,strict-pass-only",
     });
@@ -410,6 +410,16 @@ describe("runAudit()", () => {
     expect(result.checks.find((check) => check.id === "mcp-endpoint")).toMatchObject({
       status: "warn",
       message: expect.stringContaining("NEXT_AI_READY_MCP_TOKEN is not configured"),
+    });
+  });
+
+  it("accepts a protected MCP endpoint without sending deployment credentials", async () => {
+    const { target } = await startFixtureServer({ capabilityMode: "invalid" });
+    const result = await runAudit(target, { version: "3", timeoutMs: 2_000 });
+
+    expect(result.checks.find((check) => check.id === "mcp-endpoint")).toMatchObject({
+      status: "pass",
+      message: expect.stringContaining("authentication gate"),
     });
   });
 
@@ -456,12 +466,19 @@ describe("runAudit()", () => {
 
       expect(result.score).toBe(100);
       expect(result.errors).toBe(0);
-      expect(capability).toMatchObject({ score: 0, status: "warn", errors: 0, warnings: 3 });
+      expect(capability).toMatchObject(
+        capabilityMode === "invalid"
+          ? { score: 33, status: "warn", errors: 0, warnings: 2, passed: 1 }
+          : { score: 0, status: "warn", errors: 0, warnings: 3, passed: 0 },
+      );
       expect(result.checks.filter((check) => check.planes.includes("agent-capability"))).toEqual(
         expect.arrayContaining([
           expect.objectContaining({ id: "tools-manifest", status: "warn" }),
           expect.objectContaining({ id: "openapi-spec", status: "warn" }),
-          expect.objectContaining({ id: "mcp-endpoint", status: "warn" }),
+          expect.objectContaining({
+            id: "mcp-endpoint",
+            status: capabilityMode === "invalid" ? "pass" : "warn",
+          }),
         ]),
       );
     },

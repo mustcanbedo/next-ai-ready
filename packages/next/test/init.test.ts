@@ -82,7 +82,7 @@ describe("runInit()", () => {
       expect(result.patched).toContain("next.config.mjs");
 
       const config = await readFile(join(dir, "next.config.mjs"), "utf8");
-      expect(config).toContain('import { withAiReady } from "next-ai-ready"');
+      expect(config).toContain('import { withAiReady } from "next-ai-ready/config"');
       expect(config).toContain("withAiReady()(");
       expect(config).toContain("reactStrictMode");
     } finally {
@@ -130,8 +130,31 @@ describe("runInit()", () => {
       expect(result.patched).toContain("next.config.ts");
 
       const config = await readFile(join(dir, "next.config.ts"), "utf8");
-      expect(config).toContain('import { withAiReady } from "next-ai-ready"');
+      expect(config).toContain('import { withAiReady } from "next-ai-ready/config"');
       expect(config).toContain("withAiReady()(");
+    } finally {
+      await cleanup();
+    }
+  });
+
+  it.each([
+    ["object literal", `export default { reactStrictMode: true };\n`, "const nextAiReadyConfig = { reactStrictMode: true };"],
+    ["parenthesized object", `export default ({ reactStrictMode: true });\n`, "const nextAiReadyConfig = ({ reactStrictMode: true });"],
+    [
+      "defineConfig call",
+      `const defineConfig = (value) => value;\nexport default defineConfig({ reactStrictMode: true });\n`,
+      "const nextAiReadyConfig = defineConfig({ reactStrictMode: true });",
+    ],
+  ])("safely patches an inline %s default export", async (_label, source, preservedExpression) => {
+    const { dir, cleanup } = await makeTempProject();
+    try {
+      await writeFile(join(dir, "next.config.mjs"), source, "utf8");
+      const result = await runInit({ cwd: dir, silent: true });
+      expect(result.patched).toContain("next.config.mjs");
+
+      const config = await readFile(join(dir, "next.config.mjs"), "utf8");
+      expect(config).toContain(preservedExpression);
+      expect(config).toContain("export default withAiReady()(nextAiReadyConfig);");
     } finally {
       await cleanup();
     }

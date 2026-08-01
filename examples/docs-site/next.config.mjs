@@ -1,4 +1,4 @@
-import { withAiReady } from "next-ai-ready";
+import { withAiReady } from "next-ai-ready/config";
 import path from "node:path";
 
 const nextConfig = {

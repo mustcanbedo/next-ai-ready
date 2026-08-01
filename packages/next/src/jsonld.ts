@@ -1,4 +1,4 @@
-import { pageJsonLd, siteJsonLd } from "@next-ai-ready/semantic";
+import { pageJsonLd, siteJsonLd } from "@next-ai-ready/semantic/jsonld";
 import type { SemanticGraph, SiteInfo } from "@next-ai-ready/core";
 import { loadGraph } from "./runtime/graph-loader.js";
 

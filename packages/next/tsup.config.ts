@@ -3,6 +3,7 @@ import { defineConfig } from "tsup";
 export default defineConfig({
   entry: [
     "src/index.ts",
+    "src/audit.ts",
     "src/cli-bin.ts",
     "src/cli/index.ts",
     "src/handlers/llms-txt.ts",

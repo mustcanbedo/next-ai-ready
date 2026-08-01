@@ -4,7 +4,7 @@ summary: Install next-ai-ready and scaffold your first config.
 order: 2
 questions:
   - q: What are the prerequisites for next-ai-ready?
-    a: 'Node.js 20+, Next.js 15+ with App Router, and Zod v4 for actions.'
+    a: 'Node.js 20+, Next.js 14.2+ with App Router, and Zod v4 for actions. Next.js 15+ is recommended.'
   - q: Do I need to install @next-ai-ready/* packages separately?
     a: >-
       No. Install only the next-ai-ready meta package; it re-exports handlers
@@ -26,7 +26,7 @@ author: next-ai-ready team
 ## Prerequisites
 
 - **Node.js** 20 or later
-- **Next.js** 15+ with App Router (required — route handlers use async `params`; Next 14 is not supported)
+- **Next.js** 14.2+ with App Router (Next.js 15+ recommended; 14.2, 15, and 16 are covered by the compatibility matrix)
 - **pnpm**, npm, or yarn
 - **Zod v4** (`zod@^4`) — required for actions (uses `z.toJSONSchema()`)
 
@@ -42,8 +42,12 @@ This installs the meta package which re-exports everything you need and provides
 
 | Import | Needs Next.js? | Use for |
 |--------|----------------|---------|
-| `next-ai-ready` | No (CLI + config) | `init`, `build`, `doctor`, `defineConfig`, `defineAction` |
+| `next-ai-ready` | No (authoring + CLI) | `init`, `build`, `doctor`, `defineConfig`, `defineAction` |
+| `next-ai-ready/config` | Loaded by Next config | `withAiReady()` without build-time scanner imports |
+| `next-ai-ready/robots` | Yes | Dynamic `app/robots.ts` policies |
+| `next-ai-ready/hooks` | Yes | Runtime observability |
 | `next-ai-ready/handlers/*` | Yes (`server-only`) | Route stubs in `app/%5Fai-ready/` |
+| `next-ai-ready/audit` | No | Programmatic deployment audits |
 | `@next-ai-ready/next` | Yes | Monorepo / advanced: same handlers + `withAiReady()` |
 
 Install **one** meta package for typical apps: `pnpm add next-ai-ready@alpha`. The `@next-ai-ready/*` scoped packages are used internally; you do not need to add them separately.
@@ -88,7 +92,7 @@ This creates:
 - `app/api/mcp/` — the MCP server endpoint
 - `actions/index.ts` in TypeScript apps, or `.mjs` in JavaScript apps — a starter action file with a `ping` health check
 
-`init` also patches `next.config` with `withAiReady()` and adds `next-ai-ready build` to your build script when missing.
+`init` also patches `next.config` with `withAiReady()` from `next-ai-ready/config` and adds `next-ai-ready build` to your build script when missing.
 
 `%5F` is the URL-encoded form of `_`. Next.js treats a literal `app/_ai-ready/` folder as private and excludes it from routing, while `app/%5Fai-ready/` correctly serves the `/_ai-ready/*` URL namespace. Do not rename the generated folder. When upgrading from alpha.10 or earlier, rerun `npx next-ai-ready init` and remove the obsolete `app/_ai-ready/` directory after reviewing local customizations.
 
@@ -97,7 +101,7 @@ This creates:
 Edit `ai-ready.config.mjs` to match your site:
 
 ```js
-import { defineConfig } from "@next-ai-ready/core";
+import { defineConfig } from "next-ai-ready";
 
 export default defineConfig({
   site: {
@@ -112,7 +116,7 @@ export default defineConfig({
 
 ### Robots policy
 
-`next-ai-ready build` emits `public/robots.txt` with explicit AI-bot rules unless you set `emit: { robots: false }`. For dynamic policies, add `app/robots.ts` and use `aiRobots()` from `@next-ai-ready/core` — Next.js serves `app/robots.ts` at runtime. Doctor treats that as valid and does not require a static `public/robots.txt`.
+`next-ai-ready build` emits `public/robots.txt` with explicit AI-bot rules unless you set `emit: { robots: false }`. For dynamic policies, add `app/robots.ts` and use `aiRobots()` from `next-ai-ready/robots` — Next.js serves `app/robots.ts` at runtime. Doctor treats that as valid and does not require a static `public/robots.txt`.
 
 ## Build
 

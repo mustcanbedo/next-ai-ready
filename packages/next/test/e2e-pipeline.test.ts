@@ -36,6 +36,7 @@ async function linkMetaPackage(dir: string) {
 async function makePipelineProject() {
   const dir = await mkdtemp(join(FIXTURES_ROOT, "pipeline-"));
   await linkMetaPackage(dir);
+  await writeFile(join(dir, "tsconfig.json"), `{"compilerOptions":{"strict":true}}\n`, "utf8");
   await writeFile(
     join(dir, "package.json"),
     JSON.stringify(
@@ -76,7 +77,8 @@ describe("init → build → handler pipeline (X-01)", () => {
     const { dir, cleanup } = await makePipelineProject();
     try {
       const init = await runInit({ cwd: dir, silent: true });
-      expect(init.written).toContain("ai-ready.config.mjs");
+      expect(init.written).toContain("ai-ready.config.ts");
+      expect(init.written).toContain("actions/index.ts");
       expect(init.patched.some((p) => p.includes("next.config"))).toBe(true);
       expect(init.patched).toContain("package.json");
 

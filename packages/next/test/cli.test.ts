@@ -98,7 +98,7 @@ const V3_RESULT = {
   score: 100,
   methodology: {
     name: "next-ai-ready three-plane preflight" as const,
-    package: "@vercel/agent-readability" as const,
+    referencePackage: "@vercel/agent-readability" as const,
     version: "0.5.0" as const,
     scoring: "required=3,recommended=2,strict-pass-only" as const,
     coverage: "local-subset-official-cli-is-source-of-truth" as const,

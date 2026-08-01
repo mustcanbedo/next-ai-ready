@@ -1,6 +1,6 @@
 import "server-only";
 import { invokeAction } from "@next-ai-ready/actions";
-import { identifyAiBot } from "@next-ai-ready/core";
+import { identifyAiBot } from "@next-ai-ready/core/bots";
 import { emitInvoke } from "../runtime/observability.js";
 import { resolveParams } from "../runtime/params.js";
 

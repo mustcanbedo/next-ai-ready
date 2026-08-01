@@ -29,10 +29,9 @@
     "expected": {
       "readabilityScore": 77,
       "readabilityStatus": "fail",
-      "failedChecks": ["accept-markdown"],
+      "failedChecks": ["accept-markdown", "agent-user-agent"],
       "warningChecks": [
         "sitemap-md",
-        "agent-user-agent",
         "markdown-headers",
         "agent-markdown-recovery-quality"
       ]
@@ -51,13 +50,16 @@
     "expected": {
       "readabilityScore": 21,
       "readabilityStatus": "fail",
-      "failedChecks": ["llms-txt", "accept-markdown"],
-      "warningChecks": [
+      "failedChecks": [
+        "llms-txt",
         "sitemap-xml",
-        "sitemap-md",
         "robots-txt",
+        "accept-markdown",
         "agent-user-agent",
-        "explicit-markdown",
+        "explicit-markdown"
+      ],
+      "warningChecks": [
+        "sitemap-md",
         "markdown-headers",
         "markdown-frontmatter",
         "html-canonical",

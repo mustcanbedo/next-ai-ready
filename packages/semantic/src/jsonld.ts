@@ -1,5 +1,5 @@
-import type { SemanticGraph, SemanticNode, SiteInfo } from "@next-ai-ready/core";
-import { absoluteUrl } from "@next-ai-ready/core";
+import type { SemanticGraph, SiteInfo } from "@next-ai-ready/core";
+import { absoluteUrl } from "@next-ai-ready/core/url";
 
 /**
  * Emit Schema.org JSON-LD blocks for one page.

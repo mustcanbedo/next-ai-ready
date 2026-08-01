@@ -87,7 +87,7 @@ robots: {
 
 1. 在配置中设置 `emit: { robots: false }` 跳过静态生成。
 2. 使用 Next.js 内置的 robots 支持创建 `app/robots.ts`（本文档站采用此方式）。
-3. 在 `app/robots.ts` 中使用 `aiRobots()`（`next-ai-ready` / `@next-ai-ready/core`）。
+3. 在 `app/robots.ts` 中使用 `aiRobots()`（`next-ai-ready/robots` 或 `@next-ai-ready/core/robots`）。
 
 Doctor 认可 `app/robots.ts` + `emit.robots: false`，不会误报缺少 `public/robots.txt`。
 

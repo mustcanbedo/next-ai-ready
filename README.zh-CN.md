@@ -107,6 +107,11 @@ npx next-ai-ready mcp      # 通过 stdio 运行 MCP 服务器（Claude Desktop 
 在 `next.config.mjs` 中显式启用 Markdown 内容协商：
 
 ```js
+// next.config.mjs
+import { withAiReady } from "next-ai-ready/config"
+
+const nextConfig = {}
+
 export default withAiReady({ agentReadable: true })(nextConfig)
 ```
 
@@ -152,6 +157,20 @@ registerAiHooks({
 
 请使用 `next-ai-ready/hooks` 子路径，避免在 Edge instrumentation 中加载 Node 专用模块。
 
+### 运行时安全导入
+
+消费者应用只需安装 `next-ai-ready`。在 Next.js 运行时和配置文件中使用专用子路径，避免将构建期扫描器与 CLI 依赖打入服务端或 Edge bundle：
+
+| 导入 | 用途 |
+|---|---|
+| `next-ai-ready/config` | 在 `next.config` 中使用 `withAiReady()` |
+| `next-ai-ready/robots` | `aiRobots()` 与 `buildRobotsTxt()` |
+| `next-ai-ready/hooks` | 运行时观测 hook |
+| `next-ai-ready/handlers/*` | 生成的 App Router handler |
+| `next-ai-ready/audit` | 以代码方式执行部署审计 |
+
+主入口 `next-ai-ready` 仍用于 `defineConfig()`、`defineAction()` 等编写期与构建期 API。
+
 ## 状态
 
 🚧 **Pre-alpha**（`0.1.0-alpha.12` 已发布到 npm `@alpha`）。开发分支还包含尚未发布的 Audit v2/v3 与 MCP 页面发现改动，详见[当前改进台账](./docs/improvement-plan.zh-CN.md)。
@@ -180,7 +199,7 @@ registerAiHooks({
 - **仅 Node.js 运行时** — 所有 handler 导出 `runtime = "nodejs"`。不支持 Edge Runtime。
 - **不支持静态导出** — Next.js 的 `output: 'export'` 不兼容（handler 需要服务端运行时）。
 - **不支持 Pages Router** — 仅支持 App Router。`withAiReady()` 和路由 handler 基于 App Router 约定。
-- **推荐 Next.js 15+** — handler 使用 `params: Promise<>`（异步 params）。Next.js 14 可通过 `Promise.resolve()` 兼容但未官方测试。
+- **推荐 Next.js 15+** — Next.js 14.2+、15 和 16 均已通过真实项目验证；15+ 可原生使用异步 `params`。
 - **i18n 在 graph 层为路由级，非 CMS 级** — 当路由带 locale 前缀（如 `/zh/docs/...`）时，`SemanticGraph` 含 `locale` 与 `routesByLocale`；`llms.txt` 分区与 MCP 资源仍需按语言手动策展。见 [i18n 指南](https://next-ai-ready.vercel.app/zh/docs/guides/i18n-ai-urls) 与 [Phase 6 设计](./docs/phase6-design.md)。
 
 ## 许可证

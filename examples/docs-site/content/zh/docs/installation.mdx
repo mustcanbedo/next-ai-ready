@@ -34,7 +34,7 @@ pnpm add next-ai-ready@alpha zod@^4
 
 这会安装 meta 包，重新导出全部 API 并提供 CLI。
 
-> **发布渠道：** 本站跟随 `main`，npm 当前为 `0.1.0-alpha.12`。alpha.12 存在已知的 TypeScript Action 模块加载问题，已在 `main` 修复并会随下一个预发布版本发布。以下导入示例使用已发布 alpha 的 API。
+> **发布渠道：** 本站跟随 `main`，npm 当前为 `0.1.0-alpha.14`。完整内部依赖链已于 2026-08-02 通过公共 registry 干净安装、CLI 流程和 Next.js 15 生产构建验证。
 
 ## 包导出说明（N-14）
 
@@ -43,12 +43,12 @@ pnpm add next-ai-ready@alpha zod@^4
 | `next-ai-ready` | 编写期、配置与 CLI | `defineConfig`、`defineAction`、`withAiReady`、`aiRobots` 与 CLI 命令 |
 | `next-ai-ready/hooks` | 是 | 运行时观测 |
 | `next-ai-ready/handlers/*` | 是（`server-only`） | `app/%5Fai-ready/` 路由 stub |
+| `next-ai-ready/actions`、`/config`、`/json-ld`、`/robots` | 否或运行时专用 | 避免加载无关构建代码的专用 API |
+| `next-ai-ready/audit` | 否 | 不加载 CLI 调度器的程序化 Audit |
 
 典型应用只需：`pnpm add next-ai-ready@alpha`。`@next-ai-ready/*` 为内部包，无需单独安装。
 
 `jiti` 已是 `@next-ai-ready/next` 的运行时依赖，并会随 meta 包安装。因此使用 TypeScript `ai-ready.config.ts` 时无需自行添加 `jiti`。
-
-`main` 已提供 `next-ai-ready/actions`、`next-ai-ready/config`、`next-ai-ready/json-ld`、`next-ai-ready/robots` 与 `next-ai-ready/audit` 专用入口，但 npm alpha.12 尚未包含；下一个预发布版本上线前，它们会明确标为仅限 `main`。
 
 **可选 peer 与应用依赖：**
 

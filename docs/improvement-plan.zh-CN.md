@@ -1,9 +1,9 @@
 # next-ai-ready 产品改进台账
 
-> 最后更新：2026-08-01  
+> 最后更新：2026-08-02
 > 维护者视角：`next-ai-ready` 原始作者与技术负责人  
-> 当前发布：npm `0.1.0-alpha.12`  
-> 当前主分支基线：`4eea4a9`（PR #4 已合并）
+> 当前发布：npm `0.1.0-alpha.14`
+> 当前主分支基线：`a6eb7e2`（PR #7 已合并）
 
 本文是后续优化的**执行状态与决策记录**。`roadmap.md` 保留工程阶段历史，
 `post-ga.md` 保留候选方向；当它们与本文的当前优先级冲突时，以本文为准。
@@ -58,11 +58,11 @@
 | 能力 | 状态 | 说明 |
 |---|---|---|
 | Agent Markdown 缺页恢复 | `已完成` | Agent Markdown 请求返回 `200`、`noindex`、发现入口和相似页面；浏览器仍返回真实 `404` |
-| Audit 三层报告 | `待验证` | v1/v2 保持兼容；v3 已合入 `main` 并拆分 Readability、Semantic/AEO 与 Capability，待从下一版 npm 包完成外部验证 |
-| MCP 页面发现 | `待验证` | `list_pages`、`get_page`、`search_pages` 和确定性分页已合入 `main`；待从下一版 npm 包连接真实 MCP Client，locale 过滤及 HTTP 共用接口进入后续迭代 |
-| Next.js 兼容验证 | `待验证` | npm/pnpm × Next.js 14/15/16 已在 PR CI 通过；待下一版 npm 包完成 registry 安装矩阵 |
+| Audit 三层报告 | `已完成` | v1/v2 保持兼容；v3 已随 npm alpha.14 发布，并拆分 Readability、Semantic/AEO 与 Capability；发布前 CLI 回归和外部安装均通过 |
+| MCP 页面发现 | `待验证` | `list_pages`、`get_page`、`search_pages` 和确定性分页已随 alpha.14 发布；待连接真实 MCP Client，locale 过滤及 HTTP 共用接口进入后续迭代 |
+| Next.js 兼容验证 | `待验证` | npm/pnpm × Next.js 14/15/16 已在 PR CI 通过；npm alpha.14 已通过 pnpm + Next.js 15 registry 安装，剩余 registry 矩阵待执行 |
 | Vercel 官方 Readability 基线 | `已完成` | `main` 部署后已使用固定的 `@vercel/agent-readability@0.5.0` 复测生产站，25 项全部通过并保持 `100/100`；每周/手动工作流仍单独跟踪 |
-| npm GA | `待开始` | 当前仅发布 `0.1.0-alpha.12`，尚未发布 `0.1.0` |
+| npm GA | `待开始` | 当前仅发布 `0.1.0-alpha.14`，尚未发布 `0.1.0` |
 | i18n 与 Content Adapter | `待开始` | graph 有基础字段和 ContentSource 接口，但没有完整接入体验 |
 | 动态索引 | `待商榷` | 只保留 Provider 方向，等待真实需求证据 |
 | 商业观测 | `待商榷` | SDK 只定义开放事件和 Adapter；托管产品单独决策 |
@@ -106,34 +106,37 @@ pnpm audit:vercel:site
 - 质量门：`--min-score 100`
 - CI：`.github/workflows/agent-readability.yml`，每周运行并支持手动触发
 
-同日使用未发布的 Audit v3 对该 URL 预检：Agent Readability `100/100`、
+同日使用发布前的 Audit v3 对该 URL 预检：Agent Readability `100/100`、
 Semantic/AEO Quality `100/100`、Agent Capability `67/100`。Capability 的
 当时唯一警告是生产 MCP Token 尚未配置，因此无法进行带凭证的协议验证。2026-08-01
 已将 Sensitive Token 写入 Vercel Production；线上鉴权由 `401` 变为进入 MCP handler，
-同时暴露出默认 `basePath` 与生成路由不一致导致的 transport `404`。修复已进入当前分支，
-待合入 `main` 并重新部署后完成协议验收。v3 结果用于验证三层报告实现，不能替代上方
+同时暴露出默认 `basePath` 与生成路由不一致导致的 transport `404`。修复现已合入
+`main` 并随 alpha.14 发布；生产 MCP 带凭证初始化握手仍需单独完成。v3 结果用于验证三层报告实现，不能替代上方
 官方 CLI 的 25 项外部结果。
 
 ### P1：发布 0.1 GA
 
 | ID | 任务 | 状态 | 验收标准 |
 |---|---|---|---|
-| G1-01 | 合入并发布当前 Audit/MCP 功能 | `进行中` | 功能已通过 PR #2-#4 合入 `main`；下一步发布 npm alpha 并消除 registry 漂移 |
-| G1-02 | 配置生产 MCP Token | `待验证` | Vercel Production Sensitive Token 已保存并部署，MCP basePath 修复已合入 `main`；待下一版 npm 包完成带凭据初始化握手 |
-| G1-03 | 固化真实安装矩阵 | `已完成` | main 代码基线的 tarball 已通过 npm/pnpm × Next.js 14/15/16 六组合，并抽样通过 pnpm 9.12 与 11.9；registry 矩阵由 G1-07 单独跟踪 |
+| G1-01 | 合入并发布当前 Audit/MCP 功能 | `已完成` | PR #2-#7 已合入 `main`；Audit v3、MCP 页面发现和依赖链修复已随 npm alpha.14 发布 |
+| G1-02 | 配置生产 MCP Token | `待验证` | Vercel Production Sensitive Token 已保存并部署，MCP basePath 修复已随 alpha.14 发布；待完成生产环境带凭据初始化握手 |
+| G1-03 | 固化真实安装矩阵 | `进行中` | main tarball 已通过 npm/pnpm × Next.js 14/15/16 六组合，并抽样通过 pnpm 9.12 与 11.9；alpha.14 已通过 pnpm + Next.js 15 registry 安装，剩余五个 registry 组合待补齐 |
 | G1-04 | 冻结 0.1 公共 API | `已完成` | 十个发布包的 entrypoint、命名导出、类型声明哈希与 bin 基线均已通过；程序化 Audit 已收口到独立入口，不再暴露 CLI 调度 API |
 | G1-05 | 建立最小回滚流程 | `待验证` | npm 计划器仅生成精确 deprecate/dist-tag 命令；Git revert、Vercel rollback/promote 和三层验证已进入手册，待 GA 前演练 |
 | G1-06 | 更新 GA 文案并发布 `0.1.0` | `待开始` | README 不再写 Pre-alpha；十分钟流程无错误 |
-| G1-07 | 消除 `main`、npm 与网站文档的发布漂移 | `进行中` | 网站已标明 npm 与 docs 渠道；下一个 alpha 发布后验证专用入口、TypeScript Action 加载与 registry 真实安装 |
+| G1-07 | 消除 `main`、npm 与网站文档的发布漂移 | `已完成` | README、文档站和 npm 已对齐 alpha.14；专用入口、TypeScript Action 加载及 registry 干净安装已验证；发布门禁新增 manifest 漂移检查 |
 
 GA 之前不加入数据库、IndexNow、大型 DevTools 或托管后台。
 
-2026-08-01 alpha 发布准备：
+2026-08-01 至 2026-08-02 alpha 发布记录：
 
 - `verify:release` 全部门禁通过：构建、测试、类型检查、端到端生成、pack、exports、公共 API、CLI、文档站和外部 Next.js tarball 安装。
 - ESLint 无错误、无警告；`git diff --check` 通过。
-- Changesets 计划：`next-ai-ready@0.1.0-alpha.13`、`@next-ai-ready/next@0.1.0-alpha.13`、`@next-ai-ready/mcp@0.1.0-alpha.12`、`create-next-ai-ready@0.1.0-alpha.11`。
-- 真正执行 `npm publish --tag alpha` 前仍需确认 npm 身份与二次验证；发布后再把 G1-01、G1-07 和 S2-01 更新为最终状态。
+- 首次发布了 `next-ai-ready@0.1.0-alpha.13`、`@next-ai-ready/next@0.1.0-alpha.13`、`@next-ai-ready/mcp@0.1.0-alpha.12` 与 `create-next-ai-ready@0.1.0-alpha.11`。
+- 公共 registry 回归发现 alpha.13 的传递依赖 `@next-ai-ready/semantic@0.1.0-alpha.11` 未发布 `./jsonld` export；`@next-ai-ready/core@0.1.0-alpha.11` 也缺少新运行时专用 exports。根因是公开 manifest 改动未伴随底层包版本提升。
+- PR #7 增加 `registry:manifest-check`，在发布门禁中比较本地与 npm 同版本的公开 manifest，防止在相同版本下漂移；Changesets 随后生成完整的精确依赖替换链。
+- 修正版已发布：Core、Semantic、Actions、MDX、OpenAPI 为 alpha.12，LLMS、MCP 为 alpha.13，Next 与 meta 包为 alpha.14；`@alpha` 没有移动正式版 `latest`。
+- `next-ai-ready@0.1.0-alpha.14` 已从公共 npm registry 完成 pnpm 干净安装、`init`、`build`、`doctor --score` 与 Next.js 15 生产构建，全部通过。
 
 2026-08-01 分支审查修复：Audit v3 的 required 检查现在统一产生 failure 并使 CLI
 非零退出；`create-next-ai-ready` 已移出 Changesets ignore 列表；公开 Audit 只确认 MCP
@@ -144,7 +147,7 @@ GA 之前不加入数据库、IndexNow、大型 DevTools 或托管后台。
 
 | ID | 任务 | 状态 | 验收标准 |
 |---|---|---|---|
-| S2-01 | `list_pages`、`get_page`、`search_pages` | `待验证` | 已合入 `main`；从下一版 npm 包连接真实 MCP Client 后通过 |
+| S2-01 | `list_pages`、`get_page`、`search_pages` | `待验证` | 已随 alpha.14 发布；待连接真实 MCP Client 验证三个工具的发现与读取效果 |
 | S2-02 | locale 过滤和确定性分页 | `待开始` | 中英文结果不混淆；cursor 行为有回归测试 |
 | S2-03 | 统一 Search Provider | `待开始` | MCP 与 HTTP 搜索调用同一实现，不复制排序逻辑 |
 | S2-04 | 补齐页面元数据 | `进行中` | title、summary、canonical URL、locale、updatedAt 均有类型和测试 |
@@ -201,11 +204,10 @@ P0、P1 完成后再开始。
 
 P0 已完成并部署，当前按以下顺序收敛 alpha 与 GA：
 
-1. `G1-01` / `G1-07`：补充有效 Changeset，执行发布前门禁并发布下一版 npm alpha。
-2. `G1-02` / `S2-01`：用已发布包完成生产 MCP 认证初始化握手和三个页面发现工具验证。
-3. `G1-03` / `G1-04`：从 npm Registry 运行 npm/pnpm × Next.js 14/15/16 安装矩阵与公共 API 基线。
-4. `G1-05`：演练一次 npm、Git 与 Vercel 回滚计划，不执行破坏性回滚。
-5. `G1-06`：完成十分钟首次接入验证、GA 文案和 `0.1.0` 发布。
+1. `G1-02` / `S2-01`：用已发布 alpha.14 完成生产 MCP 认证初始化握手和三个页面发现工具验证。
+2. `G1-03`：从 npm Registry 补齐 npm/pnpm × Next.js 14/15/16 安装矩阵。
+3. `G1-05`：演练一次 npm、Git 与 Vercel 回滚计划，不执行破坏性回滚。
+4. `G1-06`：完成十分钟首次接入验证、GA 文案和 `0.1.0` 发布。
 
 ## 8. 维护规则
 

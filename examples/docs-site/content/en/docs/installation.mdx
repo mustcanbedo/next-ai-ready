@@ -38,7 +38,7 @@ pnpm add next-ai-ready@alpha zod@^4
 
 This installs the meta package which re-exports everything you need and provides the CLI.
 
-> **Release channel:** this site tracks `main`; npm currently serves `0.1.0-alpha.12`. Alpha.12 has a known TypeScript Action-module loading issue that is fixed on `main` and will ship in the next prerelease. The import examples below use the published alpha surface.
+> **Release channel:** this site tracks `main`; npm currently serves `0.1.0-alpha.14`. Its complete internal dependency chain passed a clean registry install, CLI workflow, and Next.js 15 production build on August 2, 2026.
 
 ## Package exports (N-14)
 
@@ -47,12 +47,12 @@ This installs the meta package which re-exports everything you need and provides
 | `next-ai-ready` | Authoring, config, and CLI | `defineConfig`, `defineAction`, `withAiReady`, `aiRobots`, and CLI commands |
 | `next-ai-ready/hooks` | Yes | Runtime observability |
 | `next-ai-ready/handlers/*` | Yes (`server-only`) | Route stubs in `app/%5Fai-ready/` |
+| `next-ai-ready/actions`, `/config`, `/json-ld`, `/robots` | No or runtime-specific | Focused APIs that avoid loading unrelated build code |
+| `next-ai-ready/audit` | No | Programmatic Audit without the CLI dispatcher |
 
 Install **one** meta package for typical apps: `pnpm add next-ai-ready@alpha`. The `@next-ai-ready/*` scoped packages are used internally; you do not need to add them separately.
 
 `jiti` is a runtime dependency of `@next-ai-ready/next` and is installed through the meta package. TypeScript `ai-ready.config.ts` files therefore work without adding `jiti` yourself.
-
-Focused `next-ai-ready/actions`, `next-ai-ready/config`, `next-ai-ready/json-ld`, `next-ai-ready/robots`, and `next-ai-ready/audit` exports exist on `main` but are not present in npm alpha.12. They are documented as main-only until the next prerelease.
 
 **Optional peers and app dependencies** (install only when needed):
 

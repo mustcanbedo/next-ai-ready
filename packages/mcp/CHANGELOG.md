@@ -1,5 +1,11 @@
 # @next-ai-ready/mcp
 
+## 0.1.0-alpha.12
+
+### Minor Changes
+
+- dd4eb8d: Add graph-backed `list_pages`, `get_page`, and deterministic local `search_pages` MCP tools. They register automatically when `registerAiReady` receives a SemanticGraph and enforce bounded pagination, query, result, and route inputs.
+
 ## 0.1.0-alpha.11
 
 ### Patch Changes

@@ -66,6 +66,56 @@ export interface AuditV2Result {
   passed: number;
 }
 
+export const AUDIT_V3_SCHEMA = "next-ai-ready.audit.v3" as const;
+export const VERCEL_AGENT_READABILITY_VERSION = "0.5.0" as const;
+
+export type AuditPlaneId = "agent-readability" | "semantic-aeo-quality" | "agent-capability";
+export type AuditCheckSource = "external-standard" | "next-ai-ready-enhancement";
+export type AuditCheckTier = "required" | "recommended" | "enhancement";
+
+export interface AuditV3Check extends AuditCheck {
+  planes: AuditPlaneId[];
+  source: AuditCheckSource;
+  tier: AuditCheckTier;
+  points: number;
+  recommendation: string | null;
+}
+
+export interface AuditPlaneResult {
+  id: AuditPlaneId;
+  name: string;
+  score: number;
+  status: AuditStatus;
+  errors: number;
+  warnings: number;
+  passed: number;
+  checks: string[];
+}
+
+export interface AuditV3Result {
+  schema: typeof AUDIT_V3_SCHEMA;
+  version: "3";
+  timestamp: string;
+  target: string;
+  pageUrl: string;
+  /** Compatibility score: the local Agent Readability preflight score. */
+  score: number;
+  methodology: {
+    name: "next-ai-ready three-plane preflight";
+    package: "@vercel/agent-readability";
+    version: typeof VERCEL_AGENT_READABILITY_VERSION;
+    scoring: "required=3,recommended=2,strict-pass-only";
+    coverage: "local-subset-official-cli-is-source-of-truth";
+    officialCommand: string;
+    referenceUrl: string;
+  };
+  planes: AuditPlaneResult[];
+  checks: AuditV3Check[];
+  errors: number;
+  warnings: number;
+  passed: number;
+}
+
 export interface AuditOptions {
   version?: "1";
   timeoutMs?: number;
@@ -74,6 +124,12 @@ export interface AuditOptions {
 
 export interface AuditV2Options {
   version: "2";
+  timeoutMs?: number;
+  fetch?: typeof globalThis.fetch;
+}
+
+export interface AuditV3Options {
+  version: "3";
   timeoutMs?: number;
   fetch?: typeof globalThis.fetch;
 }
@@ -210,13 +266,112 @@ const AUDIT_V2_CHECKS: Record<string, AuditV2CheckConfig> = {
   },
 };
 
+interface AuditV3CheckConfig {
+  planes: AuditPlaneId[];
+  source: AuditCheckSource;
+  tier: AuditCheckTier;
+  recommendation: string;
+}
+
+const AUDIT_V3_PLANES: Record<AuditPlaneId, string> = {
+  "agent-readability": "Agent Readability",
+  "semantic-aeo-quality": "Semantic/AEO Quality",
+  "agent-capability": "Agent Capability",
+};
+
+const AUDIT_V3_CHECKS: Record<string, AuditV3CheckConfig> = {
+  "html-response": standard(["agent-readability"], "required", "Return successful server-rendered HTML."),
+  "llms-txt": standard(["agent-readability"], "required", "Publish a non-empty /llms.txt."),
+  "sitemap-xml": standard(["agent-readability"], "required", "Publish /sitemap.xml with lastmod dates."),
+  "sitemap-md": standard(["agent-readability"], "recommended", "Publish a structured Markdown sitemap."),
+  "robots-txt": standard(["agent-readability"], "required", "Allow major AI crawlers in robots.txt."),
+  "accept-markdown": standard(
+    ["agent-readability"],
+    "recommended",
+    "Serve Markdown for Accept: text/markdown.",
+  ),
+  "agent-user-agent": standard(
+    ["agent-readability"],
+    "required",
+    "Serve Markdown to supported AI user agents.",
+  ),
+  "explicit-markdown": standard(
+    ["agent-readability"],
+    "required",
+    "Expose a stable .md representation for the page.",
+  ),
+  "markdown-headers": standard(
+    ["agent-readability"],
+    "recommended",
+    "Advertise Markdown and set cache-safe Vary headers.",
+  ),
+  "markdown-frontmatter": standard(
+    ["agent-readability", "semantic-aeo-quality"],
+    "recommended",
+    "Include title, description, canonical URL, and freshness metadata in Markdown frontmatter.",
+  ),
+  "html-canonical": standard(
+    ["agent-readability", "semantic-aeo-quality"],
+    "recommended",
+    "Add a canonical URL to the HTML page.",
+  ),
+  "meta-description": standard(
+    ["agent-readability", "semantic-aeo-quality"],
+    "recommended",
+    "Add a descriptive meta description.",
+  ),
+  "json-ld": standard(
+    ["agent-readability", "semantic-aeo-quality"],
+    "recommended",
+    "Add valid Schema.org JSON-LD.",
+  ),
+  "page-h1": standard(
+    ["agent-readability", "semantic-aeo-quality"],
+    "recommended",
+    "Use a clear primary heading and structured subsections.",
+  ),
+  "real-404": standard(
+    ["agent-readability"],
+    "required",
+    "Return a real browser HTTP 404 for missing pages.",
+  ),
+  "agent-markdown-404": standard(
+    ["agent-readability"],
+    "recommended",
+    "Return useful Markdown recovery for missing Agent requests.",
+  ),
+  "tools-manifest": enhancement("Publish a valid /tools.json manifest for callable actions."),
+  "openapi-spec": enhancement("Publish a valid OpenAPI 3.x document for callable actions."),
+  "mcp-endpoint": enhancement(
+    "Configure MCP authentication and verify an authenticated protocol response at /api/mcp/mcp.",
+  ),
+};
+
+function standard(
+  planes: AuditPlaneId[],
+  tier: "required" | "recommended",
+  recommendation: string,
+): AuditV3CheckConfig {
+  return { planes, source: "external-standard", tier, recommendation };
+}
+
+function enhancement(recommendation: string): AuditV3CheckConfig {
+  return {
+    planes: ["agent-capability"],
+    source: "next-ai-ready-enhancement",
+    tier: "enhancement",
+    recommendation,
+  };
+}
+
 /** Audit the deployed behavior that crawlers and agents actually receive. */
 export function runAudit(target: string, options: AuditV2Options): Promise<AuditV2Result>;
+export function runAudit(target: string, options: AuditV3Options): Promise<AuditV3Result>;
 export function runAudit(target: string, options?: AuditOptions): Promise<AuditResult>;
 export async function runAudit(
   target: string,
-  options: AuditOptions | AuditV2Options = {},
-): Promise<AuditResult | AuditV2Result> {
+  options: AuditOptions | AuditV2Options | AuditV3Options = {},
+): Promise<AuditResult | AuditV2Result | AuditV3Result> {
   const requestedUrl = parseTarget(target);
   const fetchImpl = options.fetch ?? globalThis.fetch;
   if (!fetchImpl) {
@@ -460,6 +615,15 @@ export async function runAudit(
   );
 
   const timestamp = new Date().toISOString();
+  if (options.version === "3") {
+    const capabilityChecks = await buildCapabilityChecks(fetchImpl, origin, timeoutMs);
+    return buildAuditV3Result(
+      [...weightedChecks, ...capabilityChecks],
+      requestedUrl,
+      pageUrl,
+      timestamp,
+    );
+  }
   if (options.version === "2") {
     return buildAuditV2Result(weightedChecks, requestedUrl, pageUrl, timestamp);
   }
@@ -553,6 +717,148 @@ function buildAuditV2Result(
     warnings: countStatus(checks, "warn"),
     passed: countStatus(checks, "pass"),
   };
+}
+
+async function buildCapabilityChecks(
+  fetchImpl: typeof globalThis.fetch,
+  origin: string,
+  timeoutMs: number,
+): Promise<Array<AuditCheck & { weight: number }>> {
+  const urls = {
+    tools: new URL("/tools.json", origin),
+    openapi: new URL("/openapi.json", origin),
+    mcp: new URL("/api/mcp/mcp", origin),
+  };
+  const [tools, openapi, mcp] = await Promise.all([
+    fetchText(fetchImpl, urls.tools, {}, timeoutMs),
+    fetchText(fetchImpl, urls.openapi, {}, timeoutMs),
+    fetchText(fetchImpl, urls.mcp, {}, timeoutMs),
+  ]);
+
+  const checks: Array<AuditCheck & { weight: number }> = [];
+  const add = (id: string, name: string, status: AuditStatus, message: string, url: URL) => {
+    checks.push({ id, name, status, message, url: url.toString(), weight: 0 });
+  };
+
+  const toolsJson = parseJsonObject(tools.body);
+  const toolEntries = Array.isArray(toolsJson?.tools) ? toolsJson.tools : [];
+  const toolsOk = tools.ok && toolEntries.length > 0 && toolEntries.every(isToolDefinition);
+  add(
+    "tools-manifest",
+    "Agent tool manifest",
+    toolsOk ? "pass" : "warn",
+    toolsOk
+      ? `/tools.json advertises ${toolEntries.length} valid callable tool(s).`
+      : "No non-empty, valid tools manifest was found.",
+    urls.tools,
+  );
+
+  const openapiJson = parseJsonObject(openapi.body);
+  const openapiVersion = typeof openapiJson?.openapi === "string" ? openapiJson.openapi : "";
+  const openapiPaths = isRecord(openapiJson?.paths) ? openapiJson.paths : {};
+  const openapiOk =
+    openapi.ok &&
+    openapiVersion.startsWith("3.") &&
+    Object.values(openapiPaths).some(hasOpenApiOperation);
+  add(
+    "openapi-spec",
+    "OpenAPI capability contract",
+    openapiOk ? "pass" : "warn",
+    openapiOk ? `OpenAPI ${openapiVersion} describes callable HTTP actions.` : "No valid OpenAPI 3.x action contract was found.",
+    urls.openapi,
+  );
+
+  const mcpAuthResponse = mcp.status === 401 || mcp.status === 403;
+  const mcpProtocolSignal =
+    contentType(mcp).includes("text/event-stream") ||
+    mcp.headers.has("mcp-session-id") ||
+    /"jsonrpc"\s*:\s*"2\.0"/i.test(mcp.body);
+  const mcpReachable = mcpAuthResponse || mcp.ok || [400, 405, 406, 415].includes(mcp.status);
+  add(
+    "mcp-endpoint",
+    "MCP endpoint",
+    mcpProtocolSignal ? "pass" : "warn",
+    mcpProtocolSignal
+      ? `MCP protocol response was detected (HTTP ${mcp.status}).`
+      : mcpReachable
+        ? `MCP route is reachable (HTTP ${mcp.status}), but the protocol cannot be verified without credentials.`
+        : `MCP endpoint was not found (HTTP ${mcp.status || "network error"}); this enhancement is optional.`,
+    urls.mcp,
+  );
+
+  return checks;
+}
+
+function buildAuditV3Result(
+  rawChecks: Array<AuditCheck & { weight: number }>,
+  requestedUrl: URL,
+  pageUrl: URL,
+  timestamp: string,
+): AuditV3Result {
+  const checks = rawChecks.map(({ weight: _legacyWeight, ...check }): AuditV3Check => {
+    const config = AUDIT_V3_CHECKS[check.id];
+    if (!config) {
+      throw new AiReadyError("unsupported_audit_v3_check", `Audit v3 has no metadata for check "${check.id}".`, [
+        "Add the check to AUDIT_V3_CHECKS before including it in an Audit v3 report.",
+      ]);
+    }
+    return {
+      ...check,
+      planes: config.planes,
+      source: config.source,
+      tier: config.tier,
+      points: tierPoints(config.tier),
+      recommendation: check.status === "pass" ? null : config.recommendation,
+    };
+  });
+
+  const planes = (Object.entries(AUDIT_V3_PLANES) as Array<[AuditPlaneId, string]>).map(
+    ([id, name]): AuditPlaneResult => {
+      const planeChecks = checks.filter((check) => check.planes.includes(id));
+      const total = planeChecks.reduce((sum, check) => sum + check.points, 0);
+      const earned = planeChecks.reduce((sum, check) => sum + (check.status === "pass" ? check.points : 0), 0);
+      const errors = countStatus(planeChecks, "fail");
+      const warnings = countStatus(planeChecks, "warn");
+      return {
+        id,
+        name,
+        score: total > 0 ? Math.round((earned / total) * 100) : 0,
+        status: errors > 0 ? "fail" : warnings > 0 ? "warn" : "pass",
+        errors,
+        warnings,
+        passed: countStatus(planeChecks, "pass"),
+        checks: planeChecks.map((check) => check.id),
+      };
+    },
+  );
+  const readability = planes.find((plane) => plane.id === "agent-readability");
+
+  return {
+    schema: AUDIT_V3_SCHEMA,
+    version: "3",
+    timestamp,
+    target: requestedUrl.toString(),
+    pageUrl: pageUrl.toString(),
+    score: readability?.score ?? 0,
+    methodology: {
+      name: "next-ai-ready three-plane preflight",
+      package: "@vercel/agent-readability",
+      version: VERCEL_AGENT_READABILITY_VERSION,
+      scoring: "required=3,recommended=2,strict-pass-only",
+      coverage: "local-subset-official-cli-is-source-of-truth",
+      officialCommand: "pnpm audit:vercel:site",
+      referenceUrl: "https://vercel.com/kb/guide/agent-readability-spec",
+    },
+    planes,
+    checks,
+    errors: countStatus(checks, "fail"),
+    warnings: countStatus(checks, "warn"),
+    passed: countStatus(checks, "pass"),
+  };
+}
+
+function tierPoints(tier: AuditCheckTier): number {
+  return tier === "required" ? 3 : tier === "recommended" ? 2 : 1;
 }
 
 function statusScore(status: AuditStatus): number {
@@ -722,6 +1028,29 @@ function findMetaDescription(html: string): string | null {
     if (attrs.name?.toLowerCase() === "description" && attrs.content?.trim()) return attrs.content.trim();
   }
   return null;
+}
+
+function parseJsonObject(value: string): Record<string, unknown> | null {
+  try {
+    const parsed: unknown = JSON.parse(value);
+    return isRecord(parsed) ? parsed : null;
+  } catch {
+    return null;
+  }
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+function isToolDefinition(value: unknown): boolean {
+  if (!isRecord(value) || value.type !== "function" || !isRecord(value.function)) return false;
+  return typeof value.function.name === "string" && value.function.name.trim().length > 0;
+}
+
+function hasOpenApiOperation(value: unknown): boolean {
+  if (!isRecord(value)) return false;
+  return ["get", "post", "put", "patch", "delete"].some((method) => isRecord(value[method]));
 }
 
 function parseAttributes(tag: string): Record<string, string> {

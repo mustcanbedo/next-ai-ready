@@ -33,6 +33,7 @@ const HANDLER_PACKAGES = [
 const EXTRA_EXPORTS = [
   { name: "@next-ai-ready/next", dir: join(ROOT, "packages", "next"), key: "./hooks", js: "runtime/observability.js", dts: "runtime/observability.d.ts" },
   { name: "next-ai-ready", dir: join(ROOT, "packages", "meta"), key: "./hooks", js: "hooks.js", dts: "hooks.d.ts" },
+  { name: "next-ai-ready", dir: join(ROOT, "packages", "meta"), key: "./audit", js: "audit.js", dts: "audit.d.ts" },
   { name: "@next-ai-ready/core", dir: join(ROOT, "packages", "core"), key: "./bots", js: "bots-entry.js", dts: "bots-entry.d.ts" },
 ];
 

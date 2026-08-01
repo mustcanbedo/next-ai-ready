@@ -98,6 +98,7 @@ npx next-ai-ready build    # emit llms.txt, sitemap.md, graph, OpenAPI, tools, r
 npx next-ai-ready doctor   # validate config, action exposure, route wiring (CI-friendly)
 npx next-ai-ready audit https://example.com/about  # verify the deployed page agents receive
 npx next-ai-ready audit https://example.com/about --version 2 --json  # five-dimensional report
+npx next-ai-ready audit https://example.com/about --version 3 --json  # three-plane strict preflight
 npx next-ai-ready mcp      # run an MCP server over stdio (Claude Desktop / Cursor)
 ```
 
@@ -111,7 +112,7 @@ export default withAiReady({ agentReadable: true })(nextConfig)
 
 This serves page Markdown for `Accept: text/markdown` and known agent User-Agents, while normal browser requests continue to receive HTML. Missing browser pages keep a real HTTP `404`; missing Markdown representations return a `200` recovery document with the requested path, discovery links, and up to five relevant pages so agents can continue navigating.
 
-`next-ai-ready audit <url>` verifies those browser and agent behaviors independently. Audit v1 remains the default, preserving its JSON shape, score, and CI exit behavior. Opt in to Audit v2 with `--version 2` for independently weighted `discovery`, `content-citation`, `structured-data`, `agent-access`, and `capabilities` dimensions plus a targeted recommendation for every warning or failure.
+`next-ai-ready audit <url>` verifies those browser and agent behaviors independently. Audit v1 remains the default, preserving its JSON shape, score, and CI exit behavior. Audit v2 remains available for its original five weighted dimensions. Use `--version 3` for separate Agent Readability, Semantic/AEO Quality, and Agent Capability planes with strict pass-only tier scoring. V3 is a fast local subset preflight, while the repository's pinned `@vercel/agent-readability` command remains the official external Readability quality gate.
 
 **Get started in 10 minutes:** [`docs/quickstart-10min.md`](./docs/quickstart-10min.md) · [中文](./docs/quickstart-10min.zh-CN.md)
 
@@ -153,7 +154,7 @@ Use `next-ai-ready/hooks` (or `@next-ai-ready/next/hooks`) — not the main pack
 
 ## Status
 
-🚧 **Pre-alpha** (`0.1.0-alpha.12` published on npm `@alpha`). The development branch contains additional unreleased Audit v2 and MCP discovery work; see the [current improvement ledger](./docs/improvement-plan.zh-CN.md).
+🚧 **Pre-alpha** (`0.1.0-alpha.12` published on npm `@alpha`). The development branch contains additional unreleased Audit v2/v3 and MCP discovery work; see the [current improvement ledger](./docs/improvement-plan.zh-CN.md).
 
 - ✅ **Knowledge plane** — MDX → semantic graph → `llms.txt` / `*.md` / `*.ai.json` / JSON-LD
 - ✅ **Capability plane** — `defineAction` → `/api/actions/<name>` + OpenAPI 3.1 / `tools.json` / `ai-plugin.json`

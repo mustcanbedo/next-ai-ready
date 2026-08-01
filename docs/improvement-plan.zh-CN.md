@@ -58,7 +58,7 @@
 | 能力 | 状态 | 说明 |
 |---|---|---|
 | Agent Markdown 缺页恢复 | `已完成` | Agent Markdown 请求返回 `200`、`noindex`、发现入口和相似页面；浏览器仍返回真实 `404` |
-| Audit v2 基础实现 | `进行中` | 已有五维评分和建议，但尚未改为三层模型，也未完成 Vercel 规范对齐 |
+| Audit 三层报告 | `待验证` | v1/v2 保持兼容；v3 已拆分 Readability、Semantic/AEO 与 Capability，并使用严格分层计分 |
 | MCP 页面发现 | `进行中` | 功能分支已有 `list_pages`、`get_page`、`search_pages` 和分页；尚缺 locale 过滤及 HTTP 共用接口 |
 | Next.js 兼容验证 | `待验证` | Next.js 14、15、16 构建已通过；需在发布候选上固化 CI 矩阵 |
 | Vercel 官方 Readability 基线 | `待验证` | 已固定 `@vercel/agent-readability@0.5.0` 并建立每周/手动质量门；待合入 `main` 后验证首次工作流 |
@@ -75,8 +75,8 @@
 
 | ID | 任务 | 状态 | 验收标准 |
 |---|---|---|---|
-| A0-01 | 将 Audit 输出重构为 `Agent Readability`、`Semantic/AEO Quality`、`Agent Capability` 三层 | `待开始` | JSON schema、CLI 和文档使用同一模型；旧版兼容路径有迁移说明 |
-| A0-02 | 为每条检查标记 `standard` 或 `enhancement` | `待开始` | 用户能区分外部标准要求与 next-ai-ready 增强建议 |
+| A0-01 | 将 Audit 输出重构为 `Agent Readability`、`Semantic/AEO Quality`、`Agent Capability` 三层 | `待验证` | JSON schema、CLI 和文档使用同一模型；旧版兼容路径有迁移说明 |
+| A0-02 | 为每条检查标记 `standard` 或 `enhancement` | `待验证` | 用户能区分外部标准要求与 next-ai-ready 增强建议 |
 | A0-03 | 建立 Vercel Agent Readability Spec 对照表 | `待开始` | 每条适用规范都有实现、测试或明确的“不适用”理由 |
 | A0-04 | 增加外部站点回归夹具 | `待开始` | 至少覆盖 Nuxt SEO、普通 Next.js 文档站和缺少 AI 输出的网站；结果可重复 |
 | A0-05 | 固化双 404 行为测试 | `已完成` | 浏览器 `404`；Agent Markdown `200` + `noindex` + 请求路径 + 发现入口 + 相似页面 |
@@ -104,6 +104,11 @@ pnpm audit:vercel:site
 - Is your HTML agent-friendly：`5/5`
 - 质量门：`--min-score 100`
 - CI：`.github/workflows/agent-readability.yml`，每周运行并支持手动触发
+
+同日使用未发布的 Audit v3 对该 URL 预检：Agent Readability `100/100`、
+Semantic/AEO Quality `100/100`、Agent Capability `67/100`。Capability 的
+唯一警告是生产 MCP Token 尚未配置，因此无法进行带凭证的协议验证。v3 结果
+用于验证三层报告实现，不能替代上方官方 CLI 的 25 项外部结果。
 
 ### P1：发布 0.1 GA
 

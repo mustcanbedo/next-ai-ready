@@ -113,6 +113,7 @@ Audits a deployed page as browsers, crawlers, and AI agents actually receive it.
 npx next-ai-ready audit https://example.com/about
 npx next-ai-ready audit https://example.com/about --json
 npx next-ai-ready audit https://example.com/about --version 2 --json
+npx next-ai-ready audit https://example.com/about --version 3 --json
 ```
 
 The 100-point report checks the HTML response, `llms.txt`, both sitemap formats,
@@ -145,6 +146,14 @@ groups the same deployed checks into five independently scored dimensions:
 Every v2 warning or failure includes a targeted `recommendation`; passing checks
 set it to `null`. The top-level score is the weighted total of the five dimension
 scores. Select v2 explicitly in CI until you have adopted its schema and rubric.
+
+Pass `--version 3` for the `next-ai-ready.audit.v3` schema. It reports Agent
+Readability, Semantic/AEO Quality, and Agent Capability separately, gives no
+partial credit to warnings, and marks each check as either `external-standard` or
+`next-ai-ready-enhancement`. The top-level compatibility score is the local
+Readability preflight score; run the pinned `pnpm audit:vercel:site` command for
+the official external Vercel score. V3 is intentionally a smaller local preflight,
+not a reimplementation of all 25 official checks.
 
 The command exits with code 1 when a required check fails, so the JSON form can
 act as a post-deployment CI gate. Warnings reduce the score without failing CI.

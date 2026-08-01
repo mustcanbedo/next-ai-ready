@@ -89,6 +89,60 @@ const V2_RESULT = {
   passed: 1,
 };
 
+const V3_RESULT = {
+  schema: "next-ai-ready.audit.v3" as const,
+  version: "3" as const,
+  timestamp: "2026-08-01T00:00:00.000Z",
+  target: "https://example.test/",
+  pageUrl: "https://example.test/",
+  score: 100,
+  methodology: {
+    name: "next-ai-ready three-plane preflight" as const,
+    package: "@vercel/agent-readability" as const,
+    version: "0.5.0" as const,
+    scoring: "required=3,recommended=2,strict-pass-only" as const,
+    coverage: "local-subset-official-cli-is-source-of-truth" as const,
+    officialCommand: "pnpm audit:vercel:site",
+    referenceUrl: "https://vercel.com/kb/guide/agent-readability-spec",
+  },
+  planes: [
+    {
+      id: "agent-readability" as const,
+      name: "Agent Readability",
+      score: 100,
+      status: "pass" as const,
+      errors: 0,
+      warnings: 0,
+      passed: 1,
+      checks: ["llms-txt"],
+    },
+    {
+      id: "semantic-aeo-quality" as const,
+      name: "Semantic/AEO Quality",
+      score: 80,
+      status: "warn" as const,
+      errors: 0,
+      warnings: 1,
+      passed: 1,
+      checks: ["meta-description"],
+    },
+    {
+      id: "agent-capability" as const,
+      name: "Agent Capability",
+      score: 100,
+      status: "pass" as const,
+      errors: 0,
+      warnings: 0,
+      passed: 1,
+      checks: ["mcp-endpoint"],
+    },
+  ],
+  checks: [],
+  errors: 0,
+  warnings: 1,
+  passed: 3,
+};
+
 let stdout = "";
 let stderr = "";
 
@@ -145,9 +199,21 @@ describe("audit CLI", () => {
     expect(JSON.parse(stdout)).toEqual(V2_RESULT);
   });
 
+  it("prints the three Audit v3 planes without combining their scores", async () => {
+    runAuditMock.mockResolvedValue(V3_RESULT);
+
+    await expect(runCli(["audit", "https://example.test/", "--version=3"])).resolves.toBe(0);
+
+    expect(runAuditMock).toHaveBeenCalledWith("https://example.test/", { version: "3" });
+    expect(stdout).toContain("Agent Readability: 100/100");
+    expect(stdout).toContain("Semantic/AEO Quality: 80/100");
+    expect(stdout).toContain("Agent Capability: 100/100");
+    expect(stdout).toContain("[next-ai-ready] audit v3: score 100/100");
+  });
+
   it.each([
     { argv: ["audit", "https://example.test/", "--version"], code: "missing_audit_version" },
-    { argv: ["audit", "https://example.test/", "--version", "3"], code: "invalid_audit_version" },
+    { argv: ["audit", "https://example.test/", "--version", "4"], code: "invalid_audit_version" },
     {
       argv: ["audit", "https://example.test/", "--version", "2", "--version=2"],
       code: "duplicate_audit_version",
@@ -172,5 +238,7 @@ describe("audit CLI", () => {
 
     expect(stdout).toContain("--version 2");
     expect(stdout).toContain("dimension-scored Audit v2");
+    expect(stdout).toContain("--version 3");
+    expect(stdout).toContain("three-plane Audit v3");
   });
 });

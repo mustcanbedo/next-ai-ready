@@ -98,6 +98,7 @@ npx next-ai-ready build    # 产出 llms.txt、sitemap.md、语义图、OpenAPI�
 npx next-ai-ready doctor   # 验证配置、action 暴露规则、路由接线（CI 友好）
 npx next-ai-ready audit https://example.com/about  # 验证 Agent 实际收到的线上页面
 npx next-ai-ready audit https://example.com/about --version 2 --json  # 五维审计报告
+npx next-ai-ready audit https://example.com/about --version 3 --json  # 三平面严格预检
 npx next-ai-ready mcp      # 通过 stdio 运行 MCP 服务器（Claude Desktop / Cursor）
 ```
 
@@ -111,7 +112,7 @@ export default withAiReady({ agentReadable: true })(nextConfig)
 
 带有 `Accept: text/markdown` 或已知 Agent User-Agent 的页面请求会得到 Markdown，普通浏览器请求仍然获得 HTML。浏览器访问不存在页面时仍返回真实 HTTP `404`；不存在的 Markdown 表示则返回 `200` 恢复文档，其中包含请求路径、发现入口和最多五个相关页面，便于 Agent 继续导航。
 
-`next-ai-ready audit <url>` 会独立验证浏览器与 Agent 的行为。Audit v1 仍是默认版本，保持原有 JSON 结构、评分和 CI 退出行为不变。使用 `--version 2` 可显式启用 Audit v2，分别评估 `discovery`、`content-citation`、`structured-data`、`agent-access` 与 `capabilities` 五个维度，并为每个警告或失败项提供针对性修复建议。
+`next-ai-ready audit <url>` 会独立验证浏览器与 Agent 的行为。Audit v1 仍是默认版本，保持原有 JSON 结构、评分和 CI 退出行为不变；Audit v2 继续保留原有五维报告。使用 `--version 3` 可分别查看 Agent Readability、Semantic/AEO Quality 与 Agent Capability，采用严格的通过项分层计分。v3 是快速的本地子集预检，仓库固定的 `@vercel/agent-readability` 命令仍是 Readability 的官方外部质量门。
 
 **10 分钟上手：** [`docs/quickstart-10min.zh-CN.md`](./docs/quickstart-10min.zh-CN.md) · [English](./docs/quickstart-10min.md)
 
@@ -153,7 +154,7 @@ registerAiHooks({
 
 ## 状态
 
-🚧 **Pre-alpha**（`0.1.0-alpha.12` 已发布到 npm `@alpha`）。开发分支还包含尚未发布的 Audit v2 与 MCP 页面发现改动，详见[当前改进台账](./docs/improvement-plan.zh-CN.md)。
+🚧 **Pre-alpha**（`0.1.0-alpha.12` 已发布到 npm `@alpha`）。开发分支还包含尚未发布的 Audit v2/v3 与 MCP 页面发现改动，详见[当前改进台账](./docs/improvement-plan.zh-CN.md)。
 
 - ✅ **知识平面** — MDX → 语义图 → `llms.txt` / `*.md` / `*.ai.json` / JSON-LD
 - ✅ **能力平面** — `defineAction` → `/api/actions/<name>` + OpenAPI 3.1 / `tools.json` / `ai-plugin.json`

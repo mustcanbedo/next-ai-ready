@@ -12,6 +12,10 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
     },
+    "./audit": {
+      "types": "./dist/audit.d.ts",
+      "import": "./dist/audit.js"
+    },
     "./handlers/llms-txt": {
       "types": "./dist/handlers/llms-txt.d.ts",
       "import": "./dist/handlers/llms-txt.js"

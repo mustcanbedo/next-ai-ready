@@ -108,6 +108,7 @@ npx next-ai-ready doctor --json    # 机器可读报告（含 actionItems）
 npx next-ai-ready audit https://example.com/about
 npx next-ai-ready audit https://example.com/about --json
 npx next-ai-ready audit https://example.com/about --version 2 --json
+npx next-ai-ready audit https://example.com/about --version 3 --json
 ```
 
 100 分报告会检查 HTML、`llms.txt`、两种 sitemap、`robots.txt`、Markdown
@@ -137,6 +138,13 @@ Agent 缺失页恢复仍是权重为零的建议项，因此已有解析器和 C
 v2 中每个警告或失败项都会返回针对性的 `recommendation`，通过项则为 `null`。
 顶层分数是五个维度分数的加权总和。在 CI 已明确采用新 schema 和评分规则之前，
 应始终显式传入 `--version 2`。
+
+使用 `--version 3` 可启用 `next-ai-ready.audit.v3` schema。它会分别报告
+Agent Readability、Semantic/AEO Quality 与 Agent Capability，警告不再获得
+部分分数，并将检查标记为 `external-standard` 或
+`next-ai-ready-enhancement`。顶层兼容分数是本地 Readability 预检结果；
+官方 Vercel 外部评分以仓库固定的 `pnpm audit:vercel:site` 命令为准。v3
+有意只做更小的本地预检，并不重新实现官方全部 25 项检查。
 
 必需项失败时命令以代码 1 退出，因此 JSON 输出可作为部署后的 CI 门禁。
 警告只降低分数，不会让 CI 失败。

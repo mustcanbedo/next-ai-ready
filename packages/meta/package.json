@@ -12,6 +12,14 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
     },
+    "./config": {
+      "types": "./dist/config.d.ts",
+      "import": "./dist/config.js"
+    },
+    "./robots": {
+      "types": "./dist/robots.d.ts",
+      "import": "./dist/robots.js"
+    },
     "./audit": {
       "types": "./dist/audit.d.ts",
       "import": "./dist/audit.js"

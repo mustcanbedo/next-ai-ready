@@ -6,6 +6,19 @@
       "dependsOn": ["^build"],
       "outputs": ["dist/**", ".next/**", "!.next/cache/**"]
     },
+    "@next-ai-ready/example-ecommerce#build": {
+      "dependsOn": ["^build"],
+      "outputs": [
+        ".next-ai-ready/**",
+        "public/llms.txt",
+        "public/llms-full.txt",
+        "public/sitemap.md",
+        "public/robots.txt",
+        "public/openapi.json",
+        "public/tools.json",
+        "public/.well-known/ai-plugin.json"
+      ]
+    },
     "dev": {
       "cache": false,
       "persistent": true

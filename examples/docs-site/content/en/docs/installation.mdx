@@ -112,7 +112,7 @@ export default defineConfig({
 
 ### Robots policy
 
-`next-ai-ready build` emits `public/robots.txt` with explicit AI-bot rules unless you set `emit: { robots: false }`. For dynamic policies, add `app/robots.ts` and use `aiRobots()` from `@next-ai-ready/core` — Next.js serves `app/robots.ts` at runtime. Doctor treats that as valid and does not require a static `public/robots.txt`.
+`next-ai-ready build` emits `public/robots.txt` with explicit AI-bot rules unless you set `emit: { robots: false }`. For dynamic policies, add `app/robots.ts` and use `aiRobots()` from `next-ai-ready/robots` — Next.js serves `app/robots.ts` at runtime. Doctor treats that as valid and does not require a static `public/robots.txt`.
 
 ## Build
 

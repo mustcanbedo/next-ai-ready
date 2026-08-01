@@ -8,7 +8,7 @@ import type { RobotsConfig, SiteInfo } from "./types.js";
  * `app/robots.ts` without manual conversion:
  *
  *   // app/robots.ts
- *   import { aiRobots } from "@next-ai-ready/core";
+ *   import { aiRobots } from "@next-ai-ready/core/robots";
  *   export default function robots() { return aiRobots(site, config); }
  */
 export interface AiRobotsRule {
@@ -79,7 +79,7 @@ export function buildRobotsTxt(site: SiteInfo, config: RobotsConfig = {}): strin
  *
  * ```ts
  * // app/robots.ts
- *   import { aiRobots } from "@next-ai-ready/core";
+ *   import { aiRobots } from "@next-ai-ready/core/robots";
  *   const site = { name: "Acme", baseUrl: "https://acme.com" };
  *   export default function robots() { return aiRobots(site); }
  * ```

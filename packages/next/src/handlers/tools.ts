@@ -1,6 +1,6 @@
 import "server-only";
 import { buildToolsJson } from "@next-ai-ready/openapi";
-import { serializeStable } from "@next-ai-ready/core";
+import { serializeStable } from "@next-ai-ready/core/json";
 import { loadActionsManifest } from "../runtime/manifest-loader.js";
 import { emitAiRequest } from "../runtime/observability.js";
 

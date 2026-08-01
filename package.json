@@ -2,6 +2,7 @@
   "name": "next-ai-ready-monorepo",
   "version": "0.0.0",
   "private": true,
+  "type": "module",
   "description": "AEO + Agent-API layer for Next.js. Make your site readable by AI and callable by agents.",
   "license": "MIT",
   "packageManager": "pnpm@9.12.0",

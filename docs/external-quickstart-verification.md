@@ -50,6 +50,8 @@ pnpm external:smoke
 PACKAGE_MANAGER=npm NEXT_VERSION=14 pnpm external:smoke
 # pnpm + Next.js 16
 PACKAGE_MANAGER=pnpm NEXT_VERSION=16 pnpm external:smoke
+# repository-pinned pnpm 9 via Corepack
+PACKAGE_MANAGER=pnpm NEXT_VERSION=15 PNPM_VIA_COREPACK=1 node scripts/external-quickstart-smoke.mjs
 ```
 
 The smoke packs all publishable runtime packages from the current checkout. The
@@ -67,6 +69,10 @@ GitHub Actions runs six combinations: npm and pnpm across Next.js 14, 15, and 16
 This validates the current branch rather than silently fetching an older scoped
 package from the npm registry. Tarball manifests and lockfiles are also checked so
 `workspace:` ranges or registry-backed internal packages cannot slip through.
+The fixture writes overrides to both legacy package metadata and
+`pnpm-workspace.yaml`, so it covers the repository-pinned pnpm 9 as well as pnpm
+11's root-settings model. pnpm 11 only permits the reviewed `sharp` install script
+inside the disposable consumer project; it does not enable arbitrary dependency builds.
 
 Set `PACKAGE_SOURCE=registry` to test the published `next-ai-ready@alpha` package.
 The legacy `USE_NPM=1` switch remains an alias for registry source selection.

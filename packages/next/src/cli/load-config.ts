@@ -19,7 +19,7 @@ export async function loadConfig(projectRoot: string): Promise<AiReadyConfig | n
     if (!(await fileExists(path))) continue;
 
     const config =
-      file.endsWith(".ts") ? await loadTypeScriptConfig(path) : await loadJsConfig(path, file);
+      file.endsWith(".ts") ? await loadTypeScriptConfig(path) : await loadJsConfig(path);
 
     if (!config || typeof config !== "object") {
       throw new AiReadyError("invalid_config", `${file} must export a config object as its default export.`, [
@@ -31,7 +31,7 @@ export async function loadConfig(projectRoot: string): Promise<AiReadyConfig | n
   return null;
 }
 
-async function loadJsConfig(path: string, file: string): Promise<AiReadyConfig> {
+async function loadJsConfig(path: string): Promise<AiReadyConfig> {
   const url = pathToFileURL(path).href;
   const mod = (await import(url)) as { default?: unknown };
   return (mod.default ?? mod) as AiReadyConfig;

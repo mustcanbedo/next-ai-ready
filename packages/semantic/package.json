@@ -11,6 +11,10 @@
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
+    },
+    "./jsonld": {
+      "types": "./dist/jsonld.d.ts",
+      "import": "./dist/jsonld.js"
     }
   },
   "files": [

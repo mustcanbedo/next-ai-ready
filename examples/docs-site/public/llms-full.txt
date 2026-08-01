@@ -1748,7 +1748,7 @@ If you need dynamic robots.txt (e.g. per-request A/B testing), you can:
 
 1. Set `emit: { robots: false }` in config to skip static generation.
 2. Create `app/robots.ts` using Next.js built-in robots support (this docs site does this).
-3. Use `aiRobots()` from `next-ai-ready` / `@next-ai-ready/core` inside `app/robots.ts`.
+3. Use `aiRobots()` from `next-ai-ready/robots` (or `@next-ai-ready/core/robots`) inside `app/robots.ts`.
 
 Doctor recognizes `app/robots.ts` + `emit.robots: false` and will not warn about a missing `public/robots.txt`.
 
@@ -1876,7 +1876,7 @@ export default defineConfig({
 
 ### Robots policy
 
-`next-ai-ready build` emits `public/robots.txt` with explicit AI-bot rules unless you set `emit: { robots: false }`. For dynamic policies, add `app/robots.ts` and use `aiRobots()` from `@next-ai-ready/core` — Next.js serves `app/robots.ts` at runtime. Doctor treats that as valid and does not require a static `public/robots.txt`.
+`next-ai-ready build` emits `public/robots.txt` with explicit AI-bot rules unless you set `emit: { robots: false }`. For dynamic policies, add `app/robots.ts` and use `aiRobots()` from `next-ai-ready/robots` — Next.js serves `app/robots.ts` at runtime. Doctor treats that as valid and does not require a static `public/robots.txt`.
 
 ## Build
 
@@ -3708,7 +3708,7 @@ robots: {
 
 1. 在配置中设置 `emit: { robots: false }` 跳过静态生成。
 2. 使用 Next.js 内置的 robots 支持创建 `app/robots.ts`（本文档站采用此方式）。
-3. 在 `app/robots.ts` 中使用 `aiRobots()`（`next-ai-ready` / `@next-ai-ready/core`）。
+3. 在 `app/robots.ts` 中使用 `aiRobots()`（`next-ai-ready/robots` 或 `@next-ai-ready/core/robots`）。
 
 Doctor 认可 `app/robots.ts` + `emit.robots: false`，不会误报缺少 `public/robots.txt`。
 

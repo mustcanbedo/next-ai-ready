@@ -1,1 +1,1 @@
-export * from "@next-ai-ready/next/cli";
+export * from "@next-ai-ready/next/audit";

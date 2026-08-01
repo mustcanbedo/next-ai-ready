@@ -60,7 +60,6 @@ export async function runMcpStdio(opts: McpStdioOptions = {}): Promise<void> {
   await server.connect(transport);
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function importSdkServer(): Promise<{ McpServer: any }> {
   try {
     const spec = "@modelcontextprotocol/sdk/server/mcp.js";
@@ -73,7 +72,6 @@ async function importSdkServer(): Promise<{ McpServer: any }> {
   }
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function importSdkStdio(): Promise<{ StdioServerTransport: any }> {
   try {
     const spec = "@modelcontextprotocol/sdk/server/stdio.js";

@@ -11,6 +11,7 @@
  *   NEXT_VERSION=14|15|16          Next.js major (default: 15)
  *   PACKAGE_SOURCE=tarball|registry
  *   REGISTRY_TAG=alpha             npm tag when PACKAGE_SOURCE=registry
+ *   PNPM_VIA_COREPACK=1            use the packageManager-pinned pnpm version
  *
  *   node scripts/external-quickstart-smoke.mjs
  */
@@ -30,6 +31,7 @@ const NEXT_VERSION = process.env.NEXT_VERSION ?? "15";
 const requestedSource = process.env.PACKAGE_SOURCE ?? (process.env.USE_NPM === "1" ? "registry" : "tarball");
 const PACKAGE_SOURCE = requestedSource === "workspace" ? "tarball" : requestedSource;
 const REGISTRY_TAG = process.env.REGISTRY_TAG ?? "alpha";
+const PNPM_VIA_COREPACK = process.env.PNPM_VIA_COREPACK === "1";
 
 if (!new Set(["pnpm", "npm"]).has(PACKAGE_MANAGER)) {
   throw new Error(`Unsupported PACKAGE_MANAGER=${PACKAGE_MANAGER}; expected pnpm or npm.`);
@@ -71,18 +73,21 @@ async function run(cwd, cmd, args, opts = {}) {
   }
 }
 
+function runPnpm(cwd, args, opts = {}) {
+  return PNPM_VIA_COREPACK
+    ? run(cwd, "corepack", ["pnpm", ...args], opts)
+    : run(cwd, "pnpm", args, opts);
+}
+
 async function packWorkspace(packDir) {
   await mkdir(packDir, { recursive: true });
   const artifacts = [];
   for (const packageDir of PACKAGE_DIRS) {
     const cwd = join(ROOT, "packages", packageDir);
     const manifest = JSON.parse(await readFile(join(cwd, "package.json"), "utf8"));
-    const { stdout } = await run(
-      cwd,
-      "pnpm",
-      ["pack", "--pack-destination", packDir, "--silent"],
-      { timeout: 60_000 },
-    );
+    const { stdout } = await runPnpm(cwd, ["pack", "--pack-destination", packDir, "--silent"], {
+      timeout: 60_000,
+    });
     const tarball = stdout.trim().split("\n").filter(Boolean).pop();
     if (!tarball || !(await exists(tarball))) {
       throw new Error(`pnpm pack did not produce a tarball for packages/${packageDir}`);
@@ -115,12 +120,21 @@ async function configureTarballResolution(dir, artifacts) {
   };
   packageJson.overrides = overrides;
   await writeFile(packageJsonPath, JSON.stringify(packageJson, null, 2) + "\n");
+  if (PACKAGE_MANAGER === "pnpm") {
+    const workspaceOverrides = Object.entries(overrides)
+      .map(([name, tarball]) => `  ${JSON.stringify(name)}: ${JSON.stringify(tarball)}`)
+      .join("\n");
+    await writeFile(
+      join(dir, "pnpm-workspace.yaml"),
+      `packages:\n  - "."\noverrides:\n${workspaceOverrides}\nallowBuilds:\n  sharp: true\n`,
+    );
+  }
   await writeFile(join(dir, ".npmrc"), "@next-ai-ready:registry=http://127.0.0.1:9/\n");
 }
 
 async function installConsumerDependencies(dir) {
   if (PACKAGE_MANAGER === "pnpm") {
-    await run(dir, "pnpm", ["install", "--no-frozen-lockfile"], { timeout: 300_000 });
+    await runPnpm(dir, ["install", "--no-frozen-lockfile"], { timeout: 300_000 });
     return;
   }
   await run(
@@ -303,7 +317,11 @@ async function main() {
     console.log(`  ✓ doctor exit 0 — ${doctor.stdout.trim().split("\n").pop()}`);
 
     console.log("[external] next build …");
-    await run(dir, PACKAGE_MANAGER, ["run", "build"], { timeout: 300_000 });
+    if (PACKAGE_MANAGER === "pnpm") {
+      await runPnpm(dir, ["run", "build"], { timeout: 300_000 });
+    } else {
+      await run(dir, PACKAGE_MANAGER, ["run", "build"], { timeout: 300_000 });
+    }
     if (!(await exists(join(dir, ".next", "BUILD_ID")))) {
       throw new Error("next build completed without .next/BUILD_ID");
     }

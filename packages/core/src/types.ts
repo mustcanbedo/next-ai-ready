@@ -357,7 +357,6 @@ export interface AiReadyConfig {
    * contravariant in its input. `any` is the only sound erasure for a
    * heterogeneous array.
    */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   actions?: ActionDefinition<any, any>[] | ActionsModulePath | string;
   /** Override default filesystem scanner (P6-02). */
   contentSource?: ContentSource;

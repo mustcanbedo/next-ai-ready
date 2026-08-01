@@ -78,7 +78,7 @@
 | A0-01 | 将 Audit 输出重构为 `Agent Readability`、`Semantic/AEO Quality`、`Agent Capability` 三层 | `待验证` | JSON schema、CLI 和文档使用同一模型；旧版兼容路径有迁移说明 |
 | A0-02 | 为每条检查标记 `standard` 或 `enhancement` | `待验证` | 用户能区分外部标准要求与 next-ai-ready 增强建议 |
 | A0-03 | 建立 Vercel Agent Readability Spec 对照表 | `待验证` | 已按官方 `0.5.0` 的 25 项检查标注直接覆盖、部分覆盖或仅官方门禁；详见[版本化对照表](./vercel-agent-readability-mapping.zh-CN.md) |
-| A0-04 | 增加外部站点回归夹具 | `待验证` | 已用离线响应夹具覆盖 Nuxt SEO、普通 Next.js 文档站和缺少 AI 输出的网站；来源 URL、采样日期和官方分数均已记录 |
+| A0-04 | 增加外部站点回归夹具 | `待验证` | 已用离线响应夹具覆盖 Nuxt SEO、普通 Next.js 文档站和缺少 AI 输出的网站；来源 URL、采样日期和官方分数均已记录，本地分数与固定官方基线偏差不得超过 3 分 |
 | A0-05 | 固化双 404 行为测试 | `已完成` | 浏览器 `404`；Agent Markdown `200` + `noindex` + 请求路径 + 发现入口 + 相似页面 |
 | A0-06 | 进行独立线上复测 | `待验证` | 官方 `0.5.0` 对生产 URL 得分 `100/100`；工具、日期、URL 与 25 项结果已保存为[机器可读基线](./audit-baselines/vercel-agent-readability-0.5.0-2026-08-01.json) |
 | A0-07 | 引入 Vercel 官方 Agent Readability 质量门 | `待验证` | 固定官方依赖版本；提供本地与 CI 命令；线上站低于 `100/100` 时质量门失败 |
@@ -119,12 +119,17 @@ Semantic/AEO Quality `100/100`、Agent Capability `67/100`。Capability 的
 |---|---|---|---|
 | G1-01 | 合入并发布当前 Audit/MCP 功能 | `待验证` | 功能分支通过审查后进入 `main`，npm 包与仓库版本一致 |
 | G1-02 | 配置生产 MCP Token | `待验证` | Vercel Production Sensitive Token 已保存并部署，错误凭据仍为 401、正确凭据已通过鉴权；线上复测发现生成路由缺少默认 `/api/mcp` basePath，修复待合入 `main` 后完成初始化握手 |
-| G1-03 | 固化真实安装矩阵 | `待验证` | 当前分支 tarball 以 npm/pnpm 干净安装，Next.js 14/15/16 六组合已进入 CI；待 `main` 首次矩阵通过 |
-| G1-04 | 冻结 0.1 公共 API | `待验证` | 已增加十个发布包的 entrypoint、命名导出、类型声明哈希与 bin 基线，并将 SemVer/弃用策略纳入 CI；待 `main` 首次通过 |
+| G1-03 | 固化真实安装矩阵 | `待验证` | 当前分支 tarball 已通过 npm/pnpm × Next.js 14/15/16 六组合；并抽样通过 pnpm 9.12 与 11.9；`init` 已覆盖标识符、对象字面量、括号表达式和 `defineConfig()` 默认导出；待 `main` 首次矩阵通过 |
+| G1-04 | 冻结 0.1 公共 API | `待验证` | 已增加十个发布包的 entrypoint、命名导出、类型声明哈希与 bin 基线；程序化 Audit 已收口到独立入口，不再暴露 CLI 调度 API；待 `main` 首次通过 |
 | G1-05 | 建立最小回滚流程 | `待验证` | npm 计划器仅生成精确 deprecate/dist-tag 命令；Git revert、Vercel rollback/promote 和三层验证已进入手册，待 GA 前演练 |
 | G1-06 | 更新 GA 文案并发布 `0.1.0` | `待开始` | README 不再写 Pre-alpha；十分钟流程无错误 |
 
 GA 之前不加入数据库、IndexNow、大型 DevTools 或托管后台。
+
+2026-08-01 分支审查修复：Audit v3 的 required 检查现在统一产生 failure 并使 CLI
+非零退出；`create-next-ai-ready` 已移出 Changesets ignore 列表；公开 Audit 只确认 MCP
+端点与认证门，不会自动读取或向任意审计目标外发生产 Token。带凭据的 MCP initialize
+仍属于明确域名的部署验收步骤。
 
 ### P2：知识检索闭环
 

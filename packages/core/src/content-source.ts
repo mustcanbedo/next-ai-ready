@@ -1,5 +1,4 @@
 import { readFile } from "node:fs/promises";
-import { resolve } from "node:path";
 import type { ContentScanEntry, ContentSource } from "./types.js";
 import { scanContent } from "./scanner.js";
 import { parseLocaleFromRoute } from "./locale.js";

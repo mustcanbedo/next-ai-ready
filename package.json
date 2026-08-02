@@ -19,6 +19,7 @@
     "publish:alpha": "bash scripts/publish-alpha.sh",
     "publish:alpha:interactive": "bash scripts/publish-alpha.sh",
     "pack:check": "node scripts/pack-check.mjs",
+    "metadata:check": "node scripts/package-metadata-check.mjs",
     "exports:check": "node scripts/exports-check.mjs",
     "api:check": "node --test scripts/public-api-check.test.mjs && node scripts/public-api-check.mjs",
     "rollback:plan": "node --test scripts/release-rollback-plan.test.mjs && node scripts/release-rollback-plan.mjs",
@@ -29,7 +30,7 @@
     "registry:manifest-check": "node --test scripts/published-manifest-drift-check.test.mjs && node scripts/published-manifest-drift-check.mjs",
     "external:smoke": "node scripts/external-quickstart-smoke.mjs",
     "docs-site:smoke": "pnpm --filter docs-site smoke",
-    "verify:release": "pnpm build && pnpm test && pnpm typecheck && node scripts/e2e-smoke.mjs && pnpm pack:check && pnpm exports:check && pnpm api:check && pnpm bin:smoke && pnpm docs-site:smoke && pnpm changeset:status && pnpm registry:manifest-check && pnpm external:smoke"
+    "verify:release": "pnpm build && pnpm test && pnpm typecheck && node scripts/e2e-smoke.mjs && pnpm metadata:check && pnpm pack:check && pnpm exports:check && pnpm api:check && pnpm bin:smoke && pnpm docs-site:smoke && pnpm changeset:status && pnpm registry:manifest-check && pnpm external:smoke"
   },
   "devDependencies": {
     "@changesets/cli": "^2.27.9",

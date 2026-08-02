@@ -134,3 +134,26 @@ jobs:
 
       - name: Verify SDK and documentation release versions are synchronized
         run: pnpm release:docs:check
+
+  required:
+    name: CI Required
+    runs-on: ubuntu-latest
+    if: always()
+    needs:
+      - ci
+      - e2e-smoke
+      - external-install-matrix
+      - docs-site-smoke
+
+    steps:
+      - name: Verify every required job passed
+        env:
+          BUILD_RESULT: ${{ needs.ci.result }}
+          E2E_RESULT: ${{ needs.e2e-smoke.result }}
+          EXTERNAL_RESULT: ${{ needs.external-install-matrix.result }}
+          DOCS_RESULT: ${{ needs.docs-site-smoke.result }}
+        run: |
+          test "$BUILD_RESULT" = success
+          test "$E2E_RESULT" = success
+          test "$EXTERNAL_RESULT" = success
+          test "$DOCS_RESULT" = success

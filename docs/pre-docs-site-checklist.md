@@ -118,8 +118,8 @@ pnpm changeset
 # 选择 minor bump (0.0.0 → 0.1.0)
 # 写 summary: "Initial alpha release — Knowledge + Capability planes, MCP, CLI"
 
-# 应用版本号
-pnpm changeset version
+# 应用版本号，并同步 README、文档站、版本 smoke 与机器可读产物
+pnpm version:packages
 
 # 检查版本号已更新
 grep '"version"' packages/*/package.json

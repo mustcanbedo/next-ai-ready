@@ -100,6 +100,12 @@ pnpm verify:release
 pnpm publish:alpha:interactive
 ```
 
+`pnpm version:packages` also synchronizes the new SDK version into README,
+the bilingual documentation site, current-release ledgers, route smoke, and
+generated AI artifacts. Keep the human-written release summary and validation
+evidence in that same version pull request. `pnpm release:docs:check` fails when
+the SDK package version and any managed documentation surface drift apart.
+
 Maintainers can instead run the **Release Alpha** GitHub Actions workflow and
 enter `publish-alpha` when prompted. It runs the same release gate before
 publishing and requires the repository secret `NPM_TOKEN`.
@@ -122,7 +128,7 @@ When ready for a stable release:
 ```bash
 pnpm changeset          # describe changes; select affected packages
 pnpm exec changeset pre exit  # leave the alpha prerelease mode
-pnpm version:packages   # apply version bumps + CHANGELOG
+pnpm version:packages   # apply version bumps + CHANGELOG + release docs/artifacts
 pnpm lint
 pnpm verify:release
 pnpm release            # publish only from a clean, reviewed main commit

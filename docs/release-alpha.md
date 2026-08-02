@@ -20,7 +20,14 @@ pnpm version:packages
 pnpm verify:release
 ```
 
-Commit and push the version, changelog, and `pre.json` updates. Wait for CI to
+`version:packages` applies the Changeset, synchronizes the current SDK version
+across README, GA ledgers, the bilingual documentation site, and route smoke,
+then rebuilds the committed machine-readable documentation artifacts. Update
+the human-written release summary in the same pull request.
+
+Commit and push the version, changelog, release documentation, generated
+artifacts, and `pre.json` updates together. CI runs `release:docs:check` and
+blocks publishing when any managed release surface is stale. Wait for CI to
 pass on `main` before publishing.
 
 ## Publish

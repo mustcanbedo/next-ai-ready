@@ -1,11 +1,23 @@
 {
   "name": "@next-ai-ready/core",
-  "version": "0.1.0-alpha.12",
+  "version": "0.1.0-alpha.13",
   "description": "Shared types, config, scanner, IO for next-ai-ready.",
-  "keywords": ["nextjs", "aeo", "ai-agents", "content-scanner", "typescript"],
+  "keywords": [
+    "nextjs",
+    "aeo",
+    "ai-agents",
+    "content-scanner",
+    "typescript"
+  ],
   "homepage": "https://next-ai-ready.vercel.app/en",
-  "repository": { "type": "git", "url": "git+https://github.com/mustcanbedo/next-ai-ready.git", "directory": "packages/core" },
-  "bugs": { "url": "https://github.com/mustcanbedo/next-ai-ready/issues" },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mustcanbedo/next-ai-ready.git",
+    "directory": "packages/core"
+  },
+  "bugs": {
+    "url": "https://github.com/mustcanbedo/next-ai-ready/issues"
+  },
   "license": "MIT",
   "type": "module",
   "main": "./dist/index.js",

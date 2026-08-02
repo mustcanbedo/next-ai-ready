@@ -1,11 +1,24 @@
 {
   "name": "@next-ai-ready/llms",
-  "version": "0.1.0-alpha.13",
+  "version": "0.1.0-alpha.14",
   "description": "llms.txt / llms-full.txt / per-route Markdown generators.",
-  "keywords": ["nextjs", "aeo", "llms-txt", "markdown", "ai-search", "rag"],
+  "keywords": [
+    "nextjs",
+    "aeo",
+    "llms-txt",
+    "markdown",
+    "ai-search",
+    "rag"
+  ],
   "homepage": "https://next-ai-ready.vercel.app/en",
-  "repository": { "type": "git", "url": "git+https://github.com/mustcanbedo/next-ai-ready.git", "directory": "packages/llms" },
-  "bugs": { "url": "https://github.com/mustcanbedo/next-ai-ready/issues" },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mustcanbedo/next-ai-ready.git",
+    "directory": "packages/llms"
+  },
+  "bugs": {
+    "url": "https://github.com/mustcanbedo/next-ai-ready/issues"
+  },
   "license": "MIT",
   "type": "module",
   "main": "./dist/index.js",

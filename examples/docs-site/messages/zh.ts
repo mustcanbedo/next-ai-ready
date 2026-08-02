@@ -30,6 +30,8 @@ const zh = {
     description:
       "直接检查当前生产部署提供的真实产物。普通网页、AI 可读内容和 Agent 能力均来自同一个仓库。",
     source: "查看生产站源码",
+    help: "申请免费接入协助",
+    capacity: "首批开放 5 个接入名额",
     items: [
       { href: "/llms.txt", label: "内容发现", value: "/llms.txt" },
       { href: "/zh/docs/installation.md", label: "页面 Markdown", value: "/:page.md" },

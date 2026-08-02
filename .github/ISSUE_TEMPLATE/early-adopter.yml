@@ -1,0 +1,83 @@
+name: Early adopter setup help
+description: Apply for free help adding next-ai-ready to a real Next.js project.
+title: "[adopter]: "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        We are helping the first five external projects complete a verified next-ai-ready setup at no charge.
+
+        You keep control of your code. Public repositories are easiest to support, but a repository URL is optional. Never paste API keys, tokens, credentials, private logs, customer data, or other secrets into this issue.
+
+  - type: input
+    id: repository
+    attributes:
+      label: Public repository or site URL
+      description: Optional. Share only a URL that is already public.
+      placeholder: https://github.com/owner/project or https://example.com
+
+  - type: dropdown
+    id: next-version
+    attributes:
+      label: Next.js version
+      options:
+        - Next.js 16
+        - Next.js 15
+        - Next.js 14
+        - Unsure
+    validations:
+      required: true
+
+  - type: dropdown
+    id: package-manager
+    attributes:
+      label: Package manager
+      options:
+        - pnpm
+        - npm
+        - yarn
+        - bun
+    validations:
+      required: true
+
+  - type: dropdown
+    id: content-source
+    attributes:
+      label: Primary content source
+      options:
+        - MDX or Markdown in the repository
+        - Fumadocs
+        - Contentlayer or Velite
+        - Headless CMS
+        - Application data or database
+        - Other or unsure
+    validations:
+      required: true
+
+  - type: textarea
+    id: goal
+    attributes:
+      label: What should AI systems be able to read or do?
+      description: Describe one concrete outcome, such as reading documentation or searching products.
+      placeholder: AI systems should be able to find and read our public support documentation.
+    validations:
+      required: true
+
+  - type: textarea
+    id: blocker
+    attributes:
+      label: Current blocker
+      description: Include the command and sanitized error text if you already tried the setup.
+      placeholder: I have not started, or describe the step that failed without including secrets.
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: safety
+    attributes:
+      label: Safety and follow-up
+      options:
+        - label: I confirm this issue contains no secrets, credentials, private logs, or customer data.
+          required: true
+        - label: I am willing to report whether the setup worked and how long it took.
+          required: true

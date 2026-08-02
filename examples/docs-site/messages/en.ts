@@ -31,6 +31,8 @@ const en = {
     description:
       "Inspect the exact outputs served by this production deployment. The regular interface, AI-readable content, and agent capabilities are built from the same repository.",
     source: "View the production source",
+    help: "Get free setup help",
+    capacity: "Five early-adopter setup slots",
     items: [
       { href: "/llms.txt", label: "Discovery", value: "/llms.txt" },
       { href: "/en/docs/installation.md", label: "Page Markdown", value: "/:page.md" },

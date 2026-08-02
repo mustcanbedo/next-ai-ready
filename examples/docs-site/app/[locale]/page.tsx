@@ -139,12 +139,21 @@ export default async function HomePage({ params }: PageProps) {
               <p className="mt-5 max-w-xl text-sm leading-7 text-text-secondary">
                 {t.proof.description}
               </p>
-              <a
-                href="https://github.com/mustcanbedo/next-ai-ready/tree/main/examples/docs-site"
-                className="mt-6 inline-flex text-sm font-medium text-accent transition-colors hover:text-accent-hover"
-              >
-                {t.proof.source}
-              </a>
+              <div className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-3">
+                <a
+                  href="https://github.com/mustcanbedo/next-ai-ready/issues/new?template=early-adopter.yml"
+                  className="inline-flex min-h-10 items-center rounded-lg bg-emerald-400 px-4 text-sm font-semibold text-black transition-colors hover:bg-emerald-300"
+                >
+                  {t.proof.help}
+                </a>
+                <a
+                  href="https://github.com/mustcanbedo/next-ai-ready/tree/main/examples/docs-site"
+                  className="inline-flex text-sm font-medium text-accent transition-colors hover:text-accent-hover"
+                >
+                  {t.proof.source}
+                </a>
+              </div>
+              <p className="mt-3 text-xs text-text-tertiary">{t.proof.capacity}</p>
             </div>
 
             <div className="grid gap-3 sm:grid-cols-2">

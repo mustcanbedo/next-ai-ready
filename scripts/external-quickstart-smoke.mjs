@@ -228,7 +228,6 @@ async function main() {
           name: "external-quickstart-smoke",
           version: "0.0.0",
           private: true,
-          type: "module",
           ...(PACKAGE_MANAGER === "pnpm" ? { packageManager: "pnpm@9.12.0" } : {}),
           scripts: { build: "next build" },
         },
@@ -297,6 +296,18 @@ async function main() {
 `,
       "utf8",
     );
+    if (NEXT_VERSION !== "14") {
+      await writeFile(
+        join(dir, "next.config.ts"),
+        `import type { NextConfig } from "next";
+
+const nextConfig: NextConfig = {};
+
+export default nextConfig;
+`,
+        "utf8",
+      );
+    }
 
     const cli = join(dir, "node_modules", "next-ai-ready", "dist", "cli.js");
     if (!(await exists(cli))) throw new Error(`CLI not found at ${cli}`);

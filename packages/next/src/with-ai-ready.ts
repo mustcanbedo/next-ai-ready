@@ -23,11 +23,10 @@ type RewriteEntry = { source: string; destination: string; has?: HeaderCondition
 type RewriteResult = RewriteEntry[] | { beforeFiles?: RewriteEntry[]; afterFiles?: RewriteEntry[]; fallback?: RewriteEntry[] };
 type HeaderEntry = { source: string; headers: Array<{ key: string; value: string }> };
 
-type AnyConfig = Record<string, unknown> & {
+type ConfigHooks = {
   rewrites?: () => Promise<RewriteResult> | RewriteResult;
   headers?: () => Promise<HeaderEntry[]> | HeaderEntry[];
   outputFileTracingIncludes?: Record<string, string[]>;
-  experimental?: Record<string, unknown>;
 };
 
 export interface AgentReadableOptions {
@@ -97,11 +96,12 @@ export function withAiReady(opts: WithAiReadyOptions = {}) {
   const enableTracing = opts.fileTracing ?? true;
   const agentReadable = resolveAgentReadable(opts.agentReadable);
 
-  return function applyAiReady<C extends AnyConfig>(userConfig: C = {} as C): C {
-    const next: C = { ...userConfig };
+  return function applyAiReady<C extends object>(userConfig: C = {} as C): C & ConfigHooks {
+    const current = userConfig as ConfigHooks;
+    const next = { ...userConfig } as C & ConfigHooks;
 
     if (enableRewrites) {
-      const prior = userConfig.rewrites;
+      const prior = current.rewrites;
       next.rewrites = async () => {
         const negotiated: RewriteEntry[] = [];
         if (agentReadable.accept) {
@@ -160,7 +160,7 @@ export function withAiReady(opts: WithAiReadyOptions = {}) {
         ].filter(Boolean)
       : [];
     if (vary.length > 0) {
-      const prior = userConfig.headers;
+      const prior = current.headers;
       next.headers = async () => {
         const upstream = typeof prior === "function" ? await prior() : [];
         return [
@@ -174,7 +174,7 @@ export function withAiReady(opts: WithAiReadyOptions = {}) {
     }
 
     if (enableTracing) {
-      const existing = userConfig.outputFileTracingIncludes ?? {};
+      const existing = current.outputFileTracingIncludes ?? {};
       next.outputFileTracingIncludes = {
         ...existing,
         "/_ai-ready/**/*": [".next-ai-ready/**/*"],

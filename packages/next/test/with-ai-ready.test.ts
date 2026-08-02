@@ -110,4 +110,20 @@ describe("withAiReady()", () => {
     expect(config.rewrites).toBeUndefined();
     expect(config.headers).toBeUndefined();
   });
+
+  it("accepts framework config types with broader rewrite and experimental fields", () => {
+    type NextLikeConfig = {
+      experimental?: { reactCompiler?: boolean };
+      rewrites?: () => Promise<Array<{
+        source: string;
+        destination: string;
+        has?: Array<{ type: string; key: string; value?: string }>;
+      }>>;
+    };
+    const userConfig: NextLikeConfig = { experimental: { reactCompiler: true } };
+    const config = withAiReady()(userConfig);
+
+    expect(config.experimental?.reactCompiler).toBe(true);
+    expect(typeof config.rewrites).toBe("function");
+  });
 });

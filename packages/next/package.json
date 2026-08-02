@@ -20,6 +20,10 @@
       "types": "./dist/audit.d.ts",
       "import": "./dist/audit.js"
     },
+    "./config": {
+      "types": "./dist/config.d.ts",
+      "import": "./dist/config.js"
+    },
     "./json-ld": {
       "types": "./dist/jsonld.d.ts",
       "import": "./dist/jsonld.js"

@@ -18,7 +18,8 @@
     },
     "./config": {
       "types": "./dist/config.d.ts",
-      "import": "./dist/config.js"
+      "import": "./dist/config.js",
+      "require": "./dist/config.cjs"
     },
     "./json-ld": {
       "types": "./dist/json-ld.d.ts",

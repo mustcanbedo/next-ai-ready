@@ -12,6 +12,7 @@ import { spawnSync } from "node:child_process";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const CLI = join(ROOT, "../../packages/meta/dist/cli.js");
+const SMOKE_MCP_TOKEN = "next-ai-ready-docs-site-smoke-token";
 
 async function mustExist(rel) {
   const p = join(ROOT, rel);
@@ -117,6 +118,10 @@ async function main() {
   const doctor = spawnSync("node", [CLI, "doctor", "--score"], {
     cwd: ROOT,
     encoding: "utf8",
+    env: {
+      ...process.env,
+      NEXT_AI_READY_MCP_TOKEN: process.env.NEXT_AI_READY_MCP_TOKEN ?? SMOKE_MCP_TOKEN,
+    },
   });
   if (doctor.status !== 0) {
     console.error(doctor.stdout);
@@ -128,8 +133,8 @@ async function main() {
       .split("\n")
       .find((line) => /\[next-ai-ready\] doctor:.*score \d+\/100/.test(line)) ?? "";
   console.log(`  ✓ ${scoreLine.trim()}`);
-  if (!/score 9[0-9]\/100|score 100\/100/.test(scoreLine)) {
-    fail(`expected doctor score ≥ 90, got: ${scoreLine || doctor.stdout}`);
+  if (!/0 error\(s\), 0 warning\(s\) — score 100\/100/.test(scoreLine)) {
+    fail(`expected doctor score 100 with no warnings, got: ${scoreLine || doctor.stdout}`);
   }
 
   console.log("\n[docs-site-smoke] ALL CHECKS PASSED");

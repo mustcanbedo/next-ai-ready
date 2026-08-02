@@ -145,6 +145,20 @@ async function installConsumerDependencies(dir) {
   );
 }
 
+async function expectedRegistryVersion() {
+  if (PACKAGE_SOURCE !== "registry") return undefined;
+  const { stdout } = await run(
+    ROOT,
+    "npm",
+    ["view", `next-ai-ready@${REGISTRY_TAG}`, "version", "--json"],
+  );
+  const version = JSON.parse(stdout);
+  if (typeof version !== "string" || version.length === 0) {
+    throw new Error(`Could not resolve next-ai-ready@${REGISTRY_TAG} to one exact version`);
+  }
+  return version;
+}
+
 async function configureConsumerManifest(dir, artifacts) {
   const packageJsonPath = join(dir, "package.json");
   const packageJson = JSON.parse(await readFile(packageJsonPath, "utf8"));
@@ -197,6 +211,7 @@ async function verifyTarballResolution(dir, artifacts) {
 }
 
 async function main() {
+  const expectedMetaVersion = await expectedRegistryVersion();
   const tempRoot = await mkdtemp(join(tmpdir(), "nair-ext-"));
   const dir = join(tempRoot, "app");
   const packDir = join(tempRoot, "packs");
@@ -249,6 +264,11 @@ async function main() {
     const installedMeta = JSON.parse(
       await readFile(join(dir, "node_modules", "next-ai-ready", "package.json"), "utf8"),
     );
+    if (expectedMetaVersion && installedMeta.version !== expectedMetaVersion) {
+      throw new Error(
+        `Expected next-ai-ready@${REGISTRY_TAG} to resolve to ${expectedMetaVersion}, installed ${installedMeta.version}`,
+      );
+    }
     if (!String(installedNext.version).startsWith(`${NEXT_VERSION}.`)) {
       throw new Error(`Expected Next ${NEXT_VERSION}.x, installed ${installedNext.version}`);
     }

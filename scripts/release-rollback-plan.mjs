@@ -10,10 +10,11 @@ const VERSION_PATTERN = /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-[0-9A-Za-z
 const TAG_PATTERN = /^[0-9A-Za-z][0-9A-Za-z._-]*$/;
 
 function parseArgs(argv) {
+  const tokens = argv[0] === "--" ? argv.slice(1) : argv;
   const args = {};
-  for (let index = 0; index < argv.length; index += 2) {
-    const key = argv[index];
-    const value = argv[index + 1];
+  for (let index = 0; index < tokens.length; index += 2) {
+    const key = tokens[index];
+    const value = tokens[index + 1];
     if (!key?.startsWith("--") || !value) {
       throw new Error("Expected --package, --bad, --good, and optional --tag value pairs.");
     }

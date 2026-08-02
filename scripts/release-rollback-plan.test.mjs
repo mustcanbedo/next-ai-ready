@@ -28,6 +28,19 @@ test("prints a reviewable npm rollback plan without executing it", () => {
   assert.match(result.stdout, /npm dist-tag add 'next-ai-ready@0\.1\.0-alpha\.12' latest/);
 });
 
+test("accepts the argument separator forwarded by pnpm run", () => {
+  const result = run([
+    "--",
+    "--package", "next-ai-ready",
+    "--bad", "0.1.0-alpha.13",
+    "--good", "0.1.0-alpha.14",
+    "--tag", "alpha",
+  ]);
+  assert.equal(result.status, 0, result.stderr);
+  assert.match(result.stdout, /npm deprecate 'next-ai-ready@0\.1\.0-alpha\.13'/);
+  assert.match(result.stdout, /npm dist-tag add 'next-ai-ready@0\.1\.0-alpha\.14' alpha/);
+});
+
 test("rejects unknown packages and non-exact versions", () => {
   const unknown = run(["--package", "other-package", "--bad", "0.1.0", "--good", "0.1.1"]);
   assert.equal(unknown.status, 1);

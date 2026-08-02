@@ -11,13 +11,14 @@ const PORT = Number(process.env.DOCS_SITE_SMOKE_PORT ?? 3100);
 const ORIGIN = `http://${HOST}:${PORT}`;
 const START_TIMEOUT_MS = 30_000;
 const NEXT_BIN = join(ROOT, "node_modules/next/dist/bin/next");
+const MCP_TOKEN = "next-ai-ready-docs-site-smoke-token";
 
 const server = spawn(
   process.execPath,
   [NEXT_BIN, "start", "--hostname", HOST, "--port", String(PORT)],
   {
     cwd: ROOT,
-    env: { ...process.env, NODE_ENV: "production" },
+    env: { ...process.env, NODE_ENV: "production", NEXT_AI_READY_MCP_TOKEN: MCP_TOKEN },
     stdio: ["ignore", "pipe", "pipe"],
   },
 );
@@ -75,6 +76,23 @@ async function expectResponse(
   }
 
   console.log(`  ok ${path} (${response.status})`);
+}
+
+async function callMcp(id, method, params) {
+  const response = await fetch(`${ORIGIN}/api/mcp/mcp`, {
+    method: "POST",
+    headers: {
+      accept: "application/json, text/event-stream",
+      authorization: `Bearer ${MCP_TOKEN}`,
+      "content-type": "application/json",
+    },
+    body: JSON.stringify({ jsonrpc: "2.0", id, method, params }),
+  });
+  const body = await response.text();
+  if (response.status !== 200 || body.includes('"isError":true')) {
+    fail(`MCP ${method}: expected success, received ${response.status}: ${body}`);
+  }
+  return body;
 }
 
 async function main() {
@@ -162,6 +180,47 @@ async function main() {
     contentType: "text/html",
     requestHeaders: { accept: "text/html" },
   });
+
+  const unauthorizedMcp = await fetch(`${ORIGIN}/api/mcp/mcp`, {
+    method: "POST",
+    headers: {
+      accept: "application/json, text/event-stream",
+      "content-type": "application/json",
+    },
+    body: JSON.stringify({ jsonrpc: "2.0", id: 0, method: "tools/list", params: {} }),
+  });
+  if (unauthorizedMcp.status !== 401) {
+    fail(`MCP without a token: expected 401, received ${unauthorizedMcp.status}`);
+  }
+  console.log("  ok MCP rejects missing bearer token (401)");
+  const initialized = await callMcp(1, "initialize", {
+    protocolVersion: "2025-03-26",
+    capabilities: {},
+    clientInfo: { name: "docs-site-smoke", version: "1.0.0" },
+  });
+  if (!initialized.includes('"protocolVersion":"2025-03-26"')) {
+    fail("MCP initialize response is missing the negotiated protocol version");
+  }
+  const listed = await callMcp(2, "tools/call", {
+    name: "list_pages",
+    arguments: { limit: 2 },
+  });
+  if (!listed.includes("/en")) fail("MCP list_pages did not return a page route");
+  const searched = await callMcp(3, "tools/call", {
+    name: "search_pages",
+    arguments: { query: "installation", limit: 1 },
+  });
+  if (!searched.includes("/en/docs/installation")) {
+    fail("MCP search_pages did not rank the English installation page first");
+  }
+  const page = await callMcp(4, "tools/call", {
+    name: "get_page",
+    arguments: { route: "/en/docs/installation" },
+  });
+  if (!page.includes("0.1.0-alpha.14")) {
+    fail("MCP get_page did not return the current installation content");
+  }
+  console.log("  ok MCP auth, initialize, list_pages, search_pages, get_page");
 
   console.log("[docs-site-route-smoke] ALL CHECKS PASSED");
 }

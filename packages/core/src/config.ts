@@ -16,7 +16,12 @@ export function defineConfig(config: AiReadyConfig): AiReadyConfig {
 /** Defaults applied when fields are omitted. Pure; safe to call repeatedly. */
 export function withDefaults(config: AiReadyConfig): Required<Pick<AiReadyConfig, "content">> & AiReadyConfig {
   return {
-    content: ["app/**/*.{md,mdx}", "content/**/*.mdx"],
+    content: [
+      "app/**/*.{md,mdx}",
+      "content/**/*.{md,mdx}",
+      "src/app/**/*.{md,mdx}",
+      "src/content/**/*.{md,mdx}",
+    ],
     ...config,
   };
 }

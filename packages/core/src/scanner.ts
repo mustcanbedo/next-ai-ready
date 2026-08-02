@@ -16,13 +16,18 @@ export interface ScannedFile {
 export interface ScanOptions {
   /** Working directory. Defaults to `process.cwd()`. */
   cwd?: string;
-  /** Glob patterns. Defaults to `["app/**\/*.{md,mdx}", "content/**\/*.mdx"]`. */
+  /** Glob patterns. Defaults cover root and `src/` App Router/content directories. */
   patterns?: string[];
   /** Globs to ignore. */
   ignore?: string[];
 }
 
-const DEFAULT_PATTERNS = ["app/**/*.{md,mdx}", "content/**/*.mdx"];
+const DEFAULT_PATTERNS = [
+  "app/**/*.{md,mdx}",
+  "content/**/*.{md,mdx}",
+  "src/app/**/*.{md,mdx}",
+  "src/content/**/*.{md,mdx}",
+];
 const DEFAULT_IGNORE = ["**/node_modules/**", "**/.next/**", "**/dist/**"];
 
 /**
@@ -37,6 +42,11 @@ const DEFAULT_IGNORE = ["**/node_modules/**", "**/.next/**", "**/dist/**"];
 export function fileToRoute(relPath: string): string {
   const posix = relPath.split(sep).join("/");
   let parts = posix.split("/");
+
+  // `src/app` and `src/content` use the same URL semantics as root folders.
+  if (parts[0] === "src" && (parts[1] === "app" || parts[1] === "content")) {
+    parts = parts.slice(1);
+  }
 
   // Drop the root content folder (`app` or `content`).
   if (parts[0] === "app" || parts[0] === "content") parts = parts.slice(1);

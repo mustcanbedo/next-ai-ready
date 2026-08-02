@@ -1,7 +1,10 @@
 import { describe, expect, it } from "vitest";
+import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { stableId } from "../src/id.js";
 import { serializeStable } from "../src/json.js";
-import { fileToRoute } from "../src/scanner.js";
+import { fileToRoute, scanContent } from "../src/scanner.js";
 import { identifyAiBot } from "../src/bots.js";
 import { defineConfig, withDefaults } from "../src/config.js";
 
@@ -80,6 +83,31 @@ describe("fileToRoute()", () => {
   it("handles .md extension", () => {
     expect(fileToRoute("content/guide.md")).toBe("/guide");
   });
+
+  it("maps src/content and src/app from their framework roots", () => {
+    expect(fileToRoute("src/content/docs/install.mdx")).toBe("/docs/install");
+    expect(fileToRoute("src/app/docs/page.md")).toBe("/docs");
+  });
+});
+
+describe("scanContent()", () => {
+  it("discovers root and src content with .md and .mdx defaults", async () => {
+    const cwd = await mkdtemp(join(tmpdir(), "next-ai-ready-scanner-"));
+    try {
+      await mkdir(join(cwd, "content", "docs"), { recursive: true });
+      await mkdir(join(cwd, "src", "content", "guide"), { recursive: true });
+      await writeFile(join(cwd, "content", "docs", "intro.md"), "# Intro\n");
+      await writeFile(join(cwd, "src", "content", "guide", "index.mdx"), "# Guide\n");
+
+      const files = await scanContent({ cwd });
+      expect(files.map((file) => [file.relPath, file.route])).toEqual([
+        ["content/docs/intro.md", "/docs/intro"],
+        ["src/content/guide/index.mdx", "/guide"],
+      ]);
+    } finally {
+      await rm(cwd, { recursive: true, force: true });
+    }
+  });
 });
 
 describe("identifyAiBot()", () => {
@@ -121,7 +149,12 @@ describe("withDefaults()", () => {
   it("fills in default content patterns when omitted", () => {
     const cfg = { site: { name: "X", baseUrl: "https://x.com" } };
     const result = withDefaults(cfg);
-    expect(result.content).toEqual(["app/**/*.{md,mdx}", "content/**/*.mdx"]);
+    expect(result.content).toEqual([
+      "app/**/*.{md,mdx}",
+      "content/**/*.{md,mdx}",
+      "src/app/**/*.{md,mdx}",
+      "src/content/**/*.{md,mdx}",
+    ]);
   });
 
   it("preserves user-supplied content patterns", () => {

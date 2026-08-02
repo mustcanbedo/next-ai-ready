@@ -1,0 +1,101 @@
+---
+title: 为 Fumadocs 添加 llms.txt 与 Markdown 端点
+summary: 复用 Fumadocs MDX 内容集合，在 Next.js App Router 部署中生成 AI 可读的发现和页面端点。
+order: 10
+questions:
+  - q: next-ai-ready 会替换 Fumadocs Source API 或搜索吗？
+    a: 不会。Fumadocs 继续负责文档界面、Source API 和搜索；next-ai-ready 独立读取相同源文件并生成面向机器的输出。
+  - q: 可以复用 Fumadocs 已有的 description frontmatter 吗？
+    a: 可以。没有 summary 时，next-ai-ready 会把 description 作为摘要。
+  - q: 完全静态导出的 Fumadocs 可以使用吗？
+    a: 不可以。运行时 Markdown、内容协商和 MCP handlers 需要 Next.js 服务器部署。
+tags:
+  - fumadocs
+  - nextjs
+  - llms.txt
+  - mdx
+updatedAt: '2026-08-02'
+author: next-ai-ready team
+---
+
+# 为 Fumadocs 添加 llms.txt 与 Markdown 端点
+
+[Fumadocs](https://www.fumadocs.dev/docs) 负责文档界面、Source API 和搜索。`next-ai-ready`
+可以读取同一个 MDX 集合，生成 `/llms.txt`、页面 Markdown、语义页面发现和可选 MCP 资源，
+无需改变 Fumadocs 的这些职责。
+
+本接入面向使用 Next.js App Router 和服务器部署的 Fumadocs，不支持完全静态的
+`output: "export"`，因为机器端路由需要在请求时运行。
+
+## 1. 安装并初始化
+
+在 Fumadocs Next.js 应用目录执行：
+
+```bash
+pnpm add next-ai-ready zod@^4
+pnpm exec next-ai-ready init
+```
+
+保留 `source.config.ts`、Fumadocs 生成的 source 模块、页面布局和搜索路由。初始化器只增加独立
+的 AI 路由与配置。
+
+## 2. 复用 Fumadocs 内容集合
+
+Fumadocs MDX 通常把文档放在 `content/docs`。让 next-ai-ready 指向同一批源文件：
+
+```js
+import { defineConfig } from "next-ai-ready"
+
+export default defineConfig({
+  site: {
+    name: "Acme Docs",
+    baseUrl: "https://docs.example.com",
+    description: "Documentation for Acme developers.",
+  },
+  content: ["content/docs/**/*.{md,mdx}"],
+})
+```
+
+如果集合位于 `src/content/docs`，改用对应路径。已有 `title`、`description`、`date` 与
+`author` frontmatter 会被复用；只有在日期真实且持续维护时才增加 `updatedAt`。
+
+## 3. 包装 Next.js 配置
+
+Fumadocs Source API 本身不需要竞争性的 Next.js wrapper。保留项目现有配置，再用
+`withAiReady()` 包装：
+
+```js
+import { withAiReady } from "next-ai-ready/config"
+
+const nextConfig = {
+  // 原有 Fumadocs 与 Next.js 配置保留在这里。
+}
+
+export default withAiReady({ agentReadable: true })(nextConfig)
+```
+
+如果已有其他插件包装配置，把 `withAiReady()` 应用到该插件最终返回的结果。
+
+## 4. 构建并验证
+
+```bash
+pnpm exec next-ai-ready build
+pnpm exec next-ai-ready doctor --score
+pnpm build
+```
+
+部署后执行：
+
+```bash
+curl -I https://docs.example.com/llms.txt
+curl -I https://docs.example.com/docs/getting-started.md
+pnpm exec next-ai-ready audit https://docs.example.com/docs/getting-started --version 3
+```
+
+确认 `/llms.txt` 已列出预期 Fumadocs 页面、Markdown URL 使用生产 canonical，并且浏览器请求
+仍返回正常的 Fumadocs 界面。
+
+## 保持搜索职责分离
+
+Fumadocs 搜索服务于文档界面中的人类用户；next-ai-ready 页面发现通过 Markdown、HTTP 资源
+和可选 MCP 服务于 AI 客户端。两者可以索引相同内容，但不需要互相替代。

@@ -155,6 +155,18 @@ async function main() {
     contentType: "text/markdown",
     includes: "# 如何为 Next.js 添加 llms.txt",
   });
+  await expectResponse("/en/docs/guides/nextra-ai-ready", {
+    contentType: "text/html",
+    includes: "Nextra llms.txt and Markdown endpoint setup",
+  });
+  await expectResponse("/en/docs/guides/nextra-ai-ready.md", {
+    contentType: "text/markdown",
+    includes: "# Nextra llms.txt and Markdown endpoint setup",
+  });
+  await expectResponse("/zh/docs/guides/fumadocs-ai-ready.md", {
+    contentType: "text/markdown",
+    includes: "# 为 Fumadocs 添加 llms.txt 与 Markdown 端点",
+  });
   await expectResponse("/en/docs/introduction.ai.json", {
     contentType: "application/json",
     includes: '"route": "/en/docs/introduction"',
@@ -231,6 +243,13 @@ async function main() {
   });
   if (!page.includes("0.1.0-alpha.16")) {
     fail("MCP get_page did not return the current installation content");
+  }
+  const frameworkGuide = await callMcp(5, "tools/call", {
+    name: "search_pages",
+    arguments: { query: "Nextra llms.txt", locale: "en", limit: 1 },
+  });
+  if (!frameworkGuide.includes("/en/docs/guides/nextra-ai-ready")) {
+    fail("MCP search_pages did not rank the Nextra compatibility guide first");
   }
   console.log("  ok MCP auth, initialize, list_pages, search_pages, get_page");
 

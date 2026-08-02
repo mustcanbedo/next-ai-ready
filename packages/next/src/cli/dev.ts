@@ -54,7 +54,12 @@ export async function runDev(opts: DevOptions = {}): Promise<void> {
 
   await rebuild();
 
-  const patterns = config.content ?? ["app/**/*.{md,mdx}", "content/**/*.mdx"];
+  const patterns = config.content ?? [
+    "app/**/*.{md,mdx}",
+    "content/**/*.{md,mdx}",
+    "src/app/**/*.{md,mdx}",
+    "src/content/**/*.{md,mdx}",
+  ];
   const watcher = chokidar.watch(patterns, {
     cwd,
     ignored: DEFAULT_IGNORE,

@@ -143,6 +143,38 @@ describe("page discovery tools", () => {
     expect((await search.execute({ query: "x".repeat(201) })).isError).toBe(true);
   });
 
+  it("filters search results by locale", async () => {
+    const graph: SemanticGraph = {
+      ...GRAPH,
+      routes: { "/en/docs/install": "n_en", "/zh/docs/install": "n_zh" },
+      nodes: {
+        n_en: {
+          id: "n_en",
+          route: "/en/docs/install",
+          kind: "page",
+          title: "Install",
+          summary: "Install the package.",
+          locale: "en",
+          source: { file: "content/en/install.mdx" },
+        },
+        n_zh: {
+          id: "n_zh",
+          route: "/zh/docs/install",
+          kind: "page",
+          title: "安装 Install",
+          summary: "安装软件包。",
+          locale: "zh",
+          source: { file: "content/zh/install.mdx" },
+        },
+      },
+    };
+
+    const [, , search] = toMcpPageToolDefinitions(graph);
+    const result = JSON.parse((await search.execute({ query: "install", locale: "zh" })).content[0].text);
+    expect(result.results.map((page: { route: string }) => page.route)).toEqual(["/zh/docs/install"]);
+    expect((await search.execute({ query: "install", locale: "" })).isError).toBe(true);
+  });
+
   it("keeps only top-k search results while reporting every match", async () => {
     const graph: SemanticGraph = {
       ...GRAPH,

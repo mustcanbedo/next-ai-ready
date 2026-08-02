@@ -1,0 +1,104 @@
+---
+title: Add llms.txt and Markdown endpoints to Fumadocs
+summary: Reuse a Fumadocs MDX content collection to generate AI-readable discovery and page endpoints in a Next.js App Router deployment.
+order: 10
+questions:
+  - q: Does next-ai-ready replace Fumadocs Source API or search?
+    a: No. Fumadocs continues to power the documentation UI, Source API, and search. next-ai-ready independently reads the same source files for machine-facing outputs.
+  - q: Can I use the existing Fumadocs description frontmatter?
+    a: Yes. next-ai-ready uses description as the summary when a summary field is not present.
+  - q: Does this work with a fully static Fumadocs export?
+    a: No. The runtime Markdown, content-negotiation, and MCP handlers require a Next.js server deployment.
+tags:
+  - fumadocs
+  - nextjs
+  - llms.txt
+  - mdx
+updatedAt: '2026-08-02'
+author: next-ai-ready team
+---
+
+# Add llms.txt and Markdown endpoints to Fumadocs
+
+[Fumadocs](https://www.fumadocs.dev/docs) provides the documentation UI, Source API, and search.
+`next-ai-ready` can read the same MDX collection to produce `/llms.txt`, page Markdown, semantic page
+discovery, and optional MCP resources without changing those Fumadocs responsibilities.
+
+This integration targets Fumadocs on Next.js App Router with a server deployment. It does not support
+a fully static `output: "export"` build because the machine-facing route handlers run at request time.
+
+## 1. Install and initialize
+
+From the Fumadocs Next.js application directory:
+
+```bash
+pnpm add next-ai-ready zod@^4
+pnpm exec next-ai-ready init
+```
+
+Keep `source.config.ts`, the generated Fumadocs source module, page layouts, and search routes intact.
+The initializer adds separate AI-facing handlers and configuration.
+
+## 2. Reuse the Fumadocs content collection
+
+Fumadocs MDX commonly stores documentation under `content/docs`. Point next-ai-ready at the same
+source files:
+
+```js
+import { defineConfig } from "next-ai-ready"
+
+export default defineConfig({
+  site: {
+    name: "Acme Docs",
+    baseUrl: "https://docs.example.com",
+    description: "Documentation for Acme developers.",
+  },
+  content: ["content/docs/**/*.{md,mdx}"],
+})
+```
+
+If the collection lives under `src/content/docs`, use that path instead. Existing `title`,
+`description`, `date`, and `author` frontmatter are reused. Add `updatedAt` only when the date is
+truthful and maintained.
+
+## 3. Wrap the Next.js config
+
+Fumadocs does not require a competing Next.js wrapper for its Source API. Preserve the project's
+existing options and wrap them with `withAiReady()`:
+
+```js
+import { withAiReady } from "next-ai-ready/config"
+
+const nextConfig = {
+  // Existing Fumadocs and Next.js options stay here.
+}
+
+export default withAiReady({ agentReadable: true })(nextConfig)
+```
+
+If another plugin already wraps the config, apply `withAiReady()` to that plugin's final result.
+
+## 4. Build and verify
+
+```bash
+pnpm exec next-ai-ready build
+pnpm exec next-ai-ready doctor --score
+pnpm build
+```
+
+After deployment:
+
+```bash
+curl -I https://docs.example.com/llms.txt
+curl -I https://docs.example.com/docs/getting-started.md
+pnpm exec next-ai-ready audit https://docs.example.com/docs/getting-started --version 3
+```
+
+Confirm that `/llms.txt` lists the intended Fumadocs pages, Markdown URLs use production canonicals,
+and browser requests still receive the normal Fumadocs UI.
+
+## Keep search responsibilities separate
+
+Fumadocs search serves people inside the documentation UI. next-ai-ready page discovery serves AI
+clients through Markdown, HTTP resources, and optional MCP. They may index the same content, but one
+does not need to replace the other.

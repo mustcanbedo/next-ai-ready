@@ -1,0 +1,107 @@
+---
+title: Nextra llms.txt and Markdown endpoint setup
+summary: Integrate next-ai-ready with a Nextra 4 App Router documentation site without replacing Nextra navigation, search, themes, or MDX rendering.
+order: 9
+questions:
+  - q: Does next-ai-ready replace Nextra?
+    a: No. Nextra continues to render the documentation UI. next-ai-ready reads the same Markdown and MDX sources to generate machine-facing discovery and retrieval endpoints.
+  - q: Does this work with Nextra 3 or the Pages Router?
+    a: No. This integration targets Nextra 4 and the Next.js App Router. next-ai-ready does not currently support the Pages Router.
+  - q: Can next-ai-ready scan a Nextra src/content directory?
+    a: Yes. The default scanner covers content, app, src/content, and src/app directories with both .md and .mdx files.
+tags:
+  - nextra
+  - nextjs
+  - llms.txt
+  - mdx
+updatedAt: '2026-08-02'
+author: next-ai-ready team
+---
+
+# Nextra llms.txt and Markdown endpoint setup
+
+[Nextra 4](https://nextra.site/docs) is a Next.js App Router framework for content-focused sites.
+Keep Nextra responsible for the human-facing documentation experience. Add `next-ai-ready` beside it
+when you want synchronized `/llms.txt`, page Markdown, semantic discovery, and optional MCP resources.
+
+This guide supports Nextra's root `content/` and `app/` layouts as well as their `src/` equivalents.
+It does not support Nextra 1-3 sites that still use the Pages Router.
+
+## 1. Install and initialize
+
+From the Nextra application directory:
+
+```bash
+pnpm add next-ai-ready zod@^4
+pnpm exec next-ai-ready init
+```
+
+`init` adds the AI routes and an `ai-ready.config.mjs` file. It does not replace Nextra's theme,
+catch-all page, search configuration, or MDX components.
+
+## 2. Point both systems at the same content
+
+Nextra supports Markdown and MDX in `content/`, `src/content/`, `app/`, or `src/app/`. The default
+next-ai-ready scanner covers those locations. For an explicit Nextra content directory, keep the
+configuration narrow:
+
+```js
+import { defineConfig } from "next-ai-ready"
+
+export default defineConfig({
+  site: {
+    name: "Acme Docs",
+    baseUrl: "https://docs.example.com",
+    description: "Documentation for Acme developers.",
+  },
+  content: ["content/**/*.{md,mdx}"],
+})
+```
+
+Use `src/content/**/*.{md,mdx}` instead when the Nextra project uses a `src/` directory. Frontmatter
+`description` is accepted as a page summary, so existing Nextra content does not need duplicate
+metadata solely for next-ai-ready.
+
+## 3. Compose the Next.js plugins
+
+Keep Nextra's existing plugin and wrap the resulting Next.js config with `withAiReady()`:
+
+```js
+import nextra from "nextra"
+import { withAiReady } from "next-ai-ready/config"
+
+const withNextra = nextra({
+  // Existing Nextra options stay here.
+})
+
+const nextConfig = withNextra({})
+
+export default withAiReady({ agentReadable: true })(nextConfig)
+```
+
+This composition preserves Nextra's MDX handling and adds content negotiation for AI-readable page
+responses. Do not enable Next.js `output: "export"`; the generated runtime handlers require a server.
+
+## 4. Build and verify
+
+```bash
+pnpm exec next-ai-ready build
+pnpm exec next-ai-ready doctor --score
+pnpm build
+```
+
+After deployment, verify one real page and the discovery files:
+
+```bash
+curl -I https://docs.example.com/llms.txt
+curl -I https://docs.example.com/docs/getting-started.md
+pnpm exec next-ai-ready audit https://docs.example.com/docs/getting-started --version 3
+```
+
+The Nextra HTML page must remain unchanged for browsers. The corresponding `.md` URL should return
+clean Markdown, and an unknown browser URL must continue to return a real `404`.
+
+## Start with the Knowledge plane
+
+For an initial Nextra integration, ship only content discovery and page retrieval. Add MCP or callable
+actions later when the site has a concrete agent workflow and an authentication policy.

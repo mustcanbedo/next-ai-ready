@@ -104,7 +104,7 @@ pnpm test
 pnpm typecheck
 pnpm api:check
 pnpm pack:check
-PACKAGE_SOURCE=registry REGISTRY_TAG=<restored-tag> pnpm external:smoke
+PNPM_VIA_COREPACK=1 PACKAGE_SOURCE=registry REGISTRY_TAG=<restored-tag> pnpm external:smoke
 ```
 
 然后复查线上 `llms.txt`、`sitemap.md`、Markdown negotiation、Agent Markdown

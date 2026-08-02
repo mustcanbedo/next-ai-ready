@@ -11,7 +11,7 @@ English | [中文文档](./README.zh-CN.md)
 
 > **第三方工具基线：** 生产文档站在 2026-08-01 使用 Vercel 开源的 `@vercel/agent-readability@0.5.0` 获得 **100/100**。[查看机器可读原始结果](./docs/audit-baselines/vercel-agent-readability-0.5.0-2026-08-01.json)，或运行 `pnpm audit:vercel:site` 复现。该分数衡量技术层面的 Agent 可读性，不代表搜索排名、收录或引用效果。
 
-> **发布渠道：** 本仓库与文档站跟随 `main`；npm 当前为 `0.1.0-alpha.14`，已包含 TypeScript Action 加载修复、运行时专用入口、Audit v3 和 MCP 页面发现。2026-08-02 已用公共 registry 干净安装和 Next.js 15 生产构建验证完整依赖链。
+> **发布渠道：** 本仓库与文档站跟随 `main`；npm 当前为 `0.1.0-alpha.14`，已包含 TypeScript Action 加载修复、运行时专用入口、Audit v3 和 MCP 页面发现。2026-08-02 已通过公共 registry 的 npm/pnpm × Next.js 14/15/16 完整矩阵；生产 MCP 也已通过带认证 initialize 及 `list_pages`、`search_pages`、`get_page` 调用。
 
 > 传统网站为浏览器而建。
 > **next-ai-ready** 让你的 Next.js 站点被 AI **可读**、被 Agent **可调用**。
@@ -180,7 +180,7 @@ registerAiHooks({
 
 ## 状态
 
-🚧 **Pre-alpha**（`0.1.0-alpha.14` 已发布到 npm `@alpha`）。公开包已包含上述运行时专用入口、Audit v3 加固、TypeScript Action 加载与 MCP 页面发现；剩余生产验证和 GA 工作见[当前改进台账](./docs/improvement-plan.zh-CN.md)。
+🚧 **Pre-alpha**（`0.1.0-alpha.14` 已发布到 npm `@alpha`）。公开包和生产 MCP 链路已通过上述发布验证；最终 GA 验收与后续工作见[当前改进台账](./docs/improvement-plan.zh-CN.md)。
 
 - ✅ **知识平面** — MDX → 语义图 → `llms.txt` / `*.md` / `*.ai.json` / JSON-LD
 - ✅ **能力平面** — `defineAction` → `/api/actions/<name>` + OpenAPI 3.1 / `tools.json` / `ai-plugin.json`

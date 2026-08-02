@@ -59,8 +59,8 @@
 |---|---|---|
 | Agent Markdown 缺页恢复 | `已完成` | Agent Markdown 请求返回 `200`、`noindex`、发现入口和相似页面；浏览器仍返回真实 `404` |
 | Audit 三层报告 | `已完成` | v1/v2 保持兼容；v3 已随 npm alpha.14 发布，并拆分 Readability、Semantic/AEO 与 Capability；发布前 CLI 回归和外部安装均通过 |
-| MCP 页面发现 | `待验证` | `list_pages`、`get_page`、`search_pages` 和确定性分页已随 alpha.14 发布；待连接真实 MCP Client，locale 过滤及 HTTP 共用接口进入后续迭代 |
-| Next.js 兼容验证 | `待验证` | npm/pnpm × Next.js 14/15/16 已在 PR CI 通过；npm alpha.14 已通过 pnpm + Next.js 15 registry 安装，剩余 registry 矩阵待执行 |
+| MCP 页面发现 | `已完成` | `list_pages`、`get_page`、`search_pages` 已随 alpha.14 发布，并于 2026-08-02 在带认证的生产 MCP 端点完成真实调用；locale 过滤及 HTTP 共用接口进入后续迭代 |
+| Next.js 兼容验证 | `已完成` | tarball 与公共 npm registry 均通过 npm/pnpm × Next.js 14/15/16 六组合；registry 每组均确认安装 alpha.14 并完成 CLI 与生产构建 |
 | Vercel 官方 Readability 基线 | `已完成` | `main` 部署后已使用固定的 `@vercel/agent-readability@0.5.0` 复测生产站，25 项全部通过并保持 `100/100`；每周/手动工作流仍单独跟踪 |
 | npm GA | `待开始` | 当前仅发布 `0.1.0-alpha.14`，尚未发布 `0.1.0` |
 | i18n 与 Content Adapter | `待开始` | graph 有基础字段和 ContentSource 接口，但没有完整接入体验 |
@@ -108,10 +108,11 @@ pnpm audit:vercel:site
 
 同日使用发布前的 Audit v3 对该 URL 预检：Agent Readability `100/100`、
 Semantic/AEO Quality `100/100`、Agent Capability `67/100`。Capability 的
-当时唯一警告是生产 MCP Token 尚未配置，因此无法进行带凭证的协议验证。2026-08-01
-已将 Sensitive Token 写入 Vercel Production；线上鉴权由 `401` 变为进入 MCP handler，
-同时暴露出默认 `basePath` 与生成路由不一致导致的 transport `404`。修复现已合入
-`main` 并随 alpha.14 发布；生产 MCP 带凭证初始化握手仍需单独完成。v3 结果用于验证三层报告实现，不能替代上方
+当时唯一警告是生产 MCP Token 尚未配置，因此无法进行带凭证的协议验证。2026-08-02
+已轮换并将 Sensitive Token 写入 Vercel Production，随后使用最新项目设置重新部署。
+生产端点通过 Bearer Token 完成 MCP `initialize`（HTTP 200，协议 `2025-03-26`），
+并真实调用 `list_pages`、`search_pages`、`get_page`；无凭证请求继续返回 401。
+此前发现的默认 `basePath` 与生成路由不一致问题已随 alpha.14 修复。v3 结果用于验证三层报告实现，不能替代上方
 官方 CLI 的 25 项外部结果。
 
 ### P1：发布 0.1 GA
@@ -119,10 +120,10 @@ Semantic/AEO Quality `100/100`、Agent Capability `67/100`。Capability 的
 | ID | 任务 | 状态 | 验收标准 |
 |---|---|---|---|
 | G1-01 | 合入并发布当前 Audit/MCP 功能 | `已完成` | PR #2-#7 已合入 `main`；Audit v3、MCP 页面发现和依赖链修复已随 npm alpha.14 发布 |
-| G1-02 | 配置生产 MCP Token | `待验证` | Vercel Production Sensitive Token 已保存并部署，MCP basePath 修复已随 alpha.14 发布；待完成生产环境带凭据初始化握手 |
-| G1-03 | 固化真实安装矩阵 | `进行中` | main tarball 已通过 npm/pnpm × Next.js 14/15/16 六组合，并抽样通过 pnpm 9.12 与 11.9；alpha.14 已通过 pnpm + Next.js 15 registry 安装，剩余五个 registry 组合待补齐 |
+| G1-02 | 配置生产 MCP Token | `已完成` | 2026-08-02 完成 Production Sensitive Token 轮换、重新部署、无凭证 401 和带凭证 initialize 200 验证；文档站 smoke 固化同一认证与工具回归 |
+| G1-03 | 固化真实安装矩阵 | `已完成` | main tarball 与 npm alpha.14 均通过 npm/pnpm × Next.js 14/15/16；registry smoke 现会核对 dist-tag 对应的精确安装版本 |
 | G1-04 | 冻结 0.1 公共 API | `已完成` | 十个发布包的 entrypoint、命名导出、类型声明哈希与 bin 基线均已通过；程序化 Audit 已收口到独立入口，不再暴露 CLI 调度 API |
-| G1-05 | 建立最小回滚流程 | `待验证` | npm 计划器仅生成精确 deprecate/dist-tag 命令；Git revert、Vercel rollback/promote 和三层验证已进入手册，待 GA 前演练 |
+| G1-05 | 建立最小回滚流程 | `已完成` | 2026-08-02 完成只读演练；计划器兼容 pnpm 透传的 `--`，并生成精确 deprecate/dist-tag 命令，不执行写操作 |
 | G1-06 | 更新 GA 文案并发布 `0.1.0` | `待开始` | README 不再写 Pre-alpha；十分钟流程无错误 |
 | G1-07 | 消除 `main`、npm 与网站文档的发布漂移 | `已完成` | README、文档站和 npm 已对齐 alpha.14；专用入口、TypeScript Action 加载及 registry 干净安装已验证；发布门禁新增 manifest 漂移检查 |
 
@@ -136,7 +137,10 @@ GA 之前不加入数据库、IndexNow、大型 DevTools 或托管后台。
 - 公共 registry 回归发现 alpha.13 的传递依赖 `@next-ai-ready/semantic@0.1.0-alpha.11` 未发布 `./jsonld` export；`@next-ai-ready/core@0.1.0-alpha.11` 也缺少新运行时专用 exports。根因是公开 manifest 改动未伴随底层包版本提升。
 - PR #7 增加 `registry:manifest-check`，在发布门禁中比较本地与 npm 同版本的公开 manifest，防止在相同版本下漂移；Changesets 随后生成完整的精确依赖替换链。
 - 修正版已发布：Core、Semantic、Actions、MDX、OpenAPI 为 alpha.12，LLMS、MCP 为 alpha.13，Next 与 meta 包为 alpha.14；`@alpha` 没有移动正式版 `latest`。
-- `next-ai-ready@0.1.0-alpha.14` 已从公共 npm registry 完成 pnpm 干净安装、`init`、`build`、`doctor --score` 与 Next.js 15 生产构建，全部通过。
+- `next-ai-ready@0.1.0-alpha.14` 已从公共 npm registry 完成 npm/pnpm × Next.js 14/15/16 六组合干净安装、`init`、`build`、`doctor --score` 与生产构建，全部通过。
+- 生产 MCP Token 已轮换并重新部署；认证 initialize、`list_pages`、`search_pages`、`get_page` 均通过。搜索 `installation` 时英文安装页排名第一，读取结果包含 alpha.14 文档。
+- 文档站 smoke 使用隔离的测试 token 自动验证无凭证 401、认证 initialize 和三个页面工具；本地 `doctor` 达到 0 error、0 warning、`100/100`。
+- 回滚计划完成只读演练，并修复 pnpm 9 将参数分隔符透传给脚本时的解析失败。
 
 2026-08-01 分支审查修复：Audit v3 的 required 检查现在统一产生 failure 并使 CLI
 非零退出；`create-next-ai-ready` 已移出 Changesets ignore 列表；公开 Audit 只确认 MCP
@@ -147,7 +151,7 @@ GA 之前不加入数据库、IndexNow、大型 DevTools 或托管后台。
 
 | ID | 任务 | 状态 | 验收标准 |
 |---|---|---|---|
-| S2-01 | `list_pages`、`get_page`、`search_pages` | `待验证` | 已随 alpha.14 发布；待连接真实 MCP Client 验证三个工具的发现与读取效果 |
+| S2-01 | `list_pages`、`get_page`、`search_pages` | `已完成` | 已随 alpha.14 发布并通过生产带认证调用；可枚举 42 页、搜索命中目标安装页并读取完整 Markdown |
 | S2-02 | locale 过滤和确定性分页 | `待开始` | 中英文结果不混淆；cursor 行为有回归测试 |
 | S2-03 | 统一 Search Provider | `待开始` | MCP 与 HTTP 搜索调用同一实现，不复制排序逻辑 |
 | S2-04 | 补齐页面元数据 | `进行中` | title、summary、canonical URL、locale、updatedAt 均有类型和测试 |
@@ -204,10 +208,10 @@ P0、P1 完成后再开始。
 
 P0 已完成并部署，当前按以下顺序收敛 alpha 与 GA：
 
-1. `G1-02` / `S2-01`：用已发布 alpha.14 完成生产 MCP 认证初始化握手和三个页面发现工具验证。
-2. `G1-03`：从 npm Registry 补齐 npm/pnpm × Next.js 14/15/16 安装矩阵。
-3. `G1-05`：演练一次 npm、Git 与 Vercel 回滚计划，不执行破坏性回滚。
-4. `G1-06`：完成十分钟首次接入验证、GA 文案和 `0.1.0` 发布。
+1. `G1-06`：完成十分钟首次接入人工计时验收、GA 文案和 `0.1.0` 发布决策。
+2. `S2-02`：为 `list_pages` / `search_pages` 增加 locale 过滤并补齐确定性分页回归。
+3. `S2-05`：建立一到两次工具调用找到目标页的固定问题集。
+4. `S2-03`：评估 MCP 与 HTTP 搜索共用 Search Provider 的最小接口，再决定是否进入 0.2。
 
 ## 8. 维护规则
 

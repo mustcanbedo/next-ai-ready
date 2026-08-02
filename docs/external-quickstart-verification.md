@@ -75,6 +75,8 @@ The fixture writes overrides to both legacy package metadata and
 inside the disposable consumer project; it does not enable arbitrary dependency builds.
 
 Set `PACKAGE_SOURCE=registry` to test the published `next-ai-ready@alpha` package.
+The smoke resolves the dist-tag through npm and requires the installed package to
+match that exact version, so stale package-manager metadata cannot produce a false pass.
 The legacy `USE_NPM=1` switch remains an alias for registry source selection.
 
 ## Manual verification (npm registry)
@@ -111,7 +113,7 @@ curl -sS http://localhost:3000/openapi.json | head -c 200
 
 As of 2026-08-02:
 
-- **npm `@alpha`:** `0.1.0-alpha.14` — registry single-package installation, CLI workflow, and Next.js 15 production build verified.
+- **npm `@alpha`:** `0.1.0-alpha.14` — registry single-package installation, CLI workflow, and production builds verified across npm/pnpm × Next.js 14/15/16.
 - **alpha.13:** superseded after registry smoke exposed an incomplete published Semantic/Core export chain; use alpha.14 or newer.
 - **alpha.4:** deprecated for pnpm users (scoped import bug); use ≥ alpha.5
 
@@ -129,9 +131,8 @@ As of 2026-08-02:
 ## Sign-off checklist
 
 - [x] Local current-branch tarball install — 2026-08-01
-- [x] npm + Next.js 14 production build — 2026-08-01
-- [x] pnpm + Next.js 15 production build — 2026-08-01
-- [x] pnpm + Next.js 16 production build — 2026-08-01
-- [x] `doctor` exit 0 on every sampled fresh project — 2026-08-01
-- [ ] Full npm/pnpm × Next.js 14/15/16 matrix on `main` CI
+- [x] npm/pnpm × Next.js 14/15/16 public-registry matrix — 2026-08-02
+- [x] Every combination installed `next-ai-ready@0.1.0-alpha.14`
+- [x] `init`, artifact build, `doctor`, and production build passed in every combination
+- [x] Full npm/pnpm × Next.js 14/15/16 tarball matrix on `main` CI
 - [ ] Manual `/tmp` + `create-next-app` + dev + curl (optional full UX)

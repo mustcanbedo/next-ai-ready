@@ -1826,7 +1826,7 @@ pnpm add next-ai-ready@alpha zod@^4
 
 This installs the meta package which re-exports everything you need and provides the CLI.
 
-> **Release channel:** this site tracks `main`; npm currently serves `0.1.0-alpha.14`. Its complete internal dependency chain passed a clean registry install, CLI workflow, and Next.js 15 production build on August 2, 2026.
+> **Release channel:** this site tracks `main`; npm currently serves `0.1.0-alpha.14`. On August 2, 2026, it passed clean public-registry installs, the CLI workflow, and production builds across npm/pnpm × Next.js 14/15/16. The authenticated production MCP endpoint also passed initialize and all three page discovery calls.
 
 ## Package exports (N-14)
 
@@ -3814,7 +3814,7 @@ pnpm add next-ai-ready@alpha zod@^4
 
 这会安装 meta 包，重新导出全部 API 并提供 CLI。
 
-> **发布渠道：** 本站跟随 `main`，npm 当前为 `0.1.0-alpha.14`。完整内部依赖链已于 2026-08-02 通过公共 registry 干净安装、CLI 流程和 Next.js 15 生产构建验证。
+> **发布渠道：** 本站跟随 `main`，npm 当前为 `0.1.0-alpha.14`。2026-08-02 已通过公共 registry 的 npm/pnpm × Next.js 14/15/16 干净安装、CLI 流程和生产构建；生产 MCP 也已通过带认证 initialize 与三个页面发现工具调用。
 
 ## 包导出说明（N-14）
 

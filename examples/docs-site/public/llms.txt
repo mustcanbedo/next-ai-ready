@@ -2,7 +2,7 @@
 
 > AEO + Agent-API layer for Next.js App Router. Make your site readable by AI and callable by agents.
 
-<!-- Last updated: 2026-08-01 -->
+<!-- Last updated: 2026-08-02 -->
 
 ## Home
 

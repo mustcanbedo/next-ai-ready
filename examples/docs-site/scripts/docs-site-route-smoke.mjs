@@ -143,6 +143,18 @@ async function main() {
     contentType: "text/markdown",
     includes: "# ",
   });
+  await expectResponse("/en/docs/guides/nextjs-llms-txt", {
+    contentType: "text/html",
+    includes: "How to add llms.txt to Next.js",
+  });
+  await expectResponse("/en/docs/guides/nextjs-llms-txt.md", {
+    contentType: "text/markdown",
+    includes: "# How to add llms.txt to Next.js",
+  });
+  await expectResponse("/zh/docs/guides/nextjs-llms-txt.md", {
+    contentType: "text/markdown",
+    includes: "# 如何为 Next.js 添加 llms.txt",
+  });
   await expectResponse("/en/docs/introduction.ai.json", {
     contentType: "application/json",
     includes: '"route": "/en/docs/introduction"',

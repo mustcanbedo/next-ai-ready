@@ -1599,6 +1599,128 @@ No. This site uses a simplified Markdown renderer for UI; the build pipeline run
 
 <!-- END /en/docs/guides/mdx-content -->
 
+<!-- BEGIN /en/docs/guides/nextjs-llms-txt -->
+# How to add llms.txt to Next.js
+URL: https://next-ai-ready.vercel.app/en/docs/guides/nextjs-llms-txt
+Updated: 2026-08-02
+
+# How to add llms.txt to Next.js
+
+The smallest implementation is a hand-written `public/llms.txt`. That is enough for a small,
+rarely changing site. Use a build integration when the file must stay synchronized with many
+pages, page summaries, Markdown representations, structured data, or agent tools.
+
+This guide adds those interfaces to an existing Next.js App Router project without changing its UI.
+
+## See a production example
+
+This documentation site uses the same integration described below:
+
+- [Production llms.txt](https://next-ai-ready.vercel.app/llms.txt)
+- [This installation page as Markdown](https://next-ai-ready.vercel.app/en/docs/installation.md)
+- [Production OpenAPI document](https://next-ai-ready.vercel.app/openapi.json)
+- [Production tool manifest](https://next-ai-ready.vercel.app/tools.json)
+- [Source for the deployed documentation site](https://github.com/mustcanbedo/next-ai-ready/tree/main/examples/docs-site)
+
+The production site also passes all 25 checks in the pinned Vercel Agent Readability CLI baseline.
+That score measures technical readability, not search position or citation.
+
+## 1. Install the package
+
+From an existing Next.js App Router project:
+
+```bash
+pnpm add next-ai-ready@alpha zod@^4
+pnpm exec next-ai-ready init
+```
+
+`init` creates explicit route handlers, an AI-ready configuration file, a starter action, and the
+Next.js rewrite configuration. Existing page components remain unchanged.
+
+## 2. Add AI-readable content
+
+Create an MDX source such as `content/about.mdx`:
+
+```markdown
+---
+title: About Acme
+summary: Acme helps support teams find verified product answers.
+author: Acme team
+updatedAt: 2026-08-02
+questions:
+  - q: What does Acme do?
+    a: Acme helps support teams search verified product documentation.
+---
+
+# About Acme
+
+Acme gives support teams one searchable source for verified product answers.
+```
+
+Clear titles, summaries, authorship, freshness, and direct answers are useful to people as well as
+AI consumers. Do not add claims or FAQ answers that the visible page cannot support.
+
+## 3. Generate the interfaces
+
+```bash
+pnpm exec next-ai-ready build
+pnpm exec next-ai-ready doctor --score
+```
+
+The build produces discovery files and the semantic graph used by the runtime handlers. A basic
+deployment exposes:
+
+- `/llms.txt` for concise site discovery.
+- `/llms-full.txt` for combined site context.
+- `/<page>.md` for clean page retrieval.
+- `/sitemap.md` for agent-readable navigation.
+- `/openapi.json` and `/tools.json` for declared capabilities.
+- `/api/mcp` when you choose to expose MCP resources and tools.
+
+The setup is ready when `doctor` reports zero errors and `llms.txt` lists the intended pages.
+Warnings describe optional quality or production settings that still need attention.
+
+## 4. Verify the deployed site
+
+After deploying, inspect the real public responses rather than relying only on build artifacts:
+
+```bash
+pnpm exec next-ai-ready audit https://example.com --version 3
+```
+
+Also open `https://example.com/llms.txt` and one real page such as
+`https://example.com/about.md`. Confirm that canonical URLs point to the production origin and that
+normal browser pages still return HTML.
+
+## Add callable actions later
+
+`llms.txt` and Markdown solve the first problem: helping AI systems discover and read content.
+Callable actions are a separate production decision. Add them only when an agent needs to perform a
+specific operation, then configure authentication, input validation, and audit logging.
+
+## What this does not guarantee
+
+Technical AI-readiness cannot guarantee that an AI product will crawl, index, rank, quote, or cite a
+page. Treat these endpoints as reliable machine-facing access to good source content, then measure
+actual visits, retrievals, citations, and business outcomes separately.
+
+## FAQ
+
+### Does Next.js generate llms.txt automatically?
+
+No. Add a static file yourself or use a build integration such as next-ai-ready to keep it synchronized with your content.
+
+### Does llms.txt guarantee that AI systems will cite my site?
+
+No. It improves technical discovery and readability but does not guarantee crawling, indexing, ranking, or citation.
+
+### How do I verify llms.txt after deployment?
+
+Open /llms.txt and a page Markdown URL, then run next-ai-ready audit against the production origin.
+
+
+<!-- END /en/docs/guides/nextjs-llms-txt -->
+
 <!-- BEGIN /en/docs/guides/quickstart -->
 # Quickstart
 URL: https://next-ai-ready.vercel.app/en/docs/guides/quickstart
@@ -3598,6 +3720,123 @@ summary、questions、tags、updatedAt、author 可提升 llms.txt、FAQ 节点�
 
 
 <!-- END /zh/docs/guides/mdx-content -->
+
+<!-- BEGIN /zh/docs/guides/nextjs-llms-txt -->
+# 如何为 Next.js 添加 llms.txt
+URL: https://next-ai-ready.vercel.app/zh/docs/guides/nextjs-llms-txt
+Updated: 2026-08-02
+
+# 如何为 Next.js 添加 llms.txt
+
+最小实现是在 `public/llms.txt` 中手写内容。对于页面少、更新不频繁的网站，这已经足够。
+当文件需要与大量页面、摘要、Markdown、结构化数据或 Agent 工具保持同步时，再使用构建集成。
+
+本指南为现有 Next.js App Router 项目添加这些机器接口，不改动现有 UI。
+
+## 查看生产案例
+
+当前文档站正在运行下方同一套集成：
+
+- [生产 llms.txt](https://next-ai-ready.vercel.app/llms.txt)
+- [安装页面的 Markdown](https://next-ai-ready.vercel.app/zh/docs/installation.md)
+- [生产 OpenAPI 文档](https://next-ai-ready.vercel.app/openapi.json)
+- [生产工具清单](https://next-ai-ready.vercel.app/tools.json)
+- [文档站生产源码](https://github.com/mustcanbedo/next-ai-ready/tree/main/examples/docs-site)
+
+生产站还通过了固定版本 Vercel Agent Readability CLI 的全部 25 项检查。该分数只衡量技术
+可读性，不代表搜索位置或引用效果。
+
+## 1. 安装
+
+在已有 Next.js App Router 项目中运行：
+
+```bash
+pnpm add next-ai-ready@alpha zod@^4
+pnpm exec next-ai-ready init
+```
+
+`init` 会创建显式的 route handler、AI-ready 配置、示例 Action 和 Next.js rewrite 配置，
+不会修改现有页面组件。
+
+## 2. 添加 AI 可读内容
+
+创建 `content/about.mdx`：
+
+```markdown
+---
+title: 关于 Acme
+summary: Acme 帮助客服团队查找经过核验的产品答案。
+author: Acme 团队
+updatedAt: 2026-08-02
+questions:
+  - q: Acme 提供什么服务？
+    a: Acme 帮助客服团队搜索经过核验的产品文档。
+---
+
+# 关于 Acme
+
+Acme 为客服团队提供一个可搜索的可信产品答案来源。
+```
+
+清晰的标题、摘要、作者、更新时间和直接回答同时服务人类与 AI。不要添加可见页面无法支持
+的营销主张或 FAQ 答案。
+
+## 3. 生成机器接口
+
+```bash
+pnpm exec next-ai-ready build
+pnpm exec next-ai-ready doctor --score
+```
+
+构建会生成 discovery 文件和运行时 handler 使用的语义图谱。基础部署会提供：
+
+- `/llms.txt`：简洁的站点发现入口。
+- `/llms-full.txt`：合并后的全站上下文。
+- `/<page>.md`：干净的逐页内容。
+- `/sitemap.md`：供 Agent 使用的页面导航。
+- `/openapi.json` 和 `/tools.json`：声明式能力描述。
+- `/api/mcp`：按需提供 MCP 资源与工具。
+
+当 `doctor` 没有错误，并且 `llms.txt` 列出预期页面时，基础接入完成。警告表示仍需处理的
+可选质量项或生产配置。
+
+## 4. 验证生产站
+
+部署后应检查真实公开响应，而不只检查构建产物：
+
+```bash
+pnpm exec next-ai-ready audit https://example.com --version 3
+```
+
+同时打开 `https://example.com/llms.txt` 和类似 `https://example.com/about.md` 的真实页面，
+确认 canonical URL 指向生产域名，普通浏览器页面仍返回 HTML。
+
+## 后续再添加可调用 Action
+
+`llms.txt` 和 Markdown 首先解决 AI 系统发现、读取内容的问题。可调用 Action 是另一项生产
+决策。只有当 Agent 确实需要执行具体操作时再添加，并同时配置鉴权、输入校验和审计日志。
+
+## 它不能保证什么
+
+技术层面的 AI-readiness 不能保证某个 AI 产品一定抓取、收录、排名、引用或推荐页面。这些
+端点的价值是为优质源内容提供稳定的机器访问方式，实际访问、检索、引用和业务结果仍需单独衡量。
+
+## FAQ
+
+### Next.js 会自动生成 llms.txt 吗？
+
+不会。你可以手动添加静态文件，或者使用 next-ai-ready 等构建集成让它与内容保持同步。
+
+### 添加 llms.txt 能保证 AI 引用网站吗？
+
+不能。它改善技术发现和可读性，但不能保证抓取、收录、排名或引用。
+
+### 部署后如何验证 llms.txt？
+
+打开 /llms.txt 和一个页面 Markdown URL，再使用 next-ai-ready audit 检查生产域名。
+
+
+<!-- END /zh/docs/guides/nextjs-llms-txt -->
 
 <!-- BEGIN /zh/docs/guides/quickstart -->
 # 快速开始

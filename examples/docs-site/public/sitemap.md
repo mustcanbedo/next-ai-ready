@@ -21,6 +21,7 @@
 - [i18n and AI-friendly URLs](https://next-ai-ready.vercel.app/en/docs/guides/i18n-ai-urls): Middleware, locale prefixes, and SemanticGraph routes for multilingual sites.
 - [MCP Integration](https://next-ai-ready.vercel.app/en/docs/guides/mcp-integration): Connect your actions to Claude Desktop, Cursor, and other MCP clients.
 - [Writing MDX Content](https://next-ai-ready.vercel.app/en/docs/guides/mdx-content): How to write MDX files that the semantic compiler can extract meaning from.
+- [How to add llms.txt to Next.js](https://next-ai-ready.vercel.app/en/docs/guides/nextjs-llms-txt): Add llms.txt, full-site context, and per-page Markdown endpoints to a Next.js App Router project and verify the production result.
 - [Quickstart](https://next-ai-ready.vercel.app/en/docs/guides/quickstart): Complete a verified next-ai-ready setup in about 10 minutes.
 - [Robots.txt](https://next-ai-ready.vercel.app/en/docs/guides/robots-txt): Configure your robots.txt to explicitly allow or block AI crawlers.
 - [Installation](https://next-ai-ready.vercel.app/en/docs/installation): Install next-ai-ready and scaffold your first config.
@@ -42,6 +43,7 @@
 - [国际化与 AI 友好 URL](https://next-ai-ready.vercel.app/zh/docs/guides/i18n-ai-urls): 多语言站点的 middleware、locale 前缀与 SemanticGraph 路由策略。
 - [MCP 集成](https://next-ai-ready.vercel.app/zh/docs/guides/mcp-integration): 将你的 action 连接到 Claude Desktop、Cursor 和其他 MCP 客户端。
 - [编写 MDX 内容](https://next-ai-ready.vercel.app/zh/docs/guides/mdx-content): 如何编写语义编译器能提取含义的 MDX 文件。
+- [如何为 Next.js 添加 llms.txt](https://next-ai-ready.vercel.app/zh/docs/guides/nextjs-llms-txt): 为 Next.js App Router 项目添加 llms.txt、全站上下文和逐页 Markdown，并验证生产结果。
 - [快速开始](https://next-ai-ready.vercel.app/zh/docs/guides/quickstart): 约 10 分钟完成可验证的 next-ai-ready 基础接入。
 - [Robots.txt](https://next-ai-ready.vercel.app/zh/docs/guides/robots-txt): 配置 robots.txt 以显式允许或阻止 AI 爬虫。
 - [安装](https://next-ai-ready.vercel.app/zh/docs/installation): 安装 next-ai-ready 并生成首个配置。

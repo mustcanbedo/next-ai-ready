@@ -1,0 +1,119 @@
+---
+title: How to add llms.txt to Next.js
+summary: Add llms.txt, full-site context, and per-page Markdown endpoints to a Next.js App Router project and verify the production result.
+order: 8
+questions:
+  - q: Does Next.js generate llms.txt automatically?
+    a: No. Add a static file yourself or use a build integration such as next-ai-ready to keep it synchronized with your content.
+  - q: Does llms.txt guarantee that AI systems will cite my site?
+    a: No. It improves technical discovery and readability but does not guarantee crawling, indexing, ranking, or citation.
+  - q: How do I verify llms.txt after deployment?
+    a: Open /llms.txt and a page Markdown URL, then run next-ai-ready audit against the production origin.
+tags:
+  - nextjs
+  - llms.txt
+  - markdown
+  - tutorial
+updatedAt: '2026-08-02'
+author: next-ai-ready team
+---
+
+# How to add llms.txt to Next.js
+
+The smallest implementation is a hand-written `public/llms.txt`. That is enough for a small,
+rarely changing site. Use a build integration when the file must stay synchronized with many
+pages, page summaries, Markdown representations, structured data, or agent tools.
+
+This guide adds those interfaces to an existing Next.js App Router project without changing its UI.
+
+## See a production example
+
+This documentation site uses the same integration described below:
+
+- [Production llms.txt](https://next-ai-ready.vercel.app/llms.txt)
+- [This installation page as Markdown](https://next-ai-ready.vercel.app/en/docs/installation.md)
+- [Production OpenAPI document](https://next-ai-ready.vercel.app/openapi.json)
+- [Production tool manifest](https://next-ai-ready.vercel.app/tools.json)
+- [Source for the deployed documentation site](https://github.com/mustcanbedo/next-ai-ready/tree/main/examples/docs-site)
+
+The production site also passes all 25 checks in the pinned Vercel Agent Readability CLI baseline.
+That score measures technical readability, not search position or citation.
+
+## 1. Install the package
+
+From an existing Next.js App Router project:
+
+```bash
+pnpm add next-ai-ready@alpha zod@^4
+pnpm exec next-ai-ready init
+```
+
+`init` creates explicit route handlers, an AI-ready configuration file, a starter action, and the
+Next.js rewrite configuration. Existing page components remain unchanged.
+
+## 2. Add AI-readable content
+
+Create an MDX source such as `content/about.mdx`:
+
+```markdown
+---
+title: About Acme
+summary: Acme helps support teams find verified product answers.
+author: Acme team
+updatedAt: 2026-08-02
+questions:
+  - q: What does Acme do?
+    a: Acme helps support teams search verified product documentation.
+---
+
+# About Acme
+
+Acme gives support teams one searchable source for verified product answers.
+```
+
+Clear titles, summaries, authorship, freshness, and direct answers are useful to people as well as
+AI consumers. Do not add claims or FAQ answers that the visible page cannot support.
+
+## 3. Generate the interfaces
+
+```bash
+pnpm exec next-ai-ready build
+pnpm exec next-ai-ready doctor --score
+```
+
+The build produces discovery files and the semantic graph used by the runtime handlers. A basic
+deployment exposes:
+
+- `/llms.txt` for concise site discovery.
+- `/llms-full.txt` for combined site context.
+- `/<page>.md` for clean page retrieval.
+- `/sitemap.md` for agent-readable navigation.
+- `/openapi.json` and `/tools.json` for declared capabilities.
+- `/api/mcp` when you choose to expose MCP resources and tools.
+
+The setup is ready when `doctor` reports zero errors and `llms.txt` lists the intended pages.
+Warnings describe optional quality or production settings that still need attention.
+
+## 4. Verify the deployed site
+
+After deploying, inspect the real public responses rather than relying only on build artifacts:
+
+```bash
+pnpm exec next-ai-ready audit https://example.com --version 3
+```
+
+Also open `https://example.com/llms.txt` and one real page such as
+`https://example.com/about.md`. Confirm that canonical URLs point to the production origin and that
+normal browser pages still return HTML.
+
+## Add callable actions later
+
+`llms.txt` and Markdown solve the first problem: helping AI systems discover and read content.
+Callable actions are a separate production decision. Add them only when an agent needs to perform a
+specific operation, then configure authentication, input validation, and audit logging.
+
+## What this does not guarantee
+
+Technical AI-readiness cannot guarantee that an AI product will crawl, index, rank, quote, or cite a
+page. Treat these endpoints as reliable machine-facing access to good source content, then measure
+actual visits, retrievals, citations, and business outcomes separately.

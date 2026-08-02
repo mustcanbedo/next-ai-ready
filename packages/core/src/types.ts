@@ -345,7 +345,7 @@ export interface AiReadyHooks {
 
 export interface AiReadyConfig {
   site: SiteInfo;
-  /** Glob list for content discovery. Defaults to `["app/**\/*.{md,mdx}", "content/**\/*.mdx"]`. */
+  /** Glob list for content discovery. Defaults cover root and `src/` App Router/content directories. */
   content?: string[];
   /**
    * Either an inline list of actions, or a module path resolved relative to

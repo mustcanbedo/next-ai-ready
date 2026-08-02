@@ -69,7 +69,15 @@ export async function runBuild(opts: BuildOptions = {}): Promise<BuildResult> {
 
   log(`scanning content (cwd=${cwd})`);
   const source = config.contentSource ?? filesystemContentSource();
-  const entries = await source.scan({ cwd, patterns: config.content ?? ["app/**/*.{md,mdx}", "content/**/*.mdx"] });
+  const entries = await source.scan({
+    cwd,
+    patterns: config.content ?? [
+      "app/**/*.{md,mdx}",
+      "content/**/*.{md,mdx}",
+      "src/app/**/*.{md,mdx}",
+      "src/content/**/*.{md,mdx}",
+    ],
+  });
   log(`compiling ${entries.length} files`);
 
   const pages = await Promise.all(

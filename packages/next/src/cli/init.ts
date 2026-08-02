@@ -37,7 +37,12 @@ export default defineConfig({
     baseUrl: "https://example.com",
     description: "Replace this with a short description for AI search.",
   },
-  content: ["app/**/*.{md,mdx}", "content/**/*.mdx"],
+  content: [
+    "app/**/*.{md,mdx}",
+    "content/**/*.{md,mdx}",
+    "src/app/**/*.{md,mdx}",
+    "src/content/**/*.{md,mdx}",
+  ],
   actions: "./${actionsRel}",
   // Robots: build emits public/robots.txt. For dynamic rules use app/robots.ts + aiRobots().
 });

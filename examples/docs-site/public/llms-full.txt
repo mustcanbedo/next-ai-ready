@@ -1297,6 +1297,113 @@ Next.js loads instrumentation on Edge; Node-only hooks must stay in a separate f
 
 <!-- END /en/docs/guides/analytics -->
 
+<!-- BEGIN /en/docs/guides/fumadocs-ai-ready -->
+# Add llms.txt and Markdown endpoints to Fumadocs
+URL: https://next-ai-ready.vercel.app/en/docs/guides/fumadocs-ai-ready
+Updated: 2026-08-02
+
+# Add llms.txt and Markdown endpoints to Fumadocs
+
+[Fumadocs](https://www.fumadocs.dev/docs) provides the documentation UI, Source API, and search.
+`next-ai-ready` can read the same MDX collection to produce `/llms.txt`, page Markdown, semantic page
+discovery, and optional MCP resources without changing those Fumadocs responsibilities.
+
+This integration targets Fumadocs on Next.js App Router with a server deployment. It does not support
+a fully static `output: "export"` build because the machine-facing route handlers run at request time.
+
+## 1. Install and initialize
+
+From the Fumadocs Next.js application directory:
+
+```bash
+pnpm add next-ai-ready zod@^4
+pnpm exec next-ai-ready init
+```
+
+Keep `source.config.ts`, the generated Fumadocs source module, page layouts, and search routes intact.
+The initializer adds separate AI-facing handlers and configuration.
+
+## 2. Reuse the Fumadocs content collection
+
+Fumadocs MDX commonly stores documentation under `content/docs`. Point next-ai-ready at the same
+source files:
+
+```js
+import { defineConfig } from "next-ai-ready"
+
+export default defineConfig({
+  site: {
+    name: "Acme Docs",
+    baseUrl: "https://docs.example.com",
+    description: "Documentation for Acme developers.",
+  },
+  content: ["content/docs/**/*.{md,mdx}"],
+})
+```
+
+If the collection lives under `src/content/docs`, use that path instead. Existing `title`,
+`description`, `date`, and `author` frontmatter are reused. Add `updatedAt` only when the date is
+truthful and maintained.
+
+## 3. Wrap the Next.js config
+
+Fumadocs does not require a competing Next.js wrapper for its Source API. Preserve the project's
+existing options and wrap them with `withAiReady()`:
+
+```js
+import { withAiReady } from "next-ai-ready/config"
+
+const nextConfig = {
+  // Existing Fumadocs and Next.js options stay here.
+}
+
+export default withAiReady({ agentReadable: true })(nextConfig)
+```
+
+If another plugin already wraps the config, apply `withAiReady()` to that plugin's final result.
+
+## 4. Build and verify
+
+```bash
+pnpm exec next-ai-ready build
+pnpm exec next-ai-ready doctor --score
+pnpm build
+```
+
+After deployment:
+
+```bash
+curl -I https://docs.example.com/llms.txt
+curl -I https://docs.example.com/docs/getting-started.md
+pnpm exec next-ai-ready audit https://docs.example.com/docs/getting-started --version 3
+```
+
+Confirm that `/llms.txt` lists the intended Fumadocs pages, Markdown URLs use production canonicals,
+and browser requests still receive the normal Fumadocs UI.
+
+## Keep search responsibilities separate
+
+Fumadocs search serves people inside the documentation UI. next-ai-ready page discovery serves AI
+clients through Markdown, HTTP resources, and optional MCP. They may index the same content, but one
+does not need to replace the other.
+
+## FAQ
+
+### Does next-ai-ready replace Fumadocs Source API or search?
+
+No. Fumadocs continues to power the documentation UI, Source API, and search. next-ai-ready independently reads the same source files for machine-facing outputs.
+
+### Can I use the existing Fumadocs description frontmatter?
+
+Yes. next-ai-ready uses description as the summary when a summary field is not present.
+
+### Does this work with a fully static Fumadocs export?
+
+No. The runtime Markdown, content-negotiation, and MCP handlers require a Next.js server deployment.
+
+
+<!-- END /en/docs/guides/fumadocs-ai-ready -->
+
 <!-- BEGIN /en/docs/guides/i18n-ai-urls -->
 # i18n and AI-friendly URLs
 URL: https://next-ai-ready.vercel.app/en/docs/guides/i18n-ai-urls
@@ -1612,6 +1719,9 @@ pages, page summaries, Markdown representations, structured data, or agent tools
 
 This guide adds those interfaces to an existing Next.js App Router project without changing its UI.
 
+Using a documentation framework? Follow the dedicated [Nextra 4 guide](./nextra-ai-ready) or
+[Fumadocs guide](./fumadocs-ai-ready) for content paths, plugin composition, and deployment limits.
+
 ## See a production example
 
 This documentation site uses the same integration described below:
@@ -1720,6 +1830,116 @@ Open /llms.txt and a page Markdown URL, then run next-ai-ready audit against the
 
 
 <!-- END /en/docs/guides/nextjs-llms-txt -->
+
+<!-- BEGIN /en/docs/guides/nextra-ai-ready -->
+# Nextra llms.txt and Markdown endpoint setup
+URL: https://next-ai-ready.vercel.app/en/docs/guides/nextra-ai-ready
+Updated: 2026-08-02
+
+# Nextra llms.txt and Markdown endpoint setup
+
+[Nextra 4](https://nextra.site/docs) is a Next.js App Router framework for content-focused sites.
+Keep Nextra responsible for the human-facing documentation experience. Add `next-ai-ready` beside it
+when you want synchronized `/llms.txt`, page Markdown, semantic discovery, and optional MCP resources.
+
+This guide supports Nextra's root `content/` and `app/` layouts as well as their `src/` equivalents.
+It does not support Nextra 1-3 sites that still use the Pages Router.
+
+## 1. Install and initialize
+
+From the Nextra application directory:
+
+```bash
+pnpm add next-ai-ready zod@^4
+pnpm exec next-ai-ready init
+```
+
+`init` adds the AI routes and an `ai-ready.config.mjs` file. It does not replace Nextra's theme,
+catch-all page, search configuration, or MDX components.
+
+## 2. Point both systems at the same content
+
+Nextra supports Markdown and MDX in `content/`, `src/content/`, `app/`, or `src/app/`. The default
+next-ai-ready scanner covers those locations. For an explicit Nextra content directory, keep the
+configuration narrow:
+
+```js
+import { defineConfig } from "next-ai-ready"
+
+export default defineConfig({
+  site: {
+    name: "Acme Docs",
+    baseUrl: "https://docs.example.com",
+    description: "Documentation for Acme developers.",
+  },
+  content: ["content/**/*.{md,mdx}"],
+})
+```
+
+Use `src/content/**/*.{md,mdx}` instead when the Nextra project uses a `src/` directory. Frontmatter
+`description` is accepted as a page summary, so existing Nextra content does not need duplicate
+metadata solely for next-ai-ready.
+
+## 3. Compose the Next.js plugins
+
+Keep Nextra's existing plugin and wrap the resulting Next.js config with `withAiReady()`:
+
+```js
+import nextra from "nextra"
+import { withAiReady } from "next-ai-ready/config"
+
+const withNextra = nextra({
+  // Existing Nextra options stay here.
+})
+
+const nextConfig = withNextra({})
+
+export default withAiReady({ agentReadable: true })(nextConfig)
+```
+
+This composition preserves Nextra's MDX handling and adds content negotiation for AI-readable page
+responses. Do not enable Next.js `output: "export"`; the generated runtime handlers require a server.
+
+## 4. Build and verify
+
+```bash
+pnpm exec next-ai-ready build
+pnpm exec next-ai-ready doctor --score
+pnpm build
+```
+
+After deployment, verify one real page and the discovery files:
+
+```bash
+curl -I https://docs.example.com/llms.txt
+curl -I https://docs.example.com/docs/getting-started.md
+pnpm exec next-ai-ready audit https://docs.example.com/docs/getting-started --version 3
+```
+
+The Nextra HTML page must remain unchanged for browsers. The corresponding `.md` URL should return
+clean Markdown, and an unknown browser URL must continue to return a real `404`.
+
+## Start with the Knowledge plane
+
+For an initial Nextra integration, ship only content discovery and page retrieval. Add MCP or callable
+actions later when the site has a concrete agent workflow and an authentication policy.
+
+## FAQ
+
+### Does next-ai-ready replace Nextra?
+
+No. Nextra continues to render the documentation UI. next-ai-ready reads the same Markdown and MDX sources to generate machine-facing discovery and retrieval endpoints.
+
+### Does this work with Nextra 3 or the Pages Router?
+
+No. This integration targets Nextra 4 and the Next.js App Router. next-ai-ready does not currently support the Pages Router.
+
+### Can next-ai-ready scan a Nextra src/content directory?
+
+Yes. The default scanner covers content, app, src/content, and src/app directories with both .md and .mdx files.
+
+
+<!-- END /en/docs/guides/nextra-ai-ready -->
 
 <!-- BEGIN /en/docs/guides/quickstart -->
 # Quickstart
@@ -3422,6 +3642,110 @@ Next.js 在 Edge 也会加载 instrumentation；Node 专用 hooks 需在 nodejs 
 
 <!-- END /zh/docs/guides/analytics -->
 
+<!-- BEGIN /zh/docs/guides/fumadocs-ai-ready -->
+# 为 Fumadocs 添加 llms.txt 与 Markdown 端点
+URL: https://next-ai-ready.vercel.app/zh/docs/guides/fumadocs-ai-ready
+Updated: 2026-08-02
+
+# 为 Fumadocs 添加 llms.txt 与 Markdown 端点
+
+[Fumadocs](https://www.fumadocs.dev/docs) 负责文档界面、Source API 和搜索。`next-ai-ready`
+可以读取同一个 MDX 集合，生成 `/llms.txt`、页面 Markdown、语义页面发现和可选 MCP 资源，
+无需改变 Fumadocs 的这些职责。
+
+本接入面向使用 Next.js App Router 和服务器部署的 Fumadocs，不支持完全静态的
+`output: "export"`，因为机器端路由需要在请求时运行。
+
+## 1. 安装并初始化
+
+在 Fumadocs Next.js 应用目录执行：
+
+```bash
+pnpm add next-ai-ready zod@^4
+pnpm exec next-ai-ready init
+```
+
+保留 `source.config.ts`、Fumadocs 生成的 source 模块、页面布局和搜索路由。初始化器只增加独立
+的 AI 路由与配置。
+
+## 2. 复用 Fumadocs 内容集合
+
+Fumadocs MDX 通常把文档放在 `content/docs`。让 next-ai-ready 指向同一批源文件：
+
+```js
+import { defineConfig } from "next-ai-ready"
+
+export default defineConfig({
+  site: {
+    name: "Acme Docs",
+    baseUrl: "https://docs.example.com",
+    description: "Documentation for Acme developers.",
+  },
+  content: ["content/docs/**/*.{md,mdx}"],
+})
+```
+
+如果集合位于 `src/content/docs`，改用对应路径。已有 `title`、`description`、`date` 与
+`author` frontmatter 会被复用；只有在日期真实且持续维护时才增加 `updatedAt`。
+
+## 3. 包装 Next.js 配置
+
+Fumadocs Source API 本身不需要竞争性的 Next.js wrapper。保留项目现有配置，再用
+`withAiReady()` 包装：
+
+```js
+import { withAiReady } from "next-ai-ready/config"
+
+const nextConfig = {
+  // 原有 Fumadocs 与 Next.js 配置保留在这里。
+}
+
+export default withAiReady({ agentReadable: true })(nextConfig)
+```
+
+如果已有其他插件包装配置，把 `withAiReady()` 应用到该插件最终返回的结果。
+
+## 4. 构建并验证
+
+```bash
+pnpm exec next-ai-ready build
+pnpm exec next-ai-ready doctor --score
+pnpm build
+```
+
+部署后执行：
+
+```bash
+curl -I https://docs.example.com/llms.txt
+curl -I https://docs.example.com/docs/getting-started.md
+pnpm exec next-ai-ready audit https://docs.example.com/docs/getting-started --version 3
+```
+
+确认 `/llms.txt` 已列出预期 Fumadocs 页面、Markdown URL 使用生产 canonical，并且浏览器请求
+仍返回正常的 Fumadocs 界面。
+
+## 保持搜索职责分离
+
+Fumadocs 搜索服务于文档界面中的人类用户；next-ai-ready 页面发现通过 Markdown、HTTP 资源
+和可选 MCP 服务于 AI 客户端。两者可以索引相同内容，但不需要互相替代。
+
+## FAQ
+
+### next-ai-ready 会替换 Fumadocs Source API 或搜索吗？
+
+不会。Fumadocs 继续负责文档界面、Source API 和搜索；next-ai-ready 独立读取相同源文件并生成面向机器的输出。
+
+### 可以复用 Fumadocs 已有的 description frontmatter 吗？
+
+可以。没有 summary 时，next-ai-ready 会把 description 作为摘要。
+
+### 完全静态导出的 Fumadocs 可以使用吗？
+
+不可以。运行时 Markdown、内容协商和 MCP handlers 需要 Next.js 服务器部署。
+
+
+<!-- END /zh/docs/guides/fumadocs-ai-ready -->
+
 <!-- BEGIN /zh/docs/guides/i18n-ai-urls -->
 # 国际化与 AI 友好 URL
 URL: https://next-ai-ready.vercel.app/zh/docs/guides/i18n-ai-urls
@@ -3733,6 +4057,9 @@ Updated: 2026-08-02
 
 本指南为现有 Next.js App Router 项目添加这些机器接口，不改动现有 UI。
 
+如果项目使用文档框架，请查看专门的 [Nextra 4 指南](./nextra-ai-ready) 或
+[Fumadocs 指南](./fumadocs-ai-ready)，其中包含内容目录、插件组合与部署限制。
+
 ## 查看生产案例
 
 当前文档站正在运行下方同一套集成：
@@ -3837,6 +4164,114 @@ pnpm exec next-ai-ready audit https://example.com --version 3
 
 
 <!-- END /zh/docs/guides/nextjs-llms-txt -->
+
+<!-- BEGIN /zh/docs/guides/nextra-ai-ready -->
+# 为 Nextra 4 添加 llms.txt 与 Markdown 端点
+URL: https://next-ai-ready.vercel.app/zh/docs/guides/nextra-ai-ready
+Updated: 2026-08-02
+
+# 为 Nextra 4 添加 llms.txt 与 Markdown 端点
+
+[Nextra 4](https://nextra.site/docs) 是基于 Next.js App Router 的内容型站点框架。Nextra 继续
+负责面向用户的文档体验；当你需要同步生成 `/llms.txt`、页面 Markdown、语义发现和可选 MCP
+资源时，再把 `next-ai-ready` 放在它旁边。
+
+本指南支持 Nextra 的根目录 `content/`、`app/` 以及对应的 `src/` 目录，不支持仍使用 Pages
+Router 的 Nextra 1-3。
+
+## 1. 安装并初始化
+
+在 Nextra 应用目录执行：
+
+```bash
+pnpm add next-ai-ready zod@^4
+pnpm exec next-ai-ready init
+```
+
+`init` 会增加 AI 路由和 `ai-ready.config.mjs`，不会替换 Nextra 的主题、catch-all 页面、搜索
+配置或 MDX 组件。
+
+## 2. 让两个系统读取同一份内容
+
+Nextra 支持 `content/`、`src/content/`、`app/` 或 `src/app/` 下的 Markdown 与 MDX。默认
+next-ai-ready scanner 已覆盖这些位置。若希望显式限制 Nextra 内容目录，可以这样配置：
+
+```js
+import { defineConfig } from "next-ai-ready"
+
+export default defineConfig({
+  site: {
+    name: "Acme Docs",
+    baseUrl: "https://docs.example.com",
+    description: "Documentation for Acme developers.",
+  },
+  content: ["content/**/*.{md,mdx}"],
+})
+```
+
+项目使用 `src/` 时改为 `src/content/**/*.{md,mdx}`。next-ai-ready 会把 frontmatter 中的
+`description` 作为页面摘要，因此无需为了接入再复制一套 Nextra 元数据。
+
+## 3. 组合 Next.js 插件
+
+保留 Nextra 原有插件，再用 `withAiReady()` 包装最终 Next.js 配置：
+
+```js
+import nextra from "nextra"
+import { withAiReady } from "next-ai-ready/config"
+
+const withNextra = nextra({
+  // 原有 Nextra 配置保留在这里。
+})
+
+const nextConfig = withNextra({})
+
+export default withAiReady({ agentReadable: true })(nextConfig)
+```
+
+该组合保留 Nextra 的 MDX 处理，并增加 AI 页面内容协商。不要启用 Next.js
+`output: "export"`，生成的运行时 handler 需要服务器。
+
+## 4. 构建并验证
+
+```bash
+pnpm exec next-ai-ready build
+pnpm exec next-ai-ready doctor --score
+pnpm build
+```
+
+部署后验证真实页面与发现文件：
+
+```bash
+curl -I https://docs.example.com/llms.txt
+curl -I https://docs.example.com/docs/getting-started.md
+pnpm exec next-ai-ready audit https://docs.example.com/docs/getting-started --version 3
+```
+
+浏览器访问的 Nextra HTML 页面应保持不变，对应 `.md` URL 应返回干净 Markdown；不存在的普通
+浏览器页面仍必须返回真实 `404`。
+
+## 先从 Knowledge plane 开始
+
+首次接入 Nextra 时，只发布内容发现与页面读取能力。等项目出现明确 Agent 工作流和认证策略后，
+再增加 MCP 或可调用 actions。
+
+## FAQ
+
+### next-ai-ready 会替换 Nextra 吗？
+
+不会。Nextra 继续负责面向用户的文档界面；next-ai-ready 读取相同的 Markdown 与 MDX 源文件，生成面向机器的发现和读取端点。
+
+### Nextra 3 或 Pages Router 可以使用吗？
+
+不可以。本接入面向 Nextra 4 与 Next.js App Router；next-ai-ready 当前不支持 Pages Router。
+
+### 可以扫描 Nextra 的 src/content 目录吗？
+
+可以。默认 scanner 覆盖 content、app、src/content 和 src/app，并支持 .md 与 .mdx。
+
+
+<!-- END /zh/docs/guides/nextra-ai-ready -->
 
 <!-- BEGIN /zh/docs/guides/quickstart -->
 # 快速开始

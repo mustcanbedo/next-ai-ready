@@ -25,6 +25,7 @@ const getPageInput = z.object({
 
 const searchPagesInput = z.object({
   query: z.string().min(1).max(MAX_QUERY_LENGTH),
+  locale: z.string().min(1).max(64).optional(),
   limit: z.number().int().min(1).max(MAX_SEARCH_LIMIT).optional(),
 }).strict();
 
@@ -130,12 +131,13 @@ export function toMcpPageToolDefinitions(graph: SemanticGraph): McpToolDefinitio
     ),
     createGraphTool(
       "search_pages",
-      "Search page titles, routes, summaries, topics, questions, entities, and content using deterministic local lexical ranking.",
+      "Search page titles, routes, summaries, topics, questions, entities, and content using deterministic local lexical ranking. Optionally filter results by locale.",
       searchPagesInput,
       (input) => {
         const query = normalizeSearchText(input.query);
         const terms = [...new Set(tokenize(query))];
         if (!query || terms.length === 0) return toolError("invalid_input", "query must contain letters or numbers");
+        const locale = input.locale === undefined ? undefined : normalizeSearchText(input.locale);
 
         const limit = input.limit ?? DEFAULT_SEARCH_LIMIT;
         const ranked: RankedPage[] = [];
@@ -143,6 +145,7 @@ export function toMcpPageToolDefinitions(graph: SemanticGraph): McpToolDefinitio
         for (const route of safeGraphRoutes(graph)) {
           const node = pageNode(graph, route);
           if (!node) continue;
+          if (locale !== undefined && normalizeSearchText(node.locale ?? "") !== locale) continue;
           const candidate = rankPage(route, node, query, terms);
           if (candidate.score <= 0) continue;
           totalMatches += 1;

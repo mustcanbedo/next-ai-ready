@@ -1,0 +1,105 @@
+---
+title: 为 Nextra 4 添加 llms.txt 与 Markdown 端点
+summary: 在不替换 Nextra 导航、搜索、主题和 MDX 渲染的前提下，将 next-ai-ready 接入 Nextra 4 App Router 文档站。
+order: 9
+questions:
+  - q: next-ai-ready 会替换 Nextra 吗？
+    a: 不会。Nextra 继续负责面向用户的文档界面；next-ai-ready 读取相同的 Markdown 与 MDX 源文件，生成面向机器的发现和读取端点。
+  - q: Nextra 3 或 Pages Router 可以使用吗？
+    a: 不可以。本接入面向 Nextra 4 与 Next.js App Router；next-ai-ready 当前不支持 Pages Router。
+  - q: 可以扫描 Nextra 的 src/content 目录吗？
+    a: 可以。默认 scanner 覆盖 content、app、src/content 和 src/app，并支持 .md 与 .mdx。
+tags:
+  - nextra
+  - nextjs
+  - llms.txt
+  - mdx
+updatedAt: '2026-08-02'
+author: next-ai-ready team
+---
+
+# 为 Nextra 4 添加 llms.txt 与 Markdown 端点
+
+[Nextra 4](https://nextra.site/docs) 是基于 Next.js App Router 的内容型站点框架。Nextra 继续
+负责面向用户的文档体验；当你需要同步生成 `/llms.txt`、页面 Markdown、语义发现和可选 MCP
+资源时，再把 `next-ai-ready` 放在它旁边。
+
+本指南支持 Nextra 的根目录 `content/`、`app/` 以及对应的 `src/` 目录，不支持仍使用 Pages
+Router 的 Nextra 1-3。
+
+## 1. 安装并初始化
+
+在 Nextra 应用目录执行：
+
+```bash
+pnpm add next-ai-ready zod@^4
+pnpm exec next-ai-ready init
+```
+
+`init` 会增加 AI 路由和 `ai-ready.config.mjs`，不会替换 Nextra 的主题、catch-all 页面、搜索
+配置或 MDX 组件。
+
+## 2. 让两个系统读取同一份内容
+
+Nextra 支持 `content/`、`src/content/`、`app/` 或 `src/app/` 下的 Markdown 与 MDX。默认
+next-ai-ready scanner 已覆盖这些位置。若希望显式限制 Nextra 内容目录，可以这样配置：
+
+```js
+import { defineConfig } from "next-ai-ready"
+
+export default defineConfig({
+  site: {
+    name: "Acme Docs",
+    baseUrl: "https://docs.example.com",
+    description: "Documentation for Acme developers.",
+  },
+  content: ["content/**/*.{md,mdx}"],
+})
+```
+
+项目使用 `src/` 时改为 `src/content/**/*.{md,mdx}`。next-ai-ready 会把 frontmatter 中的
+`description` 作为页面摘要，因此无需为了接入再复制一套 Nextra 元数据。
+
+## 3. 组合 Next.js 插件
+
+保留 Nextra 原有插件，再用 `withAiReady()` 包装最终 Next.js 配置：
+
+```js
+import nextra from "nextra"
+import { withAiReady } from "next-ai-ready/config"
+
+const withNextra = nextra({
+  // 原有 Nextra 配置保留在这里。
+})
+
+const nextConfig = withNextra({})
+
+export default withAiReady({ agentReadable: true })(nextConfig)
+```
+
+该组合保留 Nextra 的 MDX 处理，并增加 AI 页面内容协商。不要启用 Next.js
+`output: "export"`，生成的运行时 handler 需要服务器。
+
+## 4. 构建并验证
+
+```bash
+pnpm exec next-ai-ready build
+pnpm exec next-ai-ready doctor --score
+pnpm build
+```
+
+部署后验证真实页面与发现文件：
+
+```bash
+curl -I https://docs.example.com/llms.txt
+curl -I https://docs.example.com/docs/getting-started.md
+pnpm exec next-ai-ready audit https://docs.example.com/docs/getting-started --version 3
+```
+
+浏览器访问的 Nextra HTML 页面应保持不变，对应 `.md` URL 应返回干净 Markdown；不存在的普通
+浏览器页面仍必须返回真实 `404`。
+
+## 先从 Knowledge plane 开始
+
+首次接入 Nextra 时，只发布内容发现与页面读取能力。等项目出现明确 Agent 工作流和认证策略后，
+再增加 MCP 或可调用 actions。

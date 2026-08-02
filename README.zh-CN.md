@@ -27,7 +27,7 @@ pnpm exec next-ai-ready doctor --score
 
 > **第三方工具基线：** 生产文档站在 2026-08-01 使用 Vercel 开源的 `@vercel/agent-readability@0.5.0` 获得 **100/100**。[查看机器可读原始结果](./docs/audit-baselines/vercel-agent-readability-0.5.0-2026-08-01.json)，或运行 `pnpm audit:vercel:site` 复现。该分数衡量技术层面的 Agent 可读性，不代表搜索排名、收录或引用效果。
 
-> **发布渠道：** 本仓库与文档站跟随 `main`；npm 当前为 `0.1.0-alpha.14`，已包含 TypeScript Action 加载修复、运行时专用入口、Audit v3 和 MCP 页面发现。2026-08-02 已通过公共 registry 的 npm/pnpm × Next.js 14/15/16 完整矩阵；生产 MCP 也已通过带认证 initialize 及 `list_pages`、`search_pages`、`get_page` 调用。
+> **发布渠道：** 本仓库与文档站跟随 `main`；npm 当前为 `0.1.0-alpha.15`，已包含 TypeScript `next.config.ts` 兼容修复、运行时专用入口、Audit v3 和 MCP 页面发现。2026-08-02 已通过公共 registry 的 npm/pnpm × Next.js 14/15/16 完整矩阵；生产 MCP 也已通过带认证 initialize 及 `list_pages`、`search_pages`、`get_page` 调用。
 
 ---
 
@@ -179,7 +179,7 @@ registerAiHooks({
 
 ### 包导入
 
-消费者应用只需安装 `next-ai-ready`。已发布的 `alpha.14` 支持以下导入：
+消费者应用只需安装 `next-ai-ready`。已发布的 `alpha.15` 支持以下导入：
 
 | 导入 | 用途 |
 |---|---|
@@ -191,7 +191,7 @@ registerAiHooks({
 
 ## 状态
 
-🚧 **Pre-alpha**（`0.1.0-alpha.14` 已发布到 npm `@alpha`）。公开包和生产 MCP 链路已通过上述发布验证；最终 GA 验收与后续工作见[当前改进台账](./docs/improvement-plan.zh-CN.md)。
+🚧 **Pre-alpha**（`0.1.0-alpha.15` 已发布到 npm `@alpha`）。公开包和生产 MCP 链路已通过上述发布验证；最终 GA 验收与后续工作见[当前改进台账](./docs/improvement-plan.zh-CN.md)。
 
 - ✅ **知识平面** — MDX → 语义图 → `llms.txt` / `*.md` / `*.ai.json` / JSON-LD
 - ✅ **能力平面** — `defineAction` → `/api/actions/<name>` + OpenAPI 3.1 / `tools.json` / `ai-plugin.json`

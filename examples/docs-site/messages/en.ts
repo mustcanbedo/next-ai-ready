@@ -6,7 +6,7 @@ const en = {
     github: "GitHub",
   },
   hero: {
-    badge: "npm alpha.14 · alpha.15 candidate",
+    badge: "npm alpha.15 · docs track main",
     title: "next-ai-ready",
     subtitle:
       "Add AI-readable discovery and Markdown endpoints to a Next.js App Router site in about 10 minutes. Add authenticated agent actions later, when you need them.",

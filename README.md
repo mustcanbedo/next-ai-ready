@@ -27,7 +27,7 @@ The basic setup is complete when `doctor` reports **0 errors** and `public/llms.
 
 > **Third-party tool baseline:** the production documentation scored **100/100** with Vercel's open-source `@vercel/agent-readability@0.5.0` on 2026-08-01. [Review the machine-readable result](./docs/audit-baselines/vercel-agent-readability-0.5.0-2026-08-01.json) or reproduce it with `pnpm audit:vercel:site`. This measures technical agent readability, not search ranking, indexing, or citation.
 
-> **Release channels:** this repository and the documentation site track `main`. npm currently serves `0.1.0-alpha.14`, including the TypeScript Action loader fix, focused runtime entrypoints, Audit v3, and MCP page discovery. On 2026-08-02, the public package passed the full npm/pnpm × Next.js 14/15/16 registry matrix, and the authenticated production MCP endpoint passed initialize plus `list_pages`, `search_pages`, and `get_page` calls.
+> **Release channels:** this repository and the documentation site track `main`. npm currently serves `0.1.0-alpha.15`, including TypeScript `next.config.ts` compatibility, focused runtime entrypoints, Audit v3, and MCP page discovery. On 2026-08-02, the public package passed the full npm/pnpm × Next.js 14/15/16 registry matrix, and the authenticated production MCP endpoint passed initialize plus `list_pages`, `search_pages`, and `get_page` calls.
 
 ---
 
@@ -179,7 +179,7 @@ Use `next-ai-ready/hooks` — not the main package entry — so Turbopack does n
 
 ### Package imports
 
-Install only `next-ai-ready` in consumer apps. The published `alpha.14` supports these imports:
+Install only `next-ai-ready` in consumer apps. The published `alpha.15` supports these imports:
 
 | Import | Use for |
 |---|---|
@@ -191,7 +191,7 @@ Install only `next-ai-ready` in consumer apps. The published `alpha.14` supports
 
 ## Status
 
-🚧 **Pre-alpha** (`0.1.0-alpha.14` published on npm `@alpha`). The public package and production MCP path have passed the release validation described above; see the [current improvement ledger](./docs/improvement-plan.zh-CN.md) for the final GA sign-off and post-GA work.
+🚧 **Pre-alpha** (`0.1.0-alpha.15` published on npm `@alpha`). The public package and production MCP path have passed the release validation described above; see the [current improvement ledger](./docs/improvement-plan.zh-CN.md) for the final GA sign-off and post-GA work.
 
 - ✅ **Knowledge plane** — MDX → semantic graph → `llms.txt` / `*.md` / `*.ai.json` / JSON-LD
 - ✅ **Capability plane** — `defineAction` → `/api/actions/<name>` + OpenAPI 3.1 / `tools.json` / `ai-plugin.json`

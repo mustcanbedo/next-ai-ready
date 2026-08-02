@@ -29,7 +29,7 @@ The basic setup is complete when `doctor` reports **0 errors** and `public/llms.
 - **Deployment checks** through `next-ai-ready doctor` and `next-ai-ready audit <url>`.
 - **Open standards** with no dependency on a single AI provider.
 
-This documentation site tracks `main`, while npm currently serves `0.1.0-alpha.14`. The published package includes the focused runtime exports, Audit v3, TypeScript Action loading, and MCP page discovery documented here.
+This documentation site tracks `main`, while npm currently serves `0.1.0-alpha.15`. The published package includes TypeScript `next.config.ts` compatibility, focused runtime exports, Audit v3, and MCP page discovery documented here.
 
 ## Verified readability baseline
 
@@ -1838,7 +1838,7 @@ pnpm exec next-ai-ready doctor --score
 
 The basic setup is complete when `doctor` reports **0 errors** and `public/llms.txt` lists your content. The detailed package map and command reference below are optional reading.
 
-> **Release channel:** this site tracks `main`; npm currently serves `0.1.0-alpha.14`. On August 2, 2026, it passed clean public-registry installs, the CLI workflow, and production builds across npm/pnpm × Next.js 14/15/16. The authenticated production MCP endpoint also passed initialize and all three page discovery calls.
+> **Release channel:** this site tracks `main`; npm currently serves `0.1.0-alpha.15`. On August 2, 2026, it passed clean public-registry installs, the CLI workflow, and production builds across npm/pnpm × Next.js 14/15/16. The authenticated production MCP endpoint also passed initialize and all three page discovery calls.
 
 ## Package exports
 
@@ -2045,7 +2045,7 @@ pnpm exec next-ai-ready doctor --score
 - 通过 `next-ai-ready doctor` 和 `next-ai-ready audit <url>` 提供**部署检查**。
 - 使用开放标准，不锁定单一 AI 提供商。
 
-本文档站跟随 `main`，npm 当前为 `0.1.0-alpha.14`。已发布包包含本站记录的运行时专用入口、Audit v3、TypeScript Action 加载与 MCP 页面发现。
+本文档站跟随 `main`，npm 当前为 `0.1.0-alpha.15`。已发布包包含 TypeScript `next.config.ts` 兼容修复、运行时专用入口、Audit v3 与 MCP 页面发现。
 
 ## 已验证的可读性基线
 
@@ -3838,7 +3838,7 @@ pnpm exec next-ai-ready doctor --score
 
 当 `doctor` 显示 **0 个错误**，且 `public/llms.txt` 已列出你的内容时，基础接入即完成。下方包结构和命令参考均为可选阅读。
 
-> **发布渠道：** 本站跟随 `main`，npm 当前为 `0.1.0-alpha.14`。2026-08-02 已通过公共 registry 的 npm/pnpm × Next.js 14/15/16 干净安装、CLI 流程和生产构建；生产 MCP 也已通过带认证 initialize 与三个页面发现工具调用。
+> **发布渠道：** 本站跟随 `main`，npm 当前为 `0.1.0-alpha.15`。2026-08-02 已通过公共 registry 的 npm/pnpm × Next.js 14/15/16 干净安装、CLI 流程和生产构建；生产 MCP 也已通过带认证 initialize 与三个页面发现工具调用。
 
 ## 包导出说明
 

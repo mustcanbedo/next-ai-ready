@@ -31,6 +31,17 @@ jobs:
           cache: pnpm
           registry-url: https://registry.npmjs.org
 
+      - name: Verify npm authentication
+        shell: bash
+        run: |
+          if [[ -z "${NODE_AUTH_TOKEN:-}" ]]; then
+            echo "::error::Repository secret NPM_TOKEN is missing or empty."
+            exit 1
+          fi
+          npm whoami --registry=https://registry.npmjs.org/
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 

@@ -4,7 +4,7 @@
 >
 > **审查日期：** 2026-07-26（alpha.11 + deployed audit + agent readability）
 >
-> **当前发布补充（2026-08-02）：** npm `@alpha` 为 `0.1.0-alpha.14`；Audit v3、MCP 页面发现、运行时专用入口与 TypeScript Action 加载均已发布。公共 registry 的 npm/pnpm × Next.js 14/15/16 矩阵及生产 MCP 带认证调用已通过；当前优先级见 [`improvement-plan.zh-CN.md`](./improvement-plan.zh-CN.md)。下方正文保留 alpha.11 审查快照。
+> **当前发布补充（2026-08-02）：** npm `@alpha` 为 `0.1.0-alpha.15`；Audit v3、MCP 页面发现、运行时专用入口与 TypeScript `next.config.ts` 兼容修复均已发布。公共 registry 的 npm/pnpm × Next.js 14/15/16 矩阵及生产 MCP 带认证调用已通过；当前优先级见 [`improvement-plan.zh-CN.md`](./improvement-plan.zh-CN.md)。下方正文保留 alpha.11 审查快照。
 > **测试状态：** 145+ tests / 9 packages · CI 含 `docs-site-smoke`
 
 ### 相关文档（分工）
@@ -352,6 +352,7 @@ canonical = `/openapi.json`、`/tools.json`；`buildAiPlugin()` 默认已改。D
 - [x] npm `@alpha` → **0.1.0-alpha.11**（2026-07-26；registry install smoke 通过）
 - [x] npm `@alpha` → **0.1.0-alpha.12**（2026-08-01；registry install smoke 通过）
 - [x] npm `@alpha` → **0.1.0-alpha.14**（2026-08-02；完整依赖链及 Next.js 15 registry smoke 通过）
+- [x] npm `@alpha` → **0.1.0-alpha.15**（2026-08-02；npm/pnpm × Next.js 14/15/16 registry 矩阵通过）
 - [x] Vercel `NEXT_AI_READY_MCP_TOKEN`（2026-08-01；Production Sensitive）
 
 ---

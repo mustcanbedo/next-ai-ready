@@ -107,29 +107,33 @@ async function packWorkspace(packDir) {
 }
 
 async function configureTarballResolution(dir, artifacts) {
-  if (PACKAGE_SOURCE !== "tarball") return;
-  const packageJsonPath = join(dir, "package.json");
-  const packageJson = JSON.parse(await readFile(packageJsonPath, "utf8"));
-  const scopedArtifacts = artifacts.filter(({ name }) => name.startsWith("@next-ai-ready/"));
-  const overrides = Object.fromEntries(
-    scopedArtifacts.map(({ name, tarball }) => [name, `file:${tarball}`]),
-  );
-  packageJson.pnpm = {
-    ...(packageJson.pnpm ?? {}),
-    overrides,
-  };
-  packageJson.overrides = overrides;
-  await writeFile(packageJsonPath, JSON.stringify(packageJson, null, 2) + "\n");
+  let overrides = {};
+  if (PACKAGE_SOURCE === "tarball") {
+    const packageJsonPath = join(dir, "package.json");
+    const packageJson = JSON.parse(await readFile(packageJsonPath, "utf8"));
+    const scopedArtifacts = artifacts.filter(({ name }) => name.startsWith("@next-ai-ready/"));
+    overrides = Object.fromEntries(
+      scopedArtifacts.map(({ name, tarball }) => [name, `file:${tarball}`]),
+    );
+    packageJson.pnpm = {
+      ...(packageJson.pnpm ?? {}),
+      overrides,
+    };
+    packageJson.overrides = overrides;
+    await writeFile(packageJsonPath, JSON.stringify(packageJson, null, 2) + "\n");
+    await writeFile(join(dir, ".npmrc"), "@next-ai-ready:registry=http://127.0.0.1:9/\n");
+  }
+
   if (PACKAGE_MANAGER === "pnpm") {
     const workspaceOverrides = Object.entries(overrides)
       .map(([name, tarball]) => `  ${JSON.stringify(name)}: ${JSON.stringify(tarball)}`)
       .join("\n");
+    const overridesBlock = workspaceOverrides ? `overrides:\n${workspaceOverrides}\n` : "";
     await writeFile(
       join(dir, "pnpm-workspace.yaml"),
-      `packages:\n  - "."\noverrides:\n${workspaceOverrides}\nallowBuilds:\n  sharp: true\n`,
+      `packages:\n  - "."\n${overridesBlock}allowBuilds:\n  sharp: true\n`,
     );
   }
-  await writeFile(join(dir, ".npmrc"), "@next-ai-ready:registry=http://127.0.0.1:9/\n");
 }
 
 async function installConsumerDependencies(dir) {
@@ -159,7 +163,7 @@ async function expectedRegistryVersion() {
   return version;
 }
 
-async function configureConsumerManifest(dir, artifacts) {
+async function configureConsumerManifest(dir, artifacts, expectedMetaVersion) {
   const packageJsonPath = join(dir, "package.json");
   const packageJson = JSON.parse(await readFile(packageJsonPath, "utf8"));
   const metaArtifact = artifacts.find(({ name }) => name === "next-ai-ready");
@@ -175,7 +179,7 @@ async function configureConsumerManifest(dir, artifacts) {
   packageJson.dependencies = {
     "next-ai-ready": PACKAGE_SOURCE === "tarball"
       ? `file:${metaArtifact.tarball}`
-      : REGISTRY_TAG,
+      : expectedMetaVersion,
     next: `^${NEXT_VERSION}`,
     react: reactVersion,
     "react-dom": reactVersion,
@@ -253,7 +257,7 @@ async function main() {
     );
 
     const artifacts = PACKAGE_SOURCE === "tarball" ? await packWorkspace(packDir) : [];
-    await configureConsumerManifest(dir, artifacts);
+    await configureConsumerManifest(dir, artifacts, expectedMetaVersion);
     await configureTarballResolution(dir, artifacts);
     console.log(`[external] installing next-ai-ready (${PACKAGE_SOURCE}) …`);
     await installConsumerDependencies(dir);

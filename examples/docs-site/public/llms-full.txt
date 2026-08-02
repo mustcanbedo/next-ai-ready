@@ -14,7 +14,7 @@ Add AI-readable discovery and Markdown endpoints to a Next.js App Router site in
 ## Start in 10 minutes
 
 ```bash
-pnpm add next-ai-ready@alpha zod@^4
+pnpm add next-ai-ready zod@^4
 pnpm exec next-ai-ready init
 pnpm exec next-ai-ready build
 pnpm exec next-ai-ready doctor --score
@@ -29,7 +29,7 @@ The basic setup is complete when `doctor` reports **0 errors** and `public/llms.
 - **Deployment checks** through `next-ai-ready doctor` and `next-ai-ready audit <url>`.
 - **Open standards** with no dependency on a single AI provider.
 
-This documentation site tracks `main`, while npm currently serves `0.1.0-alpha.15`. The published package includes TypeScript `next.config.ts` compatibility, focused runtime exports, Audit v3, and MCP page discovery documented here.
+This documentation site tracks `main`, while npm `latest` and `alpha` currently serve `0.1.0-alpha.16`. The published package includes TypeScript `next.config.ts` compatibility, focused runtime exports, Audit v3, MCP page discovery, and improved npm discovery metadata documented here.
 
 ## Verified readability baseline
 
@@ -477,7 +477,7 @@ Add this to any MDX file:
 export const semantic = {
   topics: ["install", "quickstart", "pnpm"],
   questions: [
-    { q: "How do I install next-ai-ready?", a: "Run `pnpm add next-ai-ready@alpha`." },
+    { q: "How do I install next-ai-ready?", a: "Run `pnpm add next-ai-ready`." },
     { q: "Do I need Zod?", a: "Yes, Zod v4 is required for actions." },
   ],
   entities: [
@@ -834,7 +834,7 @@ export const semantic = {
   summary: "How to install the CLI tool.",
   topics: ["installation", "cli"],
   questions: [
-    { q: "How do I install?", a: "Run pnpm add next-ai-ready@alpha." }
+    { q: "How do I install?", a: "Run pnpm add next-ai-ready." }
   ],
 };
 ```
@@ -1529,7 +1529,7 @@ For richer extraction, export a `semantic` object from your MDX:
 export const semantic = {
   topics: ["install", "quickstart", "pnpm"],
   questions: [
-    { q: "How do I install next-ai-ready?", a: "Run `pnpm add next-ai-ready@alpha`." },
+    { q: "How do I install next-ai-ready?", a: "Run `pnpm add next-ai-ready`." },
     { q: "Do I need Zod?", a: "Yes, Zod v4 is required for actions." },
   ],
   entities: [
@@ -1551,7 +1551,7 @@ Use `##` headings to break your page into sections. Each heading becomes a separ
 ```text
 ## Installation
 
-Run `pnpm add next-ai-ready@alpha`.
+Run `pnpm add next-ai-ready`.
 
 ## Configuration
 
@@ -1565,7 +1565,7 @@ The compiler preserves heading IDs for stable anchor links. AI consumers can cit
 Use fenced code blocks with language tags. Wrap your code in triple backticks with a language identifier:
 
 ```bash
-pnpm add next-ai-ready@alpha
+pnpm add next-ai-ready
 ```
 
 The compiler strips code blocks to plain text in the Markdown body but preserves them in the HTML output.
@@ -1630,7 +1630,7 @@ That score measures technical readability, not search position or citation.
 From an existing Next.js App Router project:
 
 ```bash
-pnpm add next-ai-ready@alpha zod@^4
+pnpm add next-ai-ready zod@^4
 pnpm exec next-ai-ready init
 ```
 
@@ -1735,7 +1735,7 @@ This guide takes you from zero to a verified AI-readable Next.js setup in about 
 **Option A — template (fastest):**
 
 ```bash
-npm create next-ai-ready@alpha my-site
+npm create next-ai-ready my-site
 cd my-site
 npm install
 npx next-ai-ready init
@@ -1748,7 +1748,7 @@ The scaffold supplies a runnable minimal App Router TypeScript app and starter M
 ```bash
 npx create-next-app@latest my-site --typescript --app --tailwind
 cd my-site
-pnpm add next-ai-ready@alpha zod@^4
+pnpm add next-ai-ready zod@^4
 npx next-ai-ready init
 ```
 
@@ -1944,7 +1944,7 @@ Updated: 2026-08-02
 ## Install
 
 ```bash
-pnpm add next-ai-ready@alpha zod@^4
+pnpm add next-ai-ready zod@^4
 ```
 
 This installs the meta package which re-exports everything you need and provides the CLI.
@@ -1960,7 +1960,7 @@ pnpm exec next-ai-ready doctor --score
 
 The basic setup is complete when `doctor` reports **0 errors** and `public/llms.txt` lists your content. The detailed package map and command reference below are optional reading.
 
-> **Release channel:** this site tracks `main`; npm currently serves `0.1.0-alpha.15`. On August 2, 2026, it passed clean public-registry installs, the CLI workflow, and production builds across npm/pnpm × Next.js 14/15/16. The authenticated production MCP endpoint also passed initialize and all three page discovery calls.
+> **Release channel:** this site tracks `main`; npm `latest` and `alpha` currently serve `0.1.0-alpha.16`. On August 2, 2026, the published `latest` passed clean public-registry `pnpm + Next.js 16` and `npm + Next.js 15` installs, the CLI workflow, and production builds. The authenticated production MCP endpoint also passed initialize and all three page discovery calls.
 
 ## Package exports
 
@@ -1972,7 +1972,7 @@ The basic setup is complete when `doctor` reports **0 errors** and `public/llms.
 | `next-ai-ready/actions`, `/config`, `/json-ld`, `/robots` | No or runtime-specific     | Focused APIs that avoid loading unrelated build code                        |
 | `next-ai-ready/audit`                                     | No                         | Programmatic Audit without the CLI dispatcher                               |
 
-Install **one** meta package for typical apps: `pnpm add next-ai-ready@alpha`. The `@next-ai-ready/*` scoped packages are used internally; you do not need to add them separately.
+Install **one** meta package for typical apps: `pnpm add next-ai-ready`. The `@next-ai-ready/*` scoped packages are used internally; you do not need to add them separately.
 
 `jiti` is a runtime dependency of `@next-ai-ready/next` and is installed through the meta package. TypeScript `ai-ready.config.ts` files therefore work without adding `jiti` yourself.
 
@@ -1989,7 +1989,7 @@ Only **`next-ai-ready`** exposes the `next-ai-ready` CLI binary. `@next-ai-ready
 ## Scaffold (recommended)
 
 ```bash
-npm create next-ai-ready@alpha my-site
+npm create next-ai-ready my-site
 cd my-site
 npm install
 npx next-ai-ready init
@@ -2100,7 +2100,7 @@ At the same time, AI agents are emerging. They need to **call your features** �
 ## How it works
 
 ```bash
-pnpm add next-ai-ready@alpha
+pnpm add next-ai-ready
 npx next-ai-ready init
 npx next-ai-ready build
 ```
@@ -2152,7 +2152,7 @@ Updated: 2026-08-02
 ## 10 分钟开始
 
 ```bash
-pnpm add next-ai-ready@alpha zod@^4
+pnpm add next-ai-ready zod@^4
 pnpm exec next-ai-ready init
 pnpm exec next-ai-ready build
 pnpm exec next-ai-ready doctor --score
@@ -2167,7 +2167,7 @@ pnpm exec next-ai-ready doctor --score
 - 通过 `next-ai-ready doctor` 和 `next-ai-ready audit <url>` 提供**部署检查**。
 - 使用开放标准，不锁定单一 AI 提供商。
 
-本文档站跟随 `main`，npm 当前为 `0.1.0-alpha.15`。已发布包包含 TypeScript `next.config.ts` 兼容修复、运行时专用入口、Audit v3 与 MCP 页面发现。
+本文档站跟随 `main`，npm 的 `latest` 与 `alpha` 当前均为 `0.1.0-alpha.16`。已发布包包含 TypeScript `next.config.ts` 兼容修复、运行时专用入口、Audit v3、MCP 页面发现与更完整的 npm 可发现性元数据。
 
 ## 已验证的可读性基线
 
@@ -2611,7 +2611,7 @@ Updated: 2026-06-02
 export const semantic = {
   topics: ["install", "quickstart", "pnpm"],
   questions: [
-    { q: "如何安装 next-ai-ready？", a: "运行 `pnpm add next-ai-ready@alpha`。" },
+    { q: "如何安装 next-ai-ready？", a: "运行 `pnpm add next-ai-ready`。" },
     { q: "需要 Zod 吗？", a: "是的，action 需要 Zod v4。" },
   ],
   entities: [
@@ -2963,7 +2963,7 @@ export const semantic = {
   summary: "如何安装 CLI 工具。",
   topics: ["安装", "cli"],
   questions: [
-    { q: "如何安装？", a: "运行 pnpm add next-ai-ready@alpha。" }
+    { q: "如何安装？", a: "运行 pnpm add next-ai-ready。" }
   ],
 };
 ```
@@ -3651,7 +3651,7 @@ author:
 export const semantic = {
   topics: ["install", "quickstart", "pnpm"],
   questions: [
-    { q: "如何安装 next-ai-ready？", a: "运行 `pnpm add next-ai-ready@alpha`。" },
+    { q: "如何安装 next-ai-ready？", a: "运行 `pnpm add next-ai-ready`。" },
     { q: "需要 Zod 吗？", a: "是的，action 需要 Zod v4。" },
   ],
   entities: [
@@ -3673,7 +3673,7 @@ export const semantic = {
 ```text
 ## 安装
 
-运行 `pnpm add next-ai-ready@alpha`。
+运行 `pnpm add next-ai-ready`。
 
 ## 配置
 
@@ -3687,7 +3687,7 @@ export const semantic = {
 使用带语言标签的围栏代码块。用三个反引号加语言标识符包裹代码：
 
 ```bash
-pnpm add next-ai-ready@alpha
+pnpm add next-ai-ready
 ```
 
 编译器在 Markdown body 中将代码块剥离为纯文本，但在 HTML 输出中保留。
@@ -3751,7 +3751,7 @@ Updated: 2026-08-02
 在已有 Next.js App Router 项目中运行：
 
 ```bash
-pnpm add next-ai-ready@alpha zod@^4
+pnpm add next-ai-ready zod@^4
 pnpm exec next-ai-ready init
 ```
 
@@ -3852,7 +3852,7 @@ Updated: 2026-08-02
 **方式 A — 模板（最快）：**
 
 ```bash
-npm create next-ai-ready@alpha my-site
+npm create next-ai-ready my-site
 cd my-site
 npm install
 npx next-ai-ready init
@@ -3865,7 +3865,7 @@ npx next-ai-ready init
 ```bash
 npx create-next-app@latest my-site --typescript --app --tailwind
 cd my-site
-pnpm add next-ai-ready@alpha zod@^4
+pnpm add next-ai-ready zod@^4
 npx next-ai-ready init
 ```
 
@@ -4061,7 +4061,7 @@ Updated: 2026-08-02
 ## 安装
 
 ```bash
-pnpm add next-ai-ready@alpha zod@^4
+pnpm add next-ai-ready zod@^4
 ```
 
 这会安装 meta 包，重新导出全部 API 并提供 CLI。
@@ -4077,7 +4077,7 @@ pnpm exec next-ai-ready doctor --score
 
 当 `doctor` 显示 **0 个错误**，且 `public/llms.txt` 已列出你的内容时，基础接入即完成。下方包结构和命令参考均为可选阅读。
 
-> **发布渠道：** 本站跟随 `main`，npm 当前为 `0.1.0-alpha.15`。2026-08-02 已通过公共 registry 的 npm/pnpm × Next.js 14/15/16 干净安装、CLI 流程和生产构建；生产 MCP 也已通过带认证 initialize 与三个页面发现工具调用。
+> **发布渠道：** 本站跟随 `main`，npm 的 `latest` 与 `alpha` 当前均为 `0.1.0-alpha.16`。2026-08-02 已从公共 registry 通过 `pnpm + Next.js 16` 与 `npm + Next.js 15` 的干净安装、CLI 流程和生产构建；生产 MCP 也已通过带认证 initialize 与三个页面发现工具调用。
 
 ## 包导出说明
 
@@ -4089,7 +4089,7 @@ pnpm exec next-ai-ready doctor --score
 | `next-ai-ready/actions`、`/config`、`/json-ld`、`/robots` | 否或运行时专用          | 避免加载无关构建代码的专用 API                                               |
 | `next-ai-ready/audit`                                  | 否                | 不加载 CLI 调度器的程序化 Audit                                           |
 
-典型应用只需：`pnpm add next-ai-ready@alpha`。`@next-ai-ready/*` 为内部包，无需单独安装。
+典型应用只需：`pnpm add next-ai-ready`。`@next-ai-ready/*` 为内部包，无需单独安装。
 
 `jiti` 已是 `@next-ai-ready/next` 的运行时依赖，并会随 meta 包安装。因此使用 TypeScript `ai-ready.config.ts` 时无需自行添加 `jiti`。
 
@@ -4106,7 +4106,7 @@ pnpm exec next-ai-ready doctor --score
 ## 脚手架（推荐）
 
 ```bash
-npm create next-ai-ready@alpha my-site
+npm create next-ai-ready my-site
 cd my-site
 npm install
 npx next-ai-ready init
@@ -4217,7 +4217,7 @@ Updated: 2026-06-02
 ## 工作原理
 
 ```bash
-pnpm add next-ai-ready@alpha
+pnpm add next-ai-ready
 npx next-ai-ready init
 npx next-ai-ready build
 ```

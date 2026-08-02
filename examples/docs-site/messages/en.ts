@@ -6,12 +6,12 @@ const en = {
     github: "GitHub",
   },
   hero: {
-    badge: "npm alpha.15 · docs track main",
+    badge: "npm alpha.16 · docs track main",
     title: "next-ai-ready",
     subtitle:
       "Add AI-readable discovery and Markdown endpoints to a Next.js App Router site in about 10 minutes. Add authenticated agent actions later, when you need them.",
     cta: "Start the 10-minute setup",
-    setup: "pnpm add next-ai-ready@alpha zod@^4\npnpm exec next-ai-ready init\npnpm exec next-ai-ready build\npnpm exec next-ai-ready doctor --score",
+    setup: "pnpm add next-ai-ready zod@^4\npnpm exec next-ai-ready init\npnpm exec next-ai-ready build\npnpm exec next-ai-ready doctor --score",
     success: "Done when doctor reports 0 errors and llms.txt lists your content.",
   },
   verification: {

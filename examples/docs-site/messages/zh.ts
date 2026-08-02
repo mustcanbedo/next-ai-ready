@@ -6,12 +6,12 @@ const zh = {
     github: "GitHub",
   },
   hero: {
-    badge: "npm alpha.15 · 文档跟随 main",
+    badge: "npm alpha.16 · 文档跟随 main",
     title: "next-ai-ready",
     subtitle:
       "约 10 分钟，为 Next.js App Router 站点增加供 AI 工具发现和读取的内容入口。需要时，再添加经过鉴权的 Agent Action。",
     cta: "开始 10 分钟接入",
-    setup: "pnpm add next-ai-ready@alpha zod@^4\npnpm exec next-ai-ready init\npnpm exec next-ai-ready build\npnpm exec next-ai-ready doctor --score",
+    setup: "pnpm add next-ai-ready zod@^4\npnpm exec next-ai-ready init\npnpm exec next-ai-ready build\npnpm exec next-ai-ready doctor --score",
     success: "当 doctor 显示 0 个错误，且 llms.txt 已列出你的内容时，即完成接入。",
   },
   verification: {

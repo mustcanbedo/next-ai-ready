@@ -1,5 +1,11 @@
 # @next-ai-ready/core
 
+## 0.1.0-alpha.13
+
+### Patch Changes
+
+- b972b61: Add searchable npm metadata, repository links, and a release-time metadata gate for every public package. The alpha release workflow can now explicitly promote verified user-facing packages to the `latest` dist-tag.
+
 ## 0.1.0-alpha.12
 
 ### Patch Changes

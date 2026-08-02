@@ -1,11 +1,23 @@
 {
   "name": "@next-ai-ready/openapi",
-  "version": "0.1.0-alpha.12",
+  "version": "0.1.0-alpha.13",
   "description": "ActionRegistry to OpenAPI 3.1, tools.json, ai-plugin.json.",
-  "keywords": ["nextjs", "openapi", "ai-agents", "tools", "json-schema"],
+  "keywords": [
+    "nextjs",
+    "openapi",
+    "ai-agents",
+    "tools",
+    "json-schema"
+  ],
   "homepage": "https://next-ai-ready.vercel.app/en",
-  "repository": { "type": "git", "url": "git+https://github.com/mustcanbedo/next-ai-ready.git", "directory": "packages/openapi" },
-  "bugs": { "url": "https://github.com/mustcanbedo/next-ai-ready/issues" },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mustcanbedo/next-ai-ready.git",
+    "directory": "packages/openapi"
+  },
+  "bugs": {
+    "url": "https://github.com/mustcanbedo/next-ai-ready/issues"
+  },
   "license": "MIT",
   "type": "module",
   "main": "./dist/index.js",

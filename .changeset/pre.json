@@ -29,6 +29,7 @@
     "next-route-context-compat",
     "published-semantic-jsonld",
     "runnable-next-scaffold",
+    "searchable-package-metadata",
     "typescript-actions-loader",
     "typescript-config-runtime"
   ]

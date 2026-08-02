@@ -1,15 +1,24 @@
 {
   "name": "@next-ai-ready/next",
-  "version": "0.1.0-alpha.15",
+  "version": "0.1.0-alpha.16",
   "description": "Next.js plugin, route handlers, build CLI.",
-  "keywords": ["nextjs", "aeo", "llms-txt", "mcp", "ai-agents", "app-router"],
+  "keywords": [
+    "nextjs",
+    "aeo",
+    "llms-txt",
+    "mcp",
+    "ai-agents",
+    "app-router"
+  ],
   "homepage": "https://next-ai-ready.vercel.app/en",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/mustcanbedo/next-ai-ready.git",
     "directory": "packages/next"
   },
-  "bugs": { "url": "https://github.com/mustcanbedo/next-ai-ready/issues" },
+  "bugs": {
+    "url": "https://github.com/mustcanbedo/next-ai-ready/issues"
+  },
   "license": "MIT",
   "type": "module",
   "main": "./dist/index.js",

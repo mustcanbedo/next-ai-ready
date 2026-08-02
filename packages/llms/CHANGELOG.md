@@ -1,5 +1,14 @@
 # @next-ai-ready/llms
 
+## 0.1.0-alpha.14
+
+### Patch Changes
+
+- b972b61: Add searchable npm metadata, repository links, and a release-time metadata gate for every public package. The alpha release workflow can now explicitly promote verified user-facing packages to the `latest` dist-tag.
+- Updated dependencies [b972b61]
+  - @next-ai-ready/core@0.1.0-alpha.13
+  - @next-ai-ready/semantic@0.1.0-alpha.13
+
 ## 0.1.0-alpha.13
 
 ### Patch Changes

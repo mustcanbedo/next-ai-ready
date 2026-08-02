@@ -1,11 +1,24 @@
 {
   "name": "@next-ai-ready/actions",
-  "version": "0.1.0-alpha.12",
+  "version": "0.1.0-alpha.13",
   "description": "defineAction registry, Zod validation, schema emission.",
-  "keywords": ["nextjs", "ai-agents", "actions", "tools", "zod", "openapi"],
+  "keywords": [
+    "nextjs",
+    "ai-agents",
+    "actions",
+    "tools",
+    "zod",
+    "openapi"
+  ],
   "homepage": "https://next-ai-ready.vercel.app/en",
-  "repository": { "type": "git", "url": "git+https://github.com/mustcanbedo/next-ai-ready.git", "directory": "packages/actions" },
-  "bugs": { "url": "https://github.com/mustcanbedo/next-ai-ready/issues" },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mustcanbedo/next-ai-ready.git",
+    "directory": "packages/actions"
+  },
+  "bugs": {
+    "url": "https://github.com/mustcanbedo/next-ai-ready/issues"
+  },
   "license": "MIT",
   "type": "module",
   "main": "./dist/index.js",

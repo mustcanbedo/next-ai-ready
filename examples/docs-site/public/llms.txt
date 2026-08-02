@@ -6,8 +6,8 @@
 
 ## Home
 
-- [next-ai-ready](https://next-ai-ready.vercel.app/en): AEO and Agent-API infrastructure for Next.js applications.
-- [next-ai-ready](https://next-ai-ready.vercel.app/zh): 面向 Next.js 应用的 AEO 与 Agent-API 基础设施。
+- [next-ai-ready](https://next-ai-ready.vercel.app/en): Add AI-readable discovery and Markdown endpoints to a Next.js App Router site in about 10 minutes.
+- [next-ai-ready](https://next-ai-ready.vercel.app/zh): 约 10 分钟，为 Next.js App Router 站点增加供 AI 工具发现和读取的内容入口。
 
 ## Introduction
 
@@ -26,8 +26,8 @@
 
 ## Quickstart
 
-- [Quickstart](https://next-ai-ready.vercel.app/en/docs/guides/quickstart): Get up and running with next-ai-ready in 5 minutes.
-- [快速开始](https://next-ai-ready.vercel.app/zh/docs/guides/quickstart): 5 分钟内让 next-ai-ready 跑起来。
+- [Quickstart](https://next-ai-ready.vercel.app/en/docs/guides/quickstart): Complete a verified next-ai-ready setup in about 10 minutes.
+- [快速开始](https://next-ai-ready.vercel.app/zh/docs/guides/quickstart): 约 10 分钟完成可验证的 next-ai-ready 基础接入。
 
 ## Concepts
 

@@ -13,7 +13,7 @@ tags:
   - installation
   - next.js
   - zod
-updatedAt: '2026-08-01'
+updatedAt: '2026-08-02'
 author: next-ai-ready 团队
 ---
 
@@ -34,9 +34,20 @@ pnpm add next-ai-ready@alpha zod@^4
 
 这会安装 meta 包，重新导出全部 API 并提供 CLI。
 
+## 完成基础接入
+
+```bash
+pnpm exec next-ai-ready init
+# 添加或更新 content/**/*.mdx，然后执行：
+pnpm exec next-ai-ready build
+pnpm exec next-ai-ready doctor --score
+```
+
+当 `doctor` 显示 **0 个错误**，且 `public/llms.txt` 已列出你的内容时，基础接入即完成。下方包结构和命令参考均为可选阅读。
+
 > **发布渠道：** 本站跟随 `main`，npm 当前为 `0.1.0-alpha.14`。2026-08-02 已通过公共 registry 的 npm/pnpm × Next.js 14/15/16 干净安装、CLI 流程和生产构建；生产 MCP 也已通过带认证 initialize 与三个页面发现工具调用。
 
-## 包导出说明（N-14）
+## 包导出说明
 
 | 导入 | 需要 Next.js？ | 用途 |
 |------|----------------|------|

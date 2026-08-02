@@ -7,11 +7,12 @@ const zh = {
   },
   hero: {
     badge: "npm alpha.14 · 文档跟随 main",
-    title: "Next.js 的\nAI 基础设施层",
+    title: "next-ai-ready",
     subtitle:
-      "让 AI 更容易发现和读取你的内容，并通过明确授权的接口调用功能。一个配置文件，UI 零改动。",
-    cta: "开始使用",
-    install: "pnpm add next-ai-ready@alpha",
+      "约 10 分钟，为 Next.js App Router 站点增加供 AI 工具发现和读取的内容入口。需要时，再添加经过鉴权的 Agent Action。",
+    cta: "开始 10 分钟接入",
+    setup: "pnpm add next-ai-ready@alpha zod@^4\npnpm exec next-ai-ready init\npnpm exec next-ai-ready build\npnpm exec next-ai-ready doctor --score",
+    success: "当 doctor 显示 0 个错误，且 llms.txt 已列出你的内容时，即完成接入。",
   },
   verification: {
     label: "第三方工具基线",
@@ -24,7 +25,7 @@ const zh = {
     disclaimer: "该分数仅衡量技术可读性，不保证排名、收录或引用。",
   },
   features: {
-    heading: "AI 从你的站点获取一切所需",
+    heading: "为 Next.js 站点建立 AI 可读基础",
     subheading: "现有 Next.js 应用自动获得完整的 AI 接口 —— 发现、检索、工具调用。",
     items: [
       {
@@ -36,7 +37,7 @@ const zh = {
       {
         title: "Agent 工具调用",
         description:
-          "使用类型安全的 Schema 定义 Action，自动生成 OpenAPI 端点和 MCP 工具，任何 Agent 均可调用。",
+          "使用类型安全的 Schema 定义并显式暴露 Action；兼容的 Agent 可在你的鉴权策略下调用。",
         icon: "zap",
       },
       {
@@ -92,7 +93,7 @@ const zh = {
   },
   cta: {
     title: "准备让你的站点 AI-Ready？",
-    subtitle: "60 秒内即可开始。",
+    subtitle: "约 10 分钟完成可验证的基础接入。",
     button: "阅读文档",
   },
   footer: {

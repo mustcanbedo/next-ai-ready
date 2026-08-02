@@ -1,7 +1,7 @@
 ---
 title: next-ai-ready
-summary: AEO and Agent-API infrastructure for Next.js applications.
-description: Make a Next.js site readable by AI search engines and callable by AI agents without changing its existing UI.
+summary: Add AI-readable discovery and Markdown endpoints to a Next.js App Router site in about 10 minutes.
+description: Make a Next.js site easier for AI tools to discover and read, then add authenticated agent actions when needed.
 questions:
   - q: What does next-ai-ready add to a Next.js site?
     a: It adds AI-readable content artifacts, structured metadata, OpenAPI actions, and an MCP server alongside the existing website.
@@ -15,13 +15,24 @@ tags:
   - next.js
   - aeo
   - agent-api
-updatedAt: '2026-08-01'
+updatedAt: '2026-08-02'
 author: next-ai-ready team
 ---
 
 # next-ai-ready
 
-`next-ai-ready` is the **AEO and Agent-API infrastructure layer for Next.js**. It makes an existing site easier for AI systems to discover and retrieve, while exposing explicitly authorized application features to agents.
+Add AI-readable discovery and Markdown endpoints to a Next.js App Router site in about 10 minutes. Add authenticated agent actions later, when you need them.
+
+## Start in 10 minutes
+
+```bash
+pnpm add next-ai-ready@alpha zod@^4
+pnpm exec next-ai-ready init
+pnpm exec next-ai-ready build
+pnpm exec next-ai-ready doctor --score
+```
+
+The basic setup is complete when `doctor` reports **0 errors** and `public/llms.txt` lists your content. Point the generated config at your MDX or Markdown content before building.
 
 ## What it provides
 
@@ -29,16 +40,6 @@ author: next-ai-ready team
 - **Agent-callable capabilities** through typed actions, OpenAPI 3.1, `tools.json`, and MCP.
 - **Deployment checks** through `next-ai-ready doctor` and `next-ai-ready audit <url>`.
 - **Open standards** with no dependency on a single AI provider.
-
-## Install
-
-```bash
-pnpm add next-ai-ready@alpha
-npx next-ai-ready init
-npx next-ai-ready build
-```
-
-The framework adds machine-readable routes and build artifacts without replacing the site's visual pages.
 
 This documentation site tracks `main`, while npm currently serves `0.1.0-alpha.14`. The published package includes the focused runtime exports, Audit v3, TypeScript Action loading, and MCP page discovery documented here.
 

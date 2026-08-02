@@ -125,6 +125,49 @@ export default async function HomePage({ params }: PageProps) {
         </div>
       </section>
 
+      {/* Live production proof */}
+      <section className="border-b border-white/[0.06] py-20">
+        <div className="mx-auto max-w-7xl px-6">
+          <div className="grid gap-8 lg:grid-cols-[0.8fr_1.2fr] lg:gap-16">
+            <div>
+              <div className="text-[11px] font-semibold uppercase tracking-[0.2em] text-emerald-400/80">
+                {t.proof.label}
+              </div>
+              <h2 className="mt-4 max-w-xl text-3xl font-bold tracking-normal text-text sm:text-4xl">
+                {t.proof.title}
+              </h2>
+              <p className="mt-5 max-w-xl text-sm leading-7 text-text-secondary">
+                {t.proof.description}
+              </p>
+              <a
+                href="https://github.com/mustcanbedo/next-ai-ready/tree/main/examples/docs-site"
+                className="mt-6 inline-flex text-sm font-medium text-accent transition-colors hover:text-accent-hover"
+              >
+                {t.proof.source}
+              </a>
+            </div>
+
+            <div className="grid gap-3 sm:grid-cols-2">
+              {t.proof.items.map((item) => (
+                <a
+                  key={item.href}
+                  href={item.href}
+                  className="group flex min-h-32 flex-col justify-between rounded-lg border border-white/[0.08] bg-white/[0.02] p-5 transition-colors hover:border-emerald-400/40 hover:bg-emerald-400/[0.04]"
+                >
+                  <span className="text-xs text-text-tertiary">{item.label}</span>
+                  <span className="font-mono text-sm font-semibold text-text group-hover:text-emerald-300">
+                    {item.value}
+                  </span>
+                  <span className="text-xs text-text-secondary underline underline-offset-4">
+                    HTTP 200
+                  </span>
+                </a>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Features grid */}
       <section className="relative border-t border-white/[0.04] py-32">
         <div className="mx-auto max-w-7xl px-6">

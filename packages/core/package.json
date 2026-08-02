@@ -1,6 +1,6 @@
 {
   "name": "@next-ai-ready/core",
-  "version": "0.1.0-alpha.13",
+  "version": "0.1.0-alpha.14",
   "description": "Shared types, config, scanner, IO for next-ai-ready.",
   "keywords": [
     "nextjs",

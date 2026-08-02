@@ -1,6 +1,6 @@
 {
   "name": "@next-ai-ready/semantic",
-  "version": "0.1.0-alpha.13",
+  "version": "0.1.0-alpha.14",
   "description": "SemanticGraph builder + JSON-LD emitter.",
   "keywords": [
     "nextjs",

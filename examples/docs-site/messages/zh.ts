@@ -24,6 +24,19 @@ const zh = {
     workflow: "查看定期审计",
     disclaimer: "该分数仅衡量技术可读性，不保证排名、收录或引用。",
   },
+  proof: {
+    label: "线上生产证据",
+    title: "这个文档站正在使用 next-ai-ready",
+    description:
+      "直接检查当前生产部署提供的真实产物。普通网页、AI 可读内容和 Agent 能力均来自同一个仓库。",
+    source: "查看生产站源码",
+    items: [
+      { href: "/llms.txt", label: "内容发现", value: "/llms.txt" },
+      { href: "/zh/docs/installation.md", label: "页面 Markdown", value: "/:page.md" },
+      { href: "/openapi.json", label: "能力描述", value: "/openapi.json" },
+      { href: "/tools.json", label: "工具清单", value: "/tools.json" },
+    ],
+  },
   features: {
     heading: "为 Next.js 站点建立 AI 可读基础",
     subheading: "现有 Next.js 应用自动获得完整的 AI 接口 —— 发现、检索、工具调用。",

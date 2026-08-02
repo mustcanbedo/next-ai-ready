@@ -25,6 +25,19 @@ const en = {
     disclaimer:
       "Technical readability score only. It does not guarantee ranking, indexing, or citation.",
   },
+  proof: {
+    label: "Live production proof",
+    title: "This documentation site runs on next-ai-ready",
+    description:
+      "Inspect the exact outputs served by this production deployment. The regular interface, AI-readable content, and agent capabilities are built from the same repository.",
+    source: "View the production source",
+    items: [
+      { href: "/llms.txt", label: "Discovery", value: "/llms.txt" },
+      { href: "/en/docs/installation.md", label: "Page Markdown", value: "/:page.md" },
+      { href: "/openapi.json", label: "Capabilities", value: "/openapi.json" },
+      { href: "/tools.json", label: "Tool manifest", value: "/tools.json" },
+    ],
+  },
   features: {
     heading: "AI-readable foundations for your Next.js site",
     subheading:

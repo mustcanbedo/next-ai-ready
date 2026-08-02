@@ -1,6 +1,6 @@
 {
   "name": "@next-ai-ready/mdx",
-  "version": "0.1.0-alpha.13",
+  "version": "0.1.0-alpha.14",
   "description": "MDX to semantic compiler (unified pipeline).",
   "keywords": [
     "nextjs",

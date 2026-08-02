@@ -1,5 +1,11 @@
 # @next-ai-ready/core
 
+## 0.1.0-alpha.14
+
+### Patch Changes
+
+- 45b6c33: Discover Markdown and MDX from root or `src/` App Router and content directories by default, with correct routes for Nextra and Fumadocs projects. Add locale filtering to MCP page search and tested Nextra 4 and Fumadocs integration guides.
+
 ## 0.1.0-alpha.13
 
 ### Patch Changes

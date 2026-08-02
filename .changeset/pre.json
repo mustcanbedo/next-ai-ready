@@ -27,6 +27,7 @@
     "lazy-mcp-route",
     "mcp-page-discovery-tools",
     "next-route-context-compat",
+    "nextra-fumadocs-content-roots",
     "published-semantic-jsonld",
     "runnable-next-scaffold",
     "searchable-package-metadata",

@@ -1,6 +1,6 @@
 {
   "name": "@next-ai-ready/mcp",
-  "version": "0.1.0-alpha.14",
+  "version": "0.1.0-alpha.15",
   "description": "MCP bridge over vercel/mcp-handler.",
   "keywords": [
     "nextjs",

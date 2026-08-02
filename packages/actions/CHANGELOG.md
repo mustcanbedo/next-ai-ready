@@ -1,5 +1,12 @@
 # @next-ai-ready/actions
 
+## 0.1.0-alpha.14
+
+### Patch Changes
+
+- Updated dependencies [45b6c33]
+  - @next-ai-ready/core@0.1.0-alpha.14
+
 ## 0.1.0-alpha.13
 
 ### Patch Changes

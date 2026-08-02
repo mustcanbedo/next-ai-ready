@@ -9,14 +9,25 @@
 [![Agent Readability](https://github.com/mustcanbedo/next-ai-ready/actions/workflows/agent-readability.yml/badge.svg)](https://github.com/mustcanbedo/next-ai-ready/actions/workflows/agent-readability.yml)
 [![Vercel Agent Readability: 100/100](https://img.shields.io/badge/Vercel%20Agent%20Readability-100%2F100-000000?logo=vercel)](./docs/audit-baselines/vercel-agent-readability-0.5.0-2026-08-01.json)
 
+**Add AI-readable discovery and Markdown endpoints to a Next.js App Router site in about 10 minutes.** Add authenticated agent actions later, when you need them.
+
+## Start in 10 minutes
+
+```bash
+pnpm add next-ai-ready@alpha zod@^4
+pnpm exec next-ai-ready init
+# Add or update content/**/*.mdx, then:
+pnpm exec next-ai-ready build
+pnpm exec next-ai-ready doctor --score
+```
+
+The basic setup is complete when `doctor` reports **0 errors** and `public/llms.txt` lists your content. The generated discovery and Markdown endpoints run alongside your existing UI.
+
+**Next:** [follow the 10-minute guide](./docs/quickstart-10min.md) or [add authenticated agent actions](https://next-ai-ready.vercel.app/en/docs/guides/action-auth).
+
 > **Third-party tool baseline:** the production documentation scored **100/100** with Vercel's open-source `@vercel/agent-readability@0.5.0` on 2026-08-01. [Review the machine-readable result](./docs/audit-baselines/vercel-agent-readability-0.5.0-2026-08-01.json) or reproduce it with `pnpm audit:vercel:site`. This measures technical agent readability, not search ranking, indexing, or citation.
 
 > **Release channels:** this repository and the documentation site track `main`. npm currently serves `0.1.0-alpha.14`, including the TypeScript Action loader fix, focused runtime entrypoints, Audit v3, and MCP page discovery. On 2026-08-02, the public package passed the full npm/pnpm × Next.js 14/15/16 registry matrix, and the authenticated production MCP endpoint passed initialize plus `list_pages`, `search_pages`, and `get_page` calls.
-
-> Traditional websites are built for browsers.
-> **next-ai-ready** makes your Next.js site **readable** by AI and **callable** by agents.
->
-> **Website = UI + Knowledge + Capability**
 
 ---
 

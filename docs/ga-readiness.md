@@ -41,6 +41,7 @@ See [post-ga.md](./post-ga.md) for improvements **after** GA.
 | 1 | **Publish `0.1.0-alpha.11`** to npm `@alpha` | Maintainer | ✅ Published 2026-07-26; deployed audit + agent readability routes included |
 | 1a | **Publish `0.1.0-alpha.12`** baseline to npm `@alpha` | Maintainer | ✅ Published 2026-08-01; registry install smoke passed |
 | 1b | **Publish `0.1.0-alpha.14`** complete runtime chain to npm `@alpha` | Maintainer | ✅ Published 2026-08-02; npm/pnpm × Next.js 14/15/16 registry matrix passed |
+| 1c | **Publish one final alpha** with `next.config.ts` compatibility fixes | Maintainer | In progress; a real `create-next-app` run exposed gaps hidden by the earlier `.mjs` matrix |
 | 2 | **Vercel env** `NEXT_AI_READY_MCP_TOKEN` | Maintainer | ✅ Rotated as a Production Sensitive value and redeployed 2026-08-02; authenticated initialize and all three page tools passed |
 | 3 | **Commit regenerated** `examples/docs-site/public/*` after the release build | Maintainer | Run build + `pnpm check:artifacts` in docs-site |
 | 4 | **Optional:** tag `v0.1.0` and README “stable 0.1” | Maintainer | When ready to drop `@alpha` install path |
@@ -52,7 +53,7 @@ Automated gate: `pnpm verify:release` (includes docs-site smoke).
 
 ## 0.1 Definition of Done (GA)
 
-- [x] `pnpm add next-ai-ready@alpha` → `init` → `build` → `doctor` (0 errors)
+- [ ] Current `create-next-app` → `pnpm add next-ai-ready@alpha` → `init` → `build` → `doctor` → `next build` (pending final alpha registry verification)
 - [x] `examples/docs-site` full dogfood
 - [x] CI: build, test, typecheck, lint, e2e-smoke, docs-site-smoke
 - [x] Known limitations in README (Zod v4, Node-only, no static export, App Router)

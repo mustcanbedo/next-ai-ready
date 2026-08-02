@@ -6,12 +6,13 @@ const en = {
     github: "GitHub",
   },
   hero: {
-    badge: "npm alpha.14 · docs track main",
-    title: "The AI Layer\nfor Next.js",
+    badge: "npm alpha.14 · alpha.15 candidate",
+    title: "next-ai-ready",
     subtitle:
-      "Make your site readable by AI search engines and callable by AI agents. One config file, zero changes to your UI.",
-    cta: "Get Started",
-    install: "pnpm add next-ai-ready@alpha",
+      "Add AI-readable discovery and Markdown endpoints to a Next.js App Router site in about 10 minutes. Add authenticated agent actions later, when you need them.",
+    cta: "Start the 10-minute setup",
+    setup: "pnpm add next-ai-ready@alpha zod@^4\npnpm exec next-ai-ready init\npnpm exec next-ai-ready build\npnpm exec next-ai-ready doctor --score",
+    success: "Done when doctor reports 0 errors and llms.txt lists your content.",
   },
   verification: {
     label: "Third-party tool baseline",
@@ -25,7 +26,7 @@ const en = {
       "Technical readability score only. It does not guarantee ranking, indexing, or citation.",
   },
   features: {
-    heading: "Everything AI needs from your site",
+    heading: "AI-readable foundations for your Next.js site",
     subheading:
       "Your existing Next.js app gains a complete AI interface — discovery, retrieval, and tool execution.",
     items: [
@@ -38,7 +39,7 @@ const en = {
       {
         title: "Agent Tool Calling",
         description:
-          "Define actions with type-safe schemas. They become OpenAPI endpoints and MCP tools that any agent can invoke.",
+          "Define explicitly exposed actions with type-safe schemas. Compatible agents can invoke them under your authentication policy.",
         icon: "zap",
       },
       {
@@ -94,7 +95,7 @@ const en = {
   },
   cta: {
     title: "Ready to make your site AI-ready?",
-    subtitle: "Get started in under 60 seconds.",
+    subtitle: "Complete the verified setup in about 10 minutes.",
     button: "Read the documentation",
   },
   footer: {

@@ -4,7 +4,7 @@
 
 ## Pages
 
-- [next-ai-ready](https://next-ai-ready.vercel.app/en): AEO and Agent-API infrastructure for Next.js applications.
+- [next-ai-ready](https://next-ai-ready.vercel.app/en): Add AI-readable discovery and Markdown endpoints to a Next.js App Router site in about 10 minutes.
 - [CLI](https://next-ai-ready.vercel.app/en/docs/api-reference/cli): Command-line interface — init, build, doctor, audit, and mcp.
 - [Configuration](https://next-ai-ready.vercel.app/en/docs/api-reference/config): Full reference for ai-ready.config.mjs options.
 - [defineAction](https://next-ai-ready.vercel.app/en/docs/api-reference/define-action): API reference for defineAction() and defineActions().
@@ -21,11 +21,11 @@
 - [i18n and AI-friendly URLs](https://next-ai-ready.vercel.app/en/docs/guides/i18n-ai-urls): Middleware, locale prefixes, and SemanticGraph routes for multilingual sites.
 - [MCP Integration](https://next-ai-ready.vercel.app/en/docs/guides/mcp-integration): Connect your actions to Claude Desktop, Cursor, and other MCP clients.
 - [Writing MDX Content](https://next-ai-ready.vercel.app/en/docs/guides/mdx-content): How to write MDX files that the semantic compiler can extract meaning from.
-- [Quickstart](https://next-ai-ready.vercel.app/en/docs/guides/quickstart): Get up and running with next-ai-ready in 5 minutes.
+- [Quickstart](https://next-ai-ready.vercel.app/en/docs/guides/quickstart): Complete a verified next-ai-ready setup in about 10 minutes.
 - [Robots.txt](https://next-ai-ready.vercel.app/en/docs/guides/robots-txt): Configure your robots.txt to explicitly allow or block AI crawlers.
 - [Installation](https://next-ai-ready.vercel.app/en/docs/installation): Install next-ai-ready and scaffold your first config.
 - [Introduction](https://next-ai-ready.vercel.app/en/docs/introduction): What next-ai-ready is and why it exists.
-- [next-ai-ready](https://next-ai-ready.vercel.app/zh): 面向 Next.js 应用的 AEO 与 Agent-API 基础设施。
+- [next-ai-ready](https://next-ai-ready.vercel.app/zh): 约 10 分钟，为 Next.js App Router 站点增加供 AI 工具发现和读取的内容入口。
 - [CLI](https://next-ai-ready.vercel.app/zh/docs/api-reference/cli): 命令行接口——init、build、doctor、audit 和 mcp。
 - [配置](https://next-ai-ready.vercel.app/zh/docs/api-reference/config): ai-ready.config.mjs 的完整参考。
 - [defineAction](https://next-ai-ready.vercel.app/zh/docs/api-reference/define-action): defineAction() 和 defineActions() 的 API 参考。
@@ -42,7 +42,7 @@
 - [国际化与 AI 友好 URL](https://next-ai-ready.vercel.app/zh/docs/guides/i18n-ai-urls): 多语言站点的 middleware、locale 前缀与 SemanticGraph 路由策略。
 - [MCP 集成](https://next-ai-ready.vercel.app/zh/docs/guides/mcp-integration): 将你的 action 连接到 Claude Desktop、Cursor 和其他 MCP 客户端。
 - [编写 MDX 内容](https://next-ai-ready.vercel.app/zh/docs/guides/mdx-content): 如何编写语义编译器能提取含义的 MDX 文件。
-- [快速开始](https://next-ai-ready.vercel.app/zh/docs/guides/quickstart): 5 分钟内让 next-ai-ready 跑起来。
+- [快速开始](https://next-ai-ready.vercel.app/zh/docs/guides/quickstart): 约 10 分钟完成可验证的 next-ai-ready 基础接入。
 - [Robots.txt](https://next-ai-ready.vercel.app/zh/docs/guides/robots-txt): 配置 robots.txt 以显式允许或阻止 AI 爬虫。
 - [安装](https://next-ai-ready.vercel.app/zh/docs/installation): 安装 next-ai-ready 并生成首个配置。
 - [简介](https://next-ai-ready.vercel.app/zh/docs/introduction): next-ai-ready 是什么，为什么需要它。

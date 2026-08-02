@@ -121,12 +121,18 @@ When ready for a stable release:
 
 ```bash
 pnpm changeset          # describe changes; select affected packages
+pnpm exec changeset pre exit  # leave the alpha prerelease mode
 pnpm version:packages   # apply version bumps + CHANGELOG
-pnpm release            # build + changeset publish
+pnpm lint
+pnpm verify:release
+pnpm release            # publish only from a clean, reviewed main commit
 pnpm changeset:status   # verify changeset wiring (E-04)
 ```
 
-The root `release` script runs `turbo run build && changeset publish`.
+Before publishing, confirm every public package has the intended stable version,
+`.changeset/pre.json` is gone, and packed manifests contain no `workspace:`
+dependencies. Stable publishing moves npm's `latest` tag and requires explicit
+maintainer approval.
 
 ## Documentation
 

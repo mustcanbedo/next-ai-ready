@@ -48,10 +48,6 @@ export default async function HomePage({ params }: PageProps) {
           <div className="absolute top-[35%] right-[55%] h-[2px] w-[100px] bg-gradient-to-r from-white/30 via-accent/30 to-transparent rotate-[215deg] animate-meteor [animation-delay:7s]" />
         </div>
 
-        {/* Secondary glow orbs */}
-        <div className="absolute top-[20%] left-[15%] w-[300px] h-[300px] bg-purple-500/[0.04] rounded-full blur-[80px] pointer-events-none animate-float [animation-delay:2s]" />
-        <div className="absolute bottom-[20%] right-[10%] w-[250px] h-[250px] bg-cyan-400/[0.03] rounded-full blur-[80px] pointer-events-none animate-float [animation-delay:4s]" />
-
         {/* Hero content with staggered fade-up */}
         <div className="relative max-w-4xl text-center">
           <div className="mb-8 inline-flex items-center gap-2 rounded-full border border-white/[0.08] bg-white/[0.02] px-4 py-1.5 text-xs text-text-secondary backdrop-blur-sm animate-fade-up [animation-delay:0.1s]">
@@ -59,7 +55,7 @@ export default async function HomePage({ params }: PageProps) {
             {t.hero.badge}
           </div>
 
-          <h1 className="text-5xl font-bold tracking-[-0.03em] text-text sm:text-7xl lg:text-[5.5rem] whitespace-pre-line leading-[1.05] animate-fade-up [animation-delay:0.2s]">
+          <h1 className="text-5xl font-bold tracking-normal text-text sm:text-7xl lg:text-[5.5rem] whitespace-pre-line leading-[1.05] animate-fade-up [animation-delay:0.2s]">
             {t.hero.title}
           </h1>
 
@@ -69,15 +65,18 @@ export default async function HomePage({ params }: PageProps) {
 
           <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4 animate-fade-up [animation-delay:0.6s]">
             <Link
-              href={`/${locale}/docs/introduction`}
+              href={`/${locale}/docs/installation`}
               className="group relative inline-flex h-12 items-center rounded-xl bg-accent px-7 text-sm font-semibold text-white shadow-[0_0_24px_rgba(59,130,246,0.25)] hover:shadow-[0_0_40px_rgba(59,130,246,0.4)] hover:bg-accent-hover transition-all"
             >
               <span className="relative z-10">{t.hero.cta}</span>
             </Link>
-            <div className="inline-flex h-12 items-center rounded-xl border border-white/[0.08] bg-white/[0.02] px-5 font-mono text-sm text-text-secondary select-all hover:border-white/[0.15] hover:bg-white/[0.04] transition-all backdrop-blur-sm">
-              {t.hero.install}
-            </div>
+            <pre className="max-w-full overflow-x-auto rounded-lg border border-white/[0.08] bg-white/[0.02] px-5 py-3 text-left font-mono text-xs leading-5 text-text-secondary select-all backdrop-blur-sm sm:text-sm">
+              {t.hero.setup}
+            </pre>
           </div>
+          <p className="mx-auto mt-5 max-w-2xl text-sm leading-6 text-text-tertiary animate-fade-up [animation-delay:0.8s]">
+            {t.hero.success}
+          </p>
         </div>
 
         {/* Scroll indicator */}
@@ -194,7 +193,7 @@ export default async function HomePage({ params }: PageProps) {
 ## Docs
 
 - [Getting Started](/docs/start)
-  Install and configure in 60 seconds.
+  Complete the verified setup in about 10 minutes.
 - [Authentication](/docs/auth)
   Secure your app with built-in auth.
 - [Deployment](/docs/deploy)

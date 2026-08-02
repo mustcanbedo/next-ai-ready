@@ -17,7 +17,7 @@ tags:
   - installation
   - next.js
   - zod
-updatedAt: '2026-08-01'
+updatedAt: '2026-08-02'
 author: next-ai-ready team
 ---
 
@@ -38,9 +38,20 @@ pnpm add next-ai-ready@alpha zod@^4
 
 This installs the meta package which re-exports everything you need and provides the CLI.
 
+## Complete the basic setup
+
+```bash
+pnpm exec next-ai-ready init
+# Add or update content/**/*.mdx, then:
+pnpm exec next-ai-ready build
+pnpm exec next-ai-ready doctor --score
+```
+
+The basic setup is complete when `doctor` reports **0 errors** and `public/llms.txt` lists your content. The detailed package map and command reference below are optional reading.
+
 > **Release channel:** this site tracks `main`; npm currently serves `0.1.0-alpha.14`. On August 2, 2026, it passed clean public-registry installs, the CLI workflow, and production builds across npm/pnpm × Next.js 14/15/16. The authenticated production MCP endpoint also passed initialize and all three page discovery calls.
 
-## Package exports (N-14)
+## Package exports
 
 | Import | Needs Next.js? | Use for |
 |--------|----------------|---------|

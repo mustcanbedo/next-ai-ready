@@ -22,6 +22,7 @@
     "audit-v2-dimensions",
     "audit-v3-three-planes",
     "fix-escaped-ai-routes",
+    "fix-next-config-cjs",
     "focused-runtime-entrypoints",
     "lazy-mcp-route",
     "mcp-page-discovery-tools",

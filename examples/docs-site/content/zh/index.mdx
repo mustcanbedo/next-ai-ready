@@ -1,7 +1,7 @@
 ---
 title: next-ai-ready
-summary: 面向 Next.js 应用的 AEO 与 Agent-API 基础设施。
-description: 在不改动现有 UI 的前提下，让 Next.js 站点更容易被 AI 搜索引擎读取，并让 Agent 调用经明确授权的功能。
+summary: 约 10 分钟，为 Next.js App Router 站点增加供 AI 工具发现和读取的内容入口。
+description: 先让 Next.js 站点更容易被 AI 工具发现和读取，需要时再添加经过鉴权的 Agent Action。
 questions:
   - q: next-ai-ready 会为 Next.js 站点增加什么？
     a: 它在现有网站之外增加 AI 可读内容产物、结构化元数据、OpenAPI Action 和 MCP 服务。
@@ -15,13 +15,24 @@ tags:
   - next.js
   - aeo
   - agent-api
-updatedAt: '2026-08-01'
+updatedAt: '2026-08-02'
 author: next-ai-ready 团队
 ---
 
 # next-ai-ready
 
-`next-ai-ready` 是**面向 Next.js 的 AEO 与 Agent-API 基础设施层**。它让现有站点更容易被 AI 系统发现和读取，同时将经明确授权的应用功能暴露给 Agent。
+约 10 分钟，为 Next.js App Router 站点增加供 AI 工具发现和读取的内容入口。需要时，再添加经过鉴权的 Agent Action。
+
+## 10 分钟开始
+
+```bash
+pnpm add next-ai-ready@alpha zod@^4
+pnpm exec next-ai-ready init
+pnpm exec next-ai-ready build
+pnpm exec next-ai-ready doctor --score
+```
+
+当 `doctor` 显示 **0 个错误**，且 `public/llms.txt` 已列出你的内容时，基础接入即完成。构建前请在生成的配置中指向你的 MDX 或 Markdown 内容。
 
 ## 它提供什么
 
@@ -29,16 +40,6 @@ author: next-ai-ready 团队
 - 通过类型安全的 Action、OpenAPI 3.1、`tools.json` 和 MCP 提供 **Agent 可调用能力**。
 - 通过 `next-ai-ready doctor` 和 `next-ai-ready audit <url>` 提供**部署检查**。
 - 使用开放标准，不锁定单一 AI 提供商。
-
-## 安装
-
-```bash
-pnpm add next-ai-ready@alpha
-npx next-ai-ready init
-npx next-ai-ready build
-```
-
-框架会在不替换可视页面的前提下，增加机器可读路由与构建产物。
 
 本文档站跟随 `main`，npm 当前为 `0.1.0-alpha.14`。已发布包包含本站记录的运行时专用入口、Audit v3、TypeScript Action 加载与 MCP 页面发现。
 

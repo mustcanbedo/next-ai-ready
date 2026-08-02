@@ -60,7 +60,7 @@ async function main() {
       `[changeset] prepared release output detected${isCommittedPreparedRelease ? " (committed)" : ""}`,
     );
   }
-  console.log("[changeset] stable release path: pnpm changeset → pnpm version:packages → pnpm release");
+  console.log("[changeset] stable release path: pnpm changeset → pnpm exec changeset pre exit → pnpm version:packages → pnpm lint → pnpm verify:release → pnpm release");
 }
 
 async function hasConsumedPrereleaseChangesets(prePath) {

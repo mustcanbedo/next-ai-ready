@@ -31,13 +31,14 @@ const HANDLER_PACKAGES = [
 ];
 
 const EXTRA_EXPORTS = [
+  { name: "@next-ai-ready/next", dir: join(ROOT, "packages", "next"), key: "./config", js: "config.js", dts: "config.d.ts" },
   { name: "@next-ai-ready/next", dir: join(ROOT, "packages", "next"), key: "./json-ld", js: "jsonld.js", dts: "jsonld.d.ts" },
   { name: "@next-ai-ready/next", dir: join(ROOT, "packages", "next"), key: "./hooks", js: "runtime/observability.js", dts: "runtime/observability.d.ts" },
   { name: "next-ai-ready", dir: join(ROOT, "packages", "meta"), key: "./actions", js: "actions.js", dts: "actions.d.ts" },
   { name: "next-ai-ready", dir: join(ROOT, "packages", "meta"), key: "./hooks", js: "hooks.js", dts: "hooks.d.ts" },
   { name: "next-ai-ready", dir: join(ROOT, "packages", "meta"), key: "./json-ld", js: "json-ld.js", dts: "json-ld.d.ts" },
   { name: "next-ai-ready", dir: join(ROOT, "packages", "meta"), key: "./audit", js: "audit.js", dts: "audit.d.ts" },
-  { name: "next-ai-ready", dir: join(ROOT, "packages", "meta"), key: "./config", js: "config.js", dts: "config.d.ts" },
+  { name: "next-ai-ready", dir: join(ROOT, "packages", "meta"), key: "./config", js: "config.js", dts: "config.d.ts", cjs: "config.cjs" },
   { name: "next-ai-ready", dir: join(ROOT, "packages", "meta"), key: "./robots", js: "robots.js", dts: "robots.d.ts" },
   { name: "@next-ai-ready/core", dir: join(ROOT, "packages", "core"), key: "./bots", js: "bots-entry.js", dts: "bots-entry.d.ts" },
   { name: "@next-ai-ready/core", dir: join(ROOT, "packages", "core"), key: "./json", js: "json.js", dts: "json.d.ts" },
@@ -82,7 +83,7 @@ async function checkHandlerPackage({ name, dir }) {
   return failures;
 }
 
-async function checkExtraExport({ name, dir, key, js, dts }) {
+async function checkExtraExport({ name, dir, key, js, dts, cjs }) {
   let failures = 0;
   const jsPath = join(dir, "dist", js);
   const dtsPath = join(dir, "dist", dts);
@@ -97,6 +98,13 @@ async function checkExtraExport({ name, dir, key, js, dts }) {
   if (!pkg.exports?.[key]) {
     console.error(`  ✗ ${name} package.json missing export "${key}"`);
     failures++;
+  }
+  if (cjs) {
+    const cjsPath = join(dir, "dist", cjs);
+    if (!(await exists(cjsPath)) || pkg.exports?.[key]?.require !== `./dist/${cjs}`) {
+      console.error(`  ✗ ${name} ${key} — missing CommonJS export ${cjsPath}`);
+      failures++;
+    }
   }
 
   return failures;

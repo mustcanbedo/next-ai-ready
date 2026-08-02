@@ -7,6 +7,11 @@ on:
         description: Type publish-alpha to publish the current package versions
         required: true
         type: string
+      promote_latest:
+        description: Point npm latest at the published user-facing alpha packages
+        required: false
+        default: false
+        type: boolean
 
 concurrency:
   group: release-alpha
@@ -57,3 +62,15 @@ jobs:
         run: |
           npm view next-ai-ready dist-tags --json
           npm view create-next-ai-ready dist-tags --json
+
+      - name: Promote user-facing packages to latest
+        if: github.event.inputs.promote_latest == 'true'
+        shell: bash
+        run: |
+          for dir in packages/meta packages/next packages/create-next-ai-ready; do
+            name=$(node -p "require('./${dir}/package.json').name")
+            version=$(node -p "require('./${dir}/package.json').version")
+            npm dist-tag add "${name}@${version}" latest
+          done
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

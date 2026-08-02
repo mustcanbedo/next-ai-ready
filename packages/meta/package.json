@@ -2,6 +2,14 @@
   "name": "next-ai-ready",
   "version": "0.1.0-alpha.15",
   "description": "AEO + Agent-API layer for Next.js. Make your site readable by AI and callable by agents.",
+  "keywords": ["nextjs", "aeo", "llms-txt", "mcp", "model-context-protocol", "ai-agents", "json-ld", "openapi"],
+  "homepage": "https://next-ai-ready.vercel.app/en",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mustcanbedo/next-ai-ready.git",
+    "directory": "packages/meta"
+  },
+  "bugs": { "url": "https://github.com/mustcanbedo/next-ai-ready/issues" },
   "license": "MIT",
   "type": "module",
   "main": "./dist/index.js",

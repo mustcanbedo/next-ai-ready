@@ -2,6 +2,14 @@
   "name": "create-next-ai-ready",
   "version": "0.1.0-alpha.11",
   "description": "Scaffold a Next.js app with next-ai-ready pre-wired.",
+  "keywords": ["create-next-app", "nextjs", "aeo", "llms-txt", "mcp", "scaffold"],
+  "homepage": "https://next-ai-ready.vercel.app/en/docs/getting-started",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mustcanbedo/next-ai-ready.git",
+    "directory": "packages/create-next-ai-ready"
+  },
+  "bugs": { "url": "https://github.com/mustcanbedo/next-ai-ready/issues" },
   "license": "MIT",
   "type": "module",
   "bin": {

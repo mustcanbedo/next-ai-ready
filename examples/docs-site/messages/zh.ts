@@ -6,7 +6,7 @@ const zh = {
     github: "GitHub",
   },
   hero: {
-    badge: "npm alpha.14 · 文档跟随 main",
+    badge: "npm alpha.14 · alpha.15 候选版",
     title: "next-ai-ready",
     subtitle:
       "约 10 分钟，为 Next.js App Router 站点增加供 AI 工具发现和读取的内容入口。需要时，再添加经过鉴权的 Agent Action。",

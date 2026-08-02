@@ -2,7 +2,7 @@
 
 **GA** for this project means the first **generally recommendable** release: **`0.1.0`** (or final **`0.1.0-alpha.N`** before dropping the alpha tag), where a Next.js team can install, build, deploy, and get predictable AI artifacts without reading the whole monorepo.
 
-**Current published version:** `0.1.0-alpha.16`. npm `latest` and `alpha` both resolve to `0.1.0-alpha.16`. Audit v3, focused runtime exports, TypeScript `next.config.ts` compatibility, MCP page discovery, and npm discovery metadata are in the public package. Clean public-registry `pnpm + Next.js 16` and `npm + Next.js 15` installs and the authenticated production MCP path passed on 2026-08-02; see [improvement-plan.zh-CN.md](./improvement-plan.zh-CN.md) for final **`0.1.0`** GA sign-off.
+**Current published version:** `0.1.0-alpha.17`. npm `latest` and `alpha` both resolve to `0.1.0-alpha.17`. Audit v3, focused runtime exports, TypeScript `next.config.ts` compatibility, MCP page discovery with locale filtering, and Nextra/Fumadocs content discovery are in the public package. The complete release gate, npm manifest verification, a clean public-registry pnpm + Next.js 16 build, and the authenticated production MCP path passed on 2026-08-02; see [improvement-plan.zh-CN.md](./improvement-plan.zh-CN.md) for final **`0.1.0`** GA sign-off.
 
 ---
 
@@ -43,9 +43,10 @@ See [post-ga.md](./post-ga.md) for improvements **after** GA.
 | 1b | **Publish `0.1.0-alpha.14`** complete runtime chain to npm `@alpha` | Maintainer | ✅ Published 2026-08-02; npm/pnpm × Next.js 14/15/16 registry matrix passed |
 | 1c | **Publish `0.1.0-alpha.15`** with `next.config.ts` compatibility fixes | Maintainer | ✅ Published 2026-08-02; npm/pnpm × Next.js 14/15/16 registry matrix passed |
 | 1d | **Publish `0.1.0-alpha.16`** with npm discovery metadata | Maintainer | ✅ Published 2026-08-02; `latest` and `alpha` promoted; public-registry pnpm/Next.js 16 and npm/Next.js 15 smoke passed |
+| 1e | **Publish `0.1.0-alpha.17`** with Nextra/Fumadocs discovery and locale search | Maintainer | ✅ Published 2026-08-02 by Release Alpha #5; `latest` and `alpha` promoted; all public npm manifests verified; public-registry pnpm/Next.js 16 smoke passed |
 | 2 | **Vercel env** `NEXT_AI_READY_MCP_TOKEN` | Maintainer | ✅ Rotated as a Production Sensitive value and redeployed 2026-08-02; authenticated initialize and all three page tools passed |
 | 2a | **Restore GitHub Actions** `NPM_TOKEN` | Maintainer | ✅ Repository secret restored; Release Alpha #4 authenticated, passed the release gate, published alpha.16, and promoted the user-facing packages to `latest` |
-| 3 | **Commit regenerated** `examples/docs-site/public/*` after the release build | Maintainer | ✅ alpha.16 content regenerated; artifact smoke, `doctor` 100/100, and route smoke passed 2026-08-02 |
+| 3 | **Commit regenerated** `examples/docs-site/public/*` after the release build | Maintainer | ✅ alpha.17 content regenerated; artifact smoke, `doctor` 100/100, routes, and public-registry Next.js 16 build passed 2026-08-02 |
 | 4 | **Tag `v0.1.0` and update README to “stable 0.1”** | Maintainer | After the 3-project external-adoption gate passes |
 | 5 | **Optional:** 10 min UX path outside monorepo | Contributor | [CONTRIBUTING.md](../CONTRIBUTING.md) |
 
@@ -60,7 +61,7 @@ Automated gate: `pnpm verify:release` (includes docs-site smoke).
 - [x] CI: build, test, typecheck, lint, e2e-smoke, docs-site-smoke
 - [x] Known limitations in README (Zod v4, Node-only, no static export, App Router)
 - [x] [quickstart-10min](./quickstart-10min.md) for new adopters
-- [x] npm **`latest` and `alpha` = alpha.16** published (2026-08-02)
+- [x] npm **`latest` and `alpha` = alpha.17** published (2026-08-02)
 - [x] Production MCP token on Vercel (rotated, saved, and redeployed 2026-08-02)
 - [x] Authenticated production MCP initialize and `list_pages` / `search_pages` / `get_page` succeed
 - [ ] At least 3 repository-external Next.js projects complete install, build, deploy, and feedback (current: 0/3 verified)

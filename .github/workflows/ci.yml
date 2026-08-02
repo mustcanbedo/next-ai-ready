@@ -131,3 +131,6 @@ jobs:
 
       - name: Run docs-site smoke
         run: pnpm --filter docs-site smoke
+
+      - name: Verify SDK and documentation release versions are synchronized
+        run: pnpm release:docs:check

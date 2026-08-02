@@ -113,7 +113,7 @@ curl -sS http://localhost:3000/openapi.json | head -c 200
 
 As of 2026-08-02:
 
-- **npm `latest` and `alpha`:** `0.1.0-alpha.16` — registry single-package installation, CLI workflow, and production builds verified with pnpm + Next.js 16.2.12 and npm + Next.js 15.5.22. The preceding alpha.15 passed the full npm/pnpm × Next.js 14/15/16 matrix.
+- **npm `latest` and `alpha`:** `0.1.0-alpha.17` — complete release gate, npm manifest verification, and a public-registry pnpm + Next.js 16.2.12 single-package install, CLI workflow, and production build passed. Alpha.16 passed the equivalent pnpm/Next.js 16 and npm/Next.js 15 checks; alpha.15 passed the full npm/pnpm × Next.js 14/15/16 matrix.
 - **alpha.13:** superseded after registry smoke exposed an incomplete published Semantic/Core export chain; use alpha.14 or newer.
 - **alpha.4:** deprecated for pnpm users (scoped import bug); use ≥ alpha.5
 
@@ -135,5 +135,7 @@ As of 2026-08-02:
 - [x] Every combination installed `next-ai-ready@0.1.0-alpha.15`
 - [x] `init`, artifact build, `doctor`, and production build passed in every combination
 - [x] npm `latest` alpha.16 reverified with pnpm/Next.js 16 and npm/Next.js 15 — 2026-08-02
+- [x] npm `latest` and `alpha` promoted to alpha.17; all public manifests match the registry — 2026-08-02
+- [x] npm `latest` alpha.17 verified with pnpm/Next.js 16.2.12 — 2026-08-02
 - [x] Full npm/pnpm × Next.js 14/15/16 tarball matrix on `main` CI
 - [ ] Manual `/tmp` + `create-next-app` + dev + curl (optional full UX)

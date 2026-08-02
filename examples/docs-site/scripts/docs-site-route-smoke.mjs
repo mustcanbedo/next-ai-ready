@@ -229,7 +229,7 @@ async function main() {
     name: "get_page",
     arguments: { route: "/en/docs/installation" },
   });
-  if (!page.includes("0.1.0-alpha.15")) {
+  if (!page.includes("0.1.0-alpha.16")) {
     fail("MCP get_page did not return the current installation content");
   }
   console.log("  ok MCP auth, initialize, list_pages, search_pages, get_page");

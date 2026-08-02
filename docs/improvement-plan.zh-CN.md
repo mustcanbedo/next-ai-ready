@@ -2,8 +2,8 @@
 
 > 最后更新：2026-08-02
 > 维护者视角：`next-ai-ready` 原始作者与技术负责人  
-> 当前发布：npm `0.1.0-alpha.15`
-> 当前主分支基线：`782bbc7`（PR #12 已合并）
+> 当前发布：npm `0.1.0-alpha.16`（`latest` 与 `alpha`）
+> 当前主分支基线：`accd24d`（PR #17 已合并）
 
 本文是后续优化的**执行状态与决策记录**。`roadmap.md` 保留工程阶段历史，
 `post-ga.md` 保留候选方向；当它们与本文的当前优先级冲突时，以本文为准。
@@ -74,9 +74,9 @@
 | Agent Markdown 缺页恢复 | `已完成` | Agent Markdown 请求返回 `200`、`noindex`、发现入口和相似页面；浏览器仍返回真实 `404` |
 | Audit 三层报告 | `已完成` | v1/v2 保持兼容；v3 已随 npm alpha.14 发布，并拆分 Readability、Semantic/AEO 与 Capability；发布前 CLI 回归和外部安装均通过 |
 | MCP 页面发现 | `已完成` | `list_pages`、`get_page`、`search_pages` 已随 alpha.14 发布，并于 2026-08-02 在带认证的生产 MCP 端点完成真实调用；locale 过滤及 HTTP 共用接口进入后续迭代 |
-| Next.js 兼容验证 | `已完成` | alpha.15 已从公共 registry 通过 npm/pnpm × Next.js 14/15/16 六组合；15/16 使用真实 `next.config.ts` |
+| Next.js 兼容验证 | `已完成` | alpha.15 已从公共 registry 通过 npm/pnpm × Next.js 14/15/16 六组合；alpha.16 `latest` 已复验 pnpm/Next.js 16 与 npm/Next.js 15；15/16 使用真实 `next.config.ts` |
 | Vercel 官方 Readability 基线 | `已完成` | `main` 部署后已使用固定的 `@vercel/agent-readability@0.5.0` 复测生产站，25 项全部通过并保持 `100/100`；每周/手动工作流仍单独跟踪 |
-| npm GA | `进行中` | 当前已发布 `0.1.0-alpha.15` 并完成 registry 验证；尚未退出 prerelease 或发布 `0.1.0` |
+| npm GA | `进行中` | 当前已发布 `0.1.0-alpha.16`，`latest` 与 `alpha` 已对齐并完成代表性公共 registry 验证；尚未退出 prerelease 或发布 `0.1.0` |
 | i18n 与 Content Adapter | `待开始` | graph 有基础字段和 ContentSource 接口，但没有完整接入体验 |
 | 动态索引 | `待商榷` | 只保留 Provider 方向，等待真实需求证据 |
 | 商业观测 | `待商榷` | SDK 只定义开放事件和 Adapter；托管产品单独决策 |
@@ -168,11 +168,11 @@ Capability Plane 继续作为差异化能力，但不要求首次访问者在安
 |---|---|---|---|
 | G1-01 | 合入并发布当前 Audit/MCP 功能 | `已完成` | PR #2-#7 已合入 `main`；Audit v3、MCP 页面发现和依赖链修复已随 npm alpha.14 发布 |
 | G1-02 | 配置生产 MCP Token | `已完成` | 2026-08-02 完成 Production Sensitive Token 轮换、重新部署、无凭证 401 和带凭证 initialize 200 验证；文档站 smoke 固化同一认证与工具回归 |
-| G1-03 | 固化真实安装矩阵 | `已完成` | 外部 smoke 在 Next.js 15/16 使用真实 `next.config.ts`；alpha.15 已完成 tarball 与公共 registry 六组合 |
+| G1-03 | 固化真实安装矩阵 | `已完成` | 外部 smoke 在 Next.js 15/16 使用真实 `next.config.ts`；alpha.15 已完成公共 registry 六组合，alpha.16 `latest` 已复验 pnpm/Next.js 16 与 npm/Next.js 15 |
 | G1-04 | 冻结 0.1 公共 API | `已完成` | 十个发布包的 entrypoint、命名导出、类型声明哈希与 bin 基线均已通过；程序化 Audit 已收口到独立入口，不再暴露 CLI 调度 API |
 | G1-05 | 建立最小回滚流程 | `已完成` | 2026-08-02 完成只读演练；计划器兼容 pnpm 透传的 `--`，并生成精确 deprecate/dist-tag 命令，不执行写操作 |
 | G1-06 | 更新 GA 文案并发布 `0.1.0` | `待验证` | README、官网与机器可读首页已统一为“承诺、可复制流程、成功标准”；至少 3 个仓库外真实项目接入并修复共同阻塞后，再决定稳定版发布 |
-| G1-07 | 消除 `main`、npm 与网站文档的发布漂移 | `已完成` | README、文档站和 npm 已对齐 alpha.15；专用入口、TypeScript `next.config.ts` 兼容及 registry 干净安装已验证；发布门禁新增 manifest 漂移检查 |
+| G1-07 | 消除 `main`、npm 与网站文档的发布漂移 | `已完成` | npm、README、双语文档站与机器可读产物已对齐 alpha.16；文档 artifact smoke、`doctor` 100/100 与路由 smoke 通过；发布门禁已有 manifest 漂移检查 |
 | G1-08 | 恢复 GitHub Actions npm 发布身份 | `已完成` | 仓库 Secret `NPM_TOKEN` 已配置；2026-08-02 幂等重跑 Release Alpha，身份验证、发布门禁和已发布版本检查全部通过 |
 
 GA 之前不加入数据库、IndexNow、大型 DevTools 或托管后台。
@@ -191,6 +191,8 @@ GA 之前不加入数据库、IndexNow、大型 DevTools 或托管后台。
 - 回滚计划完成只读演练，并修复 pnpm 9 将参数分隔符透传给脚本时的解析失败。
 - 2026-08-02 重新执行仓库外 `create-next-app` 接入时，`doctor` 达到 100/100，但正式 `next build` 暴露两个此前矩阵未覆盖的缺口：`next-ai-ready/config` 缺少 CommonJS 入口，以及 `withAiReady()` 的类型约束不兼容官方 `NextConfig`。alpha.15 已增加专用 CJS 配置产物、放宽包装器泛型，并让外部 smoke 在 Next.js 15/16 使用 `next.config.ts`；npm/pnpm × Next.js 14/15/16 六组 tarball 与公共 registry 回归全部通过。
 - Release Alpha workflow 的完整发布门禁通过，但因仓库 `NPM_TOKEN` 为空在 publish 步骤停止；随后使用已验证的本机 npm 身份 `jairhu` 发布 alpha.15。发布前没有产生半发布状态，发布后两个入口包的 `alpha` 标签均指向 alpha.15，`latest` 未改变。
+- PR #17 合并后触发 Release Alpha #4；GitHub Actions 使用仓库 `NPM_TOKEN` 完成身份验证、完整门禁、十个包的缺失版本发布和标签验证。`next-ai-ready@0.1.0-alpha.16`、`@next-ai-ready/next@0.1.0-alpha.16` 与 `create-next-ai-ready@0.1.0-alpha.12` 的 `latest`/`alpha` 均已对齐。
+- alpha.16 发布后从公共 npm `latest` 进行两次仓库外临时项目回归：pnpm + Next.js 16.2.12、npm + Next.js 15.5.22 均完成安装、`init`、产物构建、`doctor` 与正式 `next build`。
 
 2026-08-01 分支审查修复：Audit v3 的 required 检查现在统一产生 failure 并使 CLI
 非零退出；`create-next-ai-ready` 已移出 Changesets ignore 列表；公开 Audit 只确认 MCP

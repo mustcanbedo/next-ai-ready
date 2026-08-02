@@ -1,6 +1,6 @@
 # 10 分钟上手
 
-本指南帮助你在 Next.js App Router 项目中用 `next-ai-ready@alpha` 快速接入 AI 可读 + Agent 可调用能力。
+本指南帮助你在 Next.js App Router 项目中用 `next-ai-ready` 快速接入 AI 可读 + Agent 可调用能力。
 
 ## 前置条件
 
@@ -11,7 +11,7 @@
 ## 1. 脚手架（推荐）
 
 ```bash
-npm create next-ai-ready@alpha my-app
+npm create next-ai-ready my-app
 cd my-app
 npm install
 npx next-ai-ready init

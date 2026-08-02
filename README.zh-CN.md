@@ -14,7 +14,7 @@ English | [中文文档](./README.zh-CN.md)
 ## 10 分钟开始
 
 ```bash
-pnpm add next-ai-ready@alpha zod@^4
+pnpm add next-ai-ready zod@^4
 pnpm exec next-ai-ready init
 # 添加或更新 content/**/*.mdx，然后执行：
 pnpm exec next-ai-ready build
@@ -27,7 +27,7 @@ pnpm exec next-ai-ready doctor --score
 
 > **第三方工具基线：** 生产文档站在 2026-08-01 使用 Vercel 开源的 `@vercel/agent-readability@0.5.0` 获得 **100/100**。[查看机器可读原始结果](./docs/audit-baselines/vercel-agent-readability-0.5.0-2026-08-01.json)，或运行 `pnpm audit:vercel:site` 复现。该分数衡量技术层面的 Agent 可读性，不代表搜索排名、收录或引用效果。
 
-> **发布渠道：** 本仓库与文档站跟随 `main`；npm 当前为 `0.1.0-alpha.15`，已包含 TypeScript `next.config.ts` 兼容修复、运行时专用入口、Audit v3 和 MCP 页面发现。2026-08-02 已通过公共 registry 的 npm/pnpm × Next.js 14/15/16 完整矩阵；生产 MCP 也已通过带认证 initialize 及 `list_pages`、`search_pages`、`get_page` 调用。
+> **发布渠道：** 本仓库与文档站跟随 `main`；npm 的 `latest` 与 `alpha` 当前均为 `0.1.0-alpha.16`，已包含 TypeScript `next.config.ts` 兼容修复、运行时专用入口、Audit v3、MCP 页面发现和更完整的 npm 可发现性元数据。2026-08-02 已从公共 registry 通过 `pnpm + Next.js 16` 与 `npm + Next.js 15` 的干净安装、CLI 和生产构建验证；生产 MCP 也已通过带认证 initialize 及 `list_pages`、`search_pages`、`get_page` 调用。
 
 ---
 
@@ -112,7 +112,7 @@ export default defineAction({
 ```
 
 ```bash
-pnpm add next-ai-ready@alpha
+pnpm add next-ai-ready
 npx next-ai-ready init     # 生成配置 + 路由桩文件 + 示例 action
 npx next-ai-ready build    # 产出 llms.txt、sitemap.md、语义图、OpenAPI、tools、robots
 npx next-ai-ready doctor   # 验证配置、action 暴露规则、路由接线（CI 友好）
@@ -144,7 +144,7 @@ export default withAiReady({ agentReadable: true })(nextConfig)
 或使用脚手架：
 
 ```bash
-npm create next-ai-ready@alpha my-app
+npm create next-ai-ready my-app
 cd my-app
 npm install
 npx next-ai-ready init
@@ -179,7 +179,7 @@ registerAiHooks({
 
 ### 包导入
 
-消费者应用只需安装 `next-ai-ready`。已发布的 `alpha.15` 支持以下导入：
+消费者应用只需安装 `next-ai-ready`。已发布的 `alpha.16` 支持以下导入：
 
 | 导入 | 用途 |
 |---|---|
@@ -191,7 +191,7 @@ registerAiHooks({
 
 ## 状态
 
-🚧 **Pre-alpha**（`0.1.0-alpha.15` 已发布到 npm `@alpha`）。公开包和生产 MCP 链路已通过上述发布验证；最终 GA 验收与后续工作见[当前改进台账](./docs/improvement-plan.zh-CN.md)。
+🚧 **Pre-alpha**（`0.1.0-alpha.16` 已发布到 npm `latest` 与 `alpha`）。公开包和生产 MCP 链路已通过上述发布验证；正式 `0.1.0` GA 前的外部采用门槛见[当前改进台账](./docs/improvement-plan.zh-CN.md)。
 
 - ✅ **知识平面** — MDX → 语义图 → `llms.txt` / `*.md` / `*.ai.json` / JSON-LD
 - ✅ **能力平面** — `defineAction` → `/api/actions/<name>` + OpenAPI 3.1 / `tools.json` / `ai-plugin.json`

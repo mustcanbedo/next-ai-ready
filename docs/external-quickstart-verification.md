@@ -1,6 +1,6 @@
 # External quickstart verification
 
-> Records how a user **outside this monorepo** can install `next-ai-ready@alpha` and reach AI endpoints.  
+> Records how a user **outside this monorepo** can install the published `next-ai-ready` package and reach AI endpoints.
 > Last verified: **2026-08-02** (`scripts/external-quickstart-smoke.mjs`).
 
 ## 0.1 Definition of Done (target)
@@ -8,7 +8,7 @@
 A new user should complete within **~10 minutes**:
 
 ```text
-create-next-app → pnpm add next-ai-ready@alpha → next-ai-ready init → next-ai-ready build → next dev
+create-next-app → pnpm add next-ai-ready → next-ai-ready init → next-ai-ready build → next dev
 ```
 
 Then access:
@@ -74,7 +74,7 @@ The fixture writes overrides to both legacy package metadata and
 11's root-settings model. pnpm 11 only permits the reviewed `sharp` install script
 inside the disposable consumer project; it does not enable arbitrary dependency builds.
 
-Set `PACKAGE_SOURCE=registry` to test the published `next-ai-ready@alpha` package.
+Set `PACKAGE_SOURCE=registry REGISTRY_TAG=latest` to test the default published package.
 The smoke resolves the dist-tag through npm and requires the installed package to
 match that exact version, so stale package-manager metadata cannot produce a false pass.
 The legacy `USE_NPM=1` switch remains an alias for registry source selection.
@@ -87,7 +87,7 @@ Run in a **clean directory outside the monorepo** (e.g. `/tmp/nair-verify`):
 mkdir -p /tmp/nair-verify && cd /tmp/nair-verify
 pnpm create next-app@latest my-app --yes
 cd my-app
-pnpm add next-ai-ready@alpha zod@^4
+pnpm add next-ai-ready zod@^4
 pnpm exec next-ai-ready init
 pnpm exec next-ai-ready build
 pnpm exec next-ai-ready doctor --score
@@ -113,7 +113,7 @@ curl -sS http://localhost:3000/openapi.json | head -c 200
 
 As of 2026-08-02:
 
-- **npm `@alpha`:** `0.1.0-alpha.15` — registry single-package installation, CLI workflow, and production builds verified across npm/pnpm × Next.js 14/15/16, including real `next.config.ts` projects on Next.js 15/16.
+- **npm `latest` and `alpha`:** `0.1.0-alpha.16` — registry single-package installation, CLI workflow, and production builds verified with pnpm + Next.js 16.2.12 and npm + Next.js 15.5.22. The preceding alpha.15 passed the full npm/pnpm × Next.js 14/15/16 matrix.
 - **alpha.13:** superseded after registry smoke exposed an incomplete published Semantic/Core export chain; use alpha.14 or newer.
 - **alpha.4:** deprecated for pnpm users (scoped import bug); use ≥ alpha.5
 
@@ -134,5 +134,6 @@ As of 2026-08-02:
 - [x] npm/pnpm × Next.js 14/15/16 public-registry matrix — 2026-08-02
 - [x] Every combination installed `next-ai-ready@0.1.0-alpha.15`
 - [x] `init`, artifact build, `doctor`, and production build passed in every combination
+- [x] npm `latest` alpha.16 reverified with pnpm/Next.js 16 and npm/Next.js 15 — 2026-08-02
 - [x] Full npm/pnpm × Next.js 14/15/16 tarball matrix on `main` CI
 - [ ] Manual `/tmp` + `create-next-app` + dev + curl (optional full UX)

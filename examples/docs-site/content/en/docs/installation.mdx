@@ -33,7 +33,7 @@ author: next-ai-ready team
 ## Install
 
 ```bash
-pnpm add next-ai-ready@alpha zod@^4
+pnpm add next-ai-ready zod@^4
 ```
 
 This installs the meta package which re-exports everything you need and provides the CLI.
@@ -49,7 +49,7 @@ pnpm exec next-ai-ready doctor --score
 
 The basic setup is complete when `doctor` reports **0 errors** and `public/llms.txt` lists your content. The detailed package map and command reference below are optional reading.
 
-> **Release channel:** this site tracks `main`; npm currently serves `0.1.0-alpha.15`. On August 2, 2026, it passed clean public-registry installs, the CLI workflow, and production builds across npm/pnpm × Next.js 14/15/16. The authenticated production MCP endpoint also passed initialize and all three page discovery calls.
+> **Release channel:** this site tracks `main`; npm `latest` and `alpha` currently serve `0.1.0-alpha.16`. On August 2, 2026, the published `latest` passed clean public-registry `pnpm + Next.js 16` and `npm + Next.js 15` installs, the CLI workflow, and production builds. The authenticated production MCP endpoint also passed initialize and all three page discovery calls.
 
 ## Package exports
 
@@ -61,7 +61,7 @@ The basic setup is complete when `doctor` reports **0 errors** and `public/llms.
 | `next-ai-ready/actions`, `/config`, `/json-ld`, `/robots` | No or runtime-specific | Focused APIs that avoid loading unrelated build code |
 | `next-ai-ready/audit` | No | Programmatic Audit without the CLI dispatcher |
 
-Install **one** meta package for typical apps: `pnpm add next-ai-ready@alpha`. The `@next-ai-ready/*` scoped packages are used internally; you do not need to add them separately.
+Install **one** meta package for typical apps: `pnpm add next-ai-ready`. The `@next-ai-ready/*` scoped packages are used internally; you do not need to add them separately.
 
 `jiti` is a runtime dependency of `@next-ai-ready/next` and is installed through the meta package. TypeScript `ai-ready.config.ts` files therefore work without adding `jiti` yourself.
 
@@ -78,7 +78,7 @@ Only **`next-ai-ready`** exposes the `next-ai-ready` CLI binary. `@next-ai-ready
 ## Scaffold (recommended)
 
 ```bash
-npm create next-ai-ready@alpha my-site
+npm create next-ai-ready my-site
 cd my-site
 npm install
 npx next-ai-ready init

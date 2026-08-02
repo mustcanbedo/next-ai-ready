@@ -1,6 +1,6 @@
 # Get started in 10 minutes
 
-This guide gets a new Next.js App Router project AI-ready with `next-ai-ready@alpha`.
+This guide gets a new Next.js App Router project AI-ready with `next-ai-ready`.
 
 ## Prerequisites
 
@@ -11,7 +11,7 @@ This guide gets a new Next.js App Router project AI-ready with `next-ai-ready@al
 ## 1. Scaffold (recommended)
 
 ```bash
-npm create next-ai-ready@alpha my-app
+npm create next-ai-ready my-app
 cd my-app
 npm install
 npx next-ai-ready init

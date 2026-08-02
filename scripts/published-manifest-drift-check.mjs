@@ -36,6 +36,15 @@ export function normalizeLocalManifest(pkg, workspaceVersions) {
   return normalized;
 }
 
+export function normalizePublishedManifest(pkg) {
+  const normalized = {};
+  for (const field of PUBLIC_FIELDS) {
+    if (pkg[field] === undefined) continue;
+    normalized[field] = field === "bin" ? normalizeBin(pkg[field]) : pkg[field];
+  }
+  return normalized;
+}
+
 function normalizeBin(bin) {
   if (typeof bin === "string") return bin.replace(/^\.\//, "");
   return Object.fromEntries(
@@ -116,7 +125,7 @@ async function main() {
       continue;
     }
     const local = normalizeLocalManifest(pkg, workspaceVersions);
-    const drift = findManifestDrift(local, published);
+    const drift = findManifestDrift(local, normalizePublishedManifest(published));
     if (drift.length === 0) {
       console.log("matches npm");
       continue;

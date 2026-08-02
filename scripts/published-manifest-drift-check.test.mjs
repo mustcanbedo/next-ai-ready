@@ -3,6 +3,7 @@ import test from "node:test";
 import {
   findManifestDrift,
   normalizeLocalManifest,
+  normalizePublishedManifest,
 } from "./published-manifest-drift-check.mjs";
 
 test("normalizes workspace dependency ranges to publishable versions", () => {
@@ -51,6 +52,18 @@ test("normalizes npm bin paths", () => {
     ),
     { bin: { "next-ai-ready": "dist/cli.js" } },
   );
+});
+
+test("normalizes published npm bin paths before drift comparison", () => {
+  const local = normalizeLocalManifest(
+    { bin: { "next-ai-ready": "./dist/cli.js" } },
+    new Map(),
+  );
+  const published = normalizePublishedManifest({
+    bin: { "next-ai-ready": "./dist/cli.js" },
+  });
+
+  assert.deepEqual(findManifestDrift(local, published), []);
 });
 
 test("ignores object key ordering", () => {

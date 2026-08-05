@@ -9,6 +9,7 @@ Central map for **next-ai-ready** repository docs (not the live docs site — th
 | New adopter | [quickstart-10min.md](./quickstart-10min.md) · [中文](./quickstart-10min.zh-CN.md) |
 | Maintainer / release | [ga-readiness.md](./ga-readiness.md) → [completion-audit.md](./completion-audit.md) |
 | Current improvement status | [improvement-plan.zh-CN.md](./improvement-plan.zh-CN.md) |
+| Distribution / launch | [distribution/README.md](./distribution/README.md) |
 | Long-term backlog | [backlog.md](./backlog.md) |
 | After 0.1 GA | [post-ga.md](./post-ga.md) |
 
@@ -46,6 +47,15 @@ Central map for **next-ai-ready** repository docs (not the live docs site — th
 | [../examples/recipes/upstash-ratelimit](../examples/recipes/upstash-ratelimit/) | Rate-limit actions |
 | [../examples/recipes/action-auth](../examples/recipes/action-auth/) | Per-action auth for `/api/actions` |
 | [../CONTRIBUTING.md](../CONTRIBUTING.md) | Dev setup, verify:release, publish |
+
+## Distribution
+
+| Path | Purpose |
+|------|---------|
+| [distribution/README.md](./distribution/README.md) | Canonical links, publishing rules, UTM scheme, and funnel metrics |
+| [distribution/xiaohongshu.zh-CN.md](./distribution/xiaohongshu.zh-CN.md) | Chinese post copy and a 45-second vertical video script |
+| [distribution/reddit.md](./distribution/reddit.md) | Technical discussion post and a 60-second demo script |
+| [distribution/x.md](./distribution/x.md) | Single post, thread, and a 30-second demo script |
 
 ## Historical
 

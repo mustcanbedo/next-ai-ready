@@ -145,15 +145,15 @@ async function main() {
   });
   await expectResponse("/en/docs/guides/nextjs-llms-txt", {
     contentType: "text/html",
-    includes: "How to add llms.txt to Next.js",
+    includes: "Add llms.txt and Markdown endpoints to Next.js App Router",
   });
   await expectResponse("/en/docs/guides/nextjs-llms-txt.md", {
     contentType: "text/markdown",
-    includes: "# How to add llms.txt to Next.js",
+    includes: "# Add llms.txt and Markdown endpoints to Next.js App Router",
   });
   await expectResponse("/zh/docs/guides/nextjs-llms-txt.md", {
     contentType: "text/markdown",
-    includes: "# 如何为 Next.js 添加 llms.txt",
+    includes: "# 为 Next.js App Router 添加 llms.txt 与 Markdown 端点",
   });
   await expectResponse("/en/docs/guides/nextra-ai-ready", {
     contentType: "text/html",

@@ -1707,11 +1707,11 @@ No. This site uses a simplified Markdown renderer for UI; the build pipeline run
 <!-- END /en/docs/guides/mdx-content -->
 
 <!-- BEGIN /en/docs/guides/nextjs-llms-txt -->
-# How to add llms.txt to Next.js
+# Add llms.txt and Markdown endpoints to Next.js App Router
 URL: https://next-ai-ready.vercel.app/en/docs/guides/nextjs-llms-txt
-Updated: 2026-08-02
+Updated: 2026-08-05
 
-# How to add llms.txt to Next.js
+# Add llms.txt and Markdown endpoints to Next.js App Router
 
 The smallest implementation is a hand-written `public/llms.txt`. That is enough for a small,
 rarely changing site. Use a build integration when the file must stay synchronized with many
@@ -1721,6 +1721,42 @@ This guide adds those interfaces to an existing Next.js App Router project witho
 
 Using a documentation framework? Follow the dedicated [Nextra 4 guide](./nextra-ai-ready) or
 [Fumadocs guide](./fumadocs-ai-ready) for content paths, plugin composition, and deployment limits.
+
+## Choose the smallest setup that fits
+
+| Situation                            | Recommended approach                                                                     |
+| ------------------------------------ | ---------------------------------------------------------------------------------------- |
+| A small site with a few stable pages | Hand-write `public/llms.txt` and review it when content changes.                         |
+| A documentation or content site      | Generate `llms.txt`, `llms-full.txt`, and page Markdown from the content source.         |
+| A multilingual site                  | Generate locale-aware routes and verify that each language returns the intended content. |
+| Agents need to perform operations    | Add authenticated actions only after the readable content layer works.                   |
+
+Do not add MCP, a database, or callable actions just to claim that a site is AI-ready. Start with
+content discovery and retrieval, verify them in production, and add capabilities when a real use
+case requires them.
+
+## Try a clean runnable demo first
+
+Create a minimal App Router project before changing an existing application:
+
+```bash
+npm create next-ai-ready@alpha next-ai-ready-demo
+cd next-ai-ready-demo
+npm install
+npx next-ai-ready init
+npm run build
+npm run dev
+```
+
+Then open:
+
+- `http://localhost:3000/llms.txt`
+- `http://localhost:3000/index.md`
+- `http://localhost:3000/openapi.json`
+
+The generated directory is an ordinary Next.js TypeScript project. You can commit it, deploy it,
+or compare its small integration diff with your existing app. The generator itself is covered by
+the repository's clean-install and production-build release checks.
 
 ## See a production example
 
@@ -1790,6 +1826,19 @@ deployment exposes:
 The setup is ready when `doctor` reports zero errors and `llms.txt` lists the intended pages.
 Warnings describe optional quality or production settings that still need attention.
 
+## Check the expected responses
+
+Use HTTP checks so a successful-looking page cannot hide a redirect or HTML fallback:
+
+```bash
+curl -i http://localhost:3000/llms.txt
+curl -i http://localhost:3000/about.md
+```
+
+Both requests should return `200`. `llms.txt` should be plain text and the page endpoint should
+return Markdown derived from the intended content source. A normal request to `/about` should still
+return the original HTML page.
+
 ## 4. Verify the deployed site
 
 After deploying, inspect the real public responses rather than relying only on build artifacts:
@@ -1801,6 +1850,19 @@ pnpm exec next-ai-ready audit https://example.com --version 3
 Also open `https://example.com/llms.txt` and one real page such as
 `https://example.com/about.md`. Confirm that canonical URLs point to the production origin and that
 normal browser pages still return HTML.
+
+## Common mistakes
+
+- **The endpoint returns the app's HTML shell.** Check that `withAiReady()` wraps the exported
+  Next.js config and that the generated route handlers exist.
+- **`llms.txt` is empty or misses pages.** Check the `content` globs in `ai-ready.config.*`, then run
+  the build again.
+- **Local URLs appear in production output.** Set the production `site.baseUrl` and rebuild before
+  deployment.
+- **Private content appears in a generated artifact.** Remove it from the content source or apply an
+  explicit exclusion; generated files are public unless the deployment protects them.
+- **The audit is high but citations do not increase.** Readability is an input, not a ranking or
+  citation guarantee. Measure real crawler visits and referrals separately.
 
 ## Add callable actions later
 
@@ -1827,6 +1889,10 @@ No. It improves technical discovery and readability but does not guarantee crawl
 ### How do I verify llms.txt after deployment?
 
 Open /llms.txt and a page Markdown URL, then run next-ai-ready audit against the production origin.
+
+### Should I hand-write llms.txt or generate it?
+
+Hand-write it for a small, rarely changing site. Generate it when routes, locales, summaries, or Markdown pages must stay synchronized.
 
 
 <!-- END /en/docs/guides/nextjs-llms-txt -->
@@ -4046,11 +4112,11 @@ summary、questions、tags、updatedAt、author 可提升 llms.txt、FAQ 节点�
 <!-- END /zh/docs/guides/mdx-content -->
 
 <!-- BEGIN /zh/docs/guides/nextjs-llms-txt -->
-# 如何为 Next.js 添加 llms.txt
+# 为 Next.js App Router 添加 llms.txt 与 Markdown 端点
 URL: https://next-ai-ready.vercel.app/zh/docs/guides/nextjs-llms-txt
-Updated: 2026-08-02
+Updated: 2026-08-05
 
-# 如何为 Next.js 添加 llms.txt
+# 为 Next.js App Router 添加 llms.txt 与 Markdown 端点
 
 最小实现是在 `public/llms.txt` 中手写内容。对于页面少、更新不频繁的网站，这已经足够。
 当文件需要与大量页面、摘要、Markdown、结构化数据或 Agent 工具保持同步时，再使用构建集成。
@@ -4059,6 +4125,40 @@ Updated: 2026-08-02
 
 如果项目使用文档框架，请查看专门的 [Nextra 4 指南](./nextra-ai-ready) 或
 [Fumadocs 指南](./fumadocs-ai-ready)，其中包含内容目录、插件组合与部署限制。
+
+## 选择满足需求的最小方案
+
+| 使用场景         | 推荐方案                                              |
+| ------------ | ------------------------------------------------- |
+| 只有少量稳定页面的小网站 | 手写 `public/llms.txt`，内容变化时人工检查。                   |
+| 文档站或内容型网站    | 从内容源自动生成 `llms.txt`、`llms-full.txt` 与逐页 Markdown。 |
+| 多语言网站        | 自动生成带 locale 的路由，并验证每种语言返回正确内容。                   |
+| Agent 需要执行操作 | 先让内容层可读，再按真实需求增加经过鉴权的 Action。                     |
+
+不要为了宣称网站“AI-ready”就立即加入 MCP、数据库或可调用 Action。先完成内容发现与读取，
+在生产环境验证，再根据真实使用场景添加能力。
+
+## 先运行一个干净的演示
+
+在改动现有项目之前，先创建最小 App Router 项目：
+
+```bash
+npm create next-ai-ready@alpha next-ai-ready-demo
+cd next-ai-ready-demo
+npm install
+npx next-ai-ready init
+npm run build
+npm run dev
+```
+
+然后打开：
+
+- `http://localhost:3000/llms.txt`
+- `http://localhost:3000/index.md`
+- `http://localhost:3000/openapi.json`
+
+生成目录就是一个普通的 Next.js TypeScript 项目，可以直接提交、部署，或与现有项目比较小范围
+接入差异。生成器本身也会经过仓库的干净安装与生产构建发布门禁。
 
 ## 查看生产案例
 
@@ -4127,6 +4227,18 @@ pnpm exec next-ai-ready doctor --score
 当 `doctor` 没有错误，并且 `llms.txt` 列出预期页面时，基础接入完成。警告表示仍需处理的
 可选质量项或生产配置。
 
+## 检查真实 HTTP 响应
+
+使用 HTTP 检查，避免看似成功的页面其实是重定向或 HTML fallback：
+
+```bash
+curl -i http://localhost:3000/llms.txt
+curl -i http://localhost:3000/about.md
+```
+
+两个请求都应返回 `200`。`llms.txt` 应返回纯文本，页面端点应返回来自预期内容源的 Markdown；
+普通浏览器访问 `/about` 时仍应返回原有 HTML 页面。
+
 ## 4. 验证生产站
 
 部署后应检查真实公开响应，而不只检查构建产物：
@@ -4137,6 +4249,17 @@ pnpm exec next-ai-ready audit https://example.com --version 3
 
 同时打开 `https://example.com/llms.txt` 和类似 `https://example.com/about.md` 的真实页面，
 确认 canonical URL 指向生产域名，普通浏览器页面仍返回 HTML。
+
+## 常见问题
+
+- **端点返回应用的 HTML 外壳。** 检查导出的 Next.js config 是否由 `withAiReady()` 包装，并确认
+  生成的 route handler 已存在。
+- **`llms.txt` 为空或缺少页面。** 检查 `ai-ready.config.*` 的 `content` glob，再重新构建。
+- **生产产物中出现本地 URL。** 设置生产环境的 `site.baseUrl`，然后重新构建与部署。
+- **私有内容出现在生成产物中。** 将它从内容源移除或显式排除；除非部署层另有保护，生成文件
+  默认公开。
+- **审计分数很高但引用没有增加。** 可读性只是输入条件，不是排名或引用保证；应另行衡量真实
+  爬虫访问与引荐流量。
 
 ## 后续再添加可调用 Action
 
@@ -4161,6 +4284,10 @@ pnpm exec next-ai-ready audit https://example.com --version 3
 ### 部署后如何验证 llms.txt？
 
 打开 /llms.txt 和一个页面 Markdown URL，再使用 next-ai-ready audit 检查生产域名。
+
+### 应该手写还是自动生成 llms.txt？
+
+页面少且很少更新时可以手写；当路由、语言、摘要或 Markdown 页面需要保持同步时应自动生成。
 
 
 <!-- END /zh/docs/guides/nextjs-llms-txt -->

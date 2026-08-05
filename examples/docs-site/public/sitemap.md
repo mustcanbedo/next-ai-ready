@@ -22,7 +22,7 @@
 - [i18n and AI-friendly URLs](https://next-ai-ready.vercel.app/en/docs/guides/i18n-ai-urls): Middleware, locale prefixes, and SemanticGraph routes for multilingual sites.
 - [MCP Integration](https://next-ai-ready.vercel.app/en/docs/guides/mcp-integration): Connect your actions to Claude Desktop, Cursor, and other MCP clients.
 - [Writing MDX Content](https://next-ai-ready.vercel.app/en/docs/guides/mdx-content): How to write MDX files that the semantic compiler can extract meaning from.
-- [How to add llms.txt to Next.js](https://next-ai-ready.vercel.app/en/docs/guides/nextjs-llms-txt): Add llms.txt, full-site context, and per-page Markdown endpoints to a Next.js App Router project and verify the production result.
+- [Add llms.txt and Markdown endpoints to Next.js App Router](https://next-ai-ready.vercel.app/en/docs/guides/nextjs-llms-txt): Choose between a static llms.txt and generated AI-readable endpoints, run a clean Next.js demo, and verify the production result.
 - [Nextra llms.txt and Markdown endpoint setup](https://next-ai-ready.vercel.app/en/docs/guides/nextra-ai-ready): Integrate next-ai-ready with a Nextra 4 App Router documentation site without replacing Nextra navigation, search, themes, or MDX rendering.
 - [Quickstart](https://next-ai-ready.vercel.app/en/docs/guides/quickstart): Complete a verified next-ai-ready setup in about 10 minutes.
 - [Robots.txt](https://next-ai-ready.vercel.app/en/docs/guides/robots-txt): Configure your robots.txt to explicitly allow or block AI crawlers.
@@ -46,7 +46,7 @@
 - [国际化与 AI 友好 URL](https://next-ai-ready.vercel.app/zh/docs/guides/i18n-ai-urls): 多语言站点的 middleware、locale 前缀与 SemanticGraph 路由策略。
 - [MCP 集成](https://next-ai-ready.vercel.app/zh/docs/guides/mcp-integration): 将你的 action 连接到 Claude Desktop、Cursor 和其他 MCP 客户端。
 - [编写 MDX 内容](https://next-ai-ready.vercel.app/zh/docs/guides/mdx-content): 如何编写语义编译器能提取含义的 MDX 文件。
-- [如何为 Next.js 添加 llms.txt](https://next-ai-ready.vercel.app/zh/docs/guides/nextjs-llms-txt): 为 Next.js App Router 项目添加 llms.txt、全站上下文和逐页 Markdown，并验证生产结果。
+- [为 Next.js App Router 添加 llms.txt 与 Markdown 端点](https://next-ai-ready.vercel.app/zh/docs/guides/nextjs-llms-txt): 判断应该手写还是自动生成 llms.txt，运行一个干净的 Next.js 演示，并验证生产结果。
 - [为 Nextra 4 添加 llms.txt 与 Markdown 端点](https://next-ai-ready.vercel.app/zh/docs/guides/nextra-ai-ready): 在不替换 Nextra 导航、搜索、主题和 MDX 渲染的前提下，将 next-ai-ready 接入 Nextra 4 App Router 文档站。
 - [快速开始](https://next-ai-ready.vercel.app/zh/docs/guides/quickstart): 约 10 分钟完成可验证的 next-ai-ready 基础接入。
 - [Robots.txt](https://next-ai-ready.vercel.app/zh/docs/guides/robots-txt): 配置 robots.txt 以显式允许或阻止 AI 爬虫。

@@ -23,7 +23,17 @@ pnpm exec next-ai-ready doctor --score
 
 The basic setup is complete when `doctor` reports **0 errors** and `public/llms.txt` lists your content. The generated discovery and Markdown endpoints run alongside your existing UI.
 
-**Next:** [follow the 10-minute guide](./docs/quickstart-10min.md) or [add authenticated agent actions](https://next-ai-ready.vercel.app/en/docs/guides/action-auth).
+**Next:** [follow the 10-minute guide](./docs/quickstart-10min.md), read the
+[App Router llms.txt tutorial](https://next-ai-ready.vercel.app/en/docs/guides/nextjs-llms-txt),
+or [add authenticated agent actions](https://next-ai-ready.vercel.app/en/docs/guides/action-auth).
+
+Prefer a disposable demo before editing an existing project?
+
+```bash
+npm create next-ai-ready@alpha next-ai-ready-demo
+```
+
+The generated project is a normal Next.js TypeScript app that can be committed and deployed.
 
 > **Third-party tool baseline:** the production documentation scored **100/100** with Vercel's open-source `@vercel/agent-readability@0.5.0` on 2026-08-01. [Review the machine-readable result](./docs/audit-baselines/vercel-agent-readability-0.5.0-2026-08-01.json) or reproduce it with `pnpm audit:vercel:site`. This measures technical agent readability, not search ranking, indexing, or citation.
 

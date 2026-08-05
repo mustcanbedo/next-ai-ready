@@ -23,7 +23,17 @@ pnpm exec next-ai-ready doctor --score
 
 当 `doctor` 显示 **0 个错误**，且 `public/llms.txt` 已列出你的内容时，基础接入即完成。生成的发现与 Markdown 入口会与现有 UI 并行工作。
 
-**下一步：** [完成 10 分钟指南](./docs/quickstart-10min.zh-CN.md)，或[添加经过鉴权的 Agent Action](https://next-ai-ready.vercel.app/zh/docs/guides/action-auth)。
+**下一步：** [完成 10 分钟指南](./docs/quickstart-10min.zh-CN.md)、阅读
+[App Router llms.txt 实战教程](https://next-ai-ready.vercel.app/zh/docs/guides/nextjs-llms-txt)，
+或[添加经过鉴权的 Agent Action](https://next-ai-ready.vercel.app/zh/docs/guides/action-auth)。
+
+希望先运行一个随时可删除的演示，再改动现有项目？
+
+```bash
+npm create next-ai-ready@alpha next-ai-ready-demo
+```
+
+生成结果是普通的 Next.js TypeScript 项目，可以直接提交和部署。
 
 > **第三方工具基线：** 生产文档站在 2026-08-01 使用 Vercel 开源的 `@vercel/agent-readability@0.5.0` 获得 **100/100**。[查看机器可读原始结果](./docs/audit-baselines/vercel-agent-readability-0.5.0-2026-08-01.json)，或运行 `pnpm audit:vercel:site` 复现。该分数衡量技术层面的 Agent 可读性，不代表搜索排名、收录或引用效果。
 

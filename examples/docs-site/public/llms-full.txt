@@ -1482,13 +1482,24 @@ No. Exclude paths with dots, /api, and _ai-ready from locale middleware so crawl
 <!-- END /en/docs/guides/i18n-ai-urls -->
 
 <!-- BEGIN /en/docs/guides/mcp-integration -->
-# MCP Integration
+# How to add an MCP server to Next.js App Router
 URL: https://next-ai-ready.vercel.app/en/docs/guides/mcp-integration
-Updated: 2026-08-01
+Updated: 2026-08-24
 
-# MCP Integration
+# How to add an MCP server to Next.js App Router
 
-The Model Context Protocol (MCP) lets AI clients like Claude Desktop and Cursor discover and call your actions as tools. `next-ai-ready` exposes an MCP server at `/api/mcp`.
+The shortest path is to initialize `next-ai-ready`, install the optional MCP peers, and deploy the
+generated `/api/mcp` route. Local clients can use stdio; hosted clients use authenticated Streamable
+HTTP. Both transports expose the same explicitly public actions and build-time documentation graph.
+
+```bash
+pnpm add next-ai-ready zod@^4 @modelcontextprotocol/sdk mcp-handler
+pnpm exec next-ai-ready init
+pnpm exec next-ai-ready build
+```
+
+The Model Context Protocol (MCP) lets AI clients like Claude Desktop and Cursor discover and call
+your actions as tools. `next-ai-ready` exposes an MCP server at `/api/mcp`.
 
 ## What MCP gives you
 
@@ -1580,6 +1591,14 @@ HTTP transport at /api/mcp when running Next.js, or stdio via npx next-ai-ready 
 ### How do I secure MCP in production?
 
 Set NEXT_AI_READY_MCP_TOKEN and send Authorization: Bearer <token> on HTTP requests.
+
+### Can an MCP server search my Next.js documentation?
+
+Yes. next-ai-ready exposes list_pages, search_pages, and get_page over the same pre-built SemanticGraph used for Markdown and llms.txt.
+
+### Do I need a vector database for MCP page search?
+
+No. The default search is deterministic local lexical search over the build-time graph and requires no database, embeddings, or external API.
 
 
 <!-- END /en/docs/guides/mcp-integration -->
@@ -1876,6 +1895,13 @@ Technical AI-readiness cannot guarantee that an AI product will crawl, index, ra
 page. Treat these endpoints as reliable machine-facing access to good source content, then measure
 actual visits, retrievals, citations, and business outcomes separately.
 
+## Related Next.js AI discovery guides
+
+- [Configure robots.txt for AI crawlers in Next.js](./robots-txt)
+- [How to add an MCP server to Next.js App Router](./mcp-integration)
+- [Add llms.txt and Markdown endpoints to Fumadocs](./fumadocs-ai-ready)
+- [Nextra llms.txt and Markdown endpoint setup](./nextra-ai-ready)
+
 ## FAQ
 
 ### Does Next.js generate llms.txt automatically?
@@ -2106,13 +2132,18 @@ After changing MDX content or actions, and before deploy so public/ and .next-ai
 <!-- END /en/docs/guides/quickstart -->
 
 <!-- BEGIN /en/docs/guides/robots-txt -->
-# Robots.txt
+# Configure robots.txt for AI crawlers in Next.js
 URL: https://next-ai-ready.vercel.app/en/docs/guides/robots-txt
-Updated: 2026-06-02
+Updated: 2026-08-24
 
-# Robots.txt
+# Configure robots.txt for AI crawlers in Next.js
 
-`next-ai-ready` generates a `robots.txt` that explicitly declares your AI-bot policy. This is important because AI crawlers need clear signals about what they can access.
+Use `app/robots.ts` when the policy is part of a Next.js App Router deployment, or emit a static
+`public/robots.txt` during the build. In both cases, allow ordinary search crawlers, declare the XML
+sitemap, and then make a separate decision for each AI crawler policy.
+
+`next-ai-ready` generates a `robots.txt` that explicitly declares your AI-bot policy. This is
+important because AI crawlers need clear signals about what they can access.
 
 ## Default behavior
 
@@ -2209,6 +2240,10 @@ next-ai-ready build can emit robots.txt with GPTBot, ClaudeBot, and other AI bot
 ### Should I advertise llms.txt in robots.txt?
 
 Yes. The build adds comments pointing crawlers to /llms.txt and /llms-full.txt when configured.
+
+### Does Google-Extended control normal Google Search indexing?
+
+No. Google-Extended controls whether site content may be used for certain generative AI systems; normal Google Search crawling follows Googlebot rules.
 
 
 <!-- END /en/docs/guides/robots-txt -->
@@ -3887,13 +3922,24 @@ export const config = {
 <!-- END /zh/docs/guides/i18n-ai-urls -->
 
 <!-- BEGIN /zh/docs/guides/mcp-integration -->
-# MCP 集成
+# 如何为 Next.js App Router 添加 MCP Server
 URL: https://next-ai-ready.vercel.app/zh/docs/guides/mcp-integration
-Updated: 2026-08-01
+Updated: 2026-08-24
 
-# MCP 集成
+# 如何为 Next.js App Router 添加 MCP Server
 
-模型上下文协议（MCP）让 Claude Desktop 和 Cursor 等 AI 客户端将你的 action 作为工具发现和调用。`next-ai-ready` 在 `/api/mcp` 提供 MCP 服务器。
+最短路径是初始化 `next-ai-ready`、安装可选 MCP peer 依赖，并部署生成的 `/api/mcp`
+路由。本地客户端使用 stdio，托管客户端使用经过鉴权的 Streamable HTTP；两种传输方式
+暴露同一组显式公开的 Action 与构建期文档图谱。
+
+```bash
+pnpm add next-ai-ready zod@^4 @modelcontextprotocol/sdk mcp-handler
+pnpm exec next-ai-ready init
+pnpm exec next-ai-ready build
+```
+
+模型上下文协议（MCP）让 Claude Desktop 和 Cursor 等 AI 客户端将你的 Action 作为工具发现和
+调用。`next-ai-ready` 在 `/api/mcp` 提供 MCP Server。
 
 ## MCP 能做什么
 
@@ -3985,6 +4031,14 @@ Next.js 运行时走 /api/mcp HTTP 传输；Claude Desktop/Cursor 可用 npx nex
 ### 生产环境如何保护 MCP？
 
 设置 NEXT_AI_READY_MCP_TOKEN，HTTP 请求需带 Authorization: Bearer <token>。
+
+### MCP Server 可以搜索 Next.js 文档吗？
+
+可以。next-ai-ready 通过同一个预构建 SemanticGraph 提供 list_pages、search_pages 和 get_page。
+
+### MCP 页面搜索需要向量数据库吗？
+
+不需要。默认使用构建期图谱上的确定性本地词法搜索，不依赖数据库、Embedding 或外部 API。
 
 
 <!-- END /zh/docs/guides/mcp-integration -->
@@ -4271,6 +4325,13 @@ pnpm exec next-ai-ready audit https://example.com --version 3
 技术层面的 AI-readiness 不能保证某个 AI 产品一定抓取、收录、排名、引用或推荐页面。这些
 端点的价值是为优质源内容提供稳定的机器访问方式，实际访问、检索、引用和业务结果仍需单独衡量。
 
+## 相关 Next.js AI 发现指南
+
+- [在 Next.js 中配置面向 AI 爬虫的 robots.txt](./robots-txt)
+- [如何为 Next.js App Router 添加 MCP Server](./mcp-integration)
+- [为 Fumadocs 添加 llms.txt 与 Markdown 端点](./fumadocs-ai-ready)
+- [Nextra llms.txt 与 Markdown 端点配置](./nextra-ai-ready)
+
 ## FAQ
 
 ### Next.js 会自动生成 llms.txt 吗？
@@ -4499,13 +4560,18 @@ npx next-ai-ready doctor --score
 <!-- END /zh/docs/guides/quickstart -->
 
 <!-- BEGIN /zh/docs/guides/robots-txt -->
-# Robots.txt
+# 在 Next.js 中配置面向 AI 爬虫的 robots.txt
 URL: https://next-ai-ready.vercel.app/zh/docs/guides/robots-txt
-Updated: 2026-06-02
+Updated: 2026-08-24
 
-# Robots.txt
+# 在 Next.js 中配置面向 AI 爬虫的 robots.txt
 
-`next-ai-ready` 生成一个 `robots.txt`，显式声明你的 AI 爬虫策略。这对 AI 爬虫很重要，因为它们需要明确的信号来判断可以访问什么。
+策略属于 Next.js App Router 部署时使用 `app/robots.ts`；需要构建期静态文件时生成
+`public/robots.txt`。两种方式都应允许普通搜索爬虫、声明 XML sitemap，再分别决定每一种
+AI 爬虫的访问策略。
+
+`next-ai-ready` 生成一个 `robots.txt`，显式声明你的 AI 爬虫策略。这对 AI 爬虫很重要，
+因为它们需要明确的信号来判断可以访问什么。
 
 ## 默认行为
 
@@ -4602,6 +4668,10 @@ build 可生成含 GPTBot、ClaudeBot 等规则的 robots.txt，或在 app/robot
 ### 是否应在 robots.txt 中声明 llms.txt？
 
 建议声明。构建时可通过注释指向 /llms.txt 与 /llms-full.txt。
+
+### Google-Extended 会控制普通 Google 搜索收录吗？
+
+不会。Google-Extended 控制内容能否用于部分生成式 AI 系统；普通 Google 搜索抓取遵循 Googlebot 规则。
 
 
 <!-- END /zh/docs/guides/robots-txt -->

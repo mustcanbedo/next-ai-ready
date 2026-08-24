@@ -66,8 +66,11 @@ async function expectResponse(
   if (contentType && !response.headers.get("content-type")?.includes(contentType)) {
     fail(`${path}: expected content-type containing ${contentType}`);
   }
-  if (includes && !body.includes(includes)) {
-    fail(`${path}: response body is missing ${JSON.stringify(includes)}`);
+  const expectedBodyParts = Array.isArray(includes) ? includes : includes ? [includes] : [];
+  for (const expected of expectedBodyParts) {
+    if (!body.includes(expected)) {
+      fail(`${path}: response body is missing ${JSON.stringify(expected)}`);
+    }
   }
   for (const [name, expected] of Object.entries(headerIncludes)) {
     if (!response.headers.get(name)?.includes(expected)) {
@@ -107,6 +110,13 @@ async function main() {
     contentType: "text/markdown",
     includes: "# next-ai-ready Sitemap",
   });
+  await expectResponse("/sitemap.xml", {
+    contentType: "application/xml",
+    includes: [
+      "<lastmod>2026-08-24T00:00:00.000Z</lastmod>",
+      'hreflang="zh" href="https://next-ai-ready.vercel.app/zh/docs/guides/mcp-integration"',
+    ],
+  });
   await expectResponse("/_ai-ready/llms-txt", {
     contentType: "text/plain",
     includes: "# next-ai-ready",
@@ -121,6 +131,18 @@ async function main() {
   await expectResponse("/zh.md", {
     contentType: "text/markdown",
     includes: "# next-ai-ready",
+  });
+  await expectResponse("/en", {
+    contentType: "text/html",
+    includes:
+      'content="Add llms.txt, page Markdown, JSON-LD, MCP, and authenticated agent actions to a Next.js App Router site."',
+  });
+  await expectResponse("/zh", {
+    contentType: "text/html",
+    includes: [
+      'content="为 Next.js App Router 站点添加 llms.txt、逐页 Markdown、JSON-LD、MCP 与经过鉴权的 Agent Action。"',
+      '<link rel="canonical" href="https://next-ai-ready.vercel.app/zh"',
+    ],
   });
   await expectResponse("/en", {
     contentType: "text/markdown",
@@ -154,6 +176,14 @@ async function main() {
   await expectResponse("/zh/docs/guides/nextjs-llms-txt.md", {
     contentType: "text/markdown",
     includes: "# 为 Next.js App Router 添加 llms.txt 与 Markdown 端点",
+  });
+  await expectResponse("/en/docs/guides/mcp-integration", {
+    contentType: "text/html",
+    includes: "How to add an MCP server to Next.js App Router",
+  });
+  await expectResponse("/zh/docs/guides/robots-txt", {
+    contentType: "text/html",
+    includes: "在 Next.js 中配置面向 AI 爬虫的 robots.txt",
   });
   await expectResponse("/en/docs/guides/nextra-ai-ready", {
     contentType: "text/html",

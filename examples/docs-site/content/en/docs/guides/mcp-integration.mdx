@@ -1,6 +1,6 @@
 ---
-title: MCP Integration
-summary: 'Connect your actions to Claude Desktop, Cursor, and other MCP clients.'
+title: How to add an MCP server to Next.js App Router
+summary: Add local stdio and authenticated Streamable HTTP MCP endpoints to Next.js, then expose page search and explicitly public actions as tools.
 order: 4
 questions:
   - q: How do MCP clients connect to my site?
@@ -11,16 +11,36 @@ questions:
     a: >-
       Set NEXT_AI_READY_MCP_TOKEN and send Authorization: Bearer <token> on HTTP
       requests.
+  - q: Can an MCP server search my Next.js documentation?
+    a: Yes. next-ai-ready exposes list_pages, search_pages, and get_page over the same pre-built SemanticGraph used for Markdown and llms.txt.
+  - q: Do I need a vector database for MCP page search?
+    a: No. The default search is deterministic local lexical search over the build-time graph and requires no database, embeddings, or external API.
 tags:
-  - how-to
-  - best-practices
-updatedAt: '2026-08-01'
+  - nextjs
+  - app-router
+  - mcp-server
+  - model-context-protocol
+  - claude-desktop
+  - cursor
+  - tutorial
+updatedAt: '2026-08-24'
 author: next-ai-ready team
 ---
 
-# MCP Integration
+# How to add an MCP server to Next.js App Router
 
-The Model Context Protocol (MCP) lets AI clients like Claude Desktop and Cursor discover and call your actions as tools. `next-ai-ready` exposes an MCP server at `/api/mcp`.
+The shortest path is to initialize `next-ai-ready`, install the optional MCP peers, and deploy the
+generated `/api/mcp` route. Local clients can use stdio; hosted clients use authenticated Streamable
+HTTP. Both transports expose the same explicitly public actions and build-time documentation graph.
+
+```bash
+pnpm add next-ai-ready zod@^4 @modelcontextprotocol/sdk mcp-handler
+pnpm exec next-ai-ready init
+pnpm exec next-ai-ready build
+```
+
+The Model Context Protocol (MCP) lets AI clients like Claude Desktop and Cursor discover and call
+your actions as tools. `next-ai-ready` exposes an MCP server at `/api/mcp`.
 
 ## What MCP gives you
 

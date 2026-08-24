@@ -9,6 +9,8 @@ export interface DocMeta {
   slug: string;
   section: string;
   order: number;
+  updatedAt?: string;
+  author?: string;
 }
 
 export interface DocPage extends DocMeta {
@@ -27,6 +29,15 @@ const SECTION_ORDER: Record<string, number> = {
   decisions: 4,
 };
 
+function frontmatterDate(value: unknown): string | undefined {
+  if (value instanceof Date && !Number.isNaN(value.getTime())) {
+    return value.toISOString().slice(0, 10);
+  }
+  if (typeof value !== "string") return undefined;
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? undefined : date.toISOString().slice(0, 10);
+}
+
 export async function getAllDocs(locale: Locale = "en"): Promise<DocMeta[]> {
   const docs: DocMeta[] = [];
   const dir = contentDir(locale);
@@ -43,6 +54,8 @@ export async function getAllDocs(locale: Locale = "en"): Promise<DocMeta[]> {
       slug: file.replace(".mdx", ""),
       section: "getting-started",
       order: data.order ?? 99,
+      updatedAt: frontmatterDate(data.updatedAt),
+      author: typeof data.author === "string" ? data.author : undefined,
     });
   }
 
@@ -64,6 +77,8 @@ export async function getAllDocs(locale: Locale = "en"): Promise<DocMeta[]> {
           slug: `${section}/${file.replace(".mdx", "")}`,
           section,
           order: data.order ?? 99,
+          updatedAt: frontmatterDate(data.updatedAt),
+          author: typeof data.author === "string" ? data.author : undefined,
         });
       }
     } catch {
@@ -91,6 +106,8 @@ export async function getDoc(slug: string, locale: Locale = "en"): Promise<DocPa
       slug,
       section,
       order: data.order ?? 99,
+      updatedAt: frontmatterDate(data.updatedAt),
+      author: typeof data.author === "string" ? data.author : undefined,
       content,
     };
   } catch {

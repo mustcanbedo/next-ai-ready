@@ -1,6 +1,6 @@
 ---
-title: Robots.txt
-summary: 配置 robots.txt 以显式允许或阻止 AI 爬虫。
+title: 在 Next.js 中配置面向 AI 爬虫的 robots.txt
+summary: 生成同时声明 Google 与 AI 爬虫访问规则、XML sitemap 和 llms.txt 发现入口的 Next.js robots.txt。
 order: 6
 questions:
   - q: 如何显式允许 AI 爬虫？
@@ -9,16 +9,27 @@ questions:
       aiRobots()。
   - q: 是否应在 robots.txt 中声明 llms.txt？
     a: 建议声明。构建时可通过注释指向 /llms.txt 与 /llms-full.txt。
+  - q: Google-Extended 会控制普通 Google 搜索收录吗？
+    a: 不会。Google-Extended 控制内容能否用于部分生成式 AI 系统；普通 Google 搜索抓取遵循 Googlebot 规则。
 tags:
-  - how-to
-  - best-practices
-updatedAt: '2026-06-02'
+  - nextjs
+  - robots.txt
+  - ai-crawlers
+  - googlebot
+  - llms.txt
+  - tutorial
+updatedAt: '2026-08-24'
 author: next-ai-ready 团队
 ---
 
-# Robots.txt
+# 在 Next.js 中配置面向 AI 爬虫的 robots.txt
 
-`next-ai-ready` 生成一个 `robots.txt`，显式声明你的 AI 爬虫策略。这对 AI 爬虫很重要，因为它们需要明确的信号来判断可以访问什么。
+策略属于 Next.js App Router 部署时使用 `app/robots.ts`；需要构建期静态文件时生成
+`public/robots.txt`。两种方式都应允许普通搜索爬虫、声明 XML sitemap，再分别决定每一种
+AI 爬虫的访问策略。
+
+`next-ai-ready` 生成一个 `robots.txt`，显式声明你的 AI 爬虫策略。这对 AI 爬虫很重要，
+因为它们需要明确的信号来判断可以访问什么。
 
 ## 默认行为
 

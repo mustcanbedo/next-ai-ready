@@ -32,6 +32,8 @@ export async function generateMetadata({ params }: PageProps) {
     slug: slug.join("/"),
     title: doc.title,
     summary: doc.summary,
+    updatedAt: doc.updatedAt,
+    author: doc.author,
   });
 }
 

@@ -1,6 +1,6 @@
 ---
-title: Robots.txt
-summary: Configure your robots.txt to explicitly allow or block AI crawlers.
+title: Configure robots.txt for AI crawlers in Next.js
+summary: Generate a Next.js robots.txt that declares Google and AI crawler access, links the XML sitemap, and keeps llms.txt discovery aligned.
 order: 6
 questions:
   - q: How do I allow AI crawlers explicitly?
@@ -11,16 +11,27 @@ questions:
     a: >-
       Yes. The build adds comments pointing crawlers to /llms.txt and
       /llms-full.txt when configured.
+  - q: Does Google-Extended control normal Google Search indexing?
+    a: No. Google-Extended controls whether site content may be used for certain generative AI systems; normal Google Search crawling follows Googlebot rules.
 tags:
-  - how-to
-  - best-practices
-updatedAt: '2026-06-02'
+  - nextjs
+  - robots.txt
+  - ai-crawlers
+  - googlebot
+  - llms.txt
+  - tutorial
+updatedAt: '2026-08-24'
 author: next-ai-ready team
 ---
 
-# Robots.txt
+# Configure robots.txt for AI crawlers in Next.js
 
-`next-ai-ready` generates a `robots.txt` that explicitly declares your AI-bot policy. This is important because AI crawlers need clear signals about what they can access.
+Use `app/robots.ts` when the policy is part of a Next.js App Router deployment, or emit a static
+`public/robots.txt` during the build. In both cases, allow ordinary search crawlers, declare the XML
+sitemap, and then make a separate decision for each AI crawler policy.
+
+`next-ai-ready` generates a `robots.txt` that explicitly declares your AI-bot policy. This is
+important because AI crawlers need clear signals about what they can access.
 
 ## Default behavior
 

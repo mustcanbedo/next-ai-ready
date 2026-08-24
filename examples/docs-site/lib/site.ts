@@ -13,5 +13,14 @@ export function getSiteBaseUrl(): string {
 }
 
 export const SITE_NAME = "next-ai-ready";
-export const SITE_DESCRIPTION =
-  "AEO + Agent-API layer for Next.js App Router. Make your site readable by AI and callable by agents.";
+
+export const SITE_DESCRIPTIONS = {
+  en: "Add llms.txt, page Markdown, JSON-LD, MCP, and authenticated agent actions to a Next.js App Router site.",
+  zh: "为 Next.js App Router 站点添加 llms.txt、逐页 Markdown、JSON-LD、MCP 与经过鉴权的 Agent Action。",
+} as const;
+
+export const SITE_DESCRIPTION = SITE_DESCRIPTIONS.en;
+
+export function getSiteDescription(locale: keyof typeof SITE_DESCRIPTIONS): string {
+  return SITE_DESCRIPTIONS[locale];
+}

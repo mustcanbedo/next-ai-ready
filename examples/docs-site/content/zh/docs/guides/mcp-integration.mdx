@@ -1,6 +1,6 @@
 ---
-title: MCP 集成
-summary: 将你的 action 连接到 Claude Desktop、Cursor 和其他 MCP 客户端。
+title: 如何为 Next.js App Router 添加 MCP Server
+summary: 为 Next.js 添加本地 stdio 与经过鉴权的 Streamable HTTP MCP 端点，并将页面搜索和显式公开的 Action 暴露为工具。
 order: 4
 questions:
   - q: MCP 客户端如何连接我的站点？
@@ -9,16 +9,36 @@ questions:
       mcp stdio。
   - q: 生产环境如何保护 MCP？
     a: '设置 NEXT_AI_READY_MCP_TOKEN，HTTP 请求需带 Authorization: Bearer <token>。'
+  - q: MCP Server 可以搜索 Next.js 文档吗？
+    a: 可以。next-ai-ready 通过同一个预构建 SemanticGraph 提供 list_pages、search_pages 和 get_page。
+  - q: MCP 页面搜索需要向量数据库吗？
+    a: 不需要。默认使用构建期图谱上的确定性本地词法搜索，不依赖数据库、Embedding 或外部 API。
 tags:
-  - how-to
-  - best-practices
-updatedAt: '2026-08-01'
+  - nextjs
+  - app-router
+  - mcp-server
+  - model-context-protocol
+  - claude-desktop
+  - cursor
+  - tutorial
+updatedAt: '2026-08-24'
 author: next-ai-ready 团队
 ---
 
-# MCP 集成
+# 如何为 Next.js App Router 添加 MCP Server
 
-模型上下文协议（MCP）让 Claude Desktop 和 Cursor 等 AI 客户端将你的 action 作为工具发现和调用。`next-ai-ready` 在 `/api/mcp` 提供 MCP 服务器。
+最短路径是初始化 `next-ai-ready`、安装可选 MCP peer 依赖，并部署生成的 `/api/mcp`
+路由。本地客户端使用 stdio，托管客户端使用经过鉴权的 Streamable HTTP；两种传输方式
+暴露同一组显式公开的 Action 与构建期文档图谱。
+
+```bash
+pnpm add next-ai-ready zod@^4 @modelcontextprotocol/sdk mcp-handler
+pnpm exec next-ai-ready init
+pnpm exec next-ai-ready build
+```
+
+模型上下文协议（MCP）让 Claude Desktop 和 Cursor 等 AI 客户端将你的 Action 作为工具发现和
+调用。`next-ai-ready` 在 `/api/mcp` 提供 MCP Server。
 
 ## MCP 能做什么
 

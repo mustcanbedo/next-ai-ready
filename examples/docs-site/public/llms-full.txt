@@ -2399,7 +2399,7 @@ ai-ready.config, route stubs under app/%5Fai-ready/, action and MCP endpoints, a
 <!-- BEGIN /en/docs/introduction -->
 # Introduction
 URL: https://next-ai-ready.vercel.app/en/docs/introduction
-Updated: 2026-06-02
+Updated: 2026-08-25
 
 # Introduction
 
@@ -2443,6 +2443,13 @@ Your existing UI is untouched. The framework adds **new routes** that serve AI-o
 | `/<page>.md`    | RAG pipelines                 |
 | `JSON-LD`       | Search engines                |
 | `/tools.json`   | OpenAI tool format            |
+
+## Choose your next step
+
+- [Complete the 10-minute quickstart](/en/docs/guides/quickstart) to install and verify the generated outputs.
+- [Add llms.txt to a Next.js site](/en/docs/guides/nextjs-llms-txt) to create a clean AI discovery index and per-page Markdown.
+- [Connect an MCP client](/en/docs/guides/mcp-integration) when agents need to search content or call approved tools.
+- [Configure robots.txt for AI crawlers](/en/docs/guides/robots-txt) to publish an explicit crawling policy without weakening normal search discovery.
 
 ## FAQ
 
@@ -4827,7 +4834,7 @@ ai-ready.config、app/%5Fai-ready/ 路由桩、action/MCP 端点，以及可选�
 <!-- BEGIN /zh/docs/introduction -->
 # 简介
 URL: https://next-ai-ready.vercel.app/zh/docs/introduction
-Updated: 2026-06-02
+Updated: 2026-08-25
 
 # 简介
 
@@ -4871,6 +4878,13 @@ npx next-ai-ready build
 | `/<page>.md`    | RAG 管道                |
 | `JSON-LD`       | 搜索引擎                  |
 | `/tools.json`   | OpenAI 工具格式           |
+
+## 选择下一步
+
+- [完成 10 分钟快速开始](/zh/docs/guides/quickstart)，安装并验证所有生成产物。
+- [为 Next.js 站点添加 llms.txt](/zh/docs/guides/nextjs-llms-txt)，建立清晰的 AI 内容索引与逐页 Markdown。
+- [连接 MCP 客户端](/zh/docs/guides/mcp-integration)，让 Agent 搜索内容或调用经过许可的工具。
+- [为 AI 爬虫配置 robots.txt](/zh/docs/guides/robots-txt)，在不削弱正常搜索发现的前提下声明明确的抓取策略。
 
 ## FAQ
 

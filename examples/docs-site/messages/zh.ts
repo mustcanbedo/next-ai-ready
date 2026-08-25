@@ -106,6 +106,27 @@ const zh = {
       { path: "JSON-LD", label: "结构化数据" },
     ],
   },
+  guides: {
+    heading: "Next.js 实战指南",
+    subheading: "从可落地的标准和集成开始，让搜索引擎、AI 系统与 Agent 更容易发现生产环境中的 Next.js 站点。",
+    items: [
+      {
+        href: "/zh/docs/guides/nextjs-llms-txt",
+        title: "为 Next.js 添加 llms.txt",
+        description: "无需重写 UI，生成有用的 llms.txt 索引与逐页 Markdown。",
+      },
+      {
+        href: "/zh/docs/guides/mcp-integration",
+        title: "连接 MCP 客户端",
+        description: "通过生产级 MCP 端点暴露可搜索内容与经过许可的工具。",
+      },
+      {
+        href: "/zh/docs/guides/robots-txt",
+        title: "为 AI 爬虫配置 robots.txt",
+        description: "在保留搜索引擎抓取能力的同时，为 AI 消费者声明明确策略。",
+      },
+    ],
+  },
   cta: {
     title: "准备让你的站点 AI-Ready？",
     subtitle: "约 10 分钟完成可验证的基础接入。",

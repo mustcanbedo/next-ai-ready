@@ -134,14 +134,19 @@ async function main() {
   });
   await expectResponse("/en", {
     contentType: "text/html",
-    includes:
+    includes: [
       'content="Add llms.txt, page Markdown, JSON-LD, MCP, and authenticated agent actions to a Next.js App Router site."',
+      'href="/en/docs/guides/nextjs-llms-txt"',
+      "Add llms.txt to Next.js",
+    ],
   });
   await expectResponse("/zh", {
     contentType: "text/html",
     includes: [
       'content="为 Next.js App Router 站点添加 llms.txt、逐页 Markdown、JSON-LD、MCP 与经过鉴权的 Agent Action。"',
       '<link rel="canonical" href="https://next-ai-ready.vercel.app/zh"',
+      'href="/zh/docs/guides/nextjs-llms-txt"',
+      "为 Next.js 添加 llms.txt",
     ],
   });
   await expectResponse("/en", {
@@ -159,7 +164,10 @@ async function main() {
     headerIncludes: {
       link: '<https://next-ai-ready.vercel.app/en/docs/introduction>; rel="canonical"',
     },
-    includes: "# Introduction",
+    includes: [
+      "# Introduction",
+      "[Add llms.txt to a Next.js site](/en/docs/guides/nextjs-llms-txt)",
+    ],
   });
   await expectResponse("/zh/docs/introduction.md", {
     contentType: "text/markdown",

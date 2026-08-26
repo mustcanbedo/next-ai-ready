@@ -108,6 +108,28 @@ const en = {
       { path: "JSON-LD", label: "Structured data" },
     ],
   },
+  guides: {
+    heading: "Practical Next.js guides",
+    subheading:
+      "Start with the standards and integrations that make a production Next.js site easier for search engines, AI systems, and agents to discover.",
+    items: [
+      {
+        href: "/en/docs/guides/nextjs-llms-txt",
+        title: "Add llms.txt to Next.js",
+        description: "Generate a useful llms.txt index and per-page Markdown without rebuilding your UI.",
+      },
+      {
+        href: "/en/docs/guides/mcp-integration",
+        title: "Connect an MCP client",
+        description: "Expose searchable content and approved tools through a production MCP endpoint.",
+      },
+      {
+        href: "/en/docs/guides/robots-txt",
+        title: "Configure robots.txt for AI crawlers",
+        description: "Keep search crawling intact while declaring explicit policies for AI consumers.",
+      },
+    ],
+  },
   cta: {
     title: "Ready to make your site AI-ready?",
     subtitle: "Complete the verified setup in about 10 minutes.",

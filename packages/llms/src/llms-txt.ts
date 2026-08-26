@@ -36,9 +36,10 @@ export function renderLlmsTxt(graph: SemanticGraph, opts: LlmsTxtOptions = {}): 
   lines.push(`# ${site.name}`);
   if (site.description) lines.push("");
   if (site.description) lines.push(`> ${site.description}`);
-  if (graph.generatedAt) {
+  const lastUpdated = latestPageUpdate(allPages);
+  if (lastUpdated) {
     lines.push("");
-    lines.push(`<!-- Last updated: ${graph.generatedAt.slice(0, 10)} -->`);
+    lines.push(`<!-- Last updated: ${lastUpdated} -->`);
   }
   lines.push("");
 
@@ -75,6 +76,14 @@ export function renderLlmsTxt(graph: SemanticGraph, opts: LlmsTxtOptions = {}): 
   }
 
   return lines.join("\n").replace(/\n{3,}/g, "\n\n").trim() + "\n";
+}
+
+function latestPageUpdate(pages: SemanticNode[]): string | undefined {
+  const latest = pages.reduce((current, page) => {
+    const candidate = page.updatedAt?.slice(0, 10);
+    return candidate && candidate > current ? candidate : current;
+  }, "");
+  return latest || undefined;
 }
 
 function formatEntry(p: SemanticNode): string {

@@ -44,6 +44,25 @@ describe("renderLlmsTxt()", () => {
     expect(out).toContain("[Install Acme](https://acme.com/docs/install): Install Acme in under 60 seconds.");
   });
 
+  it("derives freshness from page metadata instead of the build timestamp", async () => {
+    const graph = await makeGraph();
+    graph.generatedAt = "2099-12-31T23:59:59Z";
+
+    const out = renderLlmsTxt(graph);
+
+    expect(out).toContain("<!-- Last updated: 2026-05-01 -->");
+    expect(out).not.toContain("2099-12-31");
+  });
+
+  it("omits freshness when pages do not declare updatedAt", async () => {
+    const graph = await makeGraph();
+    for (const routeId of Object.values(graph.routes)) {
+      delete graph.nodes[routeId]?.updatedAt;
+    }
+
+    expect(renderLlmsTxt(graph)).not.toContain("Last updated:");
+  });
+
   it("respects custom sections + glob + priority + limit", async () => {
     const graph = await makeGraph();
     const out = renderLlmsTxt(graph, {

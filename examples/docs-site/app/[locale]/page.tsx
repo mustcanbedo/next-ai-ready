@@ -320,6 +320,39 @@ defineAction({
         </div>
       </section>
 
+      {/* Practical guides */}
+      <section className="border-t border-white/[0.04] py-24">
+        <div className="mx-auto max-w-7xl px-6">
+          <div className="max-w-2xl">
+            <h2 className="text-3xl font-bold tracking-normal text-text sm:text-4xl">
+              {t.guides.heading}
+            </h2>
+            <p className="mt-4 text-base leading-7 text-text-secondary">
+              {t.guides.subheading}
+            </p>
+          </div>
+          <div className="mt-10 grid gap-4 md:grid-cols-3">
+            {t.guides.items.map((guide) => (
+              <Link
+                key={guide.href}
+                href={guide.href}
+                className="group flex min-h-44 flex-col justify-between rounded-lg border border-white/[0.08] bg-white/[0.02] p-6 transition-colors hover:border-accent/40 hover:bg-accent/[0.04]"
+              >
+                <h3 className="text-lg font-semibold text-text group-hover:text-accent">
+                  {guide.title}
+                </h3>
+                <p className="mt-4 text-sm leading-6 text-text-secondary">
+                  {guide.description}
+                </p>
+                <span className="mt-6 text-sm font-medium text-accent" aria-hidden="true">
+                  {locale === "zh" ? "阅读指南" : "Read guide"}
+                </span>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* CTA */}
       <section className="relative border-t border-white/[0.04] py-32 overflow-hidden">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(59,130,246,0.04)_0%,transparent_60%)]" />

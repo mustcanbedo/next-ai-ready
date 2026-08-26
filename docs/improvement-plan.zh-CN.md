@@ -1,9 +1,10 @@
 # next-ai-ready 产品改进台账
 
-> 最后更新：2026-08-24
+> 最后更新：2026-08-26
 > 维护者视角：`next-ai-ready` 原始作者与技术负责人  
 > 当前发布：npm `0.1.0-alpha.17`（`latest` 与 `alpha`）
-> 当前主分支基线：`36fa7e1`（PR #22 已合并）
+> 当前主分支基线：`b751b90`（PR #25 已合并，合并后 CI 全部通过）
+> 待发布变更：`deterministic-llms-freshness`；Changesets 预计生成 `next-ai-ready@alpha.18`、`@next-ai-ready/next@alpha.18` 和 `@next-ai-ready/llms@alpha.16`
 
 本文是后续优化的**执行状态与决策记录**。`roadmap.md` 保留工程阶段历史，
 `post-ga.md` 保留候选方向；当它们与本文的当前优先级冲突时，以本文为准。
@@ -80,8 +81,8 @@
 | i18n 与 Content Adapter | `进行中` | alpha.17 已发布 locale 搜索过滤及 Nextra/Fumadocs 默认内容发现；完整 alternate URL 与更多 ContentSource Adapter 仍待真实采用验证 |
 | 动态索引 | `待商榷` | 只保留 Provider 方向，等待真实需求证据 |
 | 商业观测 | `待商榷` | SDK 只定义开放事件和 Adapter；托管产品单独决策 |
-| 外部采用与分发 | `进行中` | 技术可信度已建立，但尚无可核验的仓库外采用基线、公开案例漏斗或渠道归因 |
-| Google 自然搜索 | `进行中` | 公开搜索尚未稳定返回本站页面；robots、sitemap 与 canonical 可用，开始接入 Search Console、修复本地化 metadata、真实更新时间和搜索意图内容 |
+| 外部采用与分发 | `进行中` | 技术可信度已建立；已增加[早期采用执行记录](./early-adopter-operations.zh-CN.md)与[渠道成效记录](./distribution/results.md)，但仓库外成功安装仍为 0 |
+| Google 自然搜索 | `进行中` | Search Console property 已验证，sitemap 成功发现 52 个页面；核心 5 页中 4 页已收录，`nextjs-llms-txt` 指南已发现但尚未收录，PR #25 已增强站内发现入口 |
 | 赞助与商业入口 | `待开始` | 尚未配置 GitHub Sponsors/FUNDING；先建立真实使用价值，再验证赞助转化 |
 
 ## 4. 已决定执行
@@ -174,7 +175,7 @@ Capability Plane 继续作为差异化能力，但不要求首次访问者在安
 | G1-04 | 冻结 0.1 公共 API | `已完成` | 十个发布包的 entrypoint、命名导出、类型声明哈希与 bin 基线均已通过；程序化 Audit 已收口到独立入口，不再暴露 CLI 调度 API |
 | G1-05 | 建立最小回滚流程 | `已完成` | 2026-08-02 完成只读演练；计划器兼容 pnpm 透传的 `--`，并生成精确 deprecate/dist-tag 命令，不执行写操作 |
 | G1-06 | 更新 GA 文案并发布 `0.1.0` | `待验证` | README、官网与机器可读首页已统一为“承诺、可复制流程、成功标准”；至少 3 个仓库外真实项目接入并修复共同阻塞后，再决定稳定版发布 |
-| G1-07 | 消除 `main`、npm 与网站文档的发布漂移 | `已完成` | npm、README、双语文档站与机器可读产物已对齐 alpha.17；文档 artifact smoke、`doctor` 100/100、路由 smoke 及公共 registry Next.js 16 构建通过；发布门禁已有 manifest 漂移检查 |
+| G1-07 | 消除 `main`、npm 与网站文档的发布漂移 | `进行中` | alpha.17 已完成一次全链路对齐；PR #25 的站内发现和确定性 freshness 已部署到网站，但对应 changeset 尚未发布到 npm，发布后需再次核对 README、文档站和 registry |
 | G1-08 | 恢复 GitHub Actions npm 发布身份 | `已完成` | 仓库 Secret `NPM_TOKEN` 已配置；2026-08-02 幂等重跑 Release Alpha，身份验证、发布门禁和已发布版本检查全部通过 |
 
 GA 之前不加入数据库、IndexNow、大型 DevTools 或托管后台。
@@ -197,6 +198,7 @@ GA 之前不加入数据库、IndexNow、大型 DevTools 或托管后台。
 - alpha.16 发布后从公共 npm `latest` 进行两次仓库外临时项目回归：pnpm + Next.js 16.2.12、npm + Next.js 15.5.22 均完成安装、`init`、产物构建、`doctor` 与正式 `next build`。
 - PR #20 合并后触发 Release Alpha #5；完整发布门禁通过并发布 Nextra/Fumadocs 内容发现、locale 搜索过滤及精确依赖链。`next-ai-ready@0.1.0-alpha.17` 与 `@next-ai-ready/next@0.1.0-alpha.17` 的 `latest`/`alpha` 均已对齐，十个公开 manifest 与 npm 完全一致。
 - alpha.17 发布后，公共 registry smoke 曾因依赖声明使用裸 `latest` 命中 pnpm 旧标签缓存；验证器已改为先解析 registry 精确版本并显式允许 `sharp` 构建。修正后准确安装 alpha.17，并在 pnpm + Next.js 16.2.12 中完成 `init`、产物构建、`doctor` 与正式 `next build`。
+- 2026-08-26，PR #25 合入 `main`，新增首页、文档入口和 `llms.txt` 对高意图指南的站内链接，并将生成产物的 freshness 从构建时间改为内容 `updatedAt`。合并后 CI #73 的构建、测试、类型检查、lint、文档站 smoke、E2E 及 npm/pnpm × Next.js 14/15/16 外部矩阵全部通过；生产英文首页、中文首页、`llms.txt` 和目标指南均返回 HTTP 200。对应 npm changeset 仍待发布，因此不能把 SDK 状态写成已发布。
 
 2026-08-01 分支审查修复：Audit v3 的 required 检查现在统一产生 failure 并使 CLI
 非零退出；`create-next-ai-ready` 已移出 Changesets ignore 列表；公开 Audit 只确认 MCP
@@ -208,7 +210,7 @@ GA 之前不加入数据库、IndexNow、大型 DevTools 或托管后台。
 | ID | 任务 | 状态 | 验收标准 |
 |---|---|---|---|
 | S2-01 | `list_pages`、`get_page`、`search_pages` | `已完成` | 已随 alpha.14 发布并通过生产带认证调用；可枚举 42 页、搜索命中目标安装页并读取完整 Markdown |
-| S2-02 | locale 过滤和确定性分页 | `待开始` | 中英文结果不混淆；cursor 行为有回归测试 |
+| S2-02 | locale 过滤和确定性分页 | `进行中` | locale 过滤已随 alpha.17 发布并有回归测试；确定性 cursor 分页尚未实现，完成前不得将整项标记为已完成 |
 | S2-03 | 统一 Search Provider | `待开始` | MCP 与 HTTP 搜索调用同一实现，不复制排序逻辑 |
 | S2-04 | 补齐页面元数据 | `进行中` | title、summary、canonical URL、locale、updatedAt 均有类型和测试 |
 | S2-05 | 工具调用效果评估 | `待开始` | 测试问题能在一到两次工具调用内找到并读取目标页 |
@@ -265,14 +267,14 @@ P0、P1 外部采用验证完成后再开始。
 P0 已完成并部署，接下来不再按内部功能完成度排期，而按外部采用成效推进：
 
 1. `A1-01`：先把现有生产文档站包装成公开 Live Proof，不再等待新仓库。
-2. `A1-02`：用标准案例定向协助 10 位维护者，验证 5 次真实安装并记录流失点。
+2. `A1-02`：按[早期采用执行记录](./early-adopter-operations.zh-CN.md)定向协助 10 位维护者，验证 5 次真实安装并记录流失点。
 3. `A1-03`：根据真实安装问题确定免费 URL Audit MVP，不先建设完整 SaaS 后台。
 4. `A1-04`：围绕案例和 Audit 发布五篇高意图内容，并提交 Next.js 相关生态入口。
 5. `A1-05`：在已有真实价值证明的页面配置 Sponsor 和商业实施入口。
 6. `G1-06`：至少 3 个仓库外项目成功后，依据兼容反馈决定 `0.1.0` GA，而不是按日期发布。
 7. `A1-06`：文档站案例证明能带来安装后，再决定是否发布独立 starter，并复制成 SaaS 和电商示例。
 
-`S2-02`、`S2-03`、`I3-*`、动态索引与 DevTools 均暂停；只有当外部采用记录证明它们是
+`S2-02` 的剩余分页工作、`S2-03`、`I3-*`、动态索引与 DevTools 均暂停；只有当外部采用记录证明它们是
 安装、部署或持续使用的共同阻塞时，才重新进入执行队列。
 
 ### 7.1 每周成效看板
@@ -287,6 +289,9 @@ P0 已完成并部署，接下来不再按内部功能完成度排期，而按�
 | 赞助/付费线索 | 0 | >= 1 | Sponsor 意向、Audit 回复或实施咨询 |
 
 Stars、页面访问和 npm 下载量只作为上游信号，不替代成功安装与持续使用。
+
+执行记录统一维护在[早期采用执行记录](./early-adopter-operations.zh-CN.md)。公开仓库只记录
+公开 URL、技术环境、阶段和汇总结果；邮箱、姓名、私有日志和其他个人信息不得进入 Git。
 
 官方文档站可以计入“公开生产案例”，但不能计入“仓库外成功安装”。维护者自行创建的测试
 仓库、CI fixture 和本地临时项目也不得计入外部采用；它们只能

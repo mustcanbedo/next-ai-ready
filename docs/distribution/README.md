@@ -35,6 +35,9 @@ the whole documentation set.
 
 ## Measurement
 
+Publication status and measured outcomes live in [results.md](./results.md). A prepared draft does
+not count as distribution; a row only moves to `published` after a public URL is recorded.
+
 Use these URLs for the first run:
 
 ```text

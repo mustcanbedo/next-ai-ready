@@ -4,7 +4,7 @@
 >
 > **审查日期：** 2026-07-26（alpha.11 + deployed audit + agent readability）
 >
-> **当前候选发布补充（2026-08-27）：** 仓库候选版本为 `0.1.0-alpha.18`，公开 npm 状态以 registry dist-tags 为准。alpha.18 增加确定性的 `llms.txt` 新鲜度；此前已发布的 alpha.17 包含 Audit v3、MCP 页面发现与 locale 过滤、运行时专用入口、TypeScript `next.config.ts` 兼容修复、npm 可发现性元数据及 Nextra/Fumadocs 内容发现。历史发布门禁、manifest 核验、公共 registry 构建及生产 MCP 带认证调用均已通过；当前优先级见 [`improvement-plan.zh-CN.md`](./improvement-plan.zh-CN.md)。下方正文保留 alpha.11 审查快照。
+> **当前候选发布补充（2026-08-27）：** 仓库候选版本为 `0.1.0-alpha.19`，公开 npm 状态以 registry dist-tags 为准。alpha.19 包含 alpha.18 的确定性 `llms.txt` 新鲜度改动，并补齐 MCP 到 LLMS 的公开依赖链；此前已发布的 alpha.17 包含 Audit v3、MCP 页面发现与 locale 过滤、运行时专用入口、TypeScript `next.config.ts` 兼容修复、npm 可发现性元数据及 Nextra/Fumadocs 内容发现。历史发布门禁、manifest 核验、公共 registry 构建及生产 MCP 带认证调用均已通过；当前优先级见 [`improvement-plan.zh-CN.md`](./improvement-plan.zh-CN.md)。下方正文保留 alpha.11 审查快照。
 > **测试状态：** 145+ tests / 9 packages · CI 含 `docs-site-smoke`
 
 ### 相关文档（分工）

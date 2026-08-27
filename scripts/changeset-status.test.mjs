@@ -17,6 +17,25 @@ test("recognizes a committed prerelease version update", () => {
   );
 });
 
+test("allows synchronized docs and release tooling beside generated package output", () => {
+  assert.equal(
+    isPreparedReleaseCommit({
+      packageChanges: [],
+      headFiles: [
+        ".changeset/pre.json",
+        ".changeset/release-mcp-with-llms-alpha16.md",
+        "README.md",
+        "examples/docs-site/content/en/index.mdx",
+        "scripts/sync-release-docs.test.mjs",
+        "packages/mcp/package.json",
+        "packages/mcp/CHANGELOG.md",
+      ],
+      prereleaseConsumed: true,
+    }),
+    true,
+  );
+});
+
 test("does not hide source changes that are missing a changeset", () => {
   assert.equal(
     isPreparedReleaseCommit({
@@ -37,7 +56,12 @@ test("does not hide source changes that are missing a changeset", () => {
   assert.equal(
     isPreparedReleaseCommit({
       packageChanges: [],
-      headFiles: ["packages/next/package.json", "packages/next/CHANGELOG.md"],
+      headFiles: [
+        ".changeset/pre.json",
+        "packages/next/package.json",
+        "packages/next/CHANGELOG.md",
+        "packages/next/src/cli/audit.ts",
+      ],
       prereleaseConsumed: true,
     }),
     false,

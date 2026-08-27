@@ -113,7 +113,7 @@ curl -sS http://localhost:3000/openapi.json | head -c 200
 
 As of 2026-08-27:
 
-- **Repository candidate:** `0.1.0-alpha.18` — public availability must be read from npm dist-tags. The guarded Release Alpha workflow reruns the complete release gate before publication. The previously published alpha.17 passed manifest verification and a public-registry pnpm + Next.js 16.2.12 install, CLI workflow, and production build; alpha.15 passed the full npm/pnpm × Next.js 14/15/16 matrix.
+- **Repository candidate:** `0.1.0-alpha.19` — public availability must be read from npm dist-tags. This candidate carries the alpha.18 deterministic freshness change and closes the MCP-to-LLMS dependency graph. The guarded Release Alpha workflow reruns the complete release gate before publication. The previously published alpha.17 passed manifest verification and a public-registry pnpm + Next.js 16.2.12 install, CLI workflow, and production build; alpha.15 passed the full npm/pnpm × Next.js 14/15/16 matrix.
 - **alpha.13:** superseded after registry smoke exposed an incomplete published Semantic/Core export chain; use alpha.14 or newer.
 - **alpha.4:** deprecated for pnpm users (scoped import bug); use ≥ alpha.5
 

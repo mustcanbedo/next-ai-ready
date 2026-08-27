@@ -1,5 +1,13 @@
 # next-ai-ready
 
+## 0.1.0-alpha.19
+
+### Patch Changes
+
+- Updated dependencies
+  - @next-ai-ready/mcp@0.1.0-alpha.16
+  - @next-ai-ready/next@0.1.0-alpha.19
+
 ## 0.1.0-alpha.18
 
 ### Patch Changes

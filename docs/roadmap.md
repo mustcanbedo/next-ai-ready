@@ -4,19 +4,21 @@ Phased delivery. Each phase produces a usable, shippable slice.
 
 ## Current iteration
 
-Completed feature work:
+Completed delivery baseline:
 
 - [x] Agent-readable missing-page recovery that preserves real browser `404` behavior.
-- [x] Opt-in Audit v2 with five weighted dimensions and per-issue recommendations; Audit v1 remains the compatibility default.
-- [x] Graph-backed MCP page discovery with bounded `list_pages`, `get_page`, and local lexical `search_pages` tools.
+- [x] Three-plane Audit v3 with an independently reproducible Vercel Agent Readability baseline.
+- [x] Graph-backed MCP `list_pages`, `get_page`, and locale-aware `search_pages` tools.
+- [x] Clean npm/pnpm installs and production builds across Next.js 14, 15, and 16.
+- [x] A production dogfood site exposing `llms.txt`, page Markdown, OpenAPI, tools, and authenticated MCP.
 
 Next stage:
 
-1. Run the release verification matrix and publish the prepared packages through the alpha workflow.
-2. Test installation from npm in a clean external Next.js application, including both audit schemas and a real MCP client session.
-3. Measure first-time adopter setup and reduce the path to a useful audit result to ten minutes or less.
-4. Design optional runtime index providers only after large or frequently changing sites demonstrate a build-time graph limitation.
-5. Add small, opt-in ecosystem integrations such as IndexNow and Content Signals with external compatibility tests.
+1. Publish the pending deterministic `llms.txt` freshness changeset after the guarded alpha workflow passes, then verify npm, README, docs, and production artifacts together.
+2. Help ten external maintainers evaluate the package and get at least five real projects through install, init, build, and doctor.
+3. Convert at least three of those projects into verifiable external production cases before publishing `0.1.0` GA.
+4. Publish the prepared tutorial packages through measured community channels and record 24-hour and seven-day outcomes.
+5. Use repeated adopter blockers, rather than internal feature ideas, to decide whether pagination, more content adapters, or a runtime index returns to the active roadmap.
 
 ## Phase 0 — Repo bootstrap (0.5 day)
 

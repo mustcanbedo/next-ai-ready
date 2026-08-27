@@ -1,24 +1,32 @@
 # next-ai-ready Google 自然搜索执行手册
 
 > 建立日期：2026-08-24
+> 状态更新：2026-08-26
 > 目标：先获得可核验的 Google 收录与曝光，再优化点击和安装转化。
 
 ## 1. 当前诊断
 
-截至 2026-08-24，公开搜索没有稳定返回 `next-ai-ready.vercel.app` 的页面。线上
-`robots.txt`、XML sitemap、canonical 和 hreflang 均可访问，因此当前主要风险是：
+截至 2026-08-26，Search Console 的 URL-prefix property 已验证，sitemap 提交成功并发现
+52 个页面。线上 `robots.txt`、XML sitemap、canonical 和 hreflang 均可访问。核心 URL
+抽查结果为：
 
-1. 尚未使用 Google Search Console 确认抓取、收录和查询数据。
-2. 网站以产品文档为主，覆盖的非品牌搜索问题仍然较少。
-3. 中文首页此前复用了英文 description。
-4. XML sitemap 此前为所有 URL 写入同一个构建时间，不能表达真实内容更新。
-5. 仓库和网站尚未形成足够的外部引用与品牌搜索。
+| URL | 当前状态 |
+|---|---|
+| `/en` | 已收录 |
+| `/zh` | 已收录 |
+| `/en/docs/guides/mcp-integration` | 已收录 |
+| `/en/docs/guides/robots-txt` | 已收录 |
+| `/en/docs/guides/nextjs-llms-txt` | 已发现，尚未收录 |
+
+PR #25 已从中英文首页、文档入口和 `llms.txt` 增加到目标指南的内部链接，并将机器可读
+产物的 freshness 改为内容 `updatedAt`。下一步不是反复提交 sitemap，而是请求一次重新索引，
+随后观察 7 至 14 天的抓取、收录和查询变化。
 
 `Agent Readability 100/100` 只代表机器可读取，不代表 Google 已收录、获得排名或产生点击。
 
-## 2. Search Console 首次接入
+## 2. Search Console 首次接入（已完成）
 
-当前站点使用 Vercel 子域，先添加 **URL-prefix property**：
+当前站点使用 Vercel 子域，已添加 **URL-prefix property**：
 
 ```text
 https://next-ai-ready.vercel.app/
@@ -37,18 +45,18 @@ GOOGLE_SITE_VERIFICATION=<Google 提供的 token>
 <meta name="google-site-verification" content="..." />
 ```
 
-验证生产页面出现该标签后，再在 Search Console 点击 Verify。该 token 不是 API 密钥，但仍应
+生产页面已通过该标签完成 Verify。该 token 不是 API 密钥，但仍应
 由项目设置统一维护，不要硬编码进仓库。
 
 ## 3. 提交与请求收录
 
-在 Sitemaps 中提交：
+Sitemaps 已提交并成功发现 52 个页面：
 
 ```text
 https://next-ai-ready.vercel.app/sitemap.xml
 ```
 
-然后使用 URL Inspection 依次检查并请求收录：
+使用 URL Inspection 依次检查以下核心页面；只有状态发生变化或内容有实质更新时才重新请求：
 
 1. `https://next-ai-ready.vercel.app/en`
 2. `https://next-ai-ready.vercel.app/zh`

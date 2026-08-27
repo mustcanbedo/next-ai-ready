@@ -13,7 +13,7 @@ export const releaseDocRules = [
   {
     path: "README.md",
     lines: [
-      { includes: "> **Release channels:**", token: "full" },
+      { includes: "> **Release candidate:**", token: "full" },
       { includes: "Install only `next-ai-ready` in consumer apps.", token: "short" },
       { includes: "🚧 **Pre-alpha**", token: "full" },
     ],
@@ -21,7 +21,7 @@ export const releaseDocRules = [
   {
     path: "README.zh-CN.md",
     lines: [
-      { includes: "> **发布渠道：**", token: "full" },
+      { includes: "> **候选版本：**", token: "full" },
       { includes: "消费者应用只需安装 `next-ai-ready`。", token: "short" },
       { includes: "🚧 **Pre-alpha**", token: "full" },
     ],
@@ -29,7 +29,7 @@ export const releaseDocRules = [
   {
     path: "docs/improvement-plan.zh-CN.md",
     lines: [
-      { includes: "> 当前发布：npm", token: "full" },
+      { includes: "> 当前仓库候选：", token: "full" },
       { includes: "| npm GA |", token: "full" },
       { includes: "| G1-07 |", token: "short" },
     ],
@@ -37,33 +37,33 @@ export const releaseDocRules = [
   {
     path: "docs/ga-readiness.md",
     lines: [
-      { includes: "**Current published version:**", token: "full" },
-      { includes: "npm **`latest` and `alpha` =", token: "short" },
+      { includes: "**Current repository candidate:**", token: "full" },
+      { includes: "Repository candidate **", token: "short" },
     ],
   },
   {
     path: "docs/completion-audit.md",
-    lines: [{ includes: "**当前发布补充", token: "full" }],
+    lines: [{ includes: "**当前候选发布补充", token: "full" }],
   },
   {
     path: "docs/external-quickstart-verification.md",
-    lines: [{ includes: "- **npm `latest` and `alpha`:**", token: "full" }],
+    lines: [{ includes: "- **Repository candidate:**", token: "full" }],
   },
   {
     path: "examples/docs-site/messages/en.ts",
-    lines: [{ includes: "badge: \"npm ", token: "short" }],
+    lines: [{ includes: "badge: \"", token: "short" }],
   },
   {
     path: "examples/docs-site/messages/zh.ts",
-    lines: [{ includes: "badge: \"npm ", token: "short" }],
+    lines: [{ includes: "badge: \"", token: "short" }],
   },
   {
     path: "examples/docs-site/content/en/index.mdx",
-    lines: [{ includes: "npm `latest` and `alpha` currently serve", token: "full" }],
+    lines: [{ includes: "This documentation site tracks `main` and currently targets", token: "full" }],
   },
   {
     path: "examples/docs-site/content/zh/index.mdx",
-    lines: [{ includes: "npm 的 `latest` 与 `alpha` 当前均为", token: "full" }],
+    lines: [{ includes: "本文档站跟随 `main`，当前目标为仓库候选版本", token: "full" }],
   },
   {
     path: "examples/docs-site/content/en/docs/installation.mdx",

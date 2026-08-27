@@ -2,8 +2,6 @@
 
 > Example e-commerce catalog for next-ai-ready agents.
 
-<!-- Last updated: 2026-08-01 -->
-
 ## Pages
 
 - [AI Hoodie](https://shop.example.com/products/hoodie): Premium hoodie for humans who debug agents.

@@ -49,7 +49,7 @@ pnpm exec next-ai-ready doctor --score
 
 The basic setup is complete when `doctor` reports **0 errors** and `public/llms.txt` lists your content. The detailed package map and command reference below are optional reading.
 
-> **Release channel:** this site tracks `main`; npm `latest` and `alpha` currently serve `0.1.0-alpha.17`. This release adds root and `src/` content discovery, correct Nextra and Fumadocs routes, and locale-filtered MCP page search. On August 2, 2026, it passed the complete release gate, npm manifest verification, and a clean public-registry pnpm + Next.js 16 production build; the authenticated production MCP endpoint also passed initialize and all three page discovery calls.
+> **Release channel:** this site tracks `main` and currently targets the `0.1.0-alpha.18` repository candidate. Verify public availability with npm dist-tags. Alpha.18 derives `llms.txt` freshness from content `updatedAt`; the guarded release workflow reruns the complete gate before publication.
 
 ## Package exports
 

@@ -1,10 +1,10 @@
 # next-ai-ready 产品改进台账
 
-> 最后更新：2026-08-26
+> 最后更新：2026-08-27
 > 维护者视角：`next-ai-ready` 原始作者与技术负责人  
-> 当前发布：npm `0.1.0-alpha.17`（`latest` 与 `alpha`）
-> 当前主分支基线：`b751b90`（PR #25 已合并，合并后 CI 全部通过）
-> 待发布变更：`deterministic-llms-freshness`；Changesets 预计生成 `next-ai-ready@alpha.18`、`@next-ai-ready/next@alpha.18` 和 `@next-ai-ready/llms@alpha.16`
+> 当前仓库候选：`next-ai-ready@0.1.0-alpha.18`（公开 npm 状态以 dist-tags 为准）
+> 当前主分支基线：`fb80ee0`（PR #26 已合并，合并后 CI 全部通过）
+> 待发布变更：`deterministic-llms-freshness`；候选包为 `next-ai-ready@alpha.18`、`@next-ai-ready/next@alpha.18` 和 `@next-ai-ready/llms@alpha.16`
 
 本文是后续优化的**执行状态与决策记录**。`roadmap.md` 保留工程阶段历史，
 `post-ga.md` 保留候选方向；当它们与本文的当前优先级冲突时，以本文为准。
@@ -77,7 +77,7 @@
 | MCP 页面发现 | `已完成` | `list_pages`、`get_page`、`search_pages` 已随 alpha.14 发布，并于 2026-08-02 在带认证的生产 MCP 端点完成真实调用；locale 过滤已随 alpha.17 发布 |
 | Next.js 兼容验证 | `已完成` | alpha.15 已从公共 registry 通过 npm/pnpm × Next.js 14/15/16 六组合；alpha.16 `latest` 已复验 pnpm/Next.js 16 与 npm/Next.js 15；alpha.17 已从公共 `latest` 通过 pnpm + Next.js 16 的真实 `next.config.ts` 与正式生产构建 |
 | Vercel 官方 Readability 基线 | `已完成` | `main` 部署后已使用固定的 `@vercel/agent-readability@0.5.0` 复测生产站，25 项全部通过并保持 `100/100`；每周/手动工作流仍单独跟踪 |
-| npm GA | `进行中` | 当前已发布 `0.1.0-alpha.17`，`latest` 与 `alpha` 已对齐并通过完整发布门禁及 npm manifest 核验；尚未退出 prerelease 或发布 `0.1.0` |
+| npm GA | `进行中` | 仓库候选为 `0.1.0-alpha.18`；Release Alpha 在发布前验证完整门禁、manifest 与 npm 标签，公开状态不得从 `main` 推断；尚未退出 prerelease 或发布 `0.1.0` |
 | i18n 与 Content Adapter | `进行中` | alpha.17 已发布 locale 搜索过滤及 Nextra/Fumadocs 默认内容发现；完整 alternate URL 与更多 ContentSource Adapter 仍待真实采用验证 |
 | 动态索引 | `待商榷` | 只保留 Provider 方向，等待真实需求证据 |
 | 商业观测 | `待商榷` | SDK 只定义开放事件和 Adapter；托管产品单独决策 |
@@ -175,7 +175,7 @@ Capability Plane 继续作为差异化能力，但不要求首次访问者在安
 | G1-04 | 冻结 0.1 公共 API | `已完成` | 十个发布包的 entrypoint、命名导出、类型声明哈希与 bin 基线均已通过；程序化 Audit 已收口到独立入口，不再暴露 CLI 调度 API |
 | G1-05 | 建立最小回滚流程 | `已完成` | 2026-08-02 完成只读演练；计划器兼容 pnpm 透传的 `--`，并生成精确 deprecate/dist-tag 命令，不执行写操作 |
 | G1-06 | 更新 GA 文案并发布 `0.1.0` | `待验证` | README、官网与机器可读首页已统一为“承诺、可复制流程、成功标准”；至少 3 个仓库外真实项目接入并修复共同阻塞后，再决定稳定版发布 |
-| G1-07 | 消除 `main`、npm 与网站文档的发布漂移 | `进行中` | alpha.17 已完成一次全链路对齐；PR #25 的站内发现和确定性 freshness 已部署到网站，但对应 changeset 尚未发布到 npm，发布后需再次核对 README、文档站和 registry |
+| G1-07 | 消除 `main`、npm 与网站文档的发布漂移 | `进行中` | alpha.18 候选已同步 SDK、README、双语文档站与机器可读产物；发布工作流仍需核对 registry 和 dist-tags，且不得在发布前写成已发布 |
 | G1-08 | 恢复 GitHub Actions npm 发布身份 | `已完成` | 仓库 Secret `NPM_TOKEN` 已配置；2026-08-02 幂等重跑 Release Alpha，身份验证、发布门禁和已发布版本检查全部通过 |
 
 GA 之前不加入数据库、IndexNow、大型 DevTools 或托管后台。

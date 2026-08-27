@@ -1,5 +1,13 @@
 # @next-ai-ready/llms
 
+## 0.1.0-alpha.16
+
+### Patch Changes
+
+- 37ca7b9: Derive the `llms.txt` freshness marker from page `updatedAt` metadata instead
+  of the build timestamp, preventing committed AI artifacts from drifting when
+  the same content is rebuilt on a later date.
+
 ## 0.1.0-alpha.15
 
 ### Patch Changes

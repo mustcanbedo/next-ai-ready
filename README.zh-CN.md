@@ -37,7 +37,7 @@ npm create next-ai-ready@alpha next-ai-ready-demo
 
 > **第三方工具基线：** 生产文档站在 2026-08-01 使用 Vercel 开源的 `@vercel/agent-readability@0.5.0` 获得 **100/100**。[查看机器可读原始结果](./docs/audit-baselines/vercel-agent-readability-0.5.0-2026-08-01.json)，或运行 `pnpm audit:vercel:site` 复现。该分数衡量技术层面的 Agent 可读性，不代表搜索排名、收录或引用效果。
 
-> **发布渠道：** 本仓库与文档站跟随 `main`；npm 的 `latest` 与 `alpha` 当前均为 `0.1.0-alpha.17`，在此前已验证的运行时与审计能力上，新增根目录与 `src/` 内容发现、正确的 Nextra/Fumadocs 路由以及 MCP 页面搜索的 locale 过滤。2026-08-02 已通过完整发布门禁、npm manifest 核验及公共 registry 的 pnpm + Next.js 16 生产构建；生产 MCP 也已通过带认证 initialize 及 `list_pages`、`search_pages`、`get_page` 调用。
+> **候选版本：** 本仓库与文档站跟随 `main`，当前目标为 `0.1.0-alpha.18`。公开可用性以 `npm view next-ai-ready dist-tags --json` 为准，不得根据仓库版本推断 npm 已发布。alpha.18 将 `llms.txt` 新鲜度标记改为来自内容 `updatedAt`；此前已发布的 alpha.17 已通过完整发布门禁、npm manifest 核验及公共 registry 的 Next.js 16 生产构建。
 
 ---
 
@@ -189,7 +189,7 @@ registerAiHooks({
 
 ### 包导入
 
-消费者应用只需安装 `next-ai-ready`。已发布的 `alpha.17` 支持以下导入：
+消费者应用只需安装 `next-ai-ready`。仓库中的 `alpha.18` 候选版本支持以下导入：
 
 | 导入 | 用途 |
 |---|---|
@@ -201,7 +201,7 @@ registerAiHooks({
 
 ## 状态
 
-🚧 **Pre-alpha**（`0.1.0-alpha.17` 已发布到 npm `latest` 与 `alpha`）。公开包和生产 MCP 链路已通过上述发布验证；正式 `0.1.0` GA 前的外部采用门槛见[当前改进台账](./docs/improvement-plan.zh-CN.md)。
+🚧 **Pre-alpha**（仓库候选版本 `0.1.0-alpha.18`；公开可用性以 npm dist-tags 为准）。受保护发布工作流负责验证包与标签；正式 `0.1.0` GA 前的外部采用门槛见[当前改进台账](./docs/improvement-plan.zh-CN.md)。
 
 - ✅ **知识平面** — MDX → 语义图 → `llms.txt` / `*.md` / `*.ai.json` / JSON-LD
 - ✅ **能力平面** — `defineAction` → `/api/actions/<name>` + OpenAPI 3.1 / `tools.json` / `ai-plugin.json`

@@ -37,7 +37,7 @@ The generated project is a normal Next.js TypeScript app that can be committed a
 
 > **Third-party tool baseline:** the production documentation scored **100/100** with Vercel's open-source `@vercel/agent-readability@0.5.0` on 2026-08-01. [Review the machine-readable result](./docs/audit-baselines/vercel-agent-readability-0.5.0-2026-08-01.json) or reproduce it with `pnpm audit:vercel:site`. This measures technical agent readability, not search ranking, indexing, or citation.
 
-> **Release channels:** this repository and the documentation site track `main`. npm `latest` and `alpha` currently serve `0.1.0-alpha.17`, adding root and `src/` content discovery, correct Nextra and Fumadocs routes, and locale-filtered MCP page search to the previously verified runtime and audit surface. On 2026-08-02, the published package passed the release gate, npm manifest verification, and a clean public-registry pnpm + Next.js 16 production build. The authenticated production MCP endpoint also passed initialize plus `list_pages`, `search_pages`, and `get_page` calls.
+> **Release candidate:** this repository and the documentation site track `main` and currently target `0.1.0-alpha.18`. Treat `npm view next-ai-ready dist-tags --json` as the source of truth for public availability; do not infer npm publication from the repository version. Alpha.18 derives the `llms.txt` freshness marker from content `updatedAt`; the previously published alpha.17 passed the release gate, npm manifest verification, and a clean public-registry Next.js 16 production build.
 
 ---
 
@@ -189,7 +189,7 @@ Use `next-ai-ready/hooks` — not the main package entry — so Turbopack does n
 
 ### Package imports
 
-Install only `next-ai-ready` in consumer apps. The published `alpha.17` supports these imports:
+Install only `next-ai-ready` in consumer apps. The `alpha.18` repository candidate supports these imports:
 
 | Import | Use for |
 |---|---|
@@ -201,7 +201,7 @@ Install only `next-ai-ready` in consumer apps. The published `alpha.17` supports
 
 ## Status
 
-🚧 **Pre-alpha** (`0.1.0-alpha.17` published on npm `latest` and `alpha`). The public package and production MCP path have passed the release validation described above; see the [current improvement ledger](./docs/improvement-plan.zh-CN.md) for the external-adoption gate before the final `0.1.0` GA release.
+🚧 **Pre-alpha** (`0.1.0-alpha.18` repository candidate; verify published availability through npm dist-tags). The guarded release workflow validates packages and tags; see the [current improvement ledger](./docs/improvement-plan.zh-CN.md) for the external-adoption gate before the final `0.1.0` GA release.
 
 - ✅ **Knowledge plane** — MDX → semantic graph → `llms.txt` / `*.md` / `*.ai.json` / JSON-LD
 - ✅ **Capability plane** — `defineAction` → `/api/actions/<name>` + OpenAPI 3.1 / `tools.json` / `ai-plugin.json`

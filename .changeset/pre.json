@@ -21,6 +21,7 @@
     "audit-deployed-pages",
     "audit-v2-dimensions",
     "audit-v3-three-planes",
+    "deterministic-llms-freshness",
     "fix-escaped-ai-routes",
     "fix-next-config-cjs",
     "focused-runtime-entrypoints",

@@ -111,9 +111,9 @@ curl -sS http://localhost:3000/openapi.json | head -c 200
 
 ### Registry status
 
-As of 2026-08-02:
+As of 2026-08-27:
 
-- **npm `latest` and `alpha`:** `0.1.0-alpha.17` — complete release gate, npm manifest verification, and a public-registry pnpm + Next.js 16.2.12 single-package install, CLI workflow, and production build passed. Alpha.16 passed the equivalent pnpm/Next.js 16 and npm/Next.js 15 checks; alpha.15 passed the full npm/pnpm × Next.js 14/15/16 matrix.
+- **Repository candidate:** `0.1.0-alpha.18` — public availability must be read from npm dist-tags. The guarded Release Alpha workflow reruns the complete release gate before publication. The previously published alpha.17 passed manifest verification and a public-registry pnpm + Next.js 16.2.12 install, CLI workflow, and production build; alpha.15 passed the full npm/pnpm × Next.js 14/15/16 matrix.
 - **alpha.13:** superseded after registry smoke exposed an incomplete published Semantic/Core export chain; use alpha.14 or newer.
 - **alpha.4:** deprecated for pnpm users (scoped import bug); use ≥ alpha.5
 

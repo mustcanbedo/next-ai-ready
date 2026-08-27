@@ -279,7 +279,7 @@ async function main() {
     name: "get_page",
     arguments: { route: "/en/docs/installation" },
   });
-  const expectedReleaseVersion = "0.1.0-alpha.17";
+  const expectedReleaseVersion = "0.1.0-alpha.18";
   if (!page.includes(expectedReleaseVersion)) {
     fail("MCP get_page did not return the current installation content");
   }

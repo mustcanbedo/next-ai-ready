@@ -2,7 +2,7 @@
 
 **GA** for this project means the first **generally recommendable** release: **`0.1.0`** (or final **`0.1.0-alpha.N`** before dropping the alpha tag), where a Next.js team can install, build, deploy, and get predictable AI artifacts without reading the whole monorepo.
 
-**Current published version:** `0.1.0-alpha.17`. npm `latest` and `alpha` both resolve to `0.1.0-alpha.17`. Audit v3, focused runtime exports, TypeScript `next.config.ts` compatibility, MCP page discovery with locale filtering, and Nextra/Fumadocs content discovery are in the public package. The complete release gate, npm manifest verification, a clean public-registry pnpm + Next.js 16 build, and the authenticated production MCP path passed on 2026-08-02; see [improvement-plan.zh-CN.md](./improvement-plan.zh-CN.md) for final **`0.1.0`** GA sign-off.
+**Current repository candidate:** `0.1.0-alpha.18`. Public npm availability is determined by registry dist-tags, not by the version committed to `main`. The previously published alpha.17 includes Audit v3, focused runtime exports, TypeScript `next.config.ts` compatibility, locale-aware MCP page discovery, and Nextra/Fumadocs content discovery; alpha.18 adds deterministic `llms.txt` freshness. See [improvement-plan.zh-CN.md](./improvement-plan.zh-CN.md) for final **`0.1.0`** GA sign-off.
 
 ---
 
@@ -61,7 +61,7 @@ Automated gate: `pnpm verify:release` (includes docs-site smoke).
 - [x] CI: build, test, typecheck, lint, e2e-smoke, docs-site-smoke
 - [x] Known limitations in README (Zod v4, Node-only, no static export, App Router)
 - [x] [quickstart-10min](./quickstart-10min.md) for new adopters
-- [x] npm **`latest` and `alpha` = alpha.17** published (2026-08-02)
+- [x] Repository candidate **alpha.18** prepared; Release Alpha verifies publication and npm tag promotion
 - [x] Production MCP token on Vercel (rotated, saved, and redeployed 2026-08-02)
 - [x] Authenticated production MCP initialize and `list_pages` / `search_pages` / `get_page` succeed
 - [ ] At least 3 repository-external Next.js projects complete install, build, deploy, and feedback (current: 0/3 verified)

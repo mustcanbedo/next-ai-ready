@@ -64,7 +64,7 @@ test("syncs every managed release surface for the next version", async () => {
     await mkdir(join(root, "packages/meta"), { recursive: true });
     await writeFile(
       join(root, "packages/meta/package.json"),
-      JSON.stringify({ name: "next-ai-ready", version: "0.1.0-alpha.18" }),
+      JSON.stringify({ name: "next-ai-ready", version: "0.1.0-alpha.19" }),
     );
 
     for (const target of releaseDocRules) {
@@ -82,6 +82,20 @@ test("syncs every managed release surface for the next version", async () => {
     const history = await readFile(join(root, "docs/improvement-plan.zh-CN.md"), "utf8");
     assert.match(history, /alpha\.16 发布后/);
     assert.match(history, /PR #20 合并后触发 Release Alpha #5/);
+
+    const readme = await readFile(join(root, "README.md"), "utf8");
+    assert.match(readme, /\*\*Release candidate:\*\*/);
+    assert.match(readme, /0\.1\.0-alpha\.19/);
+    assert.doesNotMatch(readme, /0\.1\.0-alpha\.19[^\n]*(?:published on npm|currently serve)/i);
+
+    const chineseReadme = await readFile(join(root, "README.zh-CN.md"), "utf8");
+    assert.match(chineseReadme, /\*\*候选版本：\*\*/);
+    assert.match(chineseReadme, /0\.1\.0-alpha\.19/);
+    assert.doesNotMatch(chineseReadme, /0\.1\.0-alpha\.19[^\n]*(?:现已发布|已经发布|已发布至)/);
+
+    const readiness = await readFile(join(root, "docs/ga-readiness.md"), "utf8");
+    assert.match(readiness, /\*\*Current repository candidate:\*\*/);
+    assert.doesNotMatch(readiness, /Current published version/);
   } finally {
     await rm(root, { recursive: true, force: true });
   }

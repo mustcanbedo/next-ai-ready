@@ -1,5 +1,12 @@
 # @next-ai-ready/mcp
 
+## 0.1.0-alpha.16
+
+### Patch Changes
+
+- Republish the MCP package with the updated `@next-ai-ready/llms` dependency so
+  the public manifest remains aligned with the workspace release graph.
+
 ## 0.1.0-alpha.15
 
 ### Patch Changes

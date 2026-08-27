@@ -61,10 +61,18 @@ test("fails closed when a release anchor is ambiguous", () => {
 test("syncs every managed release surface for the next version", async () => {
   const root = await mkdtemp(join(tmpdir(), "nair-release-docs-"));
   try {
+    const currentManifest = JSON.parse(
+      await readFile(join(process.cwd(), "packages/meta/package.json"), "utf8"),
+    );
+    const match = currentManifest.version.match(/^(\d+\.\d+\.\d+)-alpha\.(\d+)$/);
+    assert.ok(match, `Expected an alpha package version, received ${currentManifest.version}`);
+    const nextVersion = `${match[1]}-alpha.${Number(match[2]) + 1}`;
+    const escapedNextVersion = nextVersion.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
     await mkdir(join(root, "packages/meta"), { recursive: true });
     await writeFile(
       join(root, "packages/meta/package.json"),
-      JSON.stringify({ name: "next-ai-ready", version: "0.1.0-alpha.19" }),
+      JSON.stringify({ name: "next-ai-ready", version: nextVersion }),
     );
 
     for (const target of releaseDocRules) {
@@ -85,13 +93,13 @@ test("syncs every managed release surface for the next version", async () => {
 
     const readme = await readFile(join(root, "README.md"), "utf8");
     assert.match(readme, /\*\*Release candidate:\*\*/);
-    assert.match(readme, /0\.1\.0-alpha\.19/);
-    assert.doesNotMatch(readme, /0\.1\.0-alpha\.19[^\n]*(?:published on npm|currently serve)/i);
+    assert.ok(readme.includes(nextVersion));
+    assert.ok(!readme.match(new RegExp(`${escapedNextVersion}[^\\n]*(?:published on npm|currently serve)`, "i")));
 
     const chineseReadme = await readFile(join(root, "README.zh-CN.md"), "utf8");
     assert.match(chineseReadme, /\*\*候选版本：\*\*/);
-    assert.match(chineseReadme, /0\.1\.0-alpha\.19/);
-    assert.doesNotMatch(chineseReadme, /0\.1\.0-alpha\.19[^\n]*(?:现已发布|已经发布|已发布至)/);
+    assert.ok(chineseReadme.includes(nextVersion));
+    assert.ok(!chineseReadme.match(new RegExp(`${escapedNextVersion}[^\\n]*(?:现已发布|已经发布|已发布至)`)));
 
     const readiness = await readFile(join(root, "docs/ga-readiness.md"), "utf8");
     assert.match(readiness, /\*\*Current repository candidate:\*\*/);

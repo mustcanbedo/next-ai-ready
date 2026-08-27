@@ -95,7 +95,7 @@ export function isPreparedReleaseCommit({ packageChanges, headFiles, prereleaseC
     packageJsonPackages.size === changelogPackages.size &&
     [...packageJsonPackages].every((name) => changelogPackages.has(name)) &&
     headFiles.length > 0 &&
-    headFiles.every((file) => file === ".changeset/pre.json" || isGeneratedPackageReleaseFile(file))
+    headFiles.every((file) => !file.startsWith("packages/") || isGeneratedPackageReleaseFile(file))
   );
 }
 

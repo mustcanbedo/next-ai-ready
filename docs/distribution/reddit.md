@@ -63,16 +63,18 @@ feature requests.
 ## 60-second landscape video script
 
 Use the video only if the community accepts video demonstrations. The text post must remain useful
-without it.
+without it. The reproducible source is in [`video/`](./video/) under the
+`NextAiReady-EN-Reddit` composition.
 
 | Time | Visual | Voiceover |
 | --- | --- | --- |
-| 0-6 s | Existing Next.js page beside its HTML response | A normal Next.js page is optimized for browsers, but retrieval tools often need a cleaner representation. |
-| 6-14 s | Show a hand-written `public/llms.txt` | For a small site, this static file may be all you need. |
-| 14-26 s | Run the project generator and `init` | For larger or multilingual sites, I am testing a generated approach that keeps discovery and Markdown routes tied to content. |
-| 26-38 s | Open `/llms.txt`, `/index.md`, and the original `/` | The UI remains unchanged while machine-facing endpoints expose concise, readable content. |
-| 38-48 s | Run `doctor --score`; highlight the disclaimer | The audit checks technical accessibility. It does not promise indexing, ranking, or citations. |
-| 48-60 s | Show the small generated diff and the three feedback questions | The project is alpha. I am looking for integration objections, especially around route count, content adapters, and deployment constraints. |
+| 0-6 s | Show the unchanged UI beside `llms.txt`, page Markdown, and optional MCP | Keep the Next.js UI and add clean machine-facing endpoints. |
+| 6-14 s | Show the pre-integration `llms.txt` 404 | Without discovery and stable page text, retrieval starts by guessing. |
+| 14-24 s | Run the generator, install, and `init` | One public package adds the App Router layer; the UI is not replaced. |
+| 24-32 s | Build deterministic `llms.txt`, page Markdown, and `sitemap.md` | The artifacts stay tied to the content already maintained by the app. |
+| 32-40 s | Run locale-aware `search_pages`, then `get_page` | MCP search can find and read the installation page from the same semantic graph. |
+| 40-48 s | Show the pinned production readability audit and disclaimer | Readability is verifiable, but it does not promise indexing, ranking, or citations. |
+| 48-60 s | Show the exact command, tutorial, repository, and feedback request | The project is MIT licensed and alpha; concrete integration blockers are the goal. |
 
 ## Reply policy
 

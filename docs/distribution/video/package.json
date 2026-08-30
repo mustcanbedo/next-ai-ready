@@ -1,0 +1,34 @@
+{
+  "name": "next-ai-ready-demo-video",
+  "version": "1.0.0",
+  "description": "Platform-native distribution videos for next-ai-ready",
+  "repository": "https://github.com/mustcanbedo/next-ai-ready",
+  "license": "MIT",
+  "private": true,
+  "dependencies": {
+    "@remotion/cli": "4.0.518",
+    "react": "19.2.3",
+    "react-dom": "19.2.3",
+    "remotion": "4.0.518"
+  },
+  "devDependencies": {
+    "@remotion/eslint-config-flat": "4.0.518",
+    "@types/react": "19.2.7",
+    "@types/web": "0.0.166",
+    "eslint": "9.19.0",
+    "prettier": "3.8.1",
+    "typescript": "5.9.3"
+  },
+  "scripts": {
+    "dev": "remotion studio --no-open",
+    "build": "remotion bundle",
+    "render:zh": "remotion render NextAiReady-ZH-Vertical out/next-ai-ready-zh-vertical.mp4",
+    "render:reddit": "remotion render NextAiReady-EN-Reddit out/next-ai-ready-en-reddit.mp4",
+    "render:x": "remotion render NextAiReady-EN-X out/next-ai-ready-en-x.mp4",
+    "upgrade": "remotion upgrade",
+    "lint": "eslint src && tsc"
+  },
+  "sideEffects": [
+    "*.css"
+  ]
+}

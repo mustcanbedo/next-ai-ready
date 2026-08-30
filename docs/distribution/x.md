@@ -66,15 +66,16 @@ Tutorial: https://next-ai-ready.vercel.app/en/docs/guides/nextjs-llms-txt
 ## 30-second video script
 
 Format: `16:9` or `1:1`, captions always on, no background music required.
+The reproducible `16:9` source is in [`video/`](./video/) under the `NextAiReady-EN-X`
+composition.
 
 | Time | Visual | On-screen line |
 | --- | --- | --- |
-| 0-4 s | Existing Next.js page | Built for people |
-| 4-8 s | Dense HTML response | Harder to retrieve cleanly |
-| 8-15 s | Run generator and `init` | Add an AI-readable layer |
-| 15-21 s | Show `/llms.txt` and `/index.md` | Discovery + page Markdown |
-| 21-25 s | Return to original page | UI unchanged |
-| 25-30 s | Tutorial and repository | Open source, alpha, feedback wanted |
+| 0-5 s | UI, `/llms.txt`, page Markdown, and optional MCP in one frame | Keep the UI. Add clean AI endpoints. |
+| 5-12 s | Run generator, install, and `init` | One public package; App Router stays intact. |
+| 12-17 s | Show deterministic build outputs | `llms.txt` + page Markdown + sitemap |
+| 17-22 s | Show the pinned readability result and disclaimer | Readability is not a citation promise. |
+| 22-30 s | Exact command, tutorial, and repository | MIT licensed, alpha, real-project feedback wanted. |
 
 Voiceover:
 

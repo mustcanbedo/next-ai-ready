@@ -20,6 +20,10 @@ the whole documentation set.
 | Reddit | [reddit.md](./reddit.md) | Start a technical discussion and collect integration objections. |
 | X | [x.md](./x.md) | Deliver a compact demo that can be shared by Next.js developers. |
 
+The platform-native video decisions and source references are documented in
+[video-research.zh-CN.md](./video-research.zh-CN.md). The first campaign uses separate 45-second
+vertical, 60-second Reddit, and 30-second X cuts instead of one cross-platform export.
+
 ## Publishing rules
 
 1. Publish the live tutorial first and verify its HTML and `.md` URLs.

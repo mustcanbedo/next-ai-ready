@@ -331,7 +331,7 @@ defineAction({
               {t.guides.subheading}
             </p>
           </div>
-          <div className="mt-10 grid gap-4 md:grid-cols-3">
+          <div className="mt-10 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             {t.guides.items.map((guide) => (
               <Link
                 key={guide.href}
@@ -364,7 +364,7 @@ defineAction({
             {t.cta.subtitle}
           </p>
           <Link
-            href={`/${locale}/docs/introduction`}
+            href={`/${locale}/docs/installation`}
             className="mt-10 inline-flex h-12 items-center rounded-xl bg-accent px-7 text-sm font-semibold text-white shadow-[0_0_24px_rgba(59,130,246,0.25)] hover:shadow-[0_0_40px_rgba(59,130,246,0.4)] hover:bg-accent-hover transition-all"
           >
             {t.cta.button}

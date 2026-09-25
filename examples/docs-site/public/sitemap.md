@@ -21,7 +21,7 @@
 - [Add llms.txt and Markdown endpoints to Fumadocs](https://next-ai-ready.vercel.app/en/docs/guides/fumadocs-ai-ready): Reuse a Fumadocs MDX content collection to generate AI-readable discovery and page endpoints in a Next.js App Router deployment.
 - [i18n and AI-friendly URLs](https://next-ai-ready.vercel.app/en/docs/guides/i18n-ai-urls): Middleware, locale prefixes, and SemanticGraph routes for multilingual sites.
 - [How to add an MCP server to Next.js App Router](https://next-ai-ready.vercel.app/en/docs/guides/mcp-integration): Add local stdio and authenticated Streamable HTTP MCP endpoints to Next.js, then expose page search and explicitly public actions as tools.
-- [Writing MDX Content](https://next-ai-ready.vercel.app/en/docs/guides/mdx-content): How to write MDX files that the semantic compiler can extract meaning from.
+- [Next.js MDX content collections for AI-readable docs](https://next-ai-ready.vercel.app/en/docs/guides/mdx-content): Configure a local MDX content collection in Next.js, map files to routes, add useful frontmatter, and generate llms.txt, page Markdown, and JSON-LD.
 - [Add llms.txt and Markdown endpoints to Next.js App Router](https://next-ai-ready.vercel.app/en/docs/guides/nextjs-llms-txt): Choose between a static llms.txt and generated AI-readable endpoints, run a clean Next.js demo, and verify the production result.
 - [Nextra llms.txt and Markdown endpoint setup](https://next-ai-ready.vercel.app/en/docs/guides/nextra-ai-ready): Integrate next-ai-ready with a Nextra 4 App Router documentation site without replacing Nextra navigation, search, themes, or MDX rendering.
 - [Quickstart](https://next-ai-ready.vercel.app/en/docs/guides/quickstart): Complete a verified next-ai-ready setup in about 10 minutes.
@@ -45,7 +45,7 @@
 - [为 Fumadocs 添加 llms.txt 与 Markdown 端点](https://next-ai-ready.vercel.app/zh/docs/guides/fumadocs-ai-ready): 复用 Fumadocs MDX 内容集合，在 Next.js App Router 部署中生成 AI 可读的发现和页面端点。
 - [国际化与 AI 友好 URL](https://next-ai-ready.vercel.app/zh/docs/guides/i18n-ai-urls): 多语言站点的 middleware、locale 前缀与 SemanticGraph 路由策略。
 - [如何为 Next.js App Router 添加 MCP Server](https://next-ai-ready.vercel.app/zh/docs/guides/mcp-integration): 为 Next.js 添加本地 stdio 与经过鉴权的 Streamable HTTP MCP 端点，并将页面搜索和显式公开的 Action 暴露为工具。
-- [编写 MDX 内容](https://next-ai-ready.vercel.app/zh/docs/guides/mdx-content): 如何编写语义编译器能提取含义的 MDX 文件。
+- [用 Next.js MDX 内容集合生成 AI 可读文档](https://next-ai-ready.vercel.app/zh/docs/guides/mdx-content): 在 Next.js 中配置本地 MDX 内容集合、映射路由、补充有效 frontmatter，并生成 llms.txt、逐页 Markdown 与 JSON-LD。
 - [为 Next.js App Router 添加 llms.txt 与 Markdown 端点](https://next-ai-ready.vercel.app/zh/docs/guides/nextjs-llms-txt): 判断应该手写还是自动生成 llms.txt，运行一个干净的 Next.js 演示，并验证生产结果。
 - [为 Nextra 4 添加 llms.txt 与 Markdown 端点](https://next-ai-ready.vercel.app/zh/docs/guides/nextra-ai-ready): 在不替换 Nextra 导航、搜索、主题和 MDX 渲染的前提下，将 next-ai-ready 接入 Nextra 4 App Router 文档站。
 - [快速开始](https://next-ai-ready.vercel.app/zh/docs/guides/quickstart): 约 10 分钟完成可验证的 next-ai-ready 基础接入。

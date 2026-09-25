@@ -249,6 +249,7 @@ async function main() {
   await expectResponse("/en/docs/does-not-exist", {
     status: 404,
     contentType: "text/html",
+    includes: "Page not found / 页面不存在",
     requestHeaders: { accept: "text/html" },
   });
 

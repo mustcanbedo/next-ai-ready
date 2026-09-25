@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Analytics } from "@vercel/analytics/next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { notFound } from "next/navigation";
+import "../globals.css";
 import { getSiteJsonLd } from "next-ai-ready/json-ld";
 import { JsonLd } from "../components/json-ld";
 import { locales, type Locale } from "@/lib/i18n";

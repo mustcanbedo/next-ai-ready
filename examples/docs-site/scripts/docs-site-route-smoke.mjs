@@ -52,7 +52,7 @@ async function waitForServer() {
 
 async function expectResponse(
   path,
-  { contentType, headerIncludes = {}, includes, requestHeaders, status = 200 },
+  { contentType, excludes, headerIncludes = {}, includes, requestHeaders, status = 200 },
 ) {
   const response = await fetch(`${ORIGIN}${path}`, {
     headers: requestHeaders,
@@ -70,6 +70,12 @@ async function expectResponse(
   for (const expected of expectedBodyParts) {
     if (!body.includes(expected)) {
       fail(`${path}: response body is missing ${JSON.stringify(expected)}`);
+    }
+  }
+  const excludedBodyParts = Array.isArray(excludes) ? excludes : excludes ? [excludes] : [];
+  for (const excluded of excludedBodyParts) {
+    if (body.includes(excluded)) {
+      fail(`${path}: response body unexpectedly includes ${JSON.stringify(excluded)}`);
     }
   }
   for (const [name, expected] of Object.entries(headerIncludes)) {
@@ -116,6 +122,7 @@ async function main() {
       "<lastmod>2026-08-24T00:00:00.000Z</lastmod>",
       'hreflang="zh" href="https://next-ai-ready.vercel.app/zh/docs/guides/mcp-integration"',
     ],
+    excludes: ["/llms.txt", "/llms-full.txt", "/openapi.json", "/tools.json"],
   });
   await expectResponse("/_ai-ready/llms-txt", {
     contentType: "text/plain",
@@ -136,6 +143,8 @@ async function main() {
     contentType: "text/html",
     includes: [
       'content="Add llms.txt, page Markdown, JSON-LD, MCP, and authenticated agent actions to a Next.js App Router site."',
+      'property="og:image"',
+      'name="twitter:image"',
       'href="/en/docs/guides/nextjs-llms-txt"',
       "Add llms.txt to Next.js",
     ],

@@ -125,12 +125,17 @@ const zh = {
         title: "为 AI 爬虫配置 robots.txt",
         description: "在保留搜索引擎抓取能力的同时，为 AI 消费者声明明确策略。",
       },
+      {
+        href: "/zh/docs/guides/mdx-content",
+        title: "建立 MDX 内容集合",
+        description: "将本地 MDX 文件映射为路由、元数据、llms.txt 与逐页 Markdown。",
+      },
     ],
   },
   cta: {
     title: "准备让你的站点 AI-Ready？",
     subtitle: "约 10 分钟完成可验证的基础接入。",
-    button: "阅读文档",
+    button: "开始安装并验证",
   },
   footer: {
     license: "MIT 许可证",

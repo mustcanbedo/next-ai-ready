@@ -128,12 +128,17 @@ const en = {
         title: "Configure robots.txt for AI crawlers",
         description: "Keep search crawling intact while declaring explicit policies for AI consumers.",
       },
+      {
+        href: "/en/docs/guides/mdx-content",
+        title: "Build an MDX content collection",
+        description: "Map local MDX files to routes, metadata, llms.txt, and page Markdown.",
+      },
     ],
   },
   cta: {
     title: "Ready to make your site AI-ready?",
     subtitle: "Complete the verified setup in about 10 minutes.",
-    button: "Read the documentation",
+    button: "Install and verify",
   },
   footer: {
     license: "MIT License",

@@ -23,8 +23,8 @@ export async function generateMetadata({
   const description = getSiteDescription(locale);
   const defaultTitle =
     locale === "zh"
-      ? "next-ai-ready — Next.js 的 AI 基础设施层"
-      : "next-ai-ready — The AI Layer for Next.js";
+      ? "next-ai-ready — 为 Next.js 生成 llms.txt 与 MCP"
+      : "next-ai-ready — llms.txt and MCP for Next.js";
   const verification = process.env.GOOGLE_SITE_VERIFICATION;
 
   return {

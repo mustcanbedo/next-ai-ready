@@ -146,7 +146,10 @@ async function main() {
       'property="og:image"',
       'name="twitter:image"',
       'href="/en/docs/guides/nextjs-llms-txt"',
+      'href="/en/docs/guides/mdx-content"',
       "Add llms.txt to Next.js",
+      "Build an MDX content collection",
+      "Install and verify",
     ],
   });
   await expectResponse("/zh", {
@@ -155,7 +158,10 @@ async function main() {
       'content="为 Next.js App Router 站点添加 llms.txt、逐页 Markdown、JSON-LD、MCP 与经过鉴权的 Agent Action。"',
       '<link rel="canonical" href="https://next-ai-ready.vercel.app/zh"',
       'href="/zh/docs/guides/nextjs-llms-txt"',
+      'href="/zh/docs/guides/mdx-content"',
       "为 Next.js 添加 llms.txt",
+      "建立 MDX 内容集合",
+      "开始安装并验证",
     ],
   });
   await expectResponse("/en", {
@@ -213,6 +219,18 @@ async function main() {
   await expectResponse("/zh/docs/guides/fumadocs-ai-ready.md", {
     contentType: "text/markdown",
     includes: "# 为 Fumadocs 添加 llms.txt 与 Markdown 端点",
+  });
+  await expectResponse("/en/docs/guides/mdx-content", {
+    contentType: "text/html",
+    includes: "Next.js MDX content collections for AI-readable docs",
+  });
+  await expectResponse("/en/docs/guides/mdx-content.md", {
+    contentType: "text/markdown",
+    includes: "# Next.js MDX content collections for AI-readable docs",
+  });
+  await expectResponse("/zh/docs/guides/mdx-content.md", {
+    contentType: "text/markdown",
+    includes: "# 用 Next.js MDX 内容集合生成 AI 可读文档",
   });
   await expectResponse("/en/docs/introduction.ai.json", {
     contentType: "application/json",

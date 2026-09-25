@@ -1,5 +1,5 @@
 import { AI_BOTS } from "./bots.js";
-import type { RobotsConfig, SiteInfo } from "./types.js";
+import type { AiBotAccess, RobotsConfig, SiteInfo } from "./types.js";
 
 /**
  * Shape compatible with Next.js `MetadataRoute.Robots`.
@@ -30,15 +30,13 @@ export interface AiRobotsResult {
  * about AI bots (ambiguous) or blocks them via an over-broad `User-agent: *`.
  * Since the entire premise of this framework is "be readable by AI", we emit
  * an explicit, auditable policy: every known AI crawler gets its own
- * `User-agent` block with an `Allow: /` (or `Disallow: /` if the user opts
- * out). We also surface the AI artifacts (`/llms.txt`, `/llms-full.txt`) so
- * crawlers discover them without guessing.
+ * `User-agent` block. A role-aware policy can keep AI search visible while
+ * opting out of training. We also leave human-readable comments pointing to
+ * the AI artifacts; comments are not standardized crawler directives.
  *
  * Deterministic: stable bot ordering (from `AI_BOTS`), no timestamps.
  */
 export function buildRobotsTxt(site: SiteInfo, config: RobotsConfig = {}): string {
-  const policy = config.aiBots ?? "allow";
-  const rule = policy === "allow" ? "Allow: /" : "Disallow: /";
   const lines: string[] = [];
 
   // A baseline for everyone else: allow all (we don't impose generic SEO
@@ -47,11 +45,12 @@ export function buildRobotsTxt(site: SiteInfo, config: RobotsConfig = {}): strin
 
   // Explicit per-AI-bot blocks so the policy is unambiguous and greppable.
   for (const bot of AI_BOTS) {
+    const rule = resolveBotAccess(config, bot.purpose) === "allow" ? "Allow: /" : "Disallow: /";
     lines.push(`User-agent: ${bot.id}`, rule, "");
   }
 
-  // Advertise the AI ingestion entrypoints. `llms.txt` is the AI analogue of
-  // a sitemap; not all crawlers read it yet, but it's cheap to point at.
+  // Human-readable pointers only. These comments do not advertise a
+  // standardized robots.txt directive and do not guarantee discovery.
   const base = site.baseUrl.replace(/\/+$/, "");
   lines.push(`# AI ingestion entrypoints`);
   lines.push(`# ${base}/llms.txt`);
@@ -89,8 +88,6 @@ export function buildRobotsTxt(site: SiteInfo, config: RobotsConfig = {}): strin
  * out), plus a catch-all `User-agent: *` rule.
  */
 export function aiRobots(site: SiteInfo, config: RobotsConfig = {}): AiRobotsResult {
-  const policy = config.aiBots ?? "allow";
-  const aiRule = policy === "allow" ? "allow" : "disallow";
   const rules: AiRobotsRule[] = [];
 
   // Catch-all baseline.
@@ -98,6 +95,7 @@ export function aiRobots(site: SiteInfo, config: RobotsConfig = {}): AiRobotsRes
 
   // Explicit per-AI-bot rules.
   for (const bot of AI_BOTS) {
+    const aiRule = resolveBotAccess(config, bot.purpose) === "allow" ? "allow" : "disallow";
     rules.push({
       userAgent: bot.id,
       [aiRule]: "/",
@@ -122,4 +120,13 @@ export function aiRobots(site: SiteInfo, config: RobotsConfig = {}): AiRobotsRes
   }
 
   return result;
+}
+
+function resolveBotAccess(
+  config: RobotsConfig,
+  purpose: (typeof AI_BOTS)[number]["purpose"],
+): AiBotAccess {
+  const policy = config.aiBots ?? "allow";
+  if (typeof policy === "string") return policy;
+  return policy[purpose] ?? policy.default ?? "allow";
 }

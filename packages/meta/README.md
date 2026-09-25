@@ -23,6 +23,22 @@ import { withAiReady } from "next-ai-ready/config"
 import { aiRobots } from "next-ai-ready/robots"
 ```
 
+Keep AI search visible while opting out of model-training crawlers:
+
+```ts
+export default aiRobots(
+  { name: "Acme", baseUrl: "https://acme.com" },
+  {
+    aiBots: {
+      search: "allow",
+      training: "disallow",
+      user: "allow",
+      other: "disallow",
+    },
+  },
+)
+```
+
 - `next-ai-ready` — authoring and build-time helpers
 - `next-ai-ready/config` — `withAiReady()`
 - `next-ai-ready/robots` — dynamic robots helpers

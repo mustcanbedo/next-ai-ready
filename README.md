@@ -70,6 +70,33 @@ From the same Next.js app, with zero changes to your UI, you get:
 | `/api/mcp` (MCP server)         | MCP clients (Claude Desktop, Cursor, agents) |
 | `/robots.txt` (explicit AI-bot policy) | AI crawlers |
 
+### Keep AI search visible without opting into training
+
+AI search, model training, and user-requested retrieval are different access
+decisions. Configure them independently instead of applying one opaque switch
+to every AI crawler:
+
+```ts
+// ai-ready.config.ts
+import { defineConfig } from "next-ai-ready"
+
+export default defineConfig({
+  site: { name: "Acme", baseUrl: "https://acme.com" },
+  robots: {
+    aiBots: {
+      search: "allow",
+      training: "disallow",
+      user: "allow",
+      other: "disallow",
+    },
+  },
+})
+```
+
+The existing `aiBots: "allow" | "disallow"` form remains supported. See the
+[AI crawler policy guide](https://next-ai-ready.vercel.app/en/docs/guides/robots-txt)
+for provider-specific limits and verification steps.
+
 ## The two planes
 
 ```

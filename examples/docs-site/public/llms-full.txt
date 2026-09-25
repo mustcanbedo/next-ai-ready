@@ -271,7 +271,7 @@ The next-ai-ready meta package. Use npx next-ai-ready or pnpm exec next-ai-ready
 <!-- BEGIN /en/docs/api-reference/config -->
 # Configuration
 URL: https://next-ai-ready.vercel.app/en/docs/api-reference/config
-Updated: 2026-08-01
+Updated: 2026-09-26
 
 # Configuration
 
@@ -334,6 +334,41 @@ Control which artifacts are generated:
 | Field     | Type      | Default | Description                                                |
 | --------- | --------- | ------- | ---------------------------------------------------------- |
 | `openapi` | `boolean` | `true`  | Generate `/openapi.json`, `/tools.json`, `/ai-plugin.json` |
+
+## robots
+
+Choose whether the build emits `public/robots.txt` and how known AI agents are grouped. The original
+all-or-nothing form remains supported:
+
+```js
+robots: {
+  aiBots: "allow", // or "disallow"
+  sitemap: true,
+}
+```
+
+Use the purpose-based form when search visibility and model-training policy differ:
+
+```js
+robots: {
+  aiBots: {
+    search: "allow",
+    user: "allow",
+    training: "disallow",
+    other: "allow",
+  },
+  sitemap: true,
+}
+```
+
+| Field     | Type                                   | Default   | Description                                                                                                   |
+| --------- | -------------------------------------- | --------- | ------------------------------------------------------------------------------------------------------------- |
+| `aiBots`  | `"allow" \| "disallow" \| AiBotPolicy` | `"allow"` | One policy for all known bots, or independent `search`, `training`, `user`, `other`, and `default` decisions. |
+| `sitemap` | `boolean \| string`                    | `false`   | Emit a sitemap declaration using the default or supplied URL.                                                 |
+| `extra`   | `string[]`                             | `[]`      | Append raw directives to the static output. Not supported by the structured `aiRobots()` helper.              |
+
+See [the robots.txt guide](../guides/robots-txt) for provider roles, a typed `app/robots.ts`
+example, and the visibility consequences of each decision.
 
 ## FAQ
 
@@ -2189,118 +2224,201 @@ After changing MDX content or actions, and before deploy so public/ and .next-ai
 <!-- END /en/docs/guides/quickstart -->
 
 <!-- BEGIN /en/docs/guides/robots-txt -->
-# Configure robots.txt for AI crawlers in Next.js
+# Configure robots.txt for AI search and training crawlers in Next.js
 URL: https://next-ai-ready.vercel.app/en/docs/guides/robots-txt
-Updated: 2026-08-24
+Updated: 2026-09-26
 
-# Configure robots.txt for AI crawlers in Next.js
+# Configure robots.txt for AI search and training crawlers in Next.js
 
-Use `app/robots.ts` when the policy is part of a Next.js App Router deployment, or emit a static
-`public/robots.txt` during the build. In both cases, allow ordinary search crawlers, declare the XML
-sitemap, and then make a separate decision for each AI crawler policy.
+Use `app/robots.ts` for a Next.js App Router site and make separate decisions for AI search,
+model training, and user-triggered retrieval. If your goal is AI visibility without opting into
+training, allow search and user crawlers while disallowing training crawlers.
 
-`next-ai-ready` generates a `robots.txt` that explicitly declares your AI-bot policy. This is
-important because AI crawlers need clear signals about what they can access.
+```ts
+// app/robots.ts
+import type { MetadataRoute } from "next"
+import { aiRobots } from "next-ai-ready/robots"
 
-## Default behavior
-
-By default, `npx next-ai-ready build` writes `public/robots.txt` that **allows** all AI bots:
-
-```
-User-agent: *
-Allow: /
-
-# AI-specific rules
-User-agent: GPTBot
-Allow: /
-
-User-agent: ClaudeBot
-Allow: /
-
-# ... (one block per known AI bot)
-
-# AI-readable content
-# llms.txt: https://your-site.com/llms.txt
-# llms-full.txt: https://your-site.com/llms-full.txt
+export default function robots(): MetadataRoute.Robots {
+  return aiRobots(
+    { name: "Acme", baseUrl: "https://acme.com" },
+    {
+      aiBots: {
+        search: "allow",
+        user: "allow",
+        training: "disallow",
+        other: "allow",
+      },
+      sitemap: true,
+    },
+  )
+}
 ```
 
-Each known AI bot gets an explicit `Allow: /` block. Comments point to your `llms.txt` and `llms-full.txt` endpoints.
+This is a bounded policy decision, not an SEO score. It says which classes of agents may fetch the
+site; it does not guarantee crawling, indexing, ranking, retrieval, or citation.
 
-## Configuration
+## Choose a policy by purpose
 
-Control robots.txt behavior in `ai-ready.config.mjs`:
+Do not treat every AI user agent as the same kind of crawler. The major providers expose separate
+identities for different jobs.
+
+| Purpose                  | Representative agents                                | Visibility consequence                                                                                        |
+| ------------------------ | ---------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| AI search                | `OAI-SearchBot`, `Claude-SearchBot`, `PerplexityBot` | Blocking can reduce or prevent discovery in the provider's search experience.                                 |
+| Model development        | `GPTBot`, `ClaudeBot`, `Google-Extended`             | Blocking opts content out of the uses described by each provider; it is separate from ordinary Google Search. |
+| User-triggered retrieval | `ChatGPT-User`, `Claude-User`, `Perplexity-User`     | Blocking can prevent an assistant from fetching the page for a user's request.                                |
+| Other or mixed           | Legacy and provider-specific agents                  | Use an explicit fallback and review provider documentation before changing it.                                |
+
+[OpenAI documents](https://developers.openai.com/api/docs/bots) that `OAI-SearchBot` is for ChatGPT
+search, `GPTBot` is for model development, and `ChatGPT-User` is user initiated. OpenAI also notes
+that robots.txt rules may not apply to `ChatGPT-User` because the request is initiated by a person.
+
+[Anthropic documents](https://support.claude.com/en/articles/8896518-does-anthropic-crawl-data-from-the-web-and-how-can-site-owners-block-the-crawler)
+the same three-way split: `Claude-SearchBot`, `ClaudeBot`, and `Claude-User`.
+
+`Google-Extended` is a robots.txt control token rather than a separate HTTP crawler identity.
+[Google states](https://developers.google.com/crawling/docs/crawlers-fetchers/google-common-crawlers#google-extended)
+that it has no effect on Google Search inclusion and is not a Google Search ranking signal.
+
+## Purpose-based configuration
+
+Configure the same policy for the build-time static file:
 
 ```js
+// ai-ready.config.mjs
+import { defineConfig } from "next-ai-ready"
+
 export default defineConfig({
-  site: { /* ... */ },
+  site: {
+    name: "Acme",
+    baseUrl: "https://acme.com",
+    description: "Acme product documentation.",
+  },
   robots: {
-    aiBots: "allow",       // "allow" (default) or "disallow"
-    sitemap: true,         // true = auto-generate, string = custom URL
-    extra: [
-      "Disallow: /admin/",
-    ],
+    aiBots: {
+      search: "allow",
+      user: "allow",
+      training: "disallow",
+      other: "allow",
+    },
+    sitemap: true,
   },
 })
 ```
 
-| Field     | Type                    | Default   | Description                                                                  |
-| --------- | ----------------------- | --------- | ---------------------------------------------------------------------------- |
-| `aiBots`  | `"allow" \| "disallow"` | `"allow"` | Whether AI bots can crawl your site.                                         |
-| `sitemap` | `boolean \| string`     | `false`   | `true` = auto-generate `Sitemap: <baseUrl>/sitemap.xml`. String = use as-is. |
-| `extra`   | `string[]`              | `[]`      | Raw lines appended verbatim to the output.                                   |
+The four keys are finite choices:
 
-## Disabling AI bots
+| Key        | Applies to                                            | Default when omitted      |
+| ---------- | ----------------------------------------------------- | ------------------------- |
+| `search`   | AI search indexing crawlers                           | `default`, then `"allow"` |
+| `training` | Model-development crawlers and control tokens         | `default`, then `"allow"` |
+| `user`     | User-triggered assistant fetches                      | `default`, then `"allow"` |
+| `other`    | Mixed, legacy, or not independently documented agents | `default`, then `"allow"` |
+| `default`  | Fallback for an omitted purpose                       | `"allow"`                 |
 
-To block all AI crawlers:
+Use `default: "disallow"` when the site requires an explicit allowlist:
 
 ```js
 robots: {
-  aiBots: "disallow",
+  aiBots: {
+    default: "disallow",
+    search: "allow",
+  },
 }
 ```
 
-This generates `Disallow: /` for every known AI bot user agent.
+## Backward-compatible all-or-nothing policy
 
-## Static vs dynamic
+The original string form remains supported. Use it only when the same decision genuinely applies
+to every known AI bot:
 
-By default, `robots.txt` is written to `public/` as a static file. This is the simplest and cheapest approach — it works on any hosting provider.
+```js
+robots: {
+  aiBots: "allow", // or "disallow"
+}
+```
 
-If you need dynamic robots.txt (e.g. per-request A/B testing), you can:
+With no `robots.aiBots` setting, next-ai-ready keeps its existing default and explicitly allows
+known AI bots.
 
-1. Set `emit: { robots: false }` in config to skip static generation.
-2. Create `app/robots.ts` using Next.js built-in robots support (this docs site does this).
-3. Use `aiRobots()` from `next-ai-ready` inside `app/robots.ts`.
+## Static file or app/robots.ts
 
-Doctor recognizes `app/robots.ts` + `emit.robots: false` and will not warn about a missing `public/robots.txt`.
+`next-ai-ready build` writes `public/robots.txt` by default. This works on any host and is useful
+when the policy changes only with a deployment.
 
-## Known AI bots
+For an App Router project, Next.js recommends the `app/robots.ts` metadata-file convention. Its
+return value is cached unless it uses a Dynamic API or dynamic route configuration. The result from
+`aiRobots()` is compatible with `MetadataRoute.Robots`.
 
-The framework detects these user agents:
+When using `app/robots.ts`:
 
-- `GPTBot` — OpenAI
-- `OAI-SearchBot` — OpenAI Search
-- `ChatGPT-User` — ChatGPT browsing
-- `PerplexityBot` — Perplexity
-- `ClaudeBot` — Anthropic
-- `anthropic-ai` — Anthropic
-- `Google-Extended` — Google AI
-- `CCBot` — Common Crawl
-- `Bytespider` — ByteDance
-- `Applebot-Extended` — Apple
+1. Set `emit: { robots: false }` so the build does not also write `public/robots.txt`.
+2. Return `aiRobots(site, robotsConfig)` from `app/robots.ts`.
+3. Keep only one authoritative policy so static and runtime rules cannot conflict.
+
+Doctor recognizes `app/robots.ts` with `emit.robots: false` and does not warn about a missing static
+file.
+
+## llms.txt comments are not directives
+
+The generated static file includes comments pointing to `/llms.txt` and `/llms-full.txt`. These
+comments make the machine-facing entrypoints easier for people to inspect, but no robots.txt
+standard requires a crawler to follow them. Keep the real discovery paths available and linked from
+the site; do not report the comments as proof of crawling or citation.
+
+## Verify the deployed response
+
+Inspect the production file after deployment:
+
+```bash
+curl -i https://example.com/robots.txt
+```
+
+Check the actual groups, not only the HTTP status:
+
+```bash
+curl -s https://example.com/robots.txt | grep -A1 -E \
+  'OAI-SearchBot|GPTBot|Claude-SearchBot|ClaudeBot|Claude-User'
+```
+
+Then run the deployed preflight:
+
+```bash
+pnpm exec next-ai-ready audit https://example.com --version 3
+```
+
+The audit verifies technical access. Search Console, server logs, and provider-specific referral or
+citation data are still required to measure whether the policy produces real discovery.
+
+## Primary references
+
+- [Next.js robots.txt metadata file](https://nextjs.org/docs/app/api-reference/file-conventions/metadata/robots)
+- [OpenAI crawler identities and controls](https://developers.openai.com/api/docs/bots)
+- [Anthropic crawler identities and controls](https://support.claude.com/en/articles/8896518-does-anthropic-crawl-data-from-the-web-and-how-can-site-owners-block-the-crawler)
+- [Google-Extended documentation](https://developers.google.com/crawling/docs/crawlers-fetchers/google-common-crawlers#google-extended)
 
 ## FAQ
 
-### How do I allow AI crawlers explicitly?
+### Can I allow AI search crawlers while blocking training crawlers?
 
-next-ai-ready build can emit robots.txt with GPTBot, ClaudeBot, and other AI bots allowed, or use app/robots.ts with aiRobots().
+Yes. Use a purpose-based aiBots policy that allows search and user access while disallowing training crawlers.
 
-### Should I advertise llms.txt in robots.txt?
+### Are OAI-SearchBot and GPTBot the same?
 
-Yes. The build adds comments pointing crawlers to /llms.txt and /llms-full.txt when configured.
+No. OAI-SearchBot controls visibility in ChatGPT search, while GPTBot is used for content that may contribute to model training.
+
+### Which Anthropic bots affect search visibility?
+
+Claude-SearchBot supports search indexing and Claude-User fetches pages at a user's direction; ClaudeBot is the model-training crawler.
+
+### Do llms.txt comments in robots.txt make crawlers read llms.txt?
+
+No. They are human-readable pointers, not standardized robots.txt directives, and they do not guarantee discovery or citation.
 
 ### Does Google-Extended control normal Google Search indexing?
 
-No. Google-Extended controls whether site content may be used for certain generative AI systems; normal Google Search crawling follows Googlebot rules.
+No. Google-Extended controls certain Gemini training and grounding uses; it does not affect Google Search inclusion or ranking.
 
 
 <!-- END /en/docs/guides/robots-txt -->
@@ -2790,7 +2908,7 @@ next-ai-ready 聚合包。使用 npx next-ai-ready 或 pnpm exec next-ai-ready�
 <!-- BEGIN /zh/docs/api-reference/config -->
 # 配置
 URL: https://next-ai-ready.vercel.app/zh/docs/api-reference/config
-Updated: 2026-08-01
+Updated: 2026-09-26
 
 # 配置
 
@@ -2853,6 +2971,41 @@ export default defineActions([ ... ]);
 | 字段        | 类型        | 默认值    | 描述                                                 |
 | --------- | --------- | ------ | -------------------------------------------------- |
 | `openapi` | `boolean` | `true` | 生成 `/openapi.json`、`/tools.json`、`/ai-plugin.json` |
+
+## robots
+
+控制构建是否生成 `public/robots.txt`，并决定已知 AI Agent 的访问策略。原来的统一写法继续
+兼容：
+
+```js
+robots: {
+  aiBots: "allow", // 或 "disallow"
+  sitemap: true,
+}
+```
+
+当搜索可见性与模型训练策略不同时，使用按用途分类的写法：
+
+```js
+robots: {
+  aiBots: {
+    search: "allow",
+    user: "allow",
+    training: "disallow",
+    other: "allow",
+  },
+  sitemap: true,
+}
+```
+
+| 字段        | 类型                                     | 默认值       | 描述                                                                     |
+| --------- | -------------------------------------- | --------- | ---------------------------------------------------------------------- |
+| `aiBots`  | `"allow" \| "disallow" \| AiBotPolicy` | `"allow"` | 对所有已知 bot 使用统一策略，或分别设置 `search`、`training`、`user`、`other` 和 `default`。 |
+| `sitemap` | `boolean \| string`                    | `false`   | 使用默认或指定 URL 生成 sitemap 声明。                                             |
+| `extra`   | `string[]`                             | `[]`      | 在静态输出末尾添加原始指令；结构化 `aiRobots()` 不支持该字段。                                 |
+
+各服务商用途、`app/robots.ts` 类型化示例和不同决策的可见性影响见
+[robots.txt 指南](../guides/robots-txt)。
 
 ## FAQ
 
@@ -4680,118 +4833,196 @@ npx next-ai-ready doctor --score
 <!-- END /zh/docs/guides/quickstart -->
 
 <!-- BEGIN /zh/docs/guides/robots-txt -->
-# 在 Next.js 中配置面向 AI 爬虫的 robots.txt
+# 在 Next.js 中分别配置 AI 搜索与训练爬虫
 URL: https://next-ai-ready.vercel.app/zh/docs/guides/robots-txt
-Updated: 2026-08-24
+Updated: 2026-09-26
 
-# 在 Next.js 中配置面向 AI 爬虫的 robots.txt
+# 在 Next.js 中分别配置 AI 搜索与训练爬虫
 
-策略属于 Next.js App Router 部署时使用 `app/robots.ts`；需要构建期静态文件时生成
-`public/robots.txt`。两种方式都应允许普通搜索爬虫、声明 XML sitemap，再分别决定每一种
-AI 爬虫的访问策略。
+Next.js App Router 站点应使用 `app/robots.ts`，并分别决定 AI 搜索、模型训练和用户触发
+读取的访问策略。如果目标是获得 AI 搜索可见性、但不希望内容参与模型训练，就允许搜索和
+用户访问，同时阻止训练爬虫。
 
-`next-ai-ready` 生成一个 `robots.txt`，显式声明你的 AI 爬虫策略。这对 AI 爬虫很重要，
-因为它们需要明确的信号来判断可以访问什么。
+```ts
+// app/robots.ts
+import type { MetadataRoute } from "next"
+import { aiRobots } from "next-ai-ready/robots"
 
-## 默认行为
-
-默认情况下，`npx next-ai-ready build` 写入的 `public/robots.txt` **允许**所有 AI 爬虫：
-
-```
-User-agent: *
-Allow: /
-
-# AI-specific rules
-User-agent: GPTBot
-Allow: /
-
-User-agent: ClaudeBot
-Allow: /
-
-# ...（每个已知 AI 爬虫一个块）
-
-# AI-readable content
-# llms.txt: https://your-site.com/llms.txt
-# llms-full.txt: https://your-site.com/llms-full.txt
+export default function robots(): MetadataRoute.Robots {
+  return aiRobots(
+    { name: "Acme", baseUrl: "https://acme.com" },
+    {
+      aiBots: {
+        search: "allow",
+        user: "allow",
+        training: "disallow",
+        other: "allow",
+      },
+      sitemap: true,
+    },
+  )
+}
 ```
 
-每个已知 AI 爬虫都有显式的 `Allow: /` 块。注释指向你的 `llms.txt` 和 `llms-full.txt` 端点。
+这是一个有限选项的访问决策，不是 SEO 分数。它只说明哪些类型的 Agent 可以抓取站点，
+不保证抓取、索引、排名、检索或引用。
 
-## 配置
+## 按用途选择策略
 
-在 `ai-ready.config.mjs` 中控制 robots.txt 行为：
+不要把所有 AI user agent 当作同一种爬虫。主要服务商已经为不同用途提供了独立身份。
+
+| 用途      | 代表性 Agent                                          | 对可见性的影响                               |
+| ------- | -------------------------------------------------- | ------------------------------------- |
+| AI 搜索   | `OAI-SearchBot`、`Claude-SearchBot`、`PerplexityBot` | 阻止后可能降低或失去在对应 AI 搜索中的发现机会。            |
+| 模型开发    | `GPTBot`、`ClaudeBot`、`Google-Extended`             | 阻止后会退出各服务商说明的相关用途；这与普通 Google 搜索是两件事。 |
+| 用户触发读取  | `ChatGPT-User`、`Claude-User`、`Perplexity-User`     | 阻止后，助手可能无法按用户要求读取页面。                  |
+| 其他或混合用途 | 旧版和服务商特有 Agent                                     | 设置明确的 fallback，并在修改前核对服务商文档。          |
+
+[OpenAI 官方文档](https://developers.openai.com/api/docs/bots)说明：`OAI-SearchBot` 用于
+ChatGPT 搜索，`GPTBot` 用于模型开发，`ChatGPT-User` 由用户操作触发。OpenAI 还指出，
+由于 `ChatGPT-User` 请求由用户发起，robots.txt 规则可能并不适用。
+
+[Anthropic 官方文档](https://support.claude.com/zh-CN/articles/8896518-anthropic-%E6%98%AF%E5%90%A6%E4%BB%8E%E7%BD%91%E7%BB%9C%E7%88%AC%E5%8F%96%E6%95%B0%E6%8D%AE-%E7%BD%91%E7%AB%99%E6%89%80%E6%9C%89%E8%80%85%E5%A6%82%E4%BD%95%E9%98%BB%E6%AD%A2%E7%88%AC%E8%99%AB)
+也采用三种身份：`Claude-SearchBot`、`ClaudeBot` 和 `Claude-User`。
+
+`Google-Extended` 是 robots.txt 控制 token，并不是一个独立发送请求的 HTTP 爬虫身份。
+[Google 明确说明](https://developers.google.com/crawling/docs/crawlers-fetchers/google-common-crawlers#google-extended)，
+它不影响 Google 搜索收录，也不是 Google 搜索排名信号。
+
+## 按用途配置静态文件
+
+构建期生成的静态文件可以使用同一策略：
 
 ```js
+// ai-ready.config.mjs
+import { defineConfig } from "next-ai-ready"
+
 export default defineConfig({
-  site: { /* ... */ },
+  site: {
+    name: "Acme",
+    baseUrl: "https://acme.com",
+    description: "Acme 产品文档。",
+  },
   robots: {
-    aiBots: "allow",       // "allow"（默认）或 "disallow"
-    sitemap: true,         // true = 自动生成，string = 自定义 URL
-    extra: [
-      "Disallow: /admin/",
-    ],
+    aiBots: {
+      search: "allow",
+      user: "allow",
+      training: "disallow",
+      other: "allow",
+    },
+    sitemap: true,
   },
 })
 ```
 
-| 字段        | 类型                      | 默认值       | 说明                                                            |
-| --------- | ----------------------- | --------- | ------------------------------------------------------------- |
-| `aiBots`  | `"allow" \| "disallow"` | `"allow"` | AI 爬虫是否可以抓取你的站点。                                              |
-| `sitemap` | `boolean \| string`     | `false`   | `true` = 自动生成 `Sitemap: <baseUrl>/sitemap.xml`。string = 直接使用。 |
-| `extra`   | `string[]`              | `[]`      | 原始行，逐字追加到输出末尾。                                                |
+四种用途都使用有限选项：
 
-## 禁用 AI 爬虫
+| 字段         | 适用对象                  | 省略后的默认值                     |
+| ---------- | --------------------- | --------------------------- |
+| `search`   | AI 搜索索引爬虫             | 先读取 `default`，否则为 `"allow"` |
+| `training` | 模型开发爬虫与控制 token       | 先读取 `default`，否则为 `"allow"` |
+| `user`     | 用户触发的助手读取             | 先读取 `default`，否则为 `"allow"` |
+| `other`    | 混合用途、旧版或未被独立说明的 Agent | 先读取 `default`，否则为 `"allow"` |
+| `default`  | 未配置用途的 fallback       | `"allow"`                   |
 
-阻止所有 AI 爬虫：
+需要严格白名单时，可以将默认值设为拒绝：
 
 ```js
 robots: {
-  aiBots: "disallow",
+  aiBots: {
+    default: "disallow",
+    search: "allow",
+  },
 }
 ```
 
-这会为每个已知 AI 爬虫 user agent 生成 `Disallow: /`。
+## 向后兼容的统一策略
 
-## 静态 vs 动态
+原来的字符串写法仍然有效。只有当同一个决定确实适用于所有已知 AI bot 时才使用它：
 
-默认情况下，`robots.txt` 作为静态文件写入 `public/`。这是最简单、最经济的方式——适用于任何托管提供商。
+```js
+robots: {
+  aiBots: "allow", // 或 "disallow"
+}
+```
 
-如果需要动态 robots.txt（如按请求 A/B 测试），可以：
+未配置 `robots.aiBots` 时，next-ai-ready 保持原有默认行为，显式允许已知 AI bot。
 
-1. 在配置中设置 `emit: { robots: false }` 跳过静态生成。
-2. 使用 Next.js 内置的 robots 支持创建 `app/robots.ts`（本文档站采用此方式）。
-3. 在 `app/robots.ts` 中使用来自 `next-ai-ready` 的 `aiRobots()`。
+## 静态文件还是 app/robots.ts
 
-Doctor 认可 `app/robots.ts` + `emit.robots: false`，不会误报缺少 `public/robots.txt`。
+`next-ai-ready build` 默认写入 `public/robots.txt`。当策略只随部署变化时，这种方式适用于
+任何托管平台。
 
-## 已知 AI 爬虫
+对于 App Router 项目，Next.js 推荐使用 `app/robots.ts` 元数据文件约定。除非使用 Dynamic
+API 或动态路由配置，否则它的返回结果会被缓存。`aiRobots()` 的结果兼容
+`MetadataRoute.Robots`。
 
-框架检测以下 user agent：
+使用 `app/robots.ts` 时：
 
-- `GPTBot` — OpenAI
-- `OAI-SearchBot` — OpenAI Search
-- `ChatGPT-User` — ChatGPT 浏览
-- `PerplexityBot` — Perplexity
-- `ClaudeBot` — Anthropic
-- `anthropic-ai` — Anthropic
-- `Google-Extended` — Google AI
-- `CCBot` — Common Crawl
-- `Bytespider` — ByteDance
-- `Applebot-Extended` — Apple
+1. 设置 `emit: { robots: false }`，避免构建时再写一份 `public/robots.txt`。
+2. 从 `app/robots.ts` 返回 `aiRobots(site, robotsConfig)`。
+3. 只保留一套权威策略，避免静态规则和运行时规则互相冲突。
+
+Doctor 能识别 `app/robots.ts` 与 `emit.robots: false`，不会误报缺少静态文件。
+
+## llms.txt 注释不是标准指令
+
+生成的静态文件包含指向 `/llms.txt` 和 `/llms-full.txt` 的注释。这些注释便于人类检查
+机器入口，但 robots.txt 标准并不要求爬虫跟随它们。请保持真实入口可访问，并从站内页面
+链接过去；不要把这些注释当作已经抓取或引用的证据。
+
+## 验证生产响应
+
+部署后检查真实文件：
+
+```bash
+curl -i https://example.com/robots.txt
+```
+
+不要只检查 HTTP 状态，还要检查实际分组：
+
+```bash
+curl -s https://example.com/robots.txt | grep -A1 -E \
+  'OAI-SearchBot|GPTBot|Claude-SearchBot|ClaudeBot|Claude-User'
+```
+
+然后运行部署预检：
+
+```bash
+pnpm exec next-ai-ready audit https://example.com --version 3
+```
+
+Audit 验证的是技术访问能力。是否产生真实发现仍需结合 Search Console、服务端日志，以及
+各服务商的引荐或引用数据来判断。
+
+## 主要依据
+
+- [Next.js robots.txt 元数据文件](https://nextjs.org/docs/app/api-reference/file-conventions/metadata/robots)
+- [OpenAI 爬虫身份与控制方式](https://developers.openai.com/api/docs/bots)
+- [Anthropic 爬虫身份与控制方式](https://support.claude.com/zh-CN/articles/8896518-anthropic-%E6%98%AF%E5%90%A6%E4%BB%8E%E7%BD%91%E7%BB%9C%E7%88%AC%E5%8F%96%E6%95%B0%E6%8D%AE-%E7%BD%91%E7%AB%99%E6%89%80%E6%9C%89%E8%80%85%E5%A6%82%E4%BD%95%E9%98%BB%E6%AD%A2%E7%88%AC%E8%99%AB)
+- [Google-Extended 文档](https://developers.google.com/crawling/docs/crawlers-fetchers/google-common-crawlers#google-extended)
 
 ## FAQ
 
-### 如何显式允许 AI 爬虫？
+### 可以允许 AI 搜索爬虫，同时阻止训练爬虫吗？
 
-build 可生成含 GPTBot、ClaudeBot 等规则的 robots.txt，或在 app/robots.ts 使用 aiRobots()。
+可以。使用按用途分类的 aiBots 策略，允许 search 与 user，同时将 training 设为 disallow。
 
-### 是否应在 robots.txt 中声明 llms.txt？
+### OAI-SearchBot 和 GPTBot 是同一种爬虫吗？
 
-建议声明。构建时可通过注释指向 /llms.txt 与 /llms-full.txt。
+不是。OAI-SearchBot 决定内容能否进入 ChatGPT 搜索；GPTBot 用于可能参与模型训练的内容抓取。
+
+### Anthropic 的哪些爬虫会影响搜索可见性？
+
+Claude-SearchBot 用于搜索索引，Claude-User 按用户要求读取页面，ClaudeBot 则是模型训练爬虫。
+
+### robots.txt 中的 llms.txt 注释会让爬虫读取 llms.txt 吗？
+
+不会。它只是方便人类查看的提示，不是标准 robots.txt 指令，也不能保证发现或引用。
 
 ### Google-Extended 会控制普通 Google 搜索收录吗？
 
-不会。Google-Extended 控制内容能否用于部分生成式 AI 系统；普通 Google 搜索抓取遵循 Googlebot 规则。
+不会。Google-Extended 控制部分 Gemini 训练与 grounding 用途，不影响 Google 搜索收录或排名。
 
 
 <!-- END /zh/docs/guides/robots-txt -->

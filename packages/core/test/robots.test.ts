@@ -29,6 +29,28 @@ describe("buildRobotsTxt()", () => {
     expect(txt).toContain("User-agent: *\nAllow: /");
   });
 
+  it("keeps AI search visible while opting out of training crawlers", () => {
+    const txt = buildRobotsTxt(SITE, {
+      aiBots: { search: "allow", training: "disallow", user: "allow" },
+    });
+
+    expect(txt).toContain("User-agent: OAI-SearchBot\nAllow: /");
+    expect(txt).toContain("User-agent: Claude-SearchBot\nAllow: /");
+    expect(txt).toContain("User-agent: GPTBot\nDisallow: /");
+    expect(txt).toContain("User-agent: ClaudeBot\nDisallow: /");
+    expect(txt).toContain("User-agent: ChatGPT-User\nAllow: /");
+    expect(txt).toContain("User-agent: Claude-User\nAllow: /");
+  });
+
+  it("uses the typed default for crawler purposes without an explicit decision", () => {
+    const txt = buildRobotsTxt(SITE, {
+      aiBots: { default: "disallow", search: "allow" },
+    });
+
+    expect(txt).toContain("User-agent: OAI-SearchBot\nAllow: /");
+    expect(txt).toContain("User-agent: Amazonbot\nDisallow: /");
+  });
+
   it("emits a Sitemap line when configured", () => {
     expect(buildRobotsTxt(SITE, { sitemap: true })).toContain("Sitemap: https://acme.com/sitemap.xml");
     expect(buildRobotsTxt(SITE, { sitemap: "https://cdn.acme.com/sm.xml" })).toContain(
@@ -76,6 +98,26 @@ describe("aiRobots()", () => {
     for (const rule of result.rules.slice(1)) {
       expect(rule).toHaveProperty("disallow", "/");
     }
+  });
+
+  it("returns role-aware Next.js rules", () => {
+    const result = aiRobots(SITE, {
+      aiBots: { search: "allow", training: "disallow", user: "allow" },
+    });
+    const byAgent = new Map(result.rules.map((rule) => [String(rule.userAgent), rule]));
+
+    expect(byAgent.get("OAI-SearchBot")).toEqual({
+      userAgent: "OAI-SearchBot",
+      allow: "/",
+    });
+    expect(byAgent.get("GPTBot")).toEqual({
+      userAgent: "GPTBot",
+      disallow: "/",
+    });
+    expect(byAgent.get("Claude-User")).toEqual({
+      userAgent: "Claude-User",
+      allow: "/",
+    });
   });
 
   it("includes sitemap when configured", () => {

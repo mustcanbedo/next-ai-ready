@@ -12,7 +12,7 @@ questions:
 tags:
   - api
   - reference
-updatedAt: '2026-08-01'
+updatedAt: '2026-09-26'
 author: next-ai-ready team
 ---
 
@@ -77,3 +77,38 @@ Control which artifacts are generated:
 | Field | Type | Default | Description |
 | --- | --- | --- | --- |
 | `openapi` | `boolean` | `true` | Generate `/openapi.json`, `/tools.json`, `/ai-plugin.json` |
+
+## robots
+
+Choose whether the build emits `public/robots.txt` and how known AI agents are grouped. The original
+all-or-nothing form remains supported:
+
+```js
+robots: {
+  aiBots: "allow", // or "disallow"
+  sitemap: true,
+}
+```
+
+Use the purpose-based form when search visibility and model-training policy differ:
+
+```js
+robots: {
+  aiBots: {
+    search: "allow",
+    user: "allow",
+    training: "disallow",
+    other: "allow",
+  },
+  sitemap: true,
+}
+```
+
+| Field | Type | Default | Description |
+| --- | --- | --- | --- |
+| `aiBots` | `"allow" \| "disallow" \| AiBotPolicy` | `"allow"` | One policy for all known bots, or independent `search`, `training`, `user`, `other`, and `default` decisions. |
+| `sitemap` | `boolean \| string` | `false` | Emit a sitemap declaration using the default or supplied URL. |
+| `extra` | `string[]` | `[]` | Append raw directives to the static output. Not supported by the structured `aiRobots()` helper. |
+
+See [the robots.txt guide](../guides/robots-txt) for provider roles, a typed `app/robots.ts`
+example, and the visibility consequences of each decision.

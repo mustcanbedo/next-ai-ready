@@ -10,7 +10,7 @@ questions:
 tags:
   - api
   - reference
-updatedAt: '2026-08-01'
+updatedAt: '2026-09-26'
 author: next-ai-ready 团队
 ---
 
@@ -75,3 +75,38 @@ export default defineActions([ ... ]);
 | 字段 | 类型 | 默认值 | 描述 |
 | --- | --- | --- | --- |
 | `openapi` | `boolean` | `true` | 生成 `/openapi.json`、`/tools.json`、`/ai-plugin.json` |
+
+## robots
+
+控制构建是否生成 `public/robots.txt`，并决定已知 AI Agent 的访问策略。原来的统一写法继续
+兼容：
+
+```js
+robots: {
+  aiBots: "allow", // 或 "disallow"
+  sitemap: true,
+}
+```
+
+当搜索可见性与模型训练策略不同时，使用按用途分类的写法：
+
+```js
+robots: {
+  aiBots: {
+    search: "allow",
+    user: "allow",
+    training: "disallow",
+    other: "allow",
+  },
+  sitemap: true,
+}
+```
+
+| 字段 | 类型 | 默认值 | 描述 |
+| --- | --- | --- | --- |
+| `aiBots` | `"allow" \| "disallow" \| AiBotPolicy` | `"allow"` | 对所有已知 bot 使用统一策略，或分别设置 `search`、`training`、`user`、`other` 和 `default`。 |
+| `sitemap` | `boolean \| string` | `false` | 使用默认或指定 URL 生成 sitemap 声明。 |
+| `extra` | `string[]` | `[]` | 在静态输出末尾添加原始指令；结构化 `aiRobots()` 不支持该字段。 |
+
+各服务商用途、`app/robots.ts` 类型化示例和不同决策的可见性影响见
+[robots.txt 指南](../guides/robots-txt)。

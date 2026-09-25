@@ -32,3 +32,6 @@ jobs:
 
       - name: Audit deployed documentation
         run: pnpm audit:vercel:site
+
+      - name: Verify production deployment contract
+        run: pnpm audit:production-contract

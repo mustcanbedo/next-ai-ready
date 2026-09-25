@@ -59,17 +59,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }
   }
 
-  const latestContentDate = latestDate(
-    [...docsByLocale.values()].flatMap((docs) => docs.map((doc) => doc.updatedAt)),
-  );
-  for (const path of ["/llms.txt", "/llms-full.txt", "/openapi.json", "/tools.json"]) {
-    entries.push({
-      url: `${base}${path}`,
-      lastModified: latestContentDate,
-      changeFrequency: "weekly",
-      priority: 0.5,
-    });
-  }
-
   return entries;
 }

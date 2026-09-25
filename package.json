@@ -26,6 +26,7 @@
     "bin:smoke": "node scripts/bin-smoke.mjs",
     "audit:vercel": "agent-readability audit",
     "audit:vercel:site": "agent-readability audit https://next-ai-ready.vercel.app/en --min-score 100",
+    "audit:production-contract": "node --test scripts/production-contract-check.test.mjs && node scripts/production-contract-check.mjs",
     "changeset:status": "node --test scripts/changeset-status.test.mjs && node scripts/changeset-status.mjs",
     "registry:manifest-check": "node --test scripts/published-manifest-drift-check.test.mjs && node scripts/published-manifest-drift-check.mjs",
     "external:smoke": "node scripts/external-quickstart-smoke.mjs",

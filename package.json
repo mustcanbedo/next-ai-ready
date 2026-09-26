@@ -30,11 +30,12 @@
     "search:intent-eval": "node --test scripts/search-intent-eval.test.mjs && node scripts/search-intent-eval.mjs",
     "changeset:status": "node --test scripts/changeset-status.test.mjs && node scripts/changeset-status.mjs",
     "registry:manifest-check": "node --test scripts/published-manifest-drift-check.test.mjs && node scripts/published-manifest-drift-check.mjs",
+    "release:registry:test": "node --test scripts/verify-npm-release.test.mjs",
     "external:smoke": "node scripts/external-quickstart-smoke.mjs",
     "release:docs:sync": "node scripts/sync-release-docs.mjs && pnpm --filter next-ai-ready... build && pnpm --filter docs-site run prebuild",
     "release:docs:check": "node --test scripts/sync-release-docs.test.mjs && node scripts/sync-release-docs.mjs --check && pnpm --filter docs-site check:artifacts",
     "docs-site:smoke": "pnpm --filter docs-site smoke",
-    "verify:release": "pnpm build && pnpm test && pnpm typecheck && node scripts/e2e-smoke.mjs && pnpm metadata:check && pnpm pack:check && pnpm exports:check && pnpm api:check && pnpm bin:smoke && pnpm release:docs:check && pnpm docs-site:smoke && pnpm search:intent-eval && pnpm changeset:status && pnpm registry:manifest-check && pnpm external:smoke"
+    "verify:release": "pnpm build && pnpm test && pnpm typecheck && node scripts/e2e-smoke.mjs && pnpm metadata:check && pnpm pack:check && pnpm exports:check && pnpm api:check && pnpm bin:smoke && pnpm release:docs:check && pnpm docs-site:smoke && pnpm search:intent-eval && pnpm changeset:status && pnpm registry:manifest-check && pnpm release:registry:test && pnpm external:smoke"
   },
   "devDependencies": {
     "@changesets/cli": "^2.27.9",

@@ -58,10 +58,8 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
-      - name: Verify npm tags
-        run: |
-          npm view next-ai-ready dist-tags --json
-          npm view create-next-ai-ready dist-tags --json
+      - name: Wait for npm alpha visibility
+        run: node scripts/verify-npm-release.mjs
 
       - name: Promote user-facing packages to latest
         if: github.event.inputs.promote_latest == 'true'
@@ -74,3 +72,7 @@ jobs:
           done
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Verify npm latest promotion
+        if: github.event.inputs.promote_latest == 'true'
+        run: node scripts/verify-npm-release.mjs --require-latest

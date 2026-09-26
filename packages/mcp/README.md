@@ -14,11 +14,17 @@ Passing a `SemanticGraph` to `registerAiReady(server, { graph })` automatically 
 | `get_page` | `{ route }` | `route` is a safe absolute site route from 1 to 512 characters; returns metadata and full AI-ready Markdown. |
 | `search_pages` | `{ query, locale?, limit? }` | `query` is 1–200 characters; `locale` narrows multilingual graphs; `limit` defaults to 5 and is capped at 20. |
 
-`search_pages` uses deterministic local lexical ranking over the pre-built graph, including CJK-aware tokenization, bounded Latin prefix matching, inverse-document-frequency weighting, and site-name suppression when a query contains more specific task terms. It does not call an external API or require a vector database. Omit `graph` to register action tools without page tools or resources.
+`search_pages` uses the shared `PageSearchProvider` from `@next-ai-ready/semantic`. The default provider performs deterministic local lexical ranking over the pre-built graph, including CJK-aware tokenization, bounded Latin prefix matching, inverse-document-frequency weighting, and site-name suppression when a query contains more specific task terms. It does not call an external API or require a vector database. Omit `graph` to register action tools without page tools or resources.
 
 ```ts
 const result = registerAiReady(server, { graph })
 // result.tools includes action tools plus list_pages, get_page, and search_pages.
+```
+
+To use a runtime index, pass a provider while keeping the MCP contract unchanged:
+
+```ts
+registerAiReady(server, { graph, searchProvider })
 ```
 
 Part of [next-ai-ready](../../README.md). Pre-alpha.

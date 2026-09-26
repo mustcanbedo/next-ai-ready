@@ -24,4 +24,10 @@ describe("next-ai-ready meta package", () => {
     expect(typeof mod.runAudit).toBe("function");
     expect(mod.AUDIT_V3_SCHEMA).toBe("next-ai-ready.audit.v3");
   });
+
+  it("exports focused page search without the main entrypoint", async () => {
+    const mod = await import("../src/search.js");
+    expect(typeof mod.searchGraphPages).toBe("function");
+    expect(typeof mod.createGraphSearchProvider).toBe("function");
+  });
 });

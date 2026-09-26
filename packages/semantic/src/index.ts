@@ -2,3 +2,4 @@
 export * from "./semantic.js";
 export * from "./graph.js";
 export * from "./jsonld.js";
+export * from "./search.js";

@@ -1620,6 +1620,10 @@ The three read-only tools are available whenever `registerAiReady(server, { grap
 
 Search runs only over the pre-built SemanticGraph and does not require an external API, embedding service, or vector database. Use routes returned by `list_pages` or `search_pages` as input to `get_page`.
 
+## One search implementation across protocols
+
+`search_pages` and the docs site's HTTP `search_docs` action both use the public `PageSearchProvider` contract. The built-in `createGraphSearchProvider(graph)` keeps retrieval deterministic and database-free. A runtime index can implement the same contract and be injected into `registerAiReady(server, { graph, searchProvider })` without changing MCP clients.
+
 ## Prerequisites
 
 MCP requires two optional peer dependencies:
@@ -4262,6 +4266,10 @@ MCP 包（`@next-ai-ready/mcp`）是一个薄适配器：
 | `search_pages` | `query`、`locale?`、`limit?` | 支持中文分词的确定性本地词法搜索。查询长度为 1–200 字符，可按 locale 缩小多语言结果，默认返回 5 条，最多 20 条。 |
 
 搜索只读取预构建的 SemanticGraph，不需要外部 API、Embedding 服务或向量数据库。将 `list_pages` 或 `search_pages` 返回的路由传给 `get_page` 即可读取全文。
+
+## 多协议共用一套检索实现
+
+`search_pages` 与文档站的 HTTP `search_docs` Action 都使用公开的 `PageSearchProvider` 契约。内置 `createGraphSearchProvider(graph)` 保持确定性且无需数据库；运行时索引只需实现同一契约，再通过 `registerAiReady(server, { graph, searchProvider })` 注入，无需修改 MCP 客户端。
 
 ## 前置条件
 

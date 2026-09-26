@@ -102,6 +102,10 @@ MCP 包（`@next-ai-ready/mcp`）是一个薄适配器：
 
 搜索只读取预构建的 SemanticGraph，不需要外部 API、Embedding 服务或向量数据库。将 `list_pages` 或 `search_pages` 返回的路由传给 `get_page` 即可读取全文。
 
+## 多协议共用一套检索实现
+
+`search_pages` 与文档站的 HTTP `search_docs` Action 都使用公开的 `PageSearchProvider` 契约。内置 `createGraphSearchProvider(graph)` 保持确定性且无需数据库；运行时索引只需实现同一契约，再通过 `registerAiReady(server, { graph, searchProvider })` 注入，无需修改 MCP 客户端。
+
 ## 前置条件
 
 MCP 需要两个可选的 peer 依赖：

@@ -104,6 +104,19 @@ async function callMcp(id, method, params) {
   return body;
 }
 
+async function callAction(name, input) {
+  const response = await fetch(`${ORIGIN}/api/actions/${name}`, {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify(input),
+  });
+  const body = await response.json();
+  if (response.status !== 200 || body.ok !== true) {
+    fail(`Action ${name}: expected success, received ${response.status}: ${JSON.stringify(body)}`);
+  }
+  return body.data;
+}
+
 async function main() {
   console.log(`[docs-site-route-smoke] starting ${ORIGIN}`);
   await waitForServer();
@@ -269,6 +282,16 @@ async function main() {
     contentType: "text/html",
     requestHeaders: { accept: "text/html" },
   });
+
+  const httpSearch = await callAction("search_docs", {
+    query: "installation",
+    locale: "en",
+    limit: 1,
+  });
+  if (httpSearch.results[0]?.route !== "/en/docs/installation") {
+    fail("HTTP search_docs did not rank the English installation page first");
+  }
+  console.log("  ok HTTP search_docs uses shared ranked retrieval");
 
   const unauthorizedMcp = await fetch(`${ORIGIN}/api/mcp/mcp`, {
     method: "POST",

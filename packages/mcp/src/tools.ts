@@ -1,6 +1,11 @@
 import { invokeAction, listActions, schemaToJsonSchema } from "@next-ai-ready/actions";
 import type { SemanticGraph, SemanticNode } from "@next-ai-ready/core";
 import { renderPageMarkdown } from "@next-ai-ready/llms";
+import {
+  createGraphSearchProvider,
+  isSearchablePageQuery,
+  type PageSearchProvider,
+} from "@next-ai-ready/semantic/search";
 import { z } from "zod";
 import { mcpPageUri, safeMcpPageRoute } from "./resources.js";
 
@@ -9,8 +14,6 @@ const MAX_LIST_LIMIT = 50;
 const DEFAULT_SEARCH_LIMIT = 5;
 const MAX_SEARCH_LIMIT = 20;
 const MAX_QUERY_LENGTH = 200;
-const MAX_SEARCH_TEXT_LENGTH = 8_000;
-const MAX_EXCERPT_LENGTH = 280;
 const MAX_TITLE_LENGTH = 200;
 const MAX_SUMMARY_LENGTH = 500;
 
@@ -92,7 +95,10 @@ export function toMcpToolDefinitions(): McpToolDefinition[] {
 }
 
 /** Build the read-only discovery tools backed by a pre-built SemanticGraph. */
-export function toMcpPageToolDefinitions(graph: SemanticGraph): McpToolDefinition[] {
+export function toMcpPageToolDefinitions(
+  graph: SemanticGraph,
+  searchProvider: PageSearchProvider = createGraphSearchProvider(graph),
+): McpToolDefinition[] {
   return [
     createGraphTool(
       "list_pages",
@@ -133,38 +139,20 @@ export function toMcpPageToolDefinitions(graph: SemanticGraph): McpToolDefinitio
       "search_pages",
       "Search page titles, routes, summaries, topics, questions, entities, and content using deterministic local lexical ranking. Optionally filter results by locale.",
       searchPagesInput,
-      (input) => {
-        const query = normalizeSearchText(input.query);
-        const rawTerms = [...new Set(tokenize(query))];
-        if (!query || rawTerms.length === 0) return toolError("invalid_input", "query must contain letters or numbers");
-        const siteTerms = new Set(tokenize(normalizeSearchText(graph.site.name)));
-        const discriminatingTerms = rawTerms.filter((term) => !siteTerms.has(term));
-        const terms = discriminatingTerms.length > 0 ? discriminatingTerms : rawTerms;
-        const locale = input.locale === undefined ? undefined : normalizeSearchText(input.locale);
-
-        const limit = input.limit ?? DEFAULT_SEARCH_LIMIT;
-        const ranked: RankedPage[] = [];
-        let totalMatches = 0;
-        const pages = safeGraphRoutes(graph)
-          .map((route) => ({ route, node: pageNode(graph, route) }))
-          .filter((page): page is { route: string; node: SemanticNode } => page.node !== undefined)
-          .filter((page) => locale === undefined || normalizeSearchText(page.node.locale ?? "") === locale);
-        const termWeights = inverseDocumentFrequency(pages, terms);
-        for (const { route, node } of pages) {
-          const candidate = rankPage(route, node, query, terms, termWeights);
-          if (candidate.score <= 0) continue;
-          totalMatches += 1;
-          insertRanked(ranked, candidate, limit);
+      async (input) => {
+        if (!isSearchablePageQuery(input.query)) {
+          return toolError("invalid_input", "query must contain letters or numbers");
         }
-
-        return toolSuccess({
+        const response = await searchProvider.search({
           query: input.query,
-          results: ranked.map(({ route, score, excerpt }) => ({
-            ...pageSummary(graph, route),
-            score,
-            excerpt,
-          })),
-          totalMatches,
+          locale: input.locale,
+          limit: input.limit ?? DEFAULT_SEARCH_LIMIT,
+        });
+        return toolSuccess({
+          ...response,
+          results: response.results
+            .filter((result) => safeMcpPageRoute(result.route) !== null)
+            .map((result) => ({ ...result, uri: mcpPageUri(result.route) })),
         });
       },
     ),
@@ -177,7 +165,7 @@ function createGraphTool<T>(
   name: string,
   description: string,
   schema: GraphToolSchema<T>,
-  handler: (input: T) => McpToolResult,
+  handler: (input: T) => McpToolResult | Promise<McpToolResult>,
 ): McpToolDefinition {
   return {
     name,
@@ -187,7 +175,7 @@ function createGraphTool<T>(
     async execute(args: unknown): Promise<McpToolResult> {
       const parsed = schema.safeParse(args);
       if (!parsed.success) return toolError("invalid_input", "Tool input failed validation");
-      return handler(parsed.data);
+      return await handler(parsed.data);
     },
   };
 }
@@ -249,136 +237,8 @@ function firstRouteAfter(routes: string[], cursor: string): number {
   return low;
 }
 
-interface RankedPage {
-  route: string;
-  score: number;
-  excerpt?: string;
-}
-
-function searchableFields(route: string, node: SemanticNode): Array<{ value: string | undefined; weight: number }> {
-  return [
-    { value: route, weight: 12 },
-    { value: node.title, weight: 10 },
-    { value: node.summary, weight: 7 },
-    { value: boundedJoin(node.topics), weight: 6 },
-    { value: boundedJoin(node.questions, (item) => `${item.q} ${item.a}`), weight: 5 },
-    { value: boundedJoin(node.entities, (item) => `${item.name} ${item.type}`), weight: 4 },
-    { value: node.embeddingHint, weight: 3 },
-    { value: node.body, weight: 1 },
-  ];
-}
-
-function inverseDocumentFrequency(
-  pages: Array<{ route: string; node: SemanticNode }>,
-  terms: string[],
-): Map<string, number> {
-  const frequencies = new Map(terms.map((term) => [term, 0]));
-  for (const { route, node } of pages) {
-    const pageTerms = new Set(
-      searchableFields(route, node).flatMap((field) => field.value ? tokenize(normalizeSearchText(field.value)) : []),
-    );
-    for (const term of terms) {
-      if (hasLexicalMatch(pageTerms, term)) frequencies.set(term, (frequencies.get(term) ?? 0) + 1);
-    }
-  }
-  return new Map(
-    terms.map((term) => [term, 1 + Math.log((pages.length + 1) / ((frequencies.get(term) ?? 0) + 1))]),
-  );
-}
-
-function rankPage(
-  route: string,
-  node: SemanticNode,
-  query: string,
-  terms: string[],
-  termWeights: Map<string, number>,
-): RankedPage {
-  const fields = searchableFields(route, node);
-
-  let score = 0;
-  let excerptSource: string | undefined;
-  for (const field of fields) {
-    if (!field.value) continue;
-    const normalized = normalizeSearchText(field.value);
-    if (!normalized) continue;
-    if (normalized.includes(query)) {
-      score += field.weight * 10;
-      excerptSource ??= field.value;
-    }
-    const fieldTerms = new Set(tokenize(normalized));
-    let matched = 0;
-    for (const term of terms) {
-      if (hasLexicalMatch(fieldTerms, term)) matched += termWeights.get(term) ?? 1;
-    }
-    if (matched > 0) {
-      score += field.weight * matched;
-      excerptSource ??= field.value;
-    }
-  }
-
-  return { route, score, excerpt: excerptSource === undefined ? undefined : excerpt(excerptSource, query) };
-}
-
-function insertRanked(ranked: RankedPage[], candidate: RankedPage, limit: number): void {
-  const index = ranked.findIndex((existing) => compareRank(candidate, existing) < 0);
-  if (index === -1) {
-    if (ranked.length < limit) ranked.push(candidate);
-  } else {
-    ranked.splice(index, 0, candidate);
-    if (ranked.length > limit) ranked.pop();
-  }
-}
-
-function compareRank(a: RankedPage, b: RankedPage): number {
-  return b.score - a.score || compareText(a.route, b.route);
-}
-
 function compareText(a: string, b: string): number {
   return a < b ? -1 : a > b ? 1 : 0;
-}
-
-function normalizeSearchText(value: string): string {
-  return boundedText(boundedText(value, MAX_SEARCH_TEXT_LENGTH).normalize("NFKC"), MAX_SEARCH_TEXT_LENGTH)
-    .toLocaleLowerCase("en")
-    .trim();
-}
-
-function tokenize(value: string): string[] {
-  const chunks = value.match(
-    /[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}\p{Script=Hangul}]+|[a-z0-9]+|[\p{L}\p{N}]+/gu,
-  ) ?? [];
-  const terms: string[] = [];
-  for (const chunk of chunks) {
-    if (!/[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}\p{Script=Hangul}]/u.test(chunk)) {
-      terms.push(chunk);
-      continue;
-    }
-    const codePoints = Array.from(chunk);
-    if (codePoints.length === 1) terms.push(chunk);
-    for (let index = 0; index < codePoints.length - 1; index += 1) {
-      terms.push(`${codePoints[index]}${codePoints[index + 1]}`);
-    }
-  }
-  return terms;
-}
-
-function hasLexicalMatch(fieldTerms: Set<string>, queryTerm: string): boolean {
-  if (fieldTerms.has(queryTerm)) return true;
-  if (queryTerm.length < 5 || !/^[a-z0-9]+$/u.test(queryTerm)) return false;
-  for (const fieldTerm of fieldTerms) {
-    if (fieldTerm.length < 5 || !/^[a-z0-9]+$/u.test(fieldTerm)) continue;
-    if (fieldTerm.startsWith(queryTerm) || queryTerm.startsWith(fieldTerm)) return true;
-  }
-  return false;
-}
-
-function excerpt(value: string, query: string): string {
-  const normalized = boundedText(value, MAX_SEARCH_TEXT_LENGTH).replace(/\s+/gu, " ").trim();
-  const lower = normalizeSearchText(normalized);
-  const index = lower.indexOf(query);
-  const start = index <= 80 ? 0 : index - 80;
-  const sliced = Array.from(normalized).slice(start, start + MAX_EXCERPT_LENGTH).join("");
-  return `${start > 0 ? "..." : ""}${sliced}${Array.from(normalized).length > start + MAX_EXCERPT_LENGTH ? "..." : ""}`;
 }
 
 function boundedText(value: string, maxCodePoints: number): string {
@@ -388,16 +248,6 @@ function boundedText(value: string, maxCodePoints: number): string {
     if (count >= maxCodePoints) break;
     result += codePoint;
     count += 1;
-  }
-  return result;
-}
-
-function boundedJoin<T>(values: T[] | undefined, select: (value: T) => string = String): string | undefined {
-  if (!values) return undefined;
-  let result = "";
-  for (const value of values) {
-    if (result.length >= MAX_SEARCH_TEXT_LENGTH) break;
-    result += `${result ? " " : ""}${boundedText(select(value), MAX_SEARCH_TEXT_LENGTH - result.length)}`;
   }
   return result;
 }

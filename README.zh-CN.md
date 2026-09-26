@@ -220,10 +220,11 @@ registerAiHooks({
 
 | 导入 | 用途 |
 |---|---|
-| `next-ai-ready` | `defineConfig()`、`defineAction()`、`withAiReady()` 与 `aiRobots()` |
+| `next-ai-ready` | `defineConfig()`、`defineAction()`、`withAiReady()`、`aiRobots()` 与统一页面检索 |
 | `next-ai-ready/hooks` | 运行时观测 hook |
 | `next-ai-ready/handlers/*` | 生成的 App Router handler |
 | `next-ai-ready/actions`、`/config`、`/json-ld`、`/robots` | tracing 范围更小的运行时专用 API |
+| `next-ai-ready/search` | 不加载构建期 SDK 模块的统一页面检索 |
 | `next-ai-ready/audit` | 不加载 CLI 调度器的程序化 Audit |
 
 ## 状态
@@ -233,6 +234,7 @@ registerAiHooks({
 - ✅ **知识平面** — MDX → 语义图 → `llms.txt` / `*.md` / `*.ai.json` / JSON-LD
 - ✅ **能力平面** — `defineAction` → `/api/actions/<name>` + OpenAPI 3.1 / `tools.json` / `ai-plugin.json`
 - ✅ **MCP 服务器** — action 作为工具、页面作为资源，并提供支持 locale 过滤和中文检索的 `list_pages` / `get_page` / `search_pages` 页面发现（HTTP + stdio）
+- ✅ **统一检索层** — MCP 与 HTTP Action 共用可替换的 `PageSearchProvider`，避免不同协议的排序结果漂移
 - ✅ **开发工具** — `build` / `init` / `doctor` / 版本化 `audit` / `mcp` CLI，`robots.txt`，分析钩子
 - ✅ **文档站** — 线上 [next-ai-ready.vercel.app](https://next-ai-ready.vercel.app/zh)（[源码](./examples/docs-site)）
 

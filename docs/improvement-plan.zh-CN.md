@@ -218,7 +218,7 @@ GA 之前不加入数据库、IndexNow、大型 DevTools 或托管后台。
 |---|---|---|---|
 | S2-01 | `list_pages`、`get_page`、`search_pages` | `已完成` | 已随 alpha.14 发布并通过生产带认证调用；可枚举 42 页、搜索命中目标安装页并读取完整 Markdown |
 | S2-02 | locale 过滤和确定性分页 | `已完成` | locale 过滤已随 alpha.17 发布；基于安全绝对路由的 cursor 分页已实现并有边界回归测试 |
-| S2-03 | 统一 Search Provider | `待开始` | MCP 与 HTTP 搜索调用同一实现，不复制排序逻辑 |
+| S2-03 | 统一 Search Provider | `已完成` | 检索与排序已下沉至公开 `PageSearchProvider`；MCP `search_pages` 与文档站 HTTP `search_docs` 共用实现，并支持注入运行时 Provider |
 | S2-04 | 补齐页面元数据 | `进行中` | title、summary、canonical URL、locale、updatedAt 均有类型和测试 |
 | S2-05 | 工具调用效果评估 | `已完成` | 30 条中英文人工标注问题直接调用编译后的 `search_pages`，命中后再由 `get_page` 验证 Markdown 可读；当前 Top-1 100%、Top-3 100%、MRR 1.000 |
 

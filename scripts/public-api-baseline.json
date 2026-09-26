@@ -99,7 +99,7 @@
         ]
       },
       "declarationHashes": {
-        ".": "1ead1e0d40d5552283b93df206fd43bb4ce6635b28d7d60f00a3a0991b9c6589"
+        ".": "5c56ff7a7ffcf98ab21a03a6305b45a80b3785e6014a5c773b615f10aa55e32a"
       }
     },
     "@next-ai-ready/mdx": {
@@ -131,6 +131,7 @@
           "buildRoutesByLocale",
           "clearAiHooks",
           "createEdgeGraphLoader",
+          "createGraphSearchProvider",
           "defineAction",
           "defineActions",
           "defineConfig",
@@ -141,11 +142,13 @@
           "getSiteJsonLd",
           "identifyAiBot",
           "invalidateEdgeGraphCache",
+          "isSearchablePageQuery",
           "loadGraphFromFetch",
           "pageJsonLdFromGraph",
           "parseLocaleFromRoute",
           "registerAiHooks",
           "scanContent",
+          "searchGraphPages",
           "serializeStable",
           "siteJsonLdFromGraph",
           "stableId",
@@ -180,11 +183,16 @@
           "pageJsonLdFromGraph",
           "siteJsonLdFromGraph"
         ],
-        "./robots": ["aiRobots", "buildRobotsTxt"]
+        "./robots": ["aiRobots", "buildRobotsTxt"],
+        "./search": [
+          "createGraphSearchProvider",
+          "isSearchablePageQuery",
+          "searchGraphPages"
+        ]
       },
       "declarationHashes": {
-        ".": "ceda34ab2f3d8e29158044b9971107bf6f01babdf8e1a4d324dd99b8acfdca2c",
-        "./actions": "bab159cf64c4e04db0040963022bb7b8e06acc135e834ea362ee83f6001fec43",
+        ".": "be8afab8fbd1ed02c025f727d4ad17ca3c0792a190cc74199568dba72f5e790c",
+        "./actions": "2daa9e25dd697af22b1df97c760ea3684fbc1888d4786ec4171732bac251e9e4",
         "./audit": "571ad8e041dd770d7993dd7d902f11b60138d1798476223a23dbeae2fc8376ae",
         "./config": "11707adca4d3d0ef9d8c31712aae4d179ec2c6485e0f373c66b76c78578b0feb",
         "./json-ld": "0f448e6c747aaae37832f974826ab811e5e3f7c9ca912eeff47dca07c3d51c30",
@@ -198,7 +206,8 @@
         "./handlers/mcp": "073cbbeca2b71fafd73d0c6a3ffe6879080308ce871f4eb4cff2b7964929ccea",
         "./handlers/ai-plugin": "56e58086f10fc8eb3bb785e57d360c88ede5e2b5cbe2c079c2b1e610d33a3083",
         "./hooks": "bea87b0dcd1917d19c4b27db009aec8a48e61386251e76e09fe4b55a3dd09325",
-        "./robots": "8db32b8a9810a7c6d29c72049977c90c62964894a94ae65de8253b3cbd55a474"
+        "./robots": "8db32b8a9810a7c6d29c72049977c90c62964894a94ae65de8253b3cbd55a474",
+        "./search": "a80c5b724f3dae2a0b62ddb86bf7820271a7caa735d90eb601ac3935546b02a3"
       },
       "bin": {
         "next-ai-ready": "./dist/cli.js"
@@ -278,7 +287,7 @@
         "./handlers/openapi": "44e1c66e536e6dbe116a505043237d9cda9716fd75160e6b3458e97f801592b8",
         "./handlers/tools": "ae579d4293ffef7ed2c3f666625776164d56f3df774c780bd5aa99b7cb7b65d5",
         "./handlers/action": "6ec5b9a918b385e734fcbec876ab8d1fa66b16e4ab91ee42a25a32142a50058f",
-        "./handlers/mcp": "a688f89fe4f76f267cabefb259062887b04ed4f9798e7fecdaa26196b0988007",
+        "./handlers/mcp": "092ea9cad5bb4c1a8fa02d188f8100a86fbefa0e8c86f0278c00863b4e876fbe",
         "./handlers/ai-plugin": "776adab9f0c18770da87dc30e6a69f31e13633abbc20fb5097cf9302bd75309d",
         "./hooks": "83a62872585b56c662d4c07882dd7546af0f5433e141d8a95360ad64cd75b251"
       }
@@ -295,12 +304,27 @@
     "@next-ai-ready/semantic": {
       "directory": "packages/semantic",
       "entrypoints": {
-        ".": ["buildGraph", "defineSemantic", "getPageNodes", "pageJsonLd", "siteJsonLd"],
-        "./jsonld": ["pageJsonLd", "siteJsonLd"]
+        ".": [
+          "buildGraph",
+          "createGraphSearchProvider",
+          "defineSemantic",
+          "getPageNodes",
+          "isSearchablePageQuery",
+          "pageJsonLd",
+          "searchGraphPages",
+          "siteJsonLd"
+        ],
+        "./jsonld": ["pageJsonLd", "siteJsonLd"],
+        "./search": [
+          "createGraphSearchProvider",
+          "isSearchablePageQuery",
+          "searchGraphPages"
+        ]
       },
       "declarationHashes": {
-        ".": "2cd7b29894e80b46f38cf886d4533349445dd75d545f79e083d1658565e204a7",
-        "./jsonld": "b57f8fe6fa0e30c848e85484cd6df06abaefb83ef77f2f0c1d3e2656f30cac89"
+        ".": "ec5d66b007c354dc7c350829817aea732e5ab51063fa635094cfd209861a20e9",
+        "./jsonld": "b57f8fe6fa0e30c848e85484cd6df06abaefb83ef77f2f0c1d3e2656f30cac89",
+        "./search": "e8aec1dcab9a360b08d6be5c3ab7586ccc635043da7b3c076f6f75bd131e49f4"
       }
     }
   }

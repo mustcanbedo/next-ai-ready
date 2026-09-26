@@ -1,4 +1,5 @@
 import { defineActions, defineAction } from "next-ai-ready/actions";
+import { searchGraphPages } from "next-ai-ready/search";
 import { z } from "zod";
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
@@ -31,6 +32,7 @@ export default defineActions([
     tags: ["docs", "search"],
     input: z.object({
       query: z.string().min(1).describe("Search keyword or phrase"),
+      locale: z.string().min(1).max(64).optional().describe("Optional locale filter, e.g. 'en' or 'zh'"),
       limit: z.number().int().min(1).max(20).optional().describe("Max results to return (default 5)"),
     }),
     output: z.object({
@@ -44,31 +46,21 @@ export default defineActions([
       ),
       total: z.number(),
     }),
-    handler: async ({ query, limit }) => {
+    handler: async ({ query, locale, limit }) => {
       const graph = await loadGraph();
-      const q = query.toLowerCase();
-      const matches = [];
-
-      for (const [route, nodeId] of Object.entries(graph.routes)) {
-        const node = graph.nodes[nodeId];
-        if (!node) continue;
-        const title = (node.title ?? "").toLowerCase();
-        const summary = (node.summary ?? "").toLowerCase();
-        const body = (node.body ?? "").toLowerCase();
-        if (title.includes(q) || summary.includes(q) || body.includes(q)) {
+      const response = searchGraphPages(graph, { query, locale, limit });
+      return {
+        results: response.results.map(({ route, title, summary }) => {
           const parts = route.split("/").filter(Boolean);
-          const section = parts.length >= 3 ? parts[2] : parts[1] ?? "root";
-          matches.push({
+          return {
             route,
-            title: node.title ?? route,
-            summary: node.summary ?? "",
-            section,
-          });
-        }
-      }
-
-      const capped = matches.slice(0, limit ?? 5);
-      return { results: capped, total: matches.length };
+            title,
+            summary: summary ?? "",
+            section: parts.length >= 3 ? parts[2] : parts[1] ?? "root",
+          };
+        }),
+        total: response.totalMatches,
+      };
     },
   }),
 

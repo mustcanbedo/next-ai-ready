@@ -1,7 +1,7 @@
 import { defineConfig } from 'tsup'
 
 export default defineConfig({
-  entry: ['src/index.ts', 'src/jsonld.ts'],
+  entry: ['src/index.ts', 'src/jsonld.ts', 'src/search.ts'],
   format: ['esm'],
   dts: true,
   clean: true,

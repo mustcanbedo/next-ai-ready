@@ -25,7 +25,7 @@
 - [Add llms.txt and Markdown endpoints to Next.js App Router](https://next-ai-ready.vercel.app/en/docs/guides/nextjs-llms-txt): Choose between a static llms.txt and generated AI-readable endpoints, run a clean Next.js demo, and verify the production result.
 - [Nextra llms.txt and Markdown endpoint setup](https://next-ai-ready.vercel.app/en/docs/guides/nextra-ai-ready): Integrate next-ai-ready with a Nextra 4 App Router documentation site without replacing Nextra navigation, search, themes, or MDX rendering.
 - [Quickstart](https://next-ai-ready.vercel.app/en/docs/guides/quickstart): Complete a verified next-ai-ready setup in about 10 minutes.
-- [Configure robots.txt for AI crawlers in Next.js](https://next-ai-ready.vercel.app/en/docs/guides/robots-txt): Generate a Next.js robots.txt that declares Google and AI crawler access, links the XML sitemap, and keeps llms.txt discovery aligned.
+- [Configure robots.txt for AI search and training crawlers in Next.js](https://next-ai-ready.vercel.app/en/docs/guides/robots-txt): Keep ChatGPT and Claude search discovery available while making a separate robots.txt decision for training and user-triggered AI access.
 - [Installation](https://next-ai-ready.vercel.app/en/docs/installation): Install next-ai-ready and scaffold your first config.
 - [Introduction](https://next-ai-ready.vercel.app/en/docs/introduction): What next-ai-ready is and why it exists.
 - [next-ai-ready](https://next-ai-ready.vercel.app/zh): 约 10 分钟，为 Next.js App Router 站点增加供 AI 工具发现和读取的内容入口。
@@ -49,6 +49,6 @@
 - [为 Next.js App Router 添加 llms.txt 与 Markdown 端点](https://next-ai-ready.vercel.app/zh/docs/guides/nextjs-llms-txt): 判断应该手写还是自动生成 llms.txt，运行一个干净的 Next.js 演示，并验证生产结果。
 - [为 Nextra 4 添加 llms.txt 与 Markdown 端点](https://next-ai-ready.vercel.app/zh/docs/guides/nextra-ai-ready): 在不替换 Nextra 导航、搜索、主题和 MDX 渲染的前提下，将 next-ai-ready 接入 Nextra 4 App Router 文档站。
 - [快速开始](https://next-ai-ready.vercel.app/zh/docs/guides/quickstart): 约 10 分钟完成可验证的 next-ai-ready 基础接入。
-- [在 Next.js 中配置面向 AI 爬虫的 robots.txt](https://next-ai-ready.vercel.app/zh/docs/guides/robots-txt): 生成同时声明 Google 与 AI 爬虫访问规则、XML sitemap 和 llms.txt 发现入口的 Next.js robots.txt。
+- [在 Next.js 中分别配置 AI 搜索与训练爬虫](https://next-ai-ready.vercel.app/zh/docs/guides/robots-txt): 保留 ChatGPT 与 Claude 的搜索发现能力，同时分别决定是否允许训练爬虫和用户触发的 AI 访问。
 - [安装](https://next-ai-ready.vercel.app/zh/docs/installation): 安装 next-ai-ready 并生成首个配置。
 - [简介](https://next-ai-ready.vercel.app/zh/docs/introduction): next-ai-ready 是什么，为什么需要它。

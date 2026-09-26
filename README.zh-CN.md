@@ -70,6 +70,31 @@ SEO 为浏览器和搜索引擎优化你的网站。
 | `/api/mcp`（MCP 服务器）        | MCP 客户端（Claude Desktop、Cursor、Agent） |
 | `/robots.txt`（显式 AI 爬虫策略）| AI 爬虫 |
 
+### 允许 AI 搜索，但不开放模型训练
+
+AI 搜索、模型训练与用户主动触发的页面读取是三种不同的访问决策。不要再用一个
+含糊的总开关控制全部 AI 爬虫，可以按用途分别配置：
+
+```ts
+// ai-ready.config.ts
+import { defineConfig } from "next-ai-ready"
+
+export default defineConfig({
+  site: { name: "Acme", baseUrl: "https://acme.com" },
+  robots: {
+    aiBots: {
+      search: "allow",
+      training: "disallow",
+      user: "allow",
+      other: "disallow",
+    },
+  },
+})
+```
+
+原有 `aiBots: "allow" | "disallow"` 写法继续兼容。各服务商的限制和验证方法见
+[AI 爬虫策略指南](https://next-ai-ready.vercel.app/zh/docs/guides/robots-txt)。
+
 ## 两个平面
 
 ```

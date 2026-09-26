@@ -206,7 +206,7 @@ async function main() {
   });
   await expectResponse("/zh/docs/guides/robots-txt", {
     contentType: "text/html",
-    includes: "在 Next.js 中配置面向 AI 爬虫的 robots.txt",
+    includes: "在 Next.js 中分别配置 AI 搜索与训练爬虫",
   });
   await expectResponse("/en/docs/guides/nextra-ai-ready", {
     contentType: "text/html",

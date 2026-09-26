@@ -236,24 +236,34 @@ export async function runDoctor(opts: DoctorOptions = {}): Promise<DoctorResult>
     add(CHECK.BUILD_SCRIPT, "warn", "No package.json found.", "Build script");
   }
 
-  // 7. T-03: robots.txt allows AI bots.
+  // 7. T-03: robots.txt keeps AI search and user-requested retrieval visible.
   const emitStaticRobots = config.emit?.robots !== false;
   const hasAppRobots =
     (await fileExists(join(cwd, "app", "robots.ts"))) ||
     (await fileExists(join(cwd, "app", "robots.js")));
   const robotsTxt = await readTextFile(publicRobotsTxtPath(cwd));
   if (robotsTxt !== null) {
-    const knownBotIds = AI_BOTS.map((b) => b.id);
-    const blockedBots = knownBotIds.filter(
-      (id) => robotsTxt.includes(`User-agent: ${id}`) && robotsTxt.includes("Disallow: /"),
+    const blockedBots = AI_BOTS.filter((bot) => isBotExplicitlyBlocked(robotsTxt, bot.id));
+    const blockedVisibilityBots = blockedBots.filter(
+      (bot) => bot.purpose === "search" || bot.purpose === "user",
     );
-    if (blockedBots.length === 0) {
-      add(CHECK.ROBOTS_AI_BOTS, "ok", "robots.txt allows all known AI bots.", "Robots AI policy");
+    const blockedTrainingBots = blockedBots.filter((bot) => bot.purpose === "training");
+
+    if (blockedVisibilityBots.length === 0) {
+      const trainingNote = blockedTrainingBots.length > 0
+        ? ` Training access is independently disabled for ${blockedTrainingBots.length} bot(s).`
+        : "";
+      add(
+        CHECK.ROBOTS_AI_BOTS,
+        "ok",
+        `robots.txt allows known AI search and user-requested retrieval bots.${trainingNote}`,
+        "Robots AI policy",
+      );
     } else {
       add(
         CHECK.ROBOTS_AI_BOTS,
         "warn",
-        `robots.txt blocks ${blockedBots.length} AI bot(s): ${blockedBots.join(", ")}. This may reduce AI discoverability.`,
+        `robots.txt blocks ${blockedVisibilityBots.length} AI search or user-requested bot(s): ${blockedVisibilityBots.map((bot) => bot.id).join(", ")}. This may reduce AI discoverability.`,
         "Robots AI policy",
       );
     }
@@ -405,6 +415,23 @@ export async function runDoctor(opts: DoctorOptions = {}): Promise<DoctorResult>
   }
 
   return finalize(diagnostics, checks, opts, config, tacticResults, tacticScore);
+}
+
+function isBotExplicitlyBlocked(robotsTxt: string, botId: string): boolean {
+  const normalizedBotId = botId.toLowerCase();
+  const groups = robotsTxt.split(/\r?\n\s*\r?\n/);
+
+  return groups.some((group) => {
+    const lines = group
+      .split(/\r?\n/)
+      .map((line) => line.replace(/#.*$/, "").trim())
+      .filter(Boolean);
+    const userAgents = lines
+      .filter((line) => /^user-agent\s*:/i.test(line))
+      .map((line) => line.slice(line.indexOf(":") + 1).trim().toLowerCase());
+    const disallowsRoot = lines.some((line) => /^disallow\s*:\s*\/$/i.test(line));
+    return userAgents.includes(normalizedBotId) && disallowsRoot;
+  });
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

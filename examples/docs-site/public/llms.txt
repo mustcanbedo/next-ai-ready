@@ -43,11 +43,11 @@
 ## Guides
 
 - [Next.js MDX content collections for AI-readable docs](https://next-ai-ready.vercel.app/en/docs/guides/mdx-content): Configure a local MDX content collection in Next.js, map files to routes, add useful frontmatter, and generate llms.txt, page Markdown, and JSON-LD.
+- [Configure robots.txt for AI search and training crawlers in Next.js](https://next-ai-ready.vercel.app/en/docs/guides/robots-txt): Keep ChatGPT and Claude search discovery available while making a separate robots.txt decision for training and user-triggered AI access.
 - [用 Next.js MDX 内容集合生成 AI 可读文档](https://next-ai-ready.vercel.app/zh/docs/guides/mdx-content): 在 Next.js 中配置本地 MDX 内容集合、映射路由、补充有效 frontmatter，并生成 llms.txt、逐页 Markdown 与 JSON-LD。
+- [在 Next.js 中分别配置 AI 搜索与训练爬虫](https://next-ai-ready.vercel.app/zh/docs/guides/robots-txt): 保留 ChatGPT 与 Claude 的搜索发现能力，同时分别决定是否允许训练爬虫和用户触发的 AI 访问。
 - [How to add an MCP server to Next.js App Router](https://next-ai-ready.vercel.app/en/docs/guides/mcp-integration): Add local stdio and authenticated Streamable HTTP MCP endpoints to Next.js, then expose page search and explicitly public actions as tools.
-- [Configure robots.txt for AI crawlers in Next.js](https://next-ai-ready.vercel.app/en/docs/guides/robots-txt): Generate a Next.js robots.txt that declares Google and AI crawler access, links the XML sitemap, and keeps llms.txt discovery aligned.
 - [如何为 Next.js App Router 添加 MCP Server](https://next-ai-ready.vercel.app/zh/docs/guides/mcp-integration): 为 Next.js 添加本地 stdio 与经过鉴权的 Streamable HTTP MCP 端点，并将页面搜索和显式公开的 Action 暴露为工具。
-- [在 Next.js 中配置面向 AI 爬虫的 robots.txt](https://next-ai-ready.vercel.app/zh/docs/guides/robots-txt): 生成同时声明 Google 与 AI 爬虫访问规则、XML sitemap 和 llms.txt 发现入口的 Next.js robots.txt。
 - [Add llms.txt and Markdown endpoints to Next.js App Router](https://next-ai-ready.vercel.app/en/docs/guides/nextjs-llms-txt): Choose between a static llms.txt and generated AI-readable endpoints, run a clean Next.js demo, and verify the production result.
 - [为 Next.js App Router 添加 llms.txt 与 Markdown 端点](https://next-ai-ready.vercel.app/zh/docs/guides/nextjs-llms-txt): 判断应该手写还是自动生成 llms.txt，运行一个干净的 Next.js 演示，并验证生产结果。
 - [Add llms.txt and Markdown endpoints to Fumadocs](https://next-ai-ready.vercel.app/en/docs/guides/fumadocs-ai-ready): Reuse a Fumadocs MDX content collection to generate AI-readable discovery and page endpoints in a Next.js App Router deployment.
@@ -63,11 +63,11 @@
 
 ## API Reference
 
-- [CLI](https://next-ai-ready.vercel.app/en/docs/api-reference/cli): Command-line interface — init, build, doctor, audit, and mcp.
 - [Configuration](https://next-ai-ready.vercel.app/en/docs/api-reference/config): Full reference for ai-ready.config.mjs options.
+- [配置](https://next-ai-ready.vercel.app/zh/docs/api-reference/config): ai-ready.config.mjs 的完整参考。
+- [CLI](https://next-ai-ready.vercel.app/en/docs/api-reference/cli): Command-line interface — init, build, doctor, audit, and mcp.
 - [withAiReady](https://next-ai-ready.vercel.app/en/docs/api-reference/with-ai-ready): API reference for the Next.js config wrapper.
 - [CLI](https://next-ai-ready.vercel.app/zh/docs/api-reference/cli): 命令行接口——init、build、doctor、audit 和 mcp。
-- [配置](https://next-ai-ready.vercel.app/zh/docs/api-reference/config): ai-ready.config.mjs 的完整参考。
 - [withAiReady](https://next-ai-ready.vercel.app/zh/docs/api-reference/with-ai-ready): Next.js 配置包装器的 API 参考。
 - [defineAction](https://next-ai-ready.vercel.app/en/docs/api-reference/define-action): API reference for defineAction() and defineActions().
 - [Semantic Metadata](https://next-ai-ready.vercel.app/en/docs/api-reference/define-semantic): How to add structured metadata to your MDX content for richer AI extraction.

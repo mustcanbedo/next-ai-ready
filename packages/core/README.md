@@ -8,4 +8,20 @@ Type contract and shared utilities for the next-ai-ready stack.
 - `buildRobotsTxt()`, `aiRobots()` — crawler policy helpers
 - `identifyAiBot()` — AI bot user-agent matching
 
-Part of [next-ai-ready](../../README.md). Pre-alpha (`0.1.0-alpha.6`).
+Crawler access can be decided by purpose without adding a model dependency:
+
+```ts
+robots: {
+  aiBots: {
+    search: "allow",
+    training: "disallow",
+    user: "allow",
+    other: "disallow",
+  },
+}
+```
+
+The string form `aiBots: "allow" | "disallow"` remains supported.
+
+Part of [next-ai-ready](../../README.md). Pre-alpha; use the package registry as
+the source of truth for the published version.

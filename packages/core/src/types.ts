@@ -299,14 +299,31 @@ export interface EmitConfig {
   robots?: boolean;
 }
 
+export type AiBotAccess = "allow" | "disallow";
+
+export interface AiBotPolicy {
+  /** Fallback for a purpose that is not configured. Default: `"allow"`. */
+  default?: AiBotAccess;
+  /** Crawlers that index content for AI search experiences. */
+  search?: AiBotAccess;
+  /** Crawlers or control tokens used for model development and training. */
+  training?: AiBotAccess;
+  /** Fetches initiated by a person using an AI assistant. */
+  user?: AiBotAccess;
+  /** Crawlers whose purpose is mixed, legacy, or not independently documented. */
+  other?: AiBotAccess;
+}
+
 export interface RobotsConfig {
   /**
    * Policy for AI crawlers (GPTBot, ClaudeBot, PerplexityBot, …).
    *   • "allow"  — explicitly Allow each known AI bot (default; the whole
    *                point of this framework is to be AI-readable).
    *   • "disallow" — Disallow each known AI bot.
+   *   • object — choose independently for search, training, user-triggered,
+   *              and other crawlers while retaining an explicit fallback.
    */
-  aiBots?: "allow" | "disallow";
+  aiBots?: AiBotAccess | AiBotPolicy;
   /** Extra raw lines appended verbatim (e.g. custom `Disallow:` rules). */
   extra?: string[];
   /**

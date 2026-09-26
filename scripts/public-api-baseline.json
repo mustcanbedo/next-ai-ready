@@ -52,11 +52,11 @@
         "./url": ["absoluteUrl"]
       },
       "declarationHashes": {
-        ".": "b1e8b5534304caafb9dbccd7c12f0e0cf01524d6a5e17768e0385cbecab3c3d1",
+        ".": "340ccd07acf7a6f0166170cb48d2585e46c75f132de896be25ecfd6b4179edeb",
         "./scanner": "a17d5dde25331586ea25d47d3bef0ef75954d6c58bfadf49e41a9091a648a990",
-        "./bots": "0d234e6db05918d2782bd66ed2a333ef52939c9c70a5f47363d7ecec9e7d4bb3",
+        "./bots": "9f5a41580a5868ec4332cc6a01c7413fb734a4e342bfd79b93b71c3c1dbb70bb",
         "./json": "37009d235b2f2f25b9b3ec8524bc76eeedd7495dd67822beda23962995931548",
-        "./robots": "3a3f782a3f538801e8ba13a1127d28f63423bbcc7fc58ef7a75378fc0bd52816",
+        "./robots": "5fa213980e6ee60cad2280ae542defe9474db0b28e1e3683e6dd1567a5131e47",
         "./url": "15fa7e59521aca1442e24ec78a557b7e6f70f5c572b44260da92b482da2a583b"
       }
     },

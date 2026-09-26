@@ -225,6 +225,61 @@ describe("runDoctor()", () => {
     }
   });
 
+  it("accepts blocking training bots while keeping AI search visible", async () => {
+    const config = `export default {
+  site: { name: "Doc", baseUrl: "https://doc.test", description: "x" },
+  content: ["content/**/*.mdx"],
+  robots: { aiBots: { search: "allow", training: "disallow", user: "allow" } },
+};
+`;
+    const { dir, cleanup } = await makeProject(config);
+    try {
+      await runBuild({ cwd: dir, silent: true });
+      const result = await runDoctor({ cwd: dir, score: true });
+      const robotsCheck = result.diagnostics.find((diagnostic) =>
+        diagnostic.message.includes("AI search and user-requested retrieval bots"),
+      );
+
+      expect(robotsCheck?.level).toBe("ok");
+      expect(robotsCheck?.message).toContain("Training access is independently disabled");
+    } finally {
+      await cleanup();
+    }
+  });
+
+  it("reports only visibility bots whose own robots group blocks access", async () => {
+    const { dir, cleanup } = await makeProject();
+    await mkdir(join(dir, "public"), { recursive: true });
+    await writeFile(
+      join(dir, "public", "robots.txt"),
+      [
+        "User-agent: OAI-SearchBot",
+        "Disallow: /",
+        "",
+        "User-agent: GPTBot",
+        "Allow: /",
+        "",
+        "User-agent: Claude-SearchBot",
+        "Allow: /",
+        "",
+      ].join("\n"),
+      "utf8",
+    );
+    try {
+      const result = await runDoctor({ cwd: dir, score: true });
+      const robotsCheck = result.diagnostics.find((diagnostic) =>
+        diagnostic.message.includes("may reduce AI discoverability"),
+      );
+
+      expect(robotsCheck?.level).toBe("warn");
+      expect(robotsCheck?.message).toContain("OAI-SearchBot");
+      expect(robotsCheck?.message).not.toContain("GPTBot");
+      expect(robotsCheck?.message).not.toContain("Claude-SearchBot");
+    } finally {
+      await cleanup();
+    }
+  });
+
   it("includes actionItems when --json is set", async () => {
     const { dir, cleanup } = await makeProject();
     try {

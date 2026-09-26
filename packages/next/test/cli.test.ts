@@ -137,7 +137,32 @@ const V3_RESULT = {
       checks: ["mcp-endpoint"],
     },
   ],
-  checks: [],
+  checks: [
+    {
+      id: "mcp-endpoint",
+      name: "MCP endpoint",
+      status: "pass" as const,
+      message: "The authentication gate is present; protocol verification requires deployment-scoped credentials.",
+      url: "https://example.test/api/mcp/mcp",
+      planes: ["agent-capability" as const],
+      source: "next-ai-ready-enhancement" as const,
+      tier: "enhancement" as const,
+      points: 1,
+      recommendation: null,
+      judgment: {
+        outcome: "unknown" as const,
+        confidence: "medium" as const,
+        evidence: [
+          {
+            kind: "protocol-observation" as const,
+            sourceUrl: "https://example.test/api/mcp/mcp",
+            observation: "The authentication gate is present.",
+          },
+        ],
+        review: "recommended" as const,
+      },
+    },
+  ],
   errors: 0,
   warnings: 1,
   passed: 3,
@@ -208,6 +233,7 @@ describe("audit CLI", () => {
     expect(stdout).toContain("Agent Readability: 100/100");
     expect(stdout).toContain("Semantic/AEO Quality: 80/100");
     expect(stdout).toContain("Agent Capability: 100/100");
+    expect(stdout).toContain("Review: recommended (unknown, medium confidence)");
     expect(stdout).toContain("[next-ai-ready] audit v3: score 100/100");
   });
 

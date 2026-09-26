@@ -395,6 +395,18 @@ describe("runAudit()", () => {
       source: "external-standard",
       tier: "required",
       points: 3,
+      judgment: {
+        outcome: "pass",
+        confidence: "high",
+        review: "none",
+        evidence: [
+          {
+            kind: "http-observation",
+            sourceUrl: expect.stringMatching(/\/llms\.txt$/),
+            observation: expect.any(String),
+          },
+        ],
+      },
     });
     expect(result.checks.find((check) => check.id === "mcp-endpoint")).toMatchObject({
       source: "next-ai-ready-enhancement",
@@ -420,6 +432,38 @@ describe("runAudit()", () => {
     expect(result.checks.find((check) => check.id === "mcp-endpoint")).toMatchObject({
       status: "pass",
       message: expect.stringContaining("authentication gate"),
+      judgment: {
+        outcome: "unknown",
+        confidence: "medium",
+        review: "recommended",
+        evidence: [expect.objectContaining({ kind: "protocol-observation" })],
+      },
+    });
+  });
+
+  it("routes unreachable evidence to required review instead of inventing a failure", async () => {
+    const fetchImpl: typeof fetch = async () => {
+      throw new Error("fixture network unavailable");
+    };
+    const result = await runAudit("https://example.test/", {
+      version: "3",
+      timeoutMs: 250,
+      fetch: fetchImpl,
+    });
+
+    expect(result.checks.find((check) => check.id === "html-response")).toMatchObject({
+      status: "fail",
+      judgment: {
+        outcome: "unknown",
+        confidence: "low",
+        review: "required",
+        evidence: [
+          expect.objectContaining({
+            sourceUrl: "https://example.test/",
+            observation: expect.stringContaining("Network error"),
+          }),
+        ],
+      },
     });
   });
 

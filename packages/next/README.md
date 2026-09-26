@@ -6,6 +6,8 @@ Next.js integration: `withAiReady()`, route handlers, and CLI (`build`, `init`, 
 
 `next-ai-ready audit <url>` defaults to report schema v1, preserving the existing JSON fields, score, and CI exit behavior. Audit v2 keeps its original five weighted dimensions. Use `next-ai-ready audit <url> --version 3 --json` for the opt-in `next-ai-ready.audit.v3` schema with independent Agent Readability, Semantic/AEO Quality, and Agent Capability planes. V3 is a local subset preflight with strict pass-only tier scoring; the official Vercel CLI remains the external source of truth.
 
+Each v3 check includes `judgment.outcome` (`pass`, `fail`, or `unknown`), finite confidence, traceable evidence, and a `none`, `recommended`, or `required` review decision. This keeps scoring severity separate from what the available evidence can actually establish.
+
 The programmatic API follows the same compatibility rule:
 
 ```ts

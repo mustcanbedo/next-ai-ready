@@ -146,6 +146,27 @@ Agent Readability、Semantic/AEO Quality 与 Agent Capability，警告不再获�
 官方 Vercel 外部评分以仓库固定的 `pnpm audit:vercel:site` 命令为准。v3
 有意只做更小的本地预检，并不重新实现官方全部 25 项检查。
 
+v3 的每条检查都包含有边界的 `judgment` 对象：
+
+```json
+{
+  "outcome": "unknown",
+  "confidence": "medium",
+  "evidence": [
+    {
+      "kind": "protocol-observation",
+      "sourceUrl": "https://example.com/api/mcp/mcp",
+      "observation": "认证门已存在，但协议验证需要部署凭据。"
+    }
+  ],
+  "review": "recommended"
+}
+```
+
+`status` 继续表示 CI 与计分严重性，`judgment` 则记录现有证据究竟能证明什么。
+网络失败会成为低置信度 `unknown` 并要求复核；受凭据限制的检查在完成授权部署
+验证之前也保持未知，而不会被误报为确定通过或失败。
+
 对于缺失页，v3 在 Agent Readability 中只评估与 Vercel 一致的
 `200 text/markdown` 行为；更严格的 `noindex` 与恢复链接要求会作为
 Semantic/AEO Quality 中独立的 `next-ai-ready-enhancement`，不会造成相对

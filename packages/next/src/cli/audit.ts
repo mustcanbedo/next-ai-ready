@@ -72,6 +72,23 @@ export const VERCEL_AGENT_READABILITY_VERSION = "0.5.0" as const;
 export type AuditPlaneId = "agent-readability" | "semantic-aeo-quality" | "agent-capability";
 export type AuditCheckSource = "external-standard" | "next-ai-ready-enhancement";
 export type AuditCheckTier = "required" | "recommended" | "enhancement";
+export type AuditJudgmentOutcome = "pass" | "fail" | "unknown";
+export type AuditJudgmentConfidence = "high" | "medium" | "low";
+export type AuditReviewDecision = "none" | "recommended" | "required";
+export type AuditEvidenceKind = "http-observation" | "document-observation" | "protocol-observation";
+
+export interface AuditEvidence {
+  kind: AuditEvidenceKind;
+  sourceUrl: string;
+  observation: string;
+}
+
+export interface AuditJudgment {
+  outcome: AuditJudgmentOutcome;
+  confidence: AuditJudgmentConfidence;
+  evidence: AuditEvidence[];
+  review: AuditReviewDecision;
+}
 
 export interface AuditV3Check extends AuditCheck {
   planes: AuditPlaneId[];
@@ -79,6 +96,8 @@ export interface AuditV3Check extends AuditCheck {
   tier: AuditCheckTier;
   points: number;
   recommendation: string | null;
+  /** Bounded decision kept separate from scoring severity. */
+  judgment: AuditJudgment;
 }
 
 export interface AuditPlaneResult {
@@ -141,6 +160,13 @@ interface FetchResult {
   headers: Headers;
   body: string;
   error?: string;
+}
+
+type AuditJudgmentSeed = Pick<AuditJudgment, "outcome" | "confidence" | "review">;
+
+interface WeightedAuditCheck extends AuditCheck {
+  weight: number;
+  judgment?: AuditJudgmentSeed;
 }
 
 const WEIGHTS = {
@@ -439,7 +465,7 @@ export async function runAudit(
       fetchText(fetchImpl, missingUrl, { headers: { Accept: "text/markdown" } }, timeoutMs),
     ]);
 
-  const weightedChecks: Array<AuditCheck & { weight: number }> = [];
+  const weightedChecks: WeightedAuditCheck[] = [];
   const add = (
     id: string,
     name: string,
@@ -447,7 +473,8 @@ export async function runAudit(
     message: string,
     url: URL | string,
     weight: number,
-  ) => weightedChecks.push({ id, name, status, message, url: String(url), weight });
+    judgment?: AuditJudgmentSeed,
+  ) => weightedChecks.push({ id, name, status, message, url: String(url), weight, judgment });
 
   const htmlType = contentType(initialPage);
   const htmlOk = initialPage.ok && htmlType.includes("text/html");
@@ -460,6 +487,7 @@ export async function runAudit(
       : responseFailure(initialPage, "Expected a successful text/html response."),
     requestedUrl,
     WEIGHTS.html,
+    judgmentFromFetch(initialPage),
   );
 
   addDiscoveryCheck(add, "llms-txt", "llms.txt", llms, discoveryUrls.llms, "text/plain", WEIGHTS.llms, true);
@@ -477,6 +505,7 @@ export async function runAudit(
       : responseFailure(acceptMarkdown, "Accept: text/markdown did not return Markdown."),
     pageUrl,
     WEIGHTS.acceptMarkdown,
+    judgmentFromFetch(acceptMarkdown),
   );
 
   const agentUaOk = isPageMarkdown(agentUserAgent);
@@ -489,6 +518,7 @@ export async function runAudit(
       : responseFailure(agentUserAgent, "The AI user-agent received HTML instead of Markdown."),
     pageUrl,
     WEIGHTS.agentUserAgent,
+    judgmentFromFetch(agentUserAgent),
   );
 
   const explicitOk = isPageMarkdown(explicitMarkdown);
@@ -502,6 +532,7 @@ export async function runAudit(
       : responseFailure(explicitMarkdown, `${markdownUrl.pathname} did not return Markdown.`),
     markdownUrl,
     WEIGHTS.explicitMarkdown,
+    judgmentFromFetch(explicitMarkdown),
   );
 
   const markdownResponse = acceptOk ? acceptMarkdown : explicitOk ? explicitMarkdown : acceptMarkdown;
@@ -533,6 +564,7 @@ export async function runAudit(
           : "Advertise the Markdown representation with a canonical Link, Content-Location, or text/markdown alternate link.",
     markdownResponse.url,
     WEIGHTS.markdownHeaders,
+    judgmentFromFetch(markdownResponse),
   );
 
   const frontmatterOk = /^---\s*\n[\s\S]*?\n---\s*\n/.test(markdownResponse.body);
@@ -543,6 +575,7 @@ export async function runAudit(
     frontmatterOk ? "Markdown begins with machine-readable frontmatter." : "Markdown is missing YAML frontmatter.",
     markdownResponse.url,
     WEIGHTS.markdownFrontmatter,
+    judgmentFromFetch(markdownResponse),
   );
 
   const canonical = findCanonical(initialPage.body);
@@ -553,6 +586,7 @@ export async function runAudit(
     canonical ? `Canonical URL: ${canonical}` : "HTML is missing <link rel=\"canonical\">.",
     pageUrl,
     WEIGHTS.canonical,
+    judgmentFromFetch(initialPage),
   );
 
   const description = findMetaDescription(initialPage.body);
@@ -563,6 +597,7 @@ export async function runAudit(
     description ? "A non-empty meta description is present." : "HTML is missing a non-empty meta description.",
     pageUrl,
     WEIGHTS.description,
+    judgmentFromFetch(initialPage),
   );
 
   const jsonLdOk = /<script\b[^>]*type\s*=\s*["']application\/ld\+json["'][^>]*>/i.test(initialPage.body);
@@ -573,6 +608,7 @@ export async function runAudit(
     jsonLdOk ? "HTML includes application/ld+json." : "HTML does not include JSON-LD structured data.",
     pageUrl,
     WEIGHTS.jsonLd,
+    judgmentFromFetch(initialPage),
   );
 
   const h1Ok = /<h1\b[^>]*>[\s\S]*?<\/h1>/i.test(initialPage.body);
@@ -583,6 +619,7 @@ export async function runAudit(
     h1Ok ? "HTML includes an H1 heading." : "HTML does not include an H1 heading.",
     pageUrl,
     WEIGHTS.h1,
+    judgmentFromFetch(initialPage),
   );
 
   const notFoundOk = htmlNotFound.status === 404;
@@ -595,6 +632,7 @@ export async function runAudit(
       : `Expected an HTML HTTP 404, received ${htmlNotFound.status || "a network error"}.`,
     missingUrl,
     WEIGHTS.notFound,
+    judgmentFromFetch(htmlNotFound),
   );
 
   const agentRecoveryBody = agentNotFound.body.trim();
@@ -632,6 +670,7 @@ export async function runAudit(
     agentNotFoundMessage,
     missingUrl,
     WEIGHTS.agentNotFound,
+    judgmentFromFetch(agentNotFound),
   );
 
   if (options.version === "3") {
@@ -644,6 +683,7 @@ export async function runAudit(
         : "Add X-Robots-Tag: noindex plus a discovery or navigation link to missing-page Markdown.",
       missingUrl,
       0,
+      judgmentFromFetch(agentNotFound),
     );
   }
 
@@ -664,14 +704,14 @@ export async function runAudit(
 }
 
 function buildAuditV1Result(
-  weightedChecks: Array<AuditCheck & { weight: number }>,
+  weightedChecks: WeightedAuditCheck[],
   requestedUrl: URL,
   pageUrl: URL,
   timestamp: string,
 ): AuditResult {
   const earned = weightedChecks.reduce((sum, check) => sum + statusScore(check.status) * check.weight, 0);
   const total = weightedChecks.reduce((sum, check) => sum + check.weight, 0);
-  const checks = weightedChecks.map(({ weight: _weight, ...check }) => check);
+  const checks = weightedChecks.map(({ weight: _weight, judgment: _judgment, ...check }) => check);
 
   return {
     version: "1",
@@ -687,12 +727,12 @@ function buildAuditV1Result(
 }
 
 function buildAuditV2Result(
-  weightedChecks: Array<AuditCheck & { weight: number }>,
+  weightedChecks: WeightedAuditCheck[],
   requestedUrl: URL,
   pageUrl: URL,
   timestamp: string,
 ): AuditV2Result {
-  const checks = weightedChecks.map(({ weight: _legacyWeight, ...check }): AuditV2Check => {
+  const checks = weightedChecks.map(({ weight: _legacyWeight, judgment: _judgment, ...check }): AuditV2Check => {
     const config = AUDIT_V2_CHECKS[check.id];
     if (!config) {
       throw new AiReadyError("unsupported_audit_v2_check", `Audit v2 has no scoring metadata for check "${check.id}".`, [
@@ -756,7 +796,7 @@ async function buildCapabilityChecks(
   fetchImpl: typeof globalThis.fetch,
   origin: string,
   timeoutMs: number,
-): Promise<Array<AuditCheck & { weight: number }>> {
+): Promise<WeightedAuditCheck[]> {
   const urls = {
     tools: new URL("/tools.json", origin),
     openapi: new URL("/openapi.json", origin),
@@ -768,9 +808,16 @@ async function buildCapabilityChecks(
     fetchText(fetchImpl, urls.mcp, {}, timeoutMs),
   ]);
 
-  const checks: Array<AuditCheck & { weight: number }> = [];
-  const add = (id: string, name: string, status: AuditStatus, message: string, url: URL) => {
-    checks.push({ id, name, status, message, url: url.toString(), weight: 0 });
+  const checks: WeightedAuditCheck[] = [];
+  const add = (
+    id: string,
+    name: string,
+    status: AuditStatus,
+    message: string,
+    url: URL,
+    judgment?: AuditJudgmentSeed,
+  ) => {
+    checks.push({ id, name, status, message, url: url.toString(), weight: 0, judgment });
   };
 
   const toolsJson = parseJsonObject(tools.body);
@@ -784,6 +831,7 @@ async function buildCapabilityChecks(
       ? `/tools.json advertises ${toolEntries.length} valid callable tool(s).`
       : "No non-empty, valid tools manifest was found.",
     urls.tools,
+    judgmentFromFetch(tools),
   );
 
   const openapiJson = parseJsonObject(openapi.body);
@@ -799,6 +847,7 @@ async function buildCapabilityChecks(
     openapiOk ? "pass" : "warn",
     openapiOk ? `OpenAPI ${openapiVersion} describes callable HTTP actions.` : "No valid OpenAPI 3.x action contract was found.",
     urls.openapi,
+    judgmentFromFetch(openapi),
   );
 
   const mcpAuthResponse = mcp.status === 401 || mcp.status === 403;
@@ -809,6 +858,9 @@ async function buildCapabilityChecks(
     mcp.headers.has("mcp-session-id") ||
     /"jsonrpc"\s*:\s*"2\.0"/i.test(mcp.body);
   const mcpReachable = mcpAuthResponse || mcp.ok || [400, 405, 406, 415].includes(mcp.status);
+  const mcpJudgment = judgmentFromFetch(mcp) ?? (mcpAuthResponse && !mcpProtocolSignal
+    ? { outcome: "unknown", confidence: "medium", review: "recommended" }
+    : undefined);
   add(
     "mcp-endpoint",
     "MCP endpoint",
@@ -823,18 +875,19 @@ async function buildCapabilityChecks(
           ? `MCP route is reachable (HTTP ${mcp.status}), but the protocol cannot be verified without credentials.`
           : `MCP endpoint was not found (HTTP ${mcp.status || "network error"}); this enhancement is optional.`,
     urls.mcp,
+    mcpJudgment,
   );
 
   return checks;
 }
 
 function buildAuditV3Result(
-  rawChecks: Array<AuditCheck & { weight: number }>,
+  rawChecks: WeightedAuditCheck[],
   requestedUrl: URL,
   pageUrl: URL,
   timestamp: string,
 ): AuditV3Result {
-  const checks = rawChecks.map(({ weight: _legacyWeight, ...check }): AuditV3Check => {
+  const checks = rawChecks.map(({ weight: _legacyWeight, judgment, ...check }): AuditV3Check => {
     const config = AUDIT_V3_CHECKS[check.id];
     if (!config) {
       throw new AiReadyError("unsupported_audit_v3_check", `Audit v3 has no metadata for check "${check.id}".`, [
@@ -850,6 +903,7 @@ function buildAuditV3Result(
       tier: config.tier,
       points: tierPoints(config.tier),
       recommendation: status === "pass" ? null : config.recommendation,
+      judgment: buildAuditJudgment(check, judgment),
     };
   });
 
@@ -896,6 +950,55 @@ function buildAuditV3Result(
     warnings: countStatus(checks, "warn"),
     passed: countStatus(checks, "pass"),
   };
+}
+
+const DOCUMENT_CHECKS = new Set([
+  "markdown-frontmatter",
+  "html-canonical",
+  "meta-description",
+  "json-ld",
+  "page-h1",
+  "agent-markdown-recovery-quality",
+]);
+
+const PROTOCOL_CHECKS = new Set(["tools-manifest", "openapi-spec", "mcp-endpoint"]);
+
+function buildAuditJudgment(check: AuditCheck, seed?: AuditJudgmentSeed): AuditJudgment {
+  const evidence: AuditEvidence[] = [
+    {
+      kind: evidenceKind(check.id),
+      sourceUrl: check.url,
+      observation: check.message,
+    },
+  ];
+  if (seed) {
+    return {
+      ...seed,
+      evidence,
+    };
+  }
+
+  return {
+    outcome: check.status === "pass" ? "pass" : "fail",
+    confidence: "high",
+    evidence,
+    review: "none",
+  };
+}
+
+function judgmentFromFetch(result: FetchResult): AuditJudgmentSeed | undefined {
+  if (!result.error) return undefined;
+  return {
+    outcome: "unknown",
+    confidence: "low",
+    review: "required",
+  };
+}
+
+function evidenceKind(checkId: string): AuditEvidenceKind {
+  if (DOCUMENT_CHECKS.has(checkId)) return "document-observation";
+  if (PROTOCOL_CHECKS.has(checkId)) return "protocol-observation";
+  return "http-observation";
 }
 
 function tierPoints(tier: AuditCheckTier): number {
@@ -994,7 +1097,15 @@ function responseFailure(result: FetchResult, fallback: string): string {
 }
 
 function addDiscoveryCheck(
-  add: (id: string, name: string, status: AuditStatus, message: string, url: URL | string, weight: number) => void,
+  add: (
+    id: string,
+    name: string,
+    status: AuditStatus,
+    message: string,
+    url: URL | string,
+    weight: number,
+    judgment?: AuditJudgmentSeed,
+  ) => void,
   id: string,
   name: string,
   result: FetchResult,
@@ -1012,6 +1123,7 @@ function addDiscoveryCheck(
     ok ? `${url.pathname} is available and non-empty.` : responseFailure(result, `${url.pathname} is missing or has the wrong content type.`),
     url,
     weight,
+    judgmentFromFetch(result),
   );
 }
 

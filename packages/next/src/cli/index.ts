@@ -186,6 +186,11 @@ export async function runCli(argv: string[]): Promise<number> {
             if ("recommendation" in check && check.recommendation) {
               stream.write(`    Fix: ${check.recommendation}\n`);
             }
+            if ("judgment" in check && check.judgment.review !== "none") {
+              stream.write(
+                `    Review: ${check.judgment.review} (${check.judgment.outcome}, ${check.judgment.confidence} confidence)\n`,
+              );
+            }
           }
           console.log(
             `[next-ai-ready] audit${result.version === "1" ? "" : ` v${result.version}`}: score ${result.score}/100 — ${result.errors} error(s), ${result.warnings} warning(s), ${result.passed} passed`,
@@ -228,8 +233,14 @@ export {
   type AuditV2Result,
   type AuditCheckSource,
   type AuditCheckTier,
+  type AuditEvidence,
+  type AuditEvidenceKind,
+  type AuditJudgment,
+  type AuditJudgmentConfidence,
+  type AuditJudgmentOutcome,
   type AuditPlaneId,
   type AuditPlaneResult,
+  type AuditReviewDecision,
   type AuditV3Check,
   type AuditV3Options,
   type AuditV3Result,

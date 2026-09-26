@@ -176,6 +176,8 @@ This serves page Markdown for `Accept: text/markdown` and known agent User-Agent
 
 `next-ai-ready audit <url>` verifies those browser and agent behaviors independently. Audit v1 remains the default, preserving its JSON shape, score, and CI exit behavior. Audit v2 remains available for its original five weighted dimensions. Use `--version 3` for separate Agent Readability, Semantic/AEO Quality, and Agent Capability planes with strict pass-only tier scoring. V3 is a fast local subset preflight, while the repository's pinned `@vercel/agent-readability` command remains the official external Readability quality gate.
 
+Every v3 check also returns a bounded `judgment`: `pass`, `fail`, or `unknown`, plus finite confidence, traceable evidence, and an explicit review decision. Scores remain useful summaries, but missing evidence and credential-bound checks are routed to review instead of being presented as certain facts.
+
 **Get started in 10 minutes:** [`docs/quickstart-10min.md`](./docs/quickstart-10min.md) · [中文](./docs/quickstart-10min.zh-CN.md)
 
 Or scaffold with:

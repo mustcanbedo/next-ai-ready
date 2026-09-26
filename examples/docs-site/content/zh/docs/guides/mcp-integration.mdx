@@ -98,7 +98,7 @@ MCP 包（`@next-ai-ready/mcp`）是一个薄适配器：
 |---|---|---|
 | `list_pages` | `cursor?`、`limit?` | 按稳定路由顺序进行游标分页。默认返回 20 条，最多 50 条；游标必须是长度不超过 512 字符的安全绝对路由。 |
 | `get_page` | `route` | 返回页面元数据和完整 AI-ready Markdown；路由必须是长度 1–512 字符的安全绝对路由。 |
-| `search_pages` | `query`、`limit?` | 确定性的本地词法搜索。查询长度为 1–200 字符，默认返回 5 条，最多 20 条。 |
+| `search_pages` | `query`、`locale?`、`limit?` | 支持中文分词的确定性本地词法搜索。查询长度为 1–200 字符，可按 locale 缩小多语言结果，默认返回 5 条，最多 20 条。 |
 
 搜索只读取预构建的 SemanticGraph，不需要外部 API、Embedding 服务或向量数据库。将 `list_pages` 或 `search_pages` 返回的路由传给 `get_page` 即可读取全文。
 

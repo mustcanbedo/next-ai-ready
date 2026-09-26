@@ -232,7 +232,7 @@ registerAiHooks({
 
 - ✅ **知识平面** — MDX → 语义图 → `llms.txt` / `*.md` / `*.ai.json` / JSON-LD
 - ✅ **能力平面** — `defineAction` → `/api/actions/<name>` + OpenAPI 3.1 / `tools.json` / `ai-plugin.json`
-- ✅ **MCP 服务器** — action 作为工具、页面作为资源，并提供基于 graph 的 `list_pages` / `get_page` / `search_pages` 页面发现（HTTP + stdio）
+- ✅ **MCP 服务器** — action 作为工具、页面作为资源，并提供支持 locale 过滤和中文检索的 `list_pages` / `get_page` / `search_pages` 页面发现（HTTP + stdio）
 - ✅ **开发工具** — `build` / `init` / `doctor` / 版本化 `audit` / `mcp` CLI，`robots.txt`，分析钩子
 - ✅ **文档站** — 线上 [next-ai-ready.vercel.app](https://next-ai-ready.vercel.app/zh)（[源码](./examples/docs-site)）
 

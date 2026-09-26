@@ -155,6 +155,28 @@ Readability preflight score; run the pinned `pnpm audit:vercel:site` command for
 the official external Vercel score. V3 is intentionally a smaller local preflight,
 not a reimplementation of all 25 official checks.
 
+Every v3 check contains a bounded `judgment` object:
+
+```json
+{
+  "outcome": "unknown",
+  "confidence": "medium",
+  "evidence": [
+    {
+      "kind": "protocol-observation",
+      "sourceUrl": "https://example.com/api/mcp/mcp",
+      "observation": "The authentication gate is present; protocol verification needs deployment credentials."
+    }
+  ],
+  "review": "recommended"
+}
+```
+
+`status` remains the CI and scoring severity. `judgment` records what the evidence
+establishes. Network failures become low-confidence `unknown` results with required
+review, while credential-bound checks remain unknown until an authorized deployment
+verification runs.
+
 For missing pages, v3 scores the Vercel-compatible `200 text/markdown` behavior
 in Agent Readability. The stricter `noindex` plus recovery-link guidance is a
 separate `next-ai-ready-enhancement` in Semantic/AEO Quality, so it cannot create

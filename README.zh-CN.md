@@ -174,6 +174,8 @@ export default withAiReady({ agentReadable: true })(nextConfig)
 
 `next-ai-ready audit <url>` 会独立验证浏览器与 Agent 的行为。Audit v1 仍是默认版本，保持原有 JSON 结构、评分和 CI 退出行为不变；Audit v2 继续保留原有五维报告。使用 `--version 3` 可分别查看 Agent Readability、Semantic/AEO Quality 与 Agent Capability，采用严格的通过项分层计分。v3 是快速的本地子集预检，仓库固定的 `@vercel/agent-readability` 命令仍是 Readability 的官方外部质量门。
 
+v3 的每条检查还会返回有边界的 `judgment`：`pass`、`fail` 或 `unknown`，并附带有限置信度、可追溯证据和明确的复核决策。分数继续作为摘要使用，但证据缺失或受凭据限制的检查会进入复核，而不会被包装成确定事实。
+
 **10 分钟上手：** [`docs/quickstart-10min.zh-CN.md`](./docs/quickstart-10min.zh-CN.md) · [English](./docs/quickstart-10min.md)
 
 或使用脚手架：

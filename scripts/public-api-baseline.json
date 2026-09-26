@@ -267,8 +267,8 @@
       },
       "declarationHashes": {
         ".": "760fbbd117e4f8e460480d6de371bd79d31d0c2d538477cab35b8c475c0e6664",
-        "./cli": "778f8fe0513aafd21f21fa5bd1134cdcbf8907d84bc23764dadd73bf6028cc0a",
-        "./audit": "ec027b1c663e6331fc22d9238d7b220ec3a01af00598fae40158e51475f3d33d",
+        "./cli": "2c080d4921aea30da511819c36d972718743edc19c5ac4f1aacabf2d2fabac83",
+        "./audit": "6b3321082f02dfbeeffbc468df94fcfb0052e2d11c4ebcacbf6c7e176ab52cc2",
         "./config": "cdb60a2061bc8de2bd0136a1a82fe4e150a8e1b709e95b5dd3ce100277539c74",
         "./json-ld": "ffe01b02c7b2bef72819ebaa5e2b9a2492072cd82c8f289eeb557c897028b4f3",
         "./handlers/llms-txt": "68c993fa8d705a770123744d7ff14ff42576a06d1fac39bbd15fe600ba5ef9dc",

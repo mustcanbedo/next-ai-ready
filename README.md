@@ -222,10 +222,11 @@ Install only `next-ai-ready` in consumer apps. The `alpha.19` repository candida
 
 | Import | Use for |
 |---|---|
-| `next-ai-ready` | `defineConfig()`, `defineAction()`, `withAiReady()`, and `aiRobots()` |
+| `next-ai-ready` | `defineConfig()`, `defineAction()`, `withAiReady()`, `aiRobots()`, and shared page search |
 | `next-ai-ready/hooks` | Runtime observability hooks |
 | `next-ai-ready/handlers/*` | Generated App Router handlers |
 | `next-ai-ready/actions`, `/config`, `/json-ld`, `/robots` | Focused runtime APIs with smaller tracing surfaces |
+| `next-ai-ready/search` | Shared page search without loading build-time SDK modules |
 | `next-ai-ready/audit` | Programmatic Audit without loading the CLI dispatcher |
 
 ## Status
@@ -235,6 +236,7 @@ Install only `next-ai-ready` in consumer apps. The `alpha.19` repository candida
 - ✅ **Knowledge plane** — MDX → semantic graph → `llms.txt` / `*.md` / `*.ai.json` / JSON-LD
 - ✅ **Capability plane** — `defineAction` → `/api/actions/<name>` + OpenAPI 3.1 / `tools.json` / `ai-plugin.json`
 - ✅ **MCP server** — actions as tools, pages as resources, and locale-aware, CJK-friendly `list_pages` / `get_page` / `search_pages` discovery (HTTP + stdio)
+- ✅ **Shared retrieval** — one replaceable `PageSearchProvider` powers MCP and HTTP actions, so ranking cannot drift between protocols
 - ✅ **Dev tooling** — `build` / `init` / `doctor` / versioned `audit` / `mcp` CLIs, `robots.txt`, analytics hooks
 - ✅ **Docs site** — live at [next-ai-ready.vercel.app](https://next-ai-ready.vercel.app/en) ([source](./examples/docs-site))
 

@@ -330,6 +330,12 @@
                     "minimum": 1,
                     "type": "integer"
                   },
+                  "locale": {
+                    "description": "Optional locale filter, e.g. 'en' or 'zh'",
+                    "maxLength": 64,
+                    "minLength": 1,
+                    "type": "string"
+                  },
                   "query": {
                     "description": "Search keyword or phrase",
                     "minLength": 1,

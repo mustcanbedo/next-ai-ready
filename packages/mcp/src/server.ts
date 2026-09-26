@@ -1,4 +1,5 @@
 import type { SemanticGraph } from "@next-ai-ready/core";
+import type { PageSearchProvider } from "@next-ai-ready/semantic/search";
 import { toMcpPageToolDefinitions, toMcpToolDefinitions, type McpToolResult } from "./tools.js";
 import { toMcpResourceDefinitions } from "./resources.js";
 
@@ -28,6 +29,8 @@ export interface McpServerLike {
 export interface RegisterOptions {
   /** Also register graph pages as MCP resources. Requires `graph`. */
   graph?: SemanticGraph;
+  /** Override graph-backed page ranking for both custom runtime indexes and tests. */
+  searchProvider?: PageSearchProvider;
   /** Filter which tools get registered (by action name). Default: all public. */
   includeTool?: (name: string) => boolean;
 }
@@ -41,7 +44,10 @@ export interface RegisterOptions {
  */
 export function registerAiReady(server: McpServerLike, opts: RegisterOptions = {}): { tools: number; resources: number } {
   let tools = 0;
-  const definitions = [...toMcpToolDefinitions(), ...(opts.graph ? toMcpPageToolDefinitions(opts.graph) : [])];
+  const definitions = [
+    ...toMcpToolDefinitions(),
+    ...(opts.graph ? toMcpPageToolDefinitions(opts.graph, opts.searchProvider) : []),
+  ];
   const registeredNames = new Set<string>();
   for (const def of definitions) {
     if (opts.includeTool && !opts.includeTool(def.name)) continue;

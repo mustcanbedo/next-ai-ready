@@ -31,6 +31,10 @@
     "./jsonld": {
       "types": "./dist/jsonld.d.ts",
       "import": "./dist/jsonld.js"
+    },
+    "./search": {
+      "types": "./dist/search.d.ts",
+      "import": "./dist/search.js"
     }
   },
   "files": [

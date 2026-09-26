@@ -1,5 +1,6 @@
 import "server-only";
 import { registerAiReady, type McpServerLike } from "@next-ai-ready/mcp";
+import type { PageSearchProvider } from "@next-ai-ready/semantic/search";
 import { loadGraph } from "../runtime/graph-loader.js";
 import { mcpAuthGate } from "./mcp-auth.js";
 
@@ -14,6 +15,8 @@ export interface AiReadyMcpOptions {
    * `/api/mcp`, matching `app/api/mcp/[transport]/route.ts`.
    */
   basePath?: string;
+  /** Replace the default graph-backed page ranking without changing MCP tools. */
+  searchProvider?: PageSearchProvider;
   /**
    * Custom auth gate. Called before the MCP handler; return a `Response` to
    * reject (e.g. 401), or `undefined`/`null` to proceed.
@@ -57,7 +60,7 @@ export async function createAiReadyMcpHandler(opts: AiReadyMcpOptions = {}) {
 
   const innerHandler = createMcpHandler(
     (server: McpServerLike) => {
-      registerAiReady(server, { graph });
+      registerAiReady(server, { graph, searchProvider: opts.searchProvider });
     },
     undefined,
     { basePath },

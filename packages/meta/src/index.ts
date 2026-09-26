@@ -2,6 +2,17 @@
 export * from '@next-ai-ready/core'
 export { defineAction, defineActions } from '@next-ai-ready/actions'
 export {
+  createGraphSearchProvider,
+  isSearchablePageQuery,
+  searchGraphPages,
+} from '@next-ai-ready/semantic'
+export type {
+  PageSearchInput,
+  PageSearchProvider,
+  PageSearchResponse,
+  PageSearchResult,
+} from '@next-ai-ready/semantic'
+export {
   withAiReady,
   registerAiHooks,
   clearAiHooks,

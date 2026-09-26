@@ -104,6 +104,10 @@ The three read-only tools are available whenever `registerAiReady(server, { grap
 
 Search runs only over the pre-built SemanticGraph and does not require an external API, embedding service, or vector database. Use routes returned by `list_pages` or `search_pages` as input to `get_page`.
 
+## One search implementation across protocols
+
+`search_pages` and the docs site's HTTP `search_docs` action both use the public `PageSearchProvider` contract. The built-in `createGraphSearchProvider(graph)` keeps retrieval deterministic and database-free. A runtime index can implement the same contract and be injected into `registerAiReady(server, { graph, searchProvider })` without changing MCP clients.
+
 ## Prerequisites
 
 MCP requires two optional peer dependencies:

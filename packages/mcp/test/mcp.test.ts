@@ -252,6 +252,21 @@ describe("page discovery tools", () => {
       Array.from({ length: 20 }, (_, index) => `/guide/${String(index).padStart(2, "0")}`),
     );
   });
+
+  it("adapts an injected search provider without reimplementing ranking", async () => {
+    const [, , search] = toMcpPageToolDefinitions(GRAPH, {
+      search: async ({ query }) => ({
+        query,
+        totalMatches: 1,
+        results: [{ route: "/docs/install", title: "Provider result", score: 42 }],
+      }),
+    });
+    const result = JSON.parse((await search.execute({ query: "custom" })).content[0].text);
+    expect(result).toMatchObject({
+      totalMatches: 1,
+      results: [{ route: "/docs/install", uri: "airead://page/docs/install", score: 42 }],
+    });
+  });
 });
 
 describe("registerAiReady()", () => {

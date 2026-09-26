@@ -1,5 +1,14 @@
 # @next-ai-ready/mdx
 
+## 0.1.0-alpha.15
+
+### Patch Changes
+
+- Updated dependencies [e0f93dd]
+- Updated dependencies [886deef]
+  - @next-ai-ready/core@0.1.0-alpha.15
+  - @next-ai-ready/semantic@0.1.0-alpha.15
+
 ## 0.1.0-alpha.14
 
 ### Patch Changes

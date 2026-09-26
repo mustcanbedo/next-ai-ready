@@ -1,5 +1,33 @@
 # @next-ai-ready/next
 
+## 0.1.0-alpha.20
+
+### Minor Changes
+
+- 77dd188: Add bounded Audit v3 judgments with pass, fail, and unknown outcomes, finite
+  confidence, traceable evidence, and explicit review decisions. Keep Audit v1
+  and v2 output unchanged, and route network or credential-bound uncertainty to
+  human review instead of treating it as a certain fact.
+
+### Patch Changes
+
+- e0f93dd: Add purpose-based AI crawler policies for search, training, user-requested,
+  and other agents while preserving the existing all-or-nothing string form.
+  Recognize Claude-SearchBot and Claude-User, and make `doctor` treat training
+  opt-out as an intentional policy choice instead of a discoverability defect.
+- 886deef: Add a public, replaceable `PageSearchProvider` and make MCP and HTTP page
+  search share the same deterministic graph ranking implementation.
+- Updated dependencies [914e887]
+- Updated dependencies [e0f93dd]
+- Updated dependencies [886deef]
+  - @next-ai-ready/mcp@0.1.0-alpha.17
+  - @next-ai-ready/core@0.1.0-alpha.15
+  - @next-ai-ready/semantic@0.1.0-alpha.15
+  - @next-ai-ready/actions@0.1.0-alpha.15
+  - @next-ai-ready/llms@0.1.0-alpha.17
+  - @next-ai-ready/mdx@0.1.0-alpha.15
+  - @next-ai-ready/openapi@0.1.0-alpha.15
+
 ## 0.1.0-alpha.19
 
 ### Patch Changes

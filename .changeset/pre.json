@@ -32,8 +32,12 @@
     "published-semantic-jsonld",
     "release-mcp-with-llms-alpha16",
     "runnable-next-scaffold",
+    "search-intent-evaluation",
     "searchable-package-metadata",
+    "typed-ai-crawler-policy",
+    "typed-audit-judgments",
     "typescript-actions-loader",
-    "typescript-config-runtime"
+    "typescript-config-runtime",
+    "unified-search-provider"
   ]
 }

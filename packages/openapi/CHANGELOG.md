@@ -1,5 +1,12 @@
 # @next-ai-ready/openapi
 
+## 0.1.0-alpha.15
+
+### Patch Changes
+
+- Updated dependencies [e0f93dd]
+  - @next-ai-ready/core@0.1.0-alpha.15
+
 ## 0.1.0-alpha.14
 
 ### Patch Changes

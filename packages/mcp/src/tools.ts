@@ -135,18 +135,23 @@ export function toMcpPageToolDefinitions(graph: SemanticGraph): McpToolDefinitio
       searchPagesInput,
       (input) => {
         const query = normalizeSearchText(input.query);
-        const terms = [...new Set(tokenize(query))];
-        if (!query || terms.length === 0) return toolError("invalid_input", "query must contain letters or numbers");
+        const rawTerms = [...new Set(tokenize(query))];
+        if (!query || rawTerms.length === 0) return toolError("invalid_input", "query must contain letters or numbers");
+        const siteTerms = new Set(tokenize(normalizeSearchText(graph.site.name)));
+        const discriminatingTerms = rawTerms.filter((term) => !siteTerms.has(term));
+        const terms = discriminatingTerms.length > 0 ? discriminatingTerms : rawTerms;
         const locale = input.locale === undefined ? undefined : normalizeSearchText(input.locale);
 
         const limit = input.limit ?? DEFAULT_SEARCH_LIMIT;
         const ranked: RankedPage[] = [];
         let totalMatches = 0;
-        for (const route of safeGraphRoutes(graph)) {
-          const node = pageNode(graph, route);
-          if (!node) continue;
-          if (locale !== undefined && normalizeSearchText(node.locale ?? "") !== locale) continue;
-          const candidate = rankPage(route, node, query, terms);
+        const pages = safeGraphRoutes(graph)
+          .map((route) => ({ route, node: pageNode(graph, route) }))
+          .filter((page): page is { route: string; node: SemanticNode } => page.node !== undefined)
+          .filter((page) => locale === undefined || normalizeSearchText(page.node.locale ?? "") === locale);
+        const termWeights = inverseDocumentFrequency(pages, terms);
+        for (const { route, node } of pages) {
+          const candidate = rankPage(route, node, query, terms, termWeights);
           if (candidate.score <= 0) continue;
           totalMatches += 1;
           insertRanked(ranked, candidate, limit);
@@ -250,8 +255,8 @@ interface RankedPage {
   excerpt?: string;
 }
 
-function rankPage(route: string, node: SemanticNode, query: string, terms: string[]): RankedPage {
-  const fields = [
+function searchableFields(route: string, node: SemanticNode): Array<{ value: string | undefined; weight: number }> {
+  return [
     { value: route, weight: 12 },
     { value: node.title, weight: 10 },
     { value: node.summary, weight: 7 },
@@ -261,6 +266,34 @@ function rankPage(route: string, node: SemanticNode, query: string, terms: strin
     { value: node.embeddingHint, weight: 3 },
     { value: node.body, weight: 1 },
   ];
+}
+
+function inverseDocumentFrequency(
+  pages: Array<{ route: string; node: SemanticNode }>,
+  terms: string[],
+): Map<string, number> {
+  const frequencies = new Map(terms.map((term) => [term, 0]));
+  for (const { route, node } of pages) {
+    const pageTerms = new Set(
+      searchableFields(route, node).flatMap((field) => field.value ? tokenize(normalizeSearchText(field.value)) : []),
+    );
+    for (const term of terms) {
+      if (hasLexicalMatch(pageTerms, term)) frequencies.set(term, (frequencies.get(term) ?? 0) + 1);
+    }
+  }
+  return new Map(
+    terms.map((term) => [term, 1 + Math.log((pages.length + 1) / ((frequencies.get(term) ?? 0) + 1))]),
+  );
+}
+
+function rankPage(
+  route: string,
+  node: SemanticNode,
+  query: string,
+  terms: string[],
+  termWeights: Map<string, number>,
+): RankedPage {
+  const fields = searchableFields(route, node);
 
   let score = 0;
   let excerptSource: string | undefined;
@@ -275,7 +308,7 @@ function rankPage(route: string, node: SemanticNode, query: string, terms: strin
     const fieldTerms = new Set(tokenize(normalized));
     let matched = 0;
     for (const term of terms) {
-      if (fieldTerms.has(term)) matched += 1;
+      if (hasLexicalMatch(fieldTerms, term)) matched += termWeights.get(term) ?? 1;
     }
     if (matched > 0) {
       score += field.weight * matched;
@@ -311,7 +344,32 @@ function normalizeSearchText(value: string): string {
 }
 
 function tokenize(value: string): string[] {
-  return value.match(/[\p{L}\p{N}]+/gu) ?? [];
+  const chunks = value.match(
+    /[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}\p{Script=Hangul}]+|[a-z0-9]+|[\p{L}\p{N}]+/gu,
+  ) ?? [];
+  const terms: string[] = [];
+  for (const chunk of chunks) {
+    if (!/[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}\p{Script=Hangul}]/u.test(chunk)) {
+      terms.push(chunk);
+      continue;
+    }
+    const codePoints = Array.from(chunk);
+    if (codePoints.length === 1) terms.push(chunk);
+    for (let index = 0; index < codePoints.length - 1; index += 1) {
+      terms.push(`${codePoints[index]}${codePoints[index + 1]}`);
+    }
+  }
+  return terms;
+}
+
+function hasLexicalMatch(fieldTerms: Set<string>, queryTerm: string): boolean {
+  if (fieldTerms.has(queryTerm)) return true;
+  if (queryTerm.length < 5 || !/^[a-z0-9]+$/u.test(queryTerm)) return false;
+  for (const fieldTerm of fieldTerms) {
+    if (fieldTerm.length < 5 || !/^[a-z0-9]+$/u.test(fieldTerm)) continue;
+    if (fieldTerm.startsWith(queryTerm) || queryTerm.startsWith(fieldTerm)) return true;
+  }
+  return false;
 }
 
 function excerpt(value: string, query: string): string {

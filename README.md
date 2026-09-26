@@ -234,7 +234,7 @@ Install only `next-ai-ready` in consumer apps. The `alpha.19` repository candida
 
 - ✅ **Knowledge plane** — MDX → semantic graph → `llms.txt` / `*.md` / `*.ai.json` / JSON-LD
 - ✅ **Capability plane** — `defineAction` → `/api/actions/<name>` + OpenAPI 3.1 / `tools.json` / `ai-plugin.json`
-- ✅ **MCP server** — actions as tools, pages as resources, and graph-backed `list_pages` / `get_page` / `search_pages` discovery (HTTP + stdio)
+- ✅ **MCP server** — actions as tools, pages as resources, and locale-aware, CJK-friendly `list_pages` / `get_page` / `search_pages` discovery (HTTP + stdio)
 - ✅ **Dev tooling** — `build` / `init` / `doctor` / versioned `audit` / `mcp` CLIs, `robots.txt`, analytics hooks
 - ✅ **Docs site** — live at [next-ai-ready.vercel.app](https://next-ai-ready.vercel.app/en) ([source](./examples/docs-site))
 

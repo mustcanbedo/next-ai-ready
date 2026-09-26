@@ -138,6 +138,8 @@ describe("page discovery tools", () => {
     expect(result.results).toHaveLength(1);
     expect(result.results[0]).toMatchObject({ route: "/docs/install", title: "Install" });
     expect(result.results[0].score).toBeGreaterThan(0);
+    const inflected = JSON.parse((await search.execute({ query: "installation" })).content[0].text);
+    expect(inflected.results[0]).toMatchObject({ route: "/docs/install", title: "Install" });
     expect((await search.execute({ query: "---" })).isError).toBe(true);
     expect((await search.execute({ query: "x", limit: 21 })).isError).toBe(true);
     expect((await search.execute({ query: "x".repeat(201) })).isError).toBe(true);
@@ -173,6 +175,53 @@ describe("page discovery tools", () => {
     const result = JSON.parse((await search.execute({ query: "install", locale: "zh" })).content[0].text);
     expect(result.results.map((page: { route: string }) => page.route)).toEqual(["/zh/docs/install"]);
     expect((await search.execute({ query: "install", locale: "" })).isError).toBe(true);
+  });
+
+  it("matches natural Chinese queries with deterministic CJK bigrams", async () => {
+    const graph: SemanticGraph = {
+      ...GRAPH,
+      site: { name: "next-ai-ready", baseUrl: "https://acme.com" },
+      routes: { "/zh": "n_home", "/zh/docs/install": "n_install", "/zh/docs/config": "n_config" },
+      nodes: {
+        n_home: {
+          id: "n_home",
+          route: "/zh",
+          kind: "page",
+          title: "next-ai-ready",
+          summary: "让 Next.js 网站可被 AI 读取。",
+          locale: "zh",
+          source: { file: "content/zh/index.mdx" },
+        },
+        n_install: {
+          id: "n_install",
+          route: "/zh/docs/install",
+          kind: "page",
+          title: "安装",
+          summary: "安装 next-ai-ready 并初始化配置。",
+          locale: "zh",
+          source: { file: "content/zh/install.mdx" },
+        },
+        n_config: {
+          id: "n_config",
+          route: "/zh/docs/config",
+          kind: "page",
+          title: "配置",
+          summary: "配置内容目录和站点选项。",
+          locale: "zh",
+          source: { file: "content/zh/config.mdx" },
+        },
+      },
+    };
+
+    const [, , search] = toMcpPageToolDefinitions(graph);
+    const install = JSON.parse((await search.execute({ query: "怎么安装 next-ai-ready", locale: "zh" })).content[0].text);
+    const config = JSON.parse((await search.execute({ query: "内容目录和站点选项怎么配置", locale: "zh" })).content[0].text);
+    const mixedScript = JSON.parse((await search.execute({ query: "AI可读 安装", locale: "zh" })).content[0].text);
+    const brand = JSON.parse((await search.execute({ query: "next-ai-ready", locale: "zh" })).content[0].text);
+    expect(install.results[0].route).toBe("/zh/docs/install");
+    expect(config.results[0].route).toBe("/zh/docs/config");
+    expect(mixedScript.results[0].route).toBe("/zh/docs/install");
+    expect(brand.results[0].route).toBe("/zh");
   });
 
   it("keeps only top-k search results while reporting every match", async () => {

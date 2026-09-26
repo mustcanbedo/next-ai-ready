@@ -1,0 +1,252 @@
+{
+  "version": 1,
+  "description": "Human-labeled queries for the next-ai-ready documentation corpus. Expected routes identify the page that should answer each query most directly.",
+  "topK": 3,
+  "thresholds": {
+    "top1Accuracy": 0.9,
+    "topKRecall": 1,
+    "meanReciprocalRank": 0.95
+  },
+  "cases": [
+    {
+      "id": "en-install-package",
+      "locale": "en",
+      "intent": "setup",
+      "query": "how do I install next-ai-ready",
+      "expectedRoutes": ["/en/docs/installation"],
+      "rationale": "The installation page owns package installation and initial scaffolding."
+    },
+    {
+      "id": "en-quickstart-ten-minutes",
+      "locale": "en",
+      "intent": "setup",
+      "query": "complete setup in ten minutes",
+      "expectedRoutes": ["/en/docs/guides/quickstart"],
+      "rationale": "The quickstart is the end-to-end ten-minute setup path."
+    },
+    {
+      "id": "en-project-files",
+      "locale": "en",
+      "intent": "setup",
+      "query": "what files does the setup create",
+      "expectedRoutes": ["/en/docs/getting-started/project-structure"],
+      "rationale": "Project Structure explains generated files and their roles."
+    },
+    {
+      "id": "en-config-reference",
+      "locale": "en",
+      "intent": "reference",
+      "query": "configure content directories and site options",
+      "expectedRoutes": ["/en/docs/api-reference/config"],
+      "rationale": "Configuration is the authoritative option reference."
+    },
+    {
+      "id": "en-cli-reference",
+      "locale": "en",
+      "intent": "reference",
+      "query": "available CLI commands doctor audit build",
+      "expectedRoutes": ["/en/docs/api-reference/cli"],
+      "rationale": "The CLI reference documents these commands."
+    },
+    {
+      "id": "en-nextjs-llms",
+      "locale": "en",
+      "intent": "integration",
+      "query": "add llms.txt to a Next.js App Router site",
+      "expectedRoutes": ["/en/docs/guides/nextjs-llms-txt"],
+      "rationale": "The Next.js llms.txt guide owns this integration task."
+    },
+    {
+      "id": "en-fumadocs",
+      "locale": "en",
+      "intent": "integration",
+      "query": "reuse a Fumadocs content collection",
+      "expectedRoutes": ["/en/docs/guides/fumadocs-ai-ready"],
+      "rationale": "The Fumadocs guide covers reuse of its MDX collection."
+    },
+    {
+      "id": "en-nextra",
+      "locale": "en",
+      "intent": "integration",
+      "query": "add AI-readable endpoints to Nextra 4",
+      "expectedRoutes": ["/en/docs/guides/nextra-ai-ready"],
+      "rationale": "The Nextra guide covers Nextra 4 without replacing its UI."
+    },
+    {
+      "id": "en-mcp-server",
+      "locale": "en",
+      "intent": "integration",
+      "query": "add an authenticated MCP server to Next.js",
+      "expectedRoutes": ["/en/docs/guides/mcp-integration"],
+      "rationale": "The MCP integration guide covers HTTP authentication and page tools."
+    },
+    {
+      "id": "en-mdx-content",
+      "locale": "en",
+      "intent": "content",
+      "query": "make an MDX content collection readable by AI",
+      "expectedRoutes": ["/en/docs/guides/mdx-content"],
+      "rationale": "The MDX guide covers content collections, frontmatter, and generated outputs."
+    },
+    {
+      "id": "en-crawler-policy",
+      "locale": "en",
+      "intent": "policy",
+      "query": "allow AI search crawlers but block training crawlers",
+      "expectedRoutes": ["/en/docs/guides/robots-txt"],
+      "rationale": "The robots guide separates search, training, and user-triggered access."
+    },
+    {
+      "id": "en-analytics",
+      "locale": "en",
+      "intent": "observability",
+      "query": "track AI crawler visits and agent actions",
+      "expectedRoutes": ["/en/docs/guides/analytics"],
+      "rationale": "Analytics documents crawler and action telemetry."
+    },
+    {
+      "id": "en-actions",
+      "locale": "en",
+      "intent": "capability",
+      "query": "define and secure an AI-callable action",
+      "expectedRoutes": ["/en/docs/guides/actions"],
+      "rationale": "The Actions guide is the task-oriented page for callable actions."
+    },
+    {
+      "id": "en-two-planes",
+      "locale": "en",
+      "intent": "architecture",
+      "query": "knowledge plane versus capability plane",
+      "expectedRoutes": ["/en/docs/concepts/two-planes"],
+      "rationale": "Two Planes compares both architectural surfaces directly."
+    },
+    {
+      "id": "en-semantic-metadata",
+      "locale": "en",
+      "intent": "reference",
+      "query": "add semantic metadata to MDX",
+      "expectedRoutes": ["/en/docs/api-reference/define-semantic"],
+      "rationale": "Semantic Metadata is the API reference for structured MDX metadata."
+    },
+    {
+      "id": "zh-install-package",
+      "locale": "zh",
+      "intent": "setup",
+      "query": "怎么安装 next-ai-ready",
+      "expectedRoutes": ["/zh/docs/installation"],
+      "rationale": "安装页负责软件包安装与首次生成配置。"
+    },
+    {
+      "id": "zh-quickstart-ten-minutes",
+      "locale": "zh",
+      "intent": "setup",
+      "query": "十分钟完成接入",
+      "expectedRoutes": ["/zh/docs/guides/quickstart"],
+      "rationale": "快速开始是完整的十分钟接入路径。"
+    },
+    {
+      "id": "zh-project-files",
+      "locale": "zh",
+      "intent": "setup",
+      "query": "初始化会创建哪些文件",
+      "expectedRoutes": ["/zh/docs/getting-started/project-structure"],
+      "rationale": "项目结构页解释生成文件及用途。"
+    },
+    {
+      "id": "zh-config-reference",
+      "locale": "zh",
+      "intent": "reference",
+      "query": "内容目录和站点选项怎么配置",
+      "expectedRoutes": ["/zh/docs/api-reference/config"],
+      "rationale": "配置页是所有配置选项的权威参考。"
+    },
+    {
+      "id": "zh-cli-reference",
+      "locale": "zh",
+      "intent": "reference",
+      "query": "doctor audit build 命令怎么用",
+      "expectedRoutes": ["/zh/docs/api-reference/cli"],
+      "rationale": "CLI 参考页记录这些命令。"
+    },
+    {
+      "id": "zh-nextjs-llms",
+      "locale": "zh",
+      "intent": "integration",
+      "query": "给 Next.js App Router 添加 llms.txt",
+      "expectedRoutes": ["/zh/docs/guides/nextjs-llms-txt"],
+      "rationale": "Next.js llms.txt 指南负责该接入任务。"
+    },
+    {
+      "id": "zh-fumadocs",
+      "locale": "zh",
+      "intent": "integration",
+      "query": "复用 Fumadocs 的 MDX 内容集合",
+      "expectedRoutes": ["/zh/docs/guides/fumadocs-ai-ready"],
+      "rationale": "Fumadocs 指南说明如何复用现有内容集合。"
+    },
+    {
+      "id": "zh-nextra",
+      "locale": "zh",
+      "intent": "integration",
+      "query": "给 Nextra 4 增加 AI 可读端点",
+      "expectedRoutes": ["/zh/docs/guides/nextra-ai-ready"],
+      "rationale": "Nextra 指南覆盖不替换原 UI 的接入方式。"
+    },
+    {
+      "id": "zh-mcp-server",
+      "locale": "zh",
+      "intent": "integration",
+      "query": "在 Next.js 里添加带鉴权的 MCP Server",
+      "expectedRoutes": ["/zh/docs/guides/mcp-integration"],
+      "rationale": "MCP 接入指南包含 HTTP 鉴权和页面工具。"
+    },
+    {
+      "id": "zh-mdx-content",
+      "locale": "zh",
+      "intent": "content",
+      "query": "让 MDX 内容集合可以被 AI 读取",
+      "expectedRoutes": ["/zh/docs/guides/mdx-content"],
+      "rationale": "MDX 指南覆盖内容集合、frontmatter 与生成产物。"
+    },
+    {
+      "id": "zh-crawler-policy",
+      "locale": "zh",
+      "intent": "policy",
+      "query": "允许 AI 搜索但禁止训练爬虫",
+      "expectedRoutes": ["/zh/docs/guides/robots-txt"],
+      "rationale": "robots 指南区分搜索、训练和用户触发用途。"
+    },
+    {
+      "id": "zh-analytics",
+      "locale": "zh",
+      "intent": "observability",
+      "query": "追踪 AI 爬虫访问和 Agent 调用",
+      "expectedRoutes": ["/zh/docs/guides/analytics"],
+      "rationale": "分析页记录爬虫与 Action 调用观测。"
+    },
+    {
+      "id": "zh-actions",
+      "locale": "zh",
+      "intent": "capability",
+      "query": "定义并保护 AI 可以调用的 Action",
+      "expectedRoutes": ["/zh/docs/guides/actions"],
+      "rationale": "Actions 指南是可调用操作的任务型入口。"
+    },
+    {
+      "id": "zh-two-planes",
+      "locale": "zh",
+      "intent": "architecture",
+      "query": "知识平面和能力平面有什么区别",
+      "expectedRoutes": ["/zh/docs/concepts/two-planes"],
+      "rationale": "双平面页面直接比较两类架构表面。"
+    },
+    {
+      "id": "zh-semantic-metadata",
+      "locale": "zh",
+      "intent": "reference",
+      "query": "给 MDX 添加语义元数据",
+      "expectedRoutes": ["/zh/docs/api-reference/define-semantic"],
+      "rationale": "语义元数据页是结构化 MDX 元数据的 API 参考。"
+    }
+  ]
+}

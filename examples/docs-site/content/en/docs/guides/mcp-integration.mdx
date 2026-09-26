@@ -100,7 +100,7 @@ The three read-only tools are available whenever `registerAiReady(server, { grap
 |---|---|---|
 | `list_pages` | `cursor?`, `limit?` | Stable route order with cursor pagination. The default limit is 20, the maximum is 50, and a cursor must be a safe absolute route no longer than 512 characters. |
 | `get_page` | `route` | Returns metadata and full AI-ready Markdown for a safe absolute route of 1–512 characters. |
-| `search_pages` | `query`, `limit?` | Deterministic local lexical search. Queries are 1–200 characters; the default result limit is 5 and the maximum is 20. |
+| `search_pages` | `query`, `locale?`, `limit?` | Deterministic local lexical search with CJK-aware tokenization. Queries are 1–200 characters; locale can narrow multilingual graphs; the default result limit is 5 and the maximum is 20. |
 
 Search runs only over the pre-built SemanticGraph and does not require an external API, embedding service, or vector database. Use routes returned by `list_pages` or `search_pages` as input to `get_page`.
 

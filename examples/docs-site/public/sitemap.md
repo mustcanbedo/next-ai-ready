@@ -6,7 +6,7 @@
 
 - [next-ai-ready](https://next-ai-ready.vercel.app/en): Add AI-readable discovery and Markdown endpoints to a Next.js App Router site in about 10 minutes.
 - [CLI](https://next-ai-ready.vercel.app/en/docs/api-reference/cli): Command-line interface — init, build, doctor, audit, and mcp.
-- [Configuration](https://next-ai-ready.vercel.app/en/docs/api-reference/config): Full reference for ai-ready.config.mjs options.
+- [Configuration](https://next-ai-ready.vercel.app/en/docs/api-reference/config): Configure site metadata, content directories, actions, robots policy, and generated outputs in ai-ready.config.mjs.
 - [defineAction](https://next-ai-ready.vercel.app/en/docs/api-reference/define-action): API reference for defineAction() and defineActions().
 - [Semantic Metadata](https://next-ai-ready.vercel.app/en/docs/api-reference/define-semantic): How to add structured metadata to your MDX content for richer AI extraction.
 - [withAiReady](https://next-ai-ready.vercel.app/en/docs/api-reference/with-ai-ready): API reference for the Next.js config wrapper.
@@ -30,7 +30,7 @@
 - [Introduction](https://next-ai-ready.vercel.app/en/docs/introduction): What next-ai-ready is and why it exists.
 - [next-ai-ready](https://next-ai-ready.vercel.app/zh): 约 10 分钟，为 Next.js App Router 站点增加供 AI 工具发现和读取的内容入口。
 - [CLI](https://next-ai-ready.vercel.app/zh/docs/api-reference/cli): 命令行接口——init、build、doctor、audit 和 mcp。
-- [配置](https://next-ai-ready.vercel.app/zh/docs/api-reference/config): ai-ready.config.mjs 的完整参考。
+- [配置](https://next-ai-ready.vercel.app/zh/docs/api-reference/config): 在 ai-ready.config.mjs 中配置站点元数据、内容目录、Actions、robots 策略与生成产物。
 - [defineAction](https://next-ai-ready.vercel.app/zh/docs/api-reference/define-action): defineAction() 和 defineActions() 的 API 参考。
 - [语义元数据](https://next-ai-ready.vercel.app/zh/docs/api-reference/define-semantic): 如何为 MDX 内容添加结构化元数据以获得更丰富的 AI 提取。
 - [withAiReady](https://next-ai-ready.vercel.app/zh/docs/api-reference/with-ai-ready): Next.js 配置包装器的 API 参考。

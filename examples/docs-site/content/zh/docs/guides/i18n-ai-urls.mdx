@@ -6,7 +6,7 @@ questions:
   - q: locale 前缀如何影响 AI 路由？
     a: 每个已识别的 locale 路径都是独立路由，graph 同时写入 locale 元数据和 routesByLocale 索引。
   - q: MCP 页面工具可以按 locale 过滤吗？
-    a: 暂时不可以。MCP 结果包含页面 locale，但 list_pages 与 search_pages 还没有 locale 参数。
+    a: 可以。search_pages 支持可选的 locale 过滤；list_pages 仍是带 locale 元数据的全站索引。
   - q: middleware 应 redirect AI 产物 URL 吗？
     a: 不应。matcher 需排除带点路径、/api、_ai-ready，避免爬虫被重定向。
 tags:
@@ -42,7 +42,7 @@ export default defineConfig({
 
 `en`、`zh` 等已识别的路由前缀会写入页面节点的 `locale` 字段。生成的 `SemanticGraph.routesByLocale` 还会将语言内相对路由映射回页面 id，同时保留扁平 `routes` 以兼容现有消费者。
 
-MCP 页面结果会返回 locale；`list_pages` 与 `search_pages` 暂无 locale 过滤参数，因此多语言客户端目前应使用路由前缀缩小结果范围。
+MCP 页面结果会返回 locale。调用 `search_pages` 时传入 `locale` 可限制检索语言；`list_pages` 仍保持确定性的全站索引，客户端可依据 locale 元数据或路由前缀浏览。
 
 ## Middleware
 
@@ -66,4 +66,4 @@ export const config = {
 
 ## 当前限制
 
-自动生成 `Available Languages`、Markdown alternate frontmatter、`hreflang` 响应链接以及 MCP locale 过滤仍在规划中。当前边界见 [Phase 6 设计](https://github.com/mustcanbedo/next-ai-ready/blob/main/docs/phase6-design.md)。
+自动生成 `Available Languages`、Markdown alternate frontmatter 与 `hreflang` 响应链接仍在规划中。MCP `search_pages` 的 locale 过滤已经可用。当前边界见 [Phase 6 设计](https://github.com/mustcanbedo/next-ai-ready/blob/main/docs/phase6-design.md)。

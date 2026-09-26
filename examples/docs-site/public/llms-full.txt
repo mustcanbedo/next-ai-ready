@@ -1493,7 +1493,7 @@ export default defineConfig({
 
 Recognized route prefixes such as `en` and `zh` are stored in each page node's `locale` field. The generated `SemanticGraph.routesByLocale` index also maps locale-relative routes back to their page ids, while the flat `routes` map remains available for compatibility.
 
-MCP page results expose the page locale. `list_pages` and `search_pages` do not yet accept a locale filter, so clients should use route prefixes when narrowing multilingual results.
+MCP page results expose the page locale. Pass `locale` to `search_pages` to restrict retrieval to one language. `list_pages` remains a deterministic global index, so clients can use its locale metadata or route prefixes when browsing.
 
 ## Middleware
 
@@ -1519,7 +1519,7 @@ Use `sections` in config to prioritize one locale in `llms.txt`, or emit separat
 
 ## Current limits
 
-Automatic `Available Languages` sections, alternate-language Markdown frontmatter, `hreflang` response links, and MCP locale filtering remain planned. See the [Phase 6 design](https://github.com/mustcanbedo/next-ai-ready/blob/main/docs/phase6-design.md) for the current boundary.
+Automatic `Available Languages` sections, alternate-language Markdown frontmatter, and `hreflang` response links remain planned. MCP `search_pages` locale filtering is available now. See the [Phase 6 design](https://github.com/mustcanbedo/next-ai-ready/blob/main/docs/phase6-design.md) for the current boundary.
 
 ## FAQ
 
@@ -1529,7 +1529,7 @@ Each recognized locale path becomes a separate route, and the graph adds locale 
 
 ### Can MCP page tools filter by locale?
 
-Not yet. MCP results include each page's locale, but list_pages and search_pages do not currently accept a locale filter.
+Yes. search_pages accepts an optional locale filter; list_pages remains a locale-annotated global index.
 
 ### Should middleware redirect AI artifact URLs?
 
@@ -1612,11 +1612,11 @@ The MCP package (`@next-ai-ready/mcp`) is a thin adapter:
 
 The three read-only tools are available whenever `registerAiReady(server, { graph })` receives a SemanticGraph:
 
-| Tool           | Parameters          | Behavior and limits                                                                                                                                              |
-| -------------- | ------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `list_pages`   | `cursor?`, `limit?` | Stable route order with cursor pagination. The default limit is 20, the maximum is 50, and a cursor must be a safe absolute route no longer than 512 characters. |
-| `get_page`     | `route`             | Returns metadata and full AI-ready Markdown for a safe absolute route of 1–512 characters.                                                                       |
-| `search_pages` | `query`, `limit?`   | Deterministic local lexical search. Queries are 1–200 characters; the default result limit is 5 and the maximum is 20.                                           |
+| Tool           | Parameters                   | Behavior and limits                                                                                                                                                                       |
+| -------------- | ---------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `list_pages`   | `cursor?`, `limit?`          | Stable route order with cursor pagination. The default limit is 20, the maximum is 50, and a cursor must be a safe absolute route no longer than 512 characters.                          |
+| `get_page`     | `route`                      | Returns metadata and full AI-ready Markdown for a safe absolute route of 1–512 characters.                                                                                                |
+| `search_pages` | `query`, `locale?`, `limit?` | Deterministic local lexical search with CJK-aware tokenization. Queries are 1–200 characters; locale can narrow multilingual graphs; the default result limit is 5 and the maximum is 20. |
 
 Search runs only over the pre-built SemanticGraph and does not require an external API, embedding service, or vector database. Use routes returned by `list_pages` or `search_pages` as input to `get_page`.
 
@@ -4138,7 +4138,7 @@ export default defineConfig({
 
 `en`、`zh` 等已识别的路由前缀会写入页面节点的 `locale` 字段。生成的 `SemanticGraph.routesByLocale` 还会将语言内相对路由映射回页面 id，同时保留扁平 `routes` 以兼容现有消费者。
 
-MCP 页面结果会返回 locale；`list_pages` 与 `search_pages` 暂无 locale 过滤参数，因此多语言客户端目前应使用路由前缀缩小结果范围。
+MCP 页面结果会返回 locale。调用 `search_pages` 时传入 `locale` 可限制检索语言；`list_pages` 仍保持确定性的全站索引，客户端可依据 locale 元数据或路由前缀浏览。
 
 ## Middleware
 
@@ -4162,7 +4162,7 @@ export const config = {
 
 ## 当前限制
 
-自动生成 `Available Languages`、Markdown alternate frontmatter、`hreflang` 响应链接以及 MCP locale 过滤仍在规划中。当前边界见 [Phase 6 设计](https://github.com/mustcanbedo/next-ai-ready/blob/main/docs/phase6-design.md)。
+自动生成 `Available Languages`、Markdown alternate frontmatter 与 `hreflang` 响应链接仍在规划中。MCP `search_pages` 的 locale 过滤已经可用。当前边界见 [Phase 6 设计](https://github.com/mustcanbedo/next-ai-ready/blob/main/docs/phase6-design.md)。
 
 ## FAQ
 
@@ -4172,7 +4172,7 @@ export const config = {
 
 ### MCP 页面工具可以按 locale 过滤吗？
 
-暂时不可以。MCP 结果包含页面 locale，但 list_pages 与 search_pages 还没有 locale 参数。
+可以。search_pages 支持可选的 locale 过滤；list_pages 仍是带 locale 元数据的全站索引。
 
 ### middleware 应 redirect AI 产物 URL 吗？
 
@@ -4255,11 +4255,11 @@ MCP 包（`@next-ai-ready/mcp`）是一个薄适配器：
 
 只要 `registerAiReady(server, { graph })` 收到 SemanticGraph，就会提供三个只读工具：
 
-| 工具             | 参数                 | 行为与限制                                                     |
-| -------------- | ------------------ | --------------------------------------------------------- |
-| `list_pages`   | `cursor?`、`limit?` | 按稳定路由顺序进行游标分页。默认返回 20 条，最多 50 条；游标必须是长度不超过 512 字符的安全绝对路由。 |
-| `get_page`     | `route`            | 返回页面元数据和完整 AI-ready Markdown；路由必须是长度 1–512 字符的安全绝对路由。     |
-| `search_pages` | `query`、`limit?`   | 确定性的本地词法搜索。查询长度为 1–200 字符，默认返回 5 条，最多 20 条。               |
+| 工具             | 参数                         | 行为与限制                                                               |
+| -------------- | -------------------------- | ------------------------------------------------------------------- |
+| `list_pages`   | `cursor?`、`limit?`         | 按稳定路由顺序进行游标分页。默认返回 20 条，最多 50 条；游标必须是长度不超过 512 字符的安全绝对路由。           |
+| `get_page`     | `route`                    | 返回页面元数据和完整 AI-ready Markdown；路由必须是长度 1–512 字符的安全绝对路由。               |
+| `search_pages` | `query`、`locale?`、`limit?` | 支持中文分词的确定性本地词法搜索。查询长度为 1–200 字符，可按 locale 缩小多语言结果，默认返回 5 条，最多 20 条。 |
 
 搜索只读取预构建的 SemanticGraph，不需要外部 API、Embedding 服务或向量数据库。将 `list_pages` 或 `search_pages` 返回的路由传给 `get_page` 即可读取全文。
 

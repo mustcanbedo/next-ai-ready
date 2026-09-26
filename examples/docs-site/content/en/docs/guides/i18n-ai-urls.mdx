@@ -9,8 +9,8 @@ questions:
       locale metadata plus a routesByLocale index.
   - q: Can MCP page tools filter by locale?
     a: >-
-      Not yet. MCP results include each page's locale, but list_pages and
-      search_pages do not currently accept a locale filter.
+      Yes. search_pages accepts an optional locale filter; list_pages remains a
+      locale-annotated global index.
   - q: Should middleware redirect AI artifact URLs?
     a: >-
       No. Exclude paths with dots, /api, and _ai-ready from locale middleware so
@@ -49,7 +49,7 @@ export default defineConfig({
 
 Recognized route prefixes such as `en` and `zh` are stored in each page node's `locale` field. The generated `SemanticGraph.routesByLocale` index also maps locale-relative routes back to their page ids, while the flat `routes` map remains available for compatibility.
 
-MCP page results expose the page locale. `list_pages` and `search_pages` do not yet accept a locale filter, so clients should use route prefixes when narrowing multilingual results.
+MCP page results expose the page locale. Pass `locale` to `search_pages` to restrict retrieval to one language. `list_pages` remains a deterministic global index, so clients can use its locale metadata or route prefixes when browsing.
 
 ## Middleware
 
@@ -75,4 +75,4 @@ Use `sections` in config to prioritize one locale in `llms.txt`, or emit separat
 
 ## Current limits
 
-Automatic `Available Languages` sections, alternate-language Markdown frontmatter, `hreflang` response links, and MCP locale filtering remain planned. See the [Phase 6 design](https://github.com/mustcanbedo/next-ai-ready/blob/main/docs/phase6-design.md) for the current boundary.
+Automatic `Available Languages` sections, alternate-language Markdown frontmatter, and `hreflang` response links remain planned. MCP `search_pages` locale filtering is available now. See the [Phase 6 design](https://github.com/mustcanbedo/next-ai-ready/blob/main/docs/phase6-design.md) for the current boundary.

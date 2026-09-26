@@ -1,5 +1,14 @@
 # @next-ai-ready/core
 
+## 0.1.0-alpha.15
+
+### Minor Changes
+
+- e0f93dd: Add purpose-based AI crawler policies for search, training, user-requested,
+  and other agents while preserving the existing all-or-nothing string form.
+  Recognize Claude-SearchBot and Claude-User, and make `doctor` treat training
+  opt-out as an intentional policy choice instead of a discoverability defect.
+
 ## 0.1.0-alpha.14
 
 ### Patch Changes

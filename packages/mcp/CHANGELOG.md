@@ -1,5 +1,23 @@
 # @next-ai-ready/mcp
 
+## 0.1.0-alpha.17
+
+### Patch Changes
+
+- 914e887: Improve deterministic page retrieval with CJK-aware tokenization, bounded
+  Latin prefix matching, inverse-document-frequency term weighting, and
+  site-name suppression for task queries. Add a bilingual, human-labeled search
+  intent evaluation gate that measures Top-1, Top-3, and MRR against the
+  documentation corpus.
+- 886deef: Add a public, replaceable `PageSearchProvider` and make MCP and HTTP page
+  search share the same deterministic graph ranking implementation.
+- Updated dependencies [e0f93dd]
+- Updated dependencies [886deef]
+  - @next-ai-ready/core@0.1.0-alpha.15
+  - @next-ai-ready/semantic@0.1.0-alpha.15
+  - @next-ai-ready/actions@0.1.0-alpha.15
+  - @next-ai-ready/llms@0.1.0-alpha.17
+
 ## 0.1.0-alpha.16
 
 ### Patch Changes

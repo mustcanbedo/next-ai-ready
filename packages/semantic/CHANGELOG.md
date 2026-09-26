@@ -1,5 +1,17 @@
 # @next-ai-ready/semantic
 
+## 0.1.0-alpha.15
+
+### Minor Changes
+
+- 886deef: Add a public, replaceable `PageSearchProvider` and make MCP and HTTP page
+  search share the same deterministic graph ranking implementation.
+
+### Patch Changes
+
+- Updated dependencies [e0f93dd]
+  - @next-ai-ready/core@0.1.0-alpha.15
+
 ## 0.1.0-alpha.14
 
 ### Patch Changes

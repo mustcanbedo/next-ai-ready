@@ -35,9 +35,9 @@ vercel rollback <known-good-deployment-url>
 回滚后验证：
 
 ```bash
-curl -fsS https://next-ai-ready.vercel.app/llms.txt >/dev/null
-curl -fsS https://next-ai-ready.vercel.app/sitemap.md >/dev/null
-pnpm exec agent-readability audit https://next-ai-ready.vercel.app/en --min-score 100
+curl -fsS https://nextaiready.com/llms.txt >/dev/null
+curl -fsS https://nextaiready.com/sitemap.md >/dev/null
+pnpm exec agent-readability audit https://nextaiready.com/en --min-score 100
 ```
 
 Instant Rollback 会暂停生产域名自动指派。修复版本验证通过后，必须显式 promote

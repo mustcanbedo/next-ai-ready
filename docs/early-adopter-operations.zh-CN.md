@@ -53,7 +53,7 @@
 
 | ID | 公开项目/站点 | 来源 | Next.js | 内容来源 | 阶段 | 首次成功耗时 | 主要阻塞 | 证据 | 更新日期 |
 |---|---|---|---:|---|---|---:|---|---|---|
-| CASE-001 | 官方文档站 | dogfood | 16 | MDX | `deployed` | 不计入 | 无 | https://next-ai-ready.vercel.app/en | 2026-08-26 |
+| CASE-001 | 官方文档站 | dogfood | 16 | MDX | `deployed` | 不计入 | 无 | https://nextaiready.com/en | 2026-08-26 |
 
 新增记录时复制一行并使用 `CASE-002` 起的递增编号。私有项目使用“private adopter CASE-xxx”，
 证据列只写“maintainer-verified”，不得加入可识别信息。

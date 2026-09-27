@@ -139,6 +139,6 @@ UI 仍用 TSX；在 `content/` 维护供 AI 平面使用的 MDX。见 [`examples
 
 ## 下一步
 
-- [线上文档](https://next-ai-ready.vercel.app/zh)
+- [线上文档](https://nextaiready.com/zh)
 - [`architecture.md`](./architecture.md)
 - [`goals.md`](./goals.md) — 24 条 AEO 战术

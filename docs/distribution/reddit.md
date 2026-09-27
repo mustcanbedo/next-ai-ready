@@ -45,7 +45,7 @@ not treat that as evidence of ranking, indexing, or citation. It is only a repro
 readability check.
 
 Tutorial:
-https://next-ai-ready.vercel.app/en/docs/guides/nextjs-llms-txt?utm_source=reddit&utm_medium=community&utm_campaign=nextjs_llms_tutorial
+https://nextaiready.com/en/docs/guides/nextjs-llms-txt?utm_source=reddit&utm_medium=community&utm_campaign=nextjs_llms_tutorial
 
 Source:
 https://github.com/mustcanbedo/next-ai-ready

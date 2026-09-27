@@ -59,7 +59,7 @@ npm run dev
 
 我把“什么时候手写、什么时候自动生成”、完整命令、验证方式和常见错误都整理成了中文教程：
 
-https://next-ai-ready.vercel.app/zh/docs/guides/nextjs-llms-txt?utm_source=xiaohongshu&utm_medium=social&utm_campaign=nextjs_llms_tutorial
+https://nextaiready.com/zh/docs/guides/nextjs-llms-txt?utm_source=xiaohongshu&utm_medium=social&utm_campaign=nextjs_llms_tutorial
 
 项目源码：
 

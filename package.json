@@ -25,7 +25,7 @@
     "rollback:plan": "node --test scripts/release-rollback-plan.test.mjs && node scripts/release-rollback-plan.mjs",
     "bin:smoke": "node scripts/bin-smoke.mjs",
     "audit:vercel": "agent-readability audit",
-    "audit:vercel:site": "agent-readability audit https://next-ai-ready.vercel.app/en --min-score 100",
+    "audit:vercel:site": "agent-readability audit https://nextaiready.com/en --min-score 100",
     "audit:production-contract": "node --test scripts/production-contract-check.test.mjs && node scripts/production-contract-check.mjs",
     "search:intent-eval": "node --test scripts/search-intent-eval.test.mjs && node scripts/search-intent-eval.mjs",
     "changeset:status": "node --test scripts/changeset-status.test.mjs && node scripts/changeset-status.mjs",

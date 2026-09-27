@@ -13,13 +13,13 @@ cd examples/docs-site
 pnpm dev
 ```
 
-**Production URL:** [next-ai-ready.vercel.app](https://next-ai-ready.vercel.app/en)
+**Production URL:** [nextaiready.com](https://nextaiready.com/en)
 
 Optional env (Vercel → Settings → Environment Variables):
 
 | Variable | Purpose |
 |----------|---------|
-| `SITE_URL` | Override `baseUrl` for llms/openapi metadata (defaults to `https://next-ai-ready.vercel.app`) |
+| `SITE_URL` | Override `baseUrl` for llms/openapi metadata (defaults to `https://nextaiready.com`) |
 | `NEXT_AI_READY_MCP_TOKEN` | Bearer token for `/api/mcp` in production |
 
 AI endpoints (after `next-ai-ready build` / prebuild):

@@ -6,10 +6,10 @@ the whole documentation set.
 
 ## Canonical links
 
-- English tutorial: https://next-ai-ready.vercel.app/en/docs/guides/nextjs-llms-txt
-- Chinese tutorial: https://next-ai-ready.vercel.app/zh/docs/guides/nextjs-llms-txt
+- English tutorial: https://nextaiready.com/en/docs/guides/nextjs-llms-txt
+- Chinese tutorial: https://nextaiready.com/zh/docs/guides/nextjs-llms-txt
 - Repository: https://github.com/mustcanbedo/next-ai-ready
-- Production `llms.txt`: https://next-ai-ready.vercel.app/llms.txt
+- Production `llms.txt`: https://nextaiready.com/llms.txt
 - Reproducible audit evidence: https://github.com/mustcanbedo/next-ai-ready/blob/main/docs/audit-baselines/vercel-agent-readability-0.5.0-2026-08-01.json
 
 ## Platform packages
@@ -42,13 +42,13 @@ Use these URLs for the first run:
 
 ```text
 Xiaohongshu
-https://next-ai-ready.vercel.app/zh/docs/guides/nextjs-llms-txt?utm_source=xiaohongshu&utm_medium=social&utm_campaign=nextjs_llms_tutorial
+https://nextaiready.com/zh/docs/guides/nextjs-llms-txt?utm_source=xiaohongshu&utm_medium=social&utm_campaign=nextjs_llms_tutorial
 
 Reddit
-https://next-ai-ready.vercel.app/en/docs/guides/nextjs-llms-txt?utm_source=reddit&utm_medium=community&utm_campaign=nextjs_llms_tutorial
+https://nextaiready.com/en/docs/guides/nextjs-llms-txt?utm_source=reddit&utm_medium=community&utm_campaign=nextjs_llms_tutorial
 
 X
-https://next-ai-ready.vercel.app/en/docs/guides/nextjs-llms-txt?utm_source=x&utm_medium=social&utm_campaign=nextjs_llms_tutorial
+https://nextaiready.com/en/docs/guides/nextjs-llms-txt?utm_source=x&utm_medium=social&utm_campaign=nextjs_llms_tutorial
 ```
 
 Track the funnel rather than impressions alone:

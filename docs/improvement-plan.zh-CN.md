@@ -121,7 +121,7 @@ pnpm audit:vercel:site
 ```
 
 - 工具：`@vercel/agent-readability@0.5.0`
-- URL：`https://next-ai-ready.vercel.app/en`
+- URL：`https://nextaiready.com/en`
 - 总分：`100/100`（Excellent）
 - Can agents reach you：`3/3`
 - Can agents find you：`8/8`

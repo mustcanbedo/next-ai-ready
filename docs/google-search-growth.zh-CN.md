@@ -1,13 +1,14 @@
 # next-ai-ready Google 自然搜索执行手册
 
 > 建立日期：2026-08-24
-> 状态更新：2026-09-26
+> 状态更新：2026-09-27
 > 目标：先获得可核验的 Google 收录与曝光，再优化点击和安装转化。
 
 ## 1. 当前诊断
 
-截至 2026-09-26，Search Console 的 URL-prefix property 已验证，生产 sitemap 包含 48 个
-真实 HTML 页面；`llms.txt`、`openapi.json` 等机器端点不再混入搜索 sitemap。线上
+截至 2026-09-27，站点已迁移到独立域名 `nextaiready.com`；根域、`www` 和旧
+`next-ai-ready.vercel.app` 入口均已配置，后两者通过 `308` 永久跳转到根域。生产 sitemap
+包含 48 个真实 HTML 页面；`llms.txt`、`openapi.json` 等机器端点不再混入搜索 sitemap。线上
 `robots.txt`、XML sitemap、canonical 和 hreflang 均可访问。核心 URL
 抽查结果为：
 
@@ -60,16 +61,25 @@ Search Console 当前公开显示的查询包括 `vercel ai ready`（7 次曝光
 自然点击；在 14 天观察窗口结束前，不再次改标题、不改 URL、不创建同义页面。第一阶段目标是
 让该页平均排名从 73.3 提升到 50 以内，并产生首个非品牌点击。
 
-## 2. Search Console 首次接入（已完成）
+## 2. Search Console 接入与域名迁移
 
-当前站点使用 Vercel 子域，已添加 **URL-prefix property**：
+旧 Vercel 子域已添加并验证 **URL-prefix property**，用于保留迁移前的历史数据：
 
 ```text
 https://next-ai-ready.vercel.app/
 ```
 
-选择 HTML tag 验证后，只复制 `content` 中的 token，不要复制整个 `<meta>` 标签。在 Vercel
-项目的 Production 环境增加：
+新 canonical 为：
+
+```text
+https://nextaiready.com/
+```
+
+在 Search Console 新增该 URL-prefix property，并优先选择 HTML file 验证。仓库已经保留
+`public/googleca0270c5e18afbba.html`，且生产根路径可返回该文件，因此无需再增加一套 token。
+
+如果未来改用 HTML tag 验证，只复制 `content` 中的 token，不要复制整个 `<meta>` 标签，并在
+Vercel 项目的 Production 环境增加：
 
 ```text
 GOOGLE_SITE_VERIFICATION=<Google 提供的 token>
@@ -81,24 +91,26 @@ GOOGLE_SITE_VERIFICATION=<Google 提供的 token>
 <meta name="google-site-verification" content="..." />
 ```
 
-生产页面已通过该标签完成 Verify。该 token 不是 API 密钥，但仍应
-由项目设置统一维护，不要硬编码进仓库。
+生产页面会通过 Next.js Metadata API 输出该标签。该 token 不是 API 密钥，但仍应由项目设置
+统一维护，不要硬编码进仓库。不要同时维护无必要的两套验证方式。旧 property 不删除，用于
+核对迁移前后的曝光和点击。
 
 ## 3. 提交与请求收录
 
-Sitemap 已提交；当前生产版本包含 48 个可索引 HTML 页面：
+旧 property 的 sitemap 已提交；本次部署完成后，在新 property 提交包含 48 个可索引 HTML
+页面的新 sitemap：
 
 ```text
-https://next-ai-ready.vercel.app/sitemap.xml
+https://nextaiready.com/sitemap.xml
 ```
 
 使用 URL Inspection 依次检查以下核心页面；只有状态发生变化或内容有实质更新时才重新请求：
 
-1. `https://next-ai-ready.vercel.app/en`
-2. `https://next-ai-ready.vercel.app/zh`
-3. `https://next-ai-ready.vercel.app/en/docs/guides/nextjs-llms-txt`
-4. `https://next-ai-ready.vercel.app/en/docs/guides/mcp-integration`
-5. `https://next-ai-ready.vercel.app/en/docs/guides/robots-txt`
+1. `https://nextaiready.com/en`
+2. `https://nextaiready.com/zh`
+3. `https://nextaiready.com/en/docs/guides/nextjs-llms-txt`
+4. `https://nextaiready.com/en/docs/guides/mcp-integration`
+5. `https://nextaiready.com/en/docs/guides/robots-txt`
 
 不要批量反复请求。只有页面有真实内容更新或修复抓取问题时才重新提交。
 
@@ -145,8 +157,21 @@ https://next-ai-ready.vercel.app/sitemap.xml
 禁止把完全相同的全文同时发布到多个没有 canonical 的站点。外部内容应提供足够独立价值，
 并把完整代码、更新记录和验证结果留在原始教程。
 
-## 7. 后续域名决策
+## 7. 独立域名迁移（进行中）
 
-Vercel 子域可以被 Google 收录，不是当前阻塞项。获得首批曝光后再评估独立域名。迁移时必须
-一次完成 canonical、重定向、Search Console 新 property、sitemap、README、npm metadata 和
-机器可读产物更新，避免把尚未形成的搜索信号再次拆散。
+已于 2026-09-27 完成基础设施迁移：
+
+- `nextaiready.com` 已绑定 Vercel Production 并通过 HTTPS 验证。
+- `www.nextaiready.com` 已通过 `308` 永久跳转到根域。
+- `next-ai-ready.vercel.app` 已通过 `308` 永久跳转到根域。
+- Vercel Production 已设置 `SITE_URL=https://nextaiready.com`。
+- README、npm metadata、站点 canonical 与机器可读产物已切换到新域名。
+
+仍需在部署后完成：
+
+1. 在 Search Console 新增并验证 `https://nextaiready.com/` URL-prefix property。
+2. 提交 `https://nextaiready.com/sitemap.xml`。
+3. 对核心 5 页各请求一次索引，并确认 Google 识别的新 canonical。
+4. 迁移后第 7、14、28 天对比新旧 property 的曝光、点击和索引覆盖率。
+
+旧 property 和旧域名不能删除；它们分别承担历史数据保留与永久重定向职责。

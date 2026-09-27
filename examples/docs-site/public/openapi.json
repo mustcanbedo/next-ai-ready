@@ -497,7 +497,7 @@
   "servers": [
     {
       "description": "next-ai-ready",
-      "url": "https://next-ai-ready.vercel.app"
+      "url": "https://nextaiready.com"
     }
   ]
 }

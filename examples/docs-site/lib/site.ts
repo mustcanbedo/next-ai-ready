@@ -9,7 +9,7 @@ export function getSiteBaseUrl(): string {
   if (process.env.VERCEL_URL) {
     return `https://${process.env.VERCEL_URL}`;
   }
-  return "https://next-ai-ready.vercel.app";
+  return "https://nextaiready.com";
 }
 
 export const SITE_NAME = "next-ai-ready";

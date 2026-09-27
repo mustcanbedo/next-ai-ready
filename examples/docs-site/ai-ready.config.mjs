@@ -7,7 +7,7 @@ function siteBaseUrl() {
   if (process.env.VERCEL_PROJECT_PRODUCTION_URL) {
     return `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`;
   }
-  return "https://next-ai-ready.vercel.app";
+  return "https://nextaiready.com";
 }
 
 export default defineConfig({

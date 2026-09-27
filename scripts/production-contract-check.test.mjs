@@ -8,9 +8,9 @@ function response(body, init = {}) {
 
 function passingFetch(url, options = {}) {
   const path = new URL(url).pathname;
-  if (path === "/en") return Promise.resolve(response("alpha.19"));
+  if (path === "/en") return Promise.resolve(response("alpha.20"));
   if (path === "/sitemap.xml") {
-    return Promise.resolve(response("<urlset><loc>https://next-ai-ready.vercel.app/en</loc></urlset>"));
+    return Promise.resolve(response("<urlset><loc>https://nextaiready.com/en</loc></urlset>"));
   }
   if (options.headers?.accept === "text/markdown") {
     return Promise.resolve(
@@ -22,7 +22,7 @@ function passingFetch(url, options = {}) {
 
 test("accepts a current deployment with correct browser and agent semantics", async () => {
   const result = await runProductionContractCheck({ fetchImpl: passingFetch });
-  assert.equal(result.expectedVersion, "0.1.0-alpha.19");
+  assert.equal(result.expectedVersion, "0.1.0-alpha.20");
 });
 
 test("rejects a stale production deployment", async () => {

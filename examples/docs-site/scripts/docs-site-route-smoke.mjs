@@ -133,7 +133,7 @@ async function main() {
     contentType: "application/xml",
     includes: [
       "<lastmod>2026-08-24T00:00:00.000Z</lastmod>",
-      'hreflang="zh" href="https://next-ai-ready.vercel.app/zh/docs/guides/mcp-integration"',
+      'hreflang="zh" href="https://nextaiready.com/zh/docs/guides/mcp-integration"',
     ],
     excludes: ["/llms.txt", "/llms-full.txt", "/openapi.json", "/tools.json"],
   });
@@ -144,7 +144,7 @@ async function main() {
   await expectResponse("/en.md", {
     contentType: "text/markdown",
     headerIncludes: {
-      link: '<https://next-ai-ready.vercel.app/en>; rel="canonical"',
+      link: '<https://nextaiready.com/en>; rel="canonical"',
     },
     includes: "# next-ai-ready",
   });
@@ -169,7 +169,7 @@ async function main() {
     contentType: "text/html",
     includes: [
       'content="为 Next.js App Router 站点添加 llms.txt、逐页 Markdown、JSON-LD、MCP 与经过鉴权的 Agent Action。"',
-      '<link rel="canonical" href="https://next-ai-ready.vercel.app/zh"',
+      '<link rel="canonical" href="https://nextaiready.com/zh"',
       'href="/zh/docs/guides/nextjs-llms-txt"',
       'href="/zh/docs/guides/mdx-content"',
       "为 Next.js 添加 llms.txt",
@@ -190,7 +190,7 @@ async function main() {
   await expectResponse("/en/docs/introduction.md", {
     contentType: "text/markdown",
     headerIncludes: {
-      link: '<https://next-ai-ready.vercel.app/en/docs/introduction>; rel="canonical"',
+      link: '<https://nextaiready.com/en/docs/introduction>; rel="canonical"',
     },
     includes: [
       "# Introduction",

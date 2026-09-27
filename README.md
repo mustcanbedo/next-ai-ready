@@ -2,7 +2,7 @@
 
 [中文文档](./README.zh-CN.md) | English
 
-**Live docs:** [English](https://next-ai-ready.vercel.app/en) · [中文](https://next-ai-ready.vercel.app/zh)
+**Live docs:** [English](https://nextaiready.com/en) · [中文](https://nextaiready.com/zh)
 
 [![npm alpha](https://img.shields.io/npm/v/next-ai-ready/alpha.svg?label=npm%20alpha)](https://www.npmjs.com/package/next-ai-ready)
 [![CI](https://github.com/mustcanbedo/next-ai-ready/actions/workflows/ci.yml/badge.svg)](https://github.com/mustcanbedo/next-ai-ready/actions/workflows/ci.yml)
@@ -24,8 +24,8 @@ pnpm exec next-ai-ready doctor --score
 The basic setup is complete when `doctor` reports **0 errors** and `public/llms.txt` lists your content. The generated discovery and Markdown endpoints run alongside your existing UI.
 
 **Next:** [follow the 10-minute guide](./docs/quickstart-10min.md), read the
-[App Router llms.txt tutorial](https://next-ai-ready.vercel.app/en/docs/guides/nextjs-llms-txt),
-or [add authenticated agent actions](https://next-ai-ready.vercel.app/en/docs/guides/action-auth).
+[App Router llms.txt tutorial](https://nextaiready.com/en/docs/guides/nextjs-llms-txt),
+or [add authenticated agent actions](https://nextaiready.com/en/docs/guides/action-auth).
 
 Prefer a disposable demo before editing an existing project?
 
@@ -94,7 +94,7 @@ export default defineConfig({
 ```
 
 The existing `aiBots: "allow" | "disallow"` form remains supported. See the
-[AI crawler policy guide](https://next-ai-ready.vercel.app/en/docs/guides/robots-txt)
+[AI crawler policy guide](https://nextaiready.com/en/docs/guides/robots-txt)
 for provider-specific limits and verification steps.
 
 ## The two planes
@@ -238,7 +238,7 @@ Install only `next-ai-ready` in consumer apps. The `alpha.20` repository candida
 - ✅ **MCP server** — actions as tools, pages as resources, and locale-aware, CJK-friendly `list_pages` / `get_page` / `search_pages` discovery (HTTP + stdio)
 - ✅ **Shared retrieval** — one replaceable `PageSearchProvider` powers MCP and HTTP actions, so ranking cannot drift between protocols
 - ✅ **Dev tooling** — `build` / `init` / `doctor` / versioned `audit` / `mcp` CLIs, `robots.txt`, analytics hooks
-- ✅ **Docs site** — live at [next-ai-ready.vercel.app](https://next-ai-ready.vercel.app/en) ([source](./examples/docs-site))
+- ✅ **Docs site** — live at [nextaiready.com](https://nextaiready.com/en) ([source](./examples/docs-site))
 
 See [`docs/`](./docs) ([**full index**](./docs/README.md)):
 
@@ -258,7 +258,7 @@ See [`docs/`](./docs) ([**full index**](./docs/README.md)):
 - **No static export** — `output: 'export'` in Next.js config is not compatible (handlers need server runtime).
 - **No Pages Router** — App Router only. The `withAiReady()` wrapper and route handlers target App Router conventions.
 - **Next.js 15+ recommended** — handlers use async `params`; Next 14 sync params supported via `resolveParams()` helper.
-- **i18n graph is route-level, not CMS-aware** — `SemanticGraph` includes `locale` and `routesByLocale` when routes use prefixes (e.g. `/en/docs/...`). You still curate `llms.txt` sections and MCP resources per locale manually. See [i18n guide](https://next-ai-ready.vercel.app/en/docs/guides/i18n-ai-urls) and [Phase 6 design](./docs/phase6-design.md).
+- **i18n graph is route-level, not CMS-aware** — `SemanticGraph` includes `locale` and `routesByLocale` when routes use prefixes (e.g. `/en/docs/...`). You still curate `llms.txt` sections and MCP resources per locale manually. See [i18n guide](https://nextaiready.com/en/docs/guides/i18n-ai-urls) and [Phase 6 design](./docs/phase6-design.md).
 
 ### Package layout (C-01)
 

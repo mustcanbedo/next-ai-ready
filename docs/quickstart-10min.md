@@ -139,6 +139,6 @@ Keep TSX for UI; maintain parallel MDX under `content/` for the Knowledge plane.
 
 ## Next steps
 
-- [Live docs](https://next-ai-ready.vercel.app/en)
+- [Live docs](https://nextaiready.com/en)
 - [`architecture.md`](./architecture.md)
 - [`goals.md`](./goals.md) — 24 AEO tactics

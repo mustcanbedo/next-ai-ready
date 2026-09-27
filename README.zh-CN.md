@@ -2,7 +2,7 @@
 
 English | [中文文档](./README.zh-CN.md)
 
-**在线文档：** [中文](https://next-ai-ready.vercel.app/zh) · [English](https://next-ai-ready.vercel.app/en)
+**在线文档：** [中文](https://nextaiready.com/zh) · [English](https://nextaiready.com/en)
 
 [![npm alpha](https://img.shields.io/npm/v/next-ai-ready/alpha.svg?label=npm%20alpha)](https://www.npmjs.com/package/next-ai-ready)
 [![CI](https://github.com/mustcanbedo/next-ai-ready/actions/workflows/ci.yml/badge.svg)](https://github.com/mustcanbedo/next-ai-ready/actions/workflows/ci.yml)
@@ -24,8 +24,8 @@ pnpm exec next-ai-ready doctor --score
 当 `doctor` 显示 **0 个错误**，且 `public/llms.txt` 已列出你的内容时，基础接入即完成。生成的发现与 Markdown 入口会与现有 UI 并行工作。
 
 **下一步：** [完成 10 分钟指南](./docs/quickstart-10min.zh-CN.md)、阅读
-[App Router llms.txt 实战教程](https://next-ai-ready.vercel.app/zh/docs/guides/nextjs-llms-txt)，
-或[添加经过鉴权的 Agent Action](https://next-ai-ready.vercel.app/zh/docs/guides/action-auth)。
+[App Router llms.txt 实战教程](https://nextaiready.com/zh/docs/guides/nextjs-llms-txt)，
+或[添加经过鉴权的 Agent Action](https://nextaiready.com/zh/docs/guides/action-auth)。
 
 希望先运行一个随时可删除的演示，再改动现有项目？
 
@@ -93,7 +93,7 @@ export default defineConfig({
 ```
 
 原有 `aiBots: "allow" | "disallow"` 写法继续兼容。各服务商的限制和验证方法见
-[AI 爬虫策略指南](https://next-ai-ready.vercel.app/zh/docs/guides/robots-txt)。
+[AI 爬虫策略指南](https://nextaiready.com/zh/docs/guides/robots-txt)。
 
 ## 两个平面
 
@@ -236,7 +236,7 @@ registerAiHooks({
 - ✅ **MCP 服务器** — action 作为工具、页面作为资源，并提供支持 locale 过滤和中文检索的 `list_pages` / `get_page` / `search_pages` 页面发现（HTTP + stdio）
 - ✅ **统一检索层** — MCP 与 HTTP Action 共用可替换的 `PageSearchProvider`，避免不同协议的排序结果漂移
 - ✅ **开发工具** — `build` / `init` / `doctor` / 版本化 `audit` / `mcp` CLI，`robots.txt`，分析钩子
-- ✅ **文档站** — 线上 [next-ai-ready.vercel.app](https://next-ai-ready.vercel.app/zh)（[源码](./examples/docs-site)）
+- ✅ **文档站** — 线上 [nextaiready.com](https://nextaiready.com/zh)（[源码](./examples/docs-site)）
 
 详见 [`docs/`](./docs)（[**文档索引**](./docs/README.md)）：
 
@@ -257,7 +257,7 @@ registerAiHooks({
 - **不支持静态导出** — Next.js 的 `output: 'export'` 不兼容（handler 需要服务端运行时）。
 - **不支持 Pages Router** — 仅支持 App Router。`withAiReady()` 和路由 handler 基于 App Router 约定。
 - **推荐 Next.js 15+** — Next.js 14.2+、15 和 16 均已通过真实项目验证；15+ 可原生使用异步 `params`。
-- **i18n 在 graph 层为路由级，非 CMS 级** — 当路由带 locale 前缀（如 `/zh/docs/...`）时，`SemanticGraph` 含 `locale` 与 `routesByLocale`；`llms.txt` 分区与 MCP 资源仍需按语言手动策展。见 [i18n 指南](https://next-ai-ready.vercel.app/zh/docs/guides/i18n-ai-urls) 与 [Phase 6 设计](./docs/phase6-design.md)。
+- **i18n 在 graph 层为路由级，非 CMS 级** — 当路由带 locale 前缀（如 `/zh/docs/...`）时，`SemanticGraph` 含 `locale` 与 `routesByLocale`；`llms.txt` 分区与 MCP 资源仍需按语言手动策展。见 [i18n 指南](https://nextaiready.com/zh/docs/guides/i18n-ai-urls) 与 [Phase 6 设计](./docs/phase6-design.md)。
 
 ## 许可证
 

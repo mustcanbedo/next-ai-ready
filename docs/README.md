@@ -1,6 +1,6 @@
 # Documentation index
 
-Central map for **next-ai-ready** repository docs (not the live docs site — that is [next-ai-ready.vercel.app](https://next-ai-ready.vercel.app/en)).
+Central map for **next-ai-ready** repository docs (not the live docs site — that is [nextaiready.com](https://nextaiready.com/en)).
 
 ## Start here
 

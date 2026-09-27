@@ -70,7 +70,7 @@ async function main() {
   ok("graph.json exists");
 
   const llms = await readFile(join(ROOT, "public/llms.txt"), "utf8");
-  if (!llms.includes("next-ai-ready.vercel.app/en/docs/introduction")) {
+  if (!llms.includes("nextaiready.com/en/docs/introduction")) {
     fail("llms.txt missing curated introduction URL");
   }
   if (!llms.includes("## Introduction")) fail("llms.txt missing Introduction section");
@@ -95,10 +95,10 @@ async function main() {
   ok("llms-full.txt curated FAQ");
 
   const sitemapMd = await readFile(join(ROOT, "public/sitemap.md"), "utf8");
-  if (!sitemapMd.includes("[Introduction](https://next-ai-ready.vercel.app/en/docs/introduction)")) {
+  if (!sitemapMd.includes("[Introduction](https://nextaiready.com/en/docs/introduction)")) {
     fail("sitemap.md missing canonical introduction URL");
   }
-  if (!sitemapMd.includes("[next-ai-ready](https://next-ai-ready.vercel.app/en)")) {
+  if (!sitemapMd.includes("[next-ai-ready](https://nextaiready.com/en)")) {
     fail("sitemap.md missing canonical English homepage URL");
   }
   ok("sitemap.md canonical page directory");

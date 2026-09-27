@@ -16,7 +16,7 @@ export function releaseLabel(version) {
 }
 
 export async function runProductionContractCheck({
-  baseUrl = process.env.NEXT_AI_READY_PRODUCTION_URL ?? "https://next-ai-ready.vercel.app",
+  baseUrl = process.env.NEXT_AI_READY_PRODUCTION_URL ?? "https://nextaiready.com",
   fetchImpl = fetch,
   root = ROOT,
 } = {}) {

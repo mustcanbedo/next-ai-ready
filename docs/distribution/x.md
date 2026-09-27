@@ -5,7 +5,7 @@
 ```text
 Built next-ai-ready: an MIT-licensed App Router layer that adds llms.txt and per-page Markdown without changing your UI. Alpha; readability does not guarantee citations.
 
-Tutorial: https://next-ai-ready.vercel.app/en/docs/guides/nextjs-llms-txt
+Tutorial: https://nextaiready.com/en/docs/guides/nextjs-llms-txt
 ```
 
 If the tracked URL makes the post too long, use the clean tutorial URL and retain campaign tracking
@@ -60,7 +60,7 @@ The live docs pass a pinned third-party agent-readability audit. Important limit
 ```text
 MIT licensed and still alpha. I am looking for real Next.js blockers, especially Nextra/Fumadocs content discovery and production deployment constraints.
 
-Tutorial: https://next-ai-ready.vercel.app/en/docs/guides/nextjs-llms-txt
+Tutorial: https://nextaiready.com/en/docs/guides/nextjs-llms-txt
 ```
 
 ## 30-second video script

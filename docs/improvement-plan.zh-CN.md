@@ -87,7 +87,7 @@
 | 动态索引 | `待商榷` | 只保留 Provider 方向，等待真实需求证据 |
 | 商业观测 | `待商榷` | SDK 只定义开放事件和 Adapter；托管产品单独决策 |
 | 外部采用与分发 | `进行中` | 技术可信度已建立；已增加[早期采用执行记录](./early-adopter-operations.zh-CN.md)与[渠道成效记录](./distribution/results.md)，但仓库外成功安装仍为 0 |
-| Google 自然搜索 | `进行中` | Search Console property 已验证，sitemap 成功发现 52 个页面；核心 5 页中 4 页已收录，`nextjs-llms-txt` 指南已发现但尚未收录，PR #25 已增强站内发现入口 |
+| Google 自然搜索 | `进行中` | 旧 URL-prefix property 保留历史数据；新 Domain property `nextaiready.com` 已于 2026-09-28 通过 DNS TXT 验证，sitemap 成功发现 48 个页面；迁移后的抓取、收录与查询数据仍在积累 |
 | 按用途区分 AI 爬虫策略 | `待验证` | 分支已支持 `search`、`training`、`user`、`other` 四类决策，并修复 `doctor` 将训练退出误判为可发现性缺陷的问题；待合入、发布及外部项目验证后再标记完成 |
 | 赞助与商业入口 | `待开始` | 尚未配置 GitHub Sponsors/FUNDING；先建立真实使用价值，再验证赞助转化 |
 

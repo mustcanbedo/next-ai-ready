@@ -1,7 +1,7 @@
 # next-ai-ready Google 自然搜索执行手册
 
 > 建立日期：2026-08-24
-> 状态更新：2026-09-27
+> 状态更新：2026-09-28
 > 目标：先获得可核验的 Google 收录与曝光，再优化点击和安装转化。
 
 ## 1. 当前诊断
@@ -75,8 +75,18 @@ https://next-ai-ready.vercel.app/
 https://nextaiready.com/
 ```
 
-在 Search Console 新增该 URL-prefix property，并优先选择 HTML file 验证。仓库已经保留
-`public/googleca0270c5e18afbba.html`，且生产根路径可返回该文件，因此无需再增加一套 token。
+新域名已新增为 **Domain property**：
+
+```text
+sc-domain:nextaiready.com
+```
+
+该 property 已于 2026-09-28 通过域名提供商的 DNS TXT 记录完成所有权验证。验证记录必须继续
+保留在 Spaceship DNS；删除后可能失去 Search Console 所有权。Domain property 覆盖根域、
+`www` 及其他协议或子域变体，因此不复用旧 URL-prefix property 的 HTML 验证文件。
+
+仓库中的 `public/googleca0270c5e18afbba.html` 继续用于旧 Vercel URL-prefix property，不能将其
+视为新域名的验证凭据。旧 property 不删除，用于核对迁移前后的曝光和点击。
 
 如果未来改用 HTML tag 验证，只复制 `content` 中的 token，不要复制整个 `<meta>` 标签，并在
 Vercel 项目的 Production 环境增加：
@@ -92,13 +102,12 @@ GOOGLE_SITE_VERIFICATION=<Google 提供的 token>
 ```
 
 生产页面会通过 Next.js Metadata API 输出该标签。该 token 不是 API 密钥，但仍应由项目设置
-统一维护，不要硬编码进仓库。不要同时维护无必要的两套验证方式。旧 property 不删除，用于
-核对迁移前后的曝光和点击。
+统一维护，不要硬编码进仓库。当前 Domain property 已通过 DNS 验证，不需要再增加 HTML tag。
 
 ## 3. 提交与请求收录
 
-旧 property 的 sitemap 已提交；本次部署完成后，在新 property 提交包含 48 个可索引 HTML
-页面的新 sitemap：
+旧 property 的 sitemap 保留历史记录；新 Domain property 已于 2026-09-28 提交并成功读取包含
+48 个可索引 HTML 页面的 sitemap：
 
 ```text
 https://nextaiready.com/sitemap.xml
@@ -157,7 +166,7 @@ https://nextaiready.com/sitemap.xml
 禁止把完全相同的全文同时发布到多个没有 canonical 的站点。外部内容应提供足够独立价值，
 并把完整代码、更新记录和验证结果留在原始教程。
 
-## 7. 独立域名迁移（进行中）
+## 7. 独立域名迁移（基础设施已完成）
 
 已于 2026-09-27 完成基础设施迁移：
 
@@ -166,12 +175,12 @@ https://nextaiready.com/sitemap.xml
 - `next-ai-ready.vercel.app` 已通过 `308` 永久跳转到根域。
 - Vercel Production 已设置 `SITE_URL=https://nextaiready.com`。
 - README、npm metadata、站点 canonical 与机器可读产物已切换到新域名。
+- Search Console Domain property `nextaiready.com` 已通过 DNS TXT 验证。
+- `https://nextaiready.com/sitemap.xml` 已提交成功，Google 已发现 48 个页面。
 
-仍需在部署后完成：
+迁移后的持续工作：
 
-1. 在 Search Console 新增并验证 `https://nextaiready.com/` URL-prefix property。
-2. 提交 `https://nextaiready.com/sitemap.xml`。
-3. 对核心 5 页各请求一次索引，并确认 Google 识别的新 canonical。
-4. 迁移后第 7、14、28 天对比新旧 property 的曝光、点击和索引覆盖率。
+1. 对核心 5 页各请求一次索引，并确认 Google 识别的新 canonical。
+2. 迁移后第 7、14、28 天对比新旧 property 的曝光、点击和索引覆盖率。
 
 旧 property 和旧域名不能删除；它们分别承担历史数据保留与永久重定向职责。

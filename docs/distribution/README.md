@@ -19,6 +19,7 @@ the whole documentation set.
 | Xiaohongshu | [xiaohongshu.zh-CN.md](./xiaohongshu.zh-CN.md) | Explain the problem visually and earn qualified Chinese developer visits. |
 | Reddit | [reddit.md](./reddit.md) | Start a technical discussion and collect integration objections. |
 | X | [x.md](./x.md) | Deliver a compact demo that can be shared by Next.js developers. |
+| Ecosystem collaboration | [ecosystem-collaboration.zh-CN.md](./ecosystem-collaboration.zh-CN.md) | Turn the executable Nextra fixture into reviewed external integrations and partner conversations. |
 
 ## Publishing rules
 

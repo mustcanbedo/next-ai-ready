@@ -36,7 +36,7 @@
 
 | 指标 | 当前 | 30 天目标 |
 |---|---:|---:|
-| 已识别且完成适配判断 | 0 | 10 |
+| 已识别且完成适配判断 | 4 | 10 |
 | 有效维护者交流 | 0 | 10 |
 | 仓库外成功安装 | 0 | 5 |
 | 公开生产案例 | 1 | 3 |
@@ -54,9 +54,17 @@
 | ID | 公开项目/站点 | 来源 | Next.js | 内容来源 | 阶段 | 首次成功耗时 | 主要阻塞 | 证据 | 更新日期 |
 |---|---|---|---:|---|---|---:|---|---|---|
 | CASE-001 | 官方文档站 | dogfood | 16 | MDX | `deployed` | 不计入 | 无 | https://nextaiready.com/en | 2026-08-26 |
+| CASE-002 | Nextra 官方文档 | Nextra 生态 | 16 | Nextra 4 MDX | `identified` | - | 尚无 `llms.txt` 与页面级 Markdown；先询问是否接受集成指南 | https://github.com/shuding/nextra/tree/main/docs | 2026-09-29 |
+| CASE-003 | Superseed Docs | 公开 Nextra 项目 | 16 | Nextra 4 MDX | `identified` | - | 尚无 `llms.txt` 与页面级 Markdown；可提供小范围兼容 PR | https://github.com/superseed-xyz/docs | 2026-09-29 |
+| CASE-004 | Morgen Dev Docs | 公开 Nextra 项目 | 15 | Nextra 4 MDX | `identified` | - | 尚无 `llms.txt` 与页面级 Markdown；可提供小范围兼容 PR | https://github.com/morgen-so/morgen-dev-docs | 2026-09-29 |
+| CASE-005 | WebNN Docs | 公开 Nextra 项目 | 16 | Nextra 4 MDX | `identified` | - | 已有 `llms.txt`，但页面级 Markdown 与内容协商仍待验证 | https://github.com/webmachinelearning/webnn-docs | 2026-09-29 |
 
-新增记录时复制一行并使用 `CASE-002` 起的递增编号。私有项目使用“private adopter CASE-xxx”，
+新增记录时复制一行并使用下一个递增编号（当前为 `CASE-006`）。私有项目使用
+“private adopter CASE-xxx”，
 证据列只写“maintainer-verified”，不得加入可识别信息。
+
+首批候选的兼容依据、排除项和待批准邀请文案统一维护在
+[`distribution/ecosystem-collaboration.zh-CN.md`](./distribution/ecosystem-collaboration.zh-CN.md)。
 
 ## 5. 每次接入必须记录
 

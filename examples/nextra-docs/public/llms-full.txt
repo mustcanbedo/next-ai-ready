@@ -1,0 +1,76 @@
+# Nextra AI-ready fixture — full content
+
+> A tested Nextra 4 and next-ai-ready knowledge-plane integration.
+
+<!-- BEGIN / -->
+# Nextra AI-ready fixture
+URL: https://nextra-fixture.example
+Updated: 2026-09-28
+
+# Nextra AI-ready fixture
+
+This is a real Nextra 4 documentation site, not a static screenshot or a configuration snippet.
+
+The browser experience remains owned by Nextra. `next-ai-ready` reads the same MDX files and adds
+discovery and retrieval endpoints for AI systems.
+
+## What this fixture proves
+
+- Nextra still renders the human-facing documentation UI.
+- `/llms.txt` lists the documentation pages.
+- `/getting-started.md` returns clean Markdown.
+- `Accept: text/markdown` negotiates the same page as Markdown.
+- Unknown browser routes remain real `404` responses.
+
+Continue with [Getting started](/getting-started).
+
+<!-- END / -->
+
+<!-- BEGIN /getting-started -->
+# Getting started
+URL: https://nextra-fixture.example/getting-started
+Updated: 2026-09-28
+
+# Getting started
+
+Install the public package beside an existing Nextra 4 application:
+
+```bash
+pnpm add next-ai-ready zod@^4
+pnpm exec next-ai-ready init
+```
+
+Keep Nextra's plugin in place, then wrap its resulting Next.js config:
+
+```js
+import nextra from "nextra"
+import { withAiReady } from "next-ai-ready/config"
+
+const withNextra = nextra({})
+const nextConfig = withNextra({})
+
+export default withAiReady({ agentReadable: true })(nextConfig)
+```
+
+Build both representations from the same MDX source:
+
+```bash
+pnpm exec next-ai-ready build
+pnpm build
+```
+
+The HTML page remains available at `/getting-started`; its explicit Markdown representation is
+available at `/getting-started.md`.
+
+## FAQ
+
+### Does next-ai-ready replace Nextra?
+
+No. Nextra keeps rendering the documentation interface while next-ai-ready adds machine-readable resources.
+
+### Does this fixture enable callable agent actions?
+
+No. It intentionally validates only the knowledge plane so the first integration stays small and reviewable.
+
+
+<!-- END /getting-started -->

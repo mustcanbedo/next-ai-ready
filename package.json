@@ -51,5 +51,11 @@
   },
   "engines": {
     "node": ">=20"
+  },
+  "pnpm": {
+    "overrides": {
+      "nextra>zod": "4.3.6",
+      "nextra-theme-docs>zod": "4.3.6"
+    }
   }
 }

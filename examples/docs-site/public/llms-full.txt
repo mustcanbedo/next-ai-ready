@@ -2044,7 +2044,7 @@ Hand-write it for a small, rarely changing site. Generate it when routes, locale
 <!-- BEGIN /en/docs/guides/nextra-ai-ready -->
 # Nextra llms.txt and Markdown endpoint setup
 URL: https://nextaiready.com/en/docs/guides/nextra-ai-ready
-Updated: 2026-08-02
+Updated: 2026-09-28
 
 # Nextra llms.txt and Markdown endpoint setup
 
@@ -2054,6 +2054,21 @@ when you want synchronized `/llms.txt`, page Markdown, semantic discovery, and o
 
 This guide supports Nextra's root `content/` and `app/` layouts as well as their `src/` equivalents.
 It does not support Nextra 1-3 sites that still use the Pages Router.
+
+## Executable reference
+
+The repository includes an [executable Nextra 4 fixture](https://github.com/mustcanbedo/next-ai-ready/tree/main/examples/nextra-docs)
+validated with Nextra `4.6.1`, Next.js `16.2.6`, and React `19.2.4`. One `content/` MDX collection
+drives both the Nextra UI and the next-ai-ready semantic graph. Its production smoke test covers HTML,
+`/llms.txt`, `/llms-full.txt`, explicit Markdown and AI JSON URLs, content negotiation, and the separate
+browser/agent missing-page contracts.
+
+Run the same contract from the repository root:
+
+```bash
+pnpm --filter @next-ai-ready/example-nextra-docs build
+pnpm --filter @next-ai-ready/example-nextra-docs test
+```
 
 ## 1. Install and initialize
 
@@ -2110,6 +2125,28 @@ export default withAiReady({ agentReadable: true })(nextConfig)
 This composition preserves Nextra's MDX handling and adds content negotiation for AI-readable page
 responses. Do not enable Next.js `output: "export"`; the generated runtime handlers require a server.
 
+### Nextra 4.6.1 and Zod 4.4 compatibility
+
+Nextra `4.6.1` currently declares a Zod range that can resolve its private dependency to Zod `4.4.x`.
+That combination can fail `nextra-theme-docs` layout validation before a page renders. Until the
+upstream fix ships, pin only Nextra's private copies in the workspace root:
+
+```json
+{
+  "pnpm": {
+    "overrides": {
+      "nextra>zod": "4.3.6",
+      "nextra-theme-docs>zod": "4.3.6"
+    }
+  }
+}
+```
+
+Keep the application's direct `zod@^4` dependency unchanged for next-ai-ready. This workaround is
+tracked upstream in [Nextra #4989](https://github.com/shuding/nextra/issues/4989) and
+[#5036](https://github.com/shuding/nextra/issues/5036); remove the override once a fixed Nextra
+release passes the fixture.
+
 ## 4. Build and verify
 
 ```bash
@@ -2147,6 +2184,10 @@ No. This integration targets Nextra 4 and the Next.js App Router. next-ai-ready 
 ### Can next-ai-ready scan a Nextra src/content directory?
 
 Yes. The default scanner covers content, app, src/content, and src/app directories with both .md and .mdx files.
+
+### Why does the executable example pin Nextra's Zod dependency to 4.3.6?
+
+Nextra 4.6.1 can currently resolve its private Zod dependency to 4.4.x, which breaks theme layout validation. The workaround affects only Nextra; the application can keep Zod 4.4.x for next-ai-ready.
 
 
 <!-- END /en/docs/guides/nextra-ai-ready -->
@@ -4751,7 +4792,7 @@ pnpm exec next-ai-ready audit https://example.com --version 3
 <!-- BEGIN /zh/docs/guides/nextra-ai-ready -->
 # 为 Nextra 4 添加 llms.txt 与 Markdown 端点
 URL: https://nextaiready.com/zh/docs/guides/nextra-ai-ready
-Updated: 2026-08-02
+Updated: 2026-09-28
 
 # 为 Nextra 4 添加 llms.txt 与 Markdown 端点
 
@@ -4761,6 +4802,21 @@ Updated: 2026-08-02
 
 本指南支持 Nextra 的根目录 `content/`、`app/` 以及对应的 `src/` 目录，不支持仍使用 Pages
 Router 的 Nextra 1-3。
+
+## 可执行参考实现
+
+仓库提供了[可执行 Nextra 4 夹具](https://github.com/mustcanbedo/next-ai-ready/tree/main/examples/nextra-docs)，
+已使用 Nextra `4.6.1`、Next.js `16.2.6` 与 React `19.2.4` 验证。同一份 `content/` MDX 同时
+驱动 Nextra 界面与 next-ai-ready 语义图；生产 smoke 覆盖 HTML、`/llms.txt`、
+`/llms-full.txt`、显式 Markdown 与 AI JSON URL、内容协商，以及相互独立的浏览器和 Agent
+缺页契约。
+
+在仓库根目录可复现同一套契约：
+
+```bash
+pnpm --filter @next-ai-ready/example-nextra-docs build
+pnpm --filter @next-ai-ready/example-nextra-docs test
+```
 
 ## 1. 安装并初始化
 
@@ -4815,6 +4871,27 @@ export default withAiReady({ agentReadable: true })(nextConfig)
 该组合保留 Nextra 的 MDX 处理，并增加 AI 页面内容协商。不要启用 Next.js
 `output: "export"`，生成的运行时 handler 需要服务器。
 
+### Nextra 4.6.1 与 Zod 4.4 兼容说明
+
+Nextra `4.6.1` 当前声明的 Zod 依赖范围可能把内部依赖解析到 `4.4.x`，导致页面渲染前的
+`nextra-theme-docs` layout 校验失败。在上游修复发布前，可只在 workspace 根目录固定 Nextra
+自己的副本：
+
+```json
+{
+  "pnpm": {
+    "overrides": {
+      "nextra>zod": "4.3.6",
+      "nextra-theme-docs>zod": "4.3.6"
+    }
+  }
+}
+```
+
+应用为 next-ai-ready 安装的直接依赖 `zod@^4` 保持不变。上游进度见
+[Nextra #4989](https://github.com/shuding/nextra/issues/4989) 与
+[#5036](https://github.com/shuding/nextra/issues/5036)；修复版本通过该夹具后即可移除 override。
+
 ## 4. 构建并验证
 
 ```bash
@@ -4852,6 +4929,10 @@ pnpm exec next-ai-ready audit https://docs.example.com/docs/getting-started --ve
 ### 可以扫描 Nextra 的 src/content 目录吗？
 
 可以。默认 scanner 覆盖 content、app、src/content 和 src/app，并支持 .md 与 .mdx。
+
+### 为什么可执行示例把 Nextra 的 Zod 依赖固定为 4.3.6？
+
+Nextra 4.6.1 当前可能把内部 Zod 解析到 4.4.x，导致主题 layout 校验失败。该兼容配置只影响 Nextra，应用仍可为 next-ai-ready 使用 Zod 4.4.x。
 
 
 <!-- END /zh/docs/guides/nextra-ai-ready -->

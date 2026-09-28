@@ -241,6 +241,7 @@ Install only `next-ai-ready` in consumer apps. The `alpha.20` repository candida
 - ✅ **Shared retrieval** — one replaceable `PageSearchProvider` powers MCP and HTTP actions, so ranking cannot drift between protocols
 - ✅ **Dev tooling** — `build` / `init` / `doctor` / versioned `audit` / `mcp` CLIs, `robots.txt`, analytics hooks
 - ✅ **Docs site** — live at [nextaiready.com](https://nextaiready.com/en) ([source](./examples/docs-site))
+- ✅ **Nextra 4 compatibility fixture** — one MDX collection drives the Nextra UI and AI-readable endpoints, with a production smoke contract ([run it](./examples/nextra-docs))
 
 See [`docs/`](./docs) ([**full index**](./docs/README.md)):
 
@@ -256,6 +257,7 @@ See [`docs/`](./docs) ([**full index**](./docs/README.md)):
 ### Known limitations
 
 - **Zod v4 required** — actions use `z.toJSONSchema()` which only exists in Zod v4. Install `zod@^4`.
+- **Nextra 4.6.1 needs a scoped Zod workaround** — Nextra's published range can resolve its private dependency to Zod 4.4.x and break theme layout validation. The [executable fixture](./examples/nextra-docs) pins only Nextra's internal Zod to 4.3.6 while the application continues using Zod 4.4.x; remove the override after the upstream fix ships ([#4989](https://github.com/shuding/nextra/issues/4989), [#5036](https://github.com/shuding/nextra/issues/5036)).
 - **Node.js runtime only** — all handlers export `runtime = "nodejs"`. Edge Runtime is not supported.
 - **No static export** — `output: 'export'` in Next.js config is not compatible (handlers need server runtime).
 - **No Pages Router** — App Router only. The `withAiReady()` wrapper and route handlers target App Router conventions.

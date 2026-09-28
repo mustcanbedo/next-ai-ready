@@ -239,6 +239,7 @@ registerAiHooks({
 - ✅ **统一检索层** — MCP 与 HTTP Action 共用可替换的 `PageSearchProvider`，避免不同协议的排序结果漂移
 - ✅ **开发工具** — `build` / `init` / `doctor` / 版本化 `audit` / `mcp` CLI，`robots.txt`，分析钩子
 - ✅ **文档站** — 线上 [nextaiready.com](https://nextaiready.com/zh)（[源码](./examples/docs-site)）
+- ✅ **Nextra 4 兼容夹具** — 同一份 MDX 同时驱动 Nextra 界面和 AI 可读端点，并带生产级 smoke 契约（[运行示例](./examples/nextra-docs)）
 
 详见 [`docs/`](./docs)（[**文档索引**](./docs/README.md)）：
 
@@ -255,6 +256,7 @@ registerAiHooks({
 ### 已知限制
 
 - **需要 Zod v4** — action 使用 `z.toJSONSchema()`，仅 Zod v4 支持。请安装 `zod@^4`。
+- **Nextra 4.6.1 需要局部 Zod 兼容配置** — Nextra 的依赖范围可能把内部 Zod 解析到 4.4.x，导致主题 layout 校验失败。[可执行夹具](./examples/nextra-docs)只把 Nextra 内部 Zod 固定为 4.3.6，应用仍使用 Zod 4.4.x；上游修复发布后即可移除 override（[#4989](https://github.com/shuding/nextra/issues/4989)、[#5036](https://github.com/shuding/nextra/issues/5036)）。
 - **仅 Node.js 运行时** — 所有 handler 导出 `runtime = "nodejs"`。不支持 Edge Runtime。
 - **不支持静态导出** — Next.js 的 `output: 'export'` 不兼容（handler 需要服务端运行时）。
 - **不支持 Pages Router** — 仅支持 App Router。`withAiReady()` 和路由 handler 基于 App Router 约定。

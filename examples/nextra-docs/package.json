@@ -1,0 +1,22 @@
+{
+  "name": "@next-ai-ready/example-nextra-docs",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Executable Nextra 4 compatibility fixture for next-ai-ready.",
+  "scripts": {
+    "dev": "next dev",
+    "prebuild": "node ../../packages/meta/dist/cli.js build",
+    "build": "next build --webpack",
+    "start": "next start",
+    "test": "node scripts/compatibility-smoke.mjs"
+  },
+  "dependencies": {
+    "next": "16.2.6",
+    "next-ai-ready": "workspace:*",
+    "nextra": "4.6.1",
+    "nextra-theme-docs": "4.6.1",
+    "react": "19.2.4",
+    "react-dom": "19.2.4",
+    "zod": "4"
+  }
+}

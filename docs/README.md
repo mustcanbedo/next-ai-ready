@@ -45,6 +45,7 @@ Central map for **next-ai-ready** repository docs (not the live docs site — th
 | Path | Purpose |
 |------|---------|
 | [../examples/docs-site/README.md](../examples/docs-site/README.md) | Dogfood docs + dual-track + artifact policy |
+| [../examples/nextra-docs/README.md](../examples/nextra-docs/README.md) | Executable Nextra 4 compatibility and production smoke contract |
 | [../examples/recipes/upstash-ratelimit](../examples/recipes/upstash-ratelimit/) | Rate-limit actions |
 | [../examples/recipes/action-auth](../examples/recipes/action-auth/) | Per-action auth for `/api/actions` |
 | [../CONTRIBUTING.md](../CONTRIBUTING.md) | Dev setup, verify:release, publish |

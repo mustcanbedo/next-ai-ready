@@ -4,6 +4,8 @@
 
 **Live docs:** [English](https://nextaiready.com/en) · [中文](https://nextaiready.com/zh)
 
+**Support and services:** [support the open-source project or request a fixed-scope diagnostic](https://nextaiready.com/en/docs/support)
+
 [![npm alpha](https://img.shields.io/npm/v/next-ai-ready/alpha.svg?label=npm%20alpha)](https://www.npmjs.com/package/next-ai-ready)
 [![CI](https://github.com/mustcanbedo/next-ai-ready/actions/workflows/ci.yml/badge.svg)](https://github.com/mustcanbedo/next-ai-ready/actions/workflows/ci.yml)
 [![Agent Readability](https://github.com/mustcanbedo/next-ai-ready/actions/workflows/agent-readability.yml/badge.svg)](https://github.com/mustcanbedo/next-ai-ready/actions/workflows/agent-readability.yml)

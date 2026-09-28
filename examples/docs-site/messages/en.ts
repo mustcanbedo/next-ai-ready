@@ -3,6 +3,7 @@ const en = {
     docs: "Docs",
     quickstart: "Quickstart",
     api: "API",
+    support: "Support",
     github: "GitHub",
   },
   hero: {

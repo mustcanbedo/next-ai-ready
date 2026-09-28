@@ -134,6 +134,8 @@ async function main() {
     includes: [
       "<lastmod>2026-08-24T00:00:00.000Z</lastmod>",
       'hreflang="zh" href="https://nextaiready.com/zh/docs/guides/mcp-integration"',
+      "<loc>https://nextaiready.com/en/docs/support</loc>",
+      'hreflang="zh" href="https://nextaiready.com/zh/docs/support"',
     ],
     excludes: ["/llms.txt", "/llms-full.txt", "/openapi.json", "/tools.json"],
   });
@@ -200,6 +202,27 @@ async function main() {
   await expectResponse("/zh/docs/introduction.md", {
     contentType: "text/markdown",
     includes: "# ",
+  });
+  await expectResponse("/en/docs/support", {
+    contentType: "text/html",
+    includes: [
+      "Support and services",
+      "Fixed-scope diagnostic",
+      "USD 299",
+      "khuangnanyeji0113@gmail.com",
+    ],
+  });
+  await expectResponse("/en/docs/support.md", {
+    contentType: "text/markdown",
+    includes: ["# Support next-ai-ready", "## Evidence boundary"],
+  });
+  await expectResponse("/zh/docs/support", {
+    contentType: "text/html",
+    includes: ["支持与服务", "固定范围诊断", "299 美元起"],
+  });
+  await expectResponse("/zh/docs/support.md", {
+    contentType: "text/markdown",
+    includes: ["# 支持 next-ai-ready", "## 证据边界"],
   });
   await expectResponse("/en/docs/guides/nextjs-llms-txt", {
     contentType: "text/html",

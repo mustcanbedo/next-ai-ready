@@ -21,6 +21,10 @@
   "bugs": {
     "url": "https://github.com/mustcanbedo/next-ai-ready/issues"
   },
+  "funding": {
+    "type": "individual",
+    "url": "https://nextaiready.com/en/docs/support"
+  },
   "license": "MIT",
   "type": "module",
   "main": "./dist/index.js",

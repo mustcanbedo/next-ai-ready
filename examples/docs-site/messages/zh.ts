@@ -3,6 +3,7 @@ const zh = {
     docs: "文档",
     quickstart: "快速开始",
     api: "API",
+    support: "支持",
     github: "GitHub",
   },
   hero: {

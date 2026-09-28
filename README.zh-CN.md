@@ -4,6 +4,8 @@ English | [中文文档](./README.zh-CN.md)
 
 **在线文档：** [中文](https://nextaiready.com/zh) · [English](https://nextaiready.com/en)
 
+**支持与服务：** [支持开源项目，或申请固定范围诊断](https://nextaiready.com/zh/docs/support)
+
 [![npm alpha](https://img.shields.io/npm/v/next-ai-ready/alpha.svg?label=npm%20alpha)](https://www.npmjs.com/package/next-ai-ready)
 [![CI](https://github.com/mustcanbedo/next-ai-ready/actions/workflows/ci.yml/badge.svg)](https://github.com/mustcanbedo/next-ai-ready/actions/workflows/ci.yml)
 [![Agent Readability](https://github.com/mustcanbedo/next-ai-ready/actions/workflows/agent-readability.yml/badge.svg)](https://github.com/mustcanbedo/next-ai-ready/actions/workflows/agent-readability.yml)

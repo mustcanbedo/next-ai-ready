@@ -1,7 +1,7 @@
 # Nextra 生态采用与合作执行单
 
 > 更新日期：2026-09-29  
-> 当前状态：候选与文案已准备，尚未代表项目对外发布。
+> 当前状态：首批三条邀请已发布，等待外部回复；没有回复不自动追发。
 
 ## 1. 本轮目标
 
@@ -48,12 +48,12 @@ Nextra 当前的赞助页同时展示 Inkeep 与 xyflow；官方 Ask AI 指南�
 以下 HTTP 检查均在 2026-09-29 执行。自有 Audit 分数只用于内部定位，不作为对外批评或
 外部标准分数；邀请只陈述可直接复现的端点事实。
 
-| 优先级 | 项目 | 适配证据 | 当前可验证缺口 | 渠道 | 下一步 |
+| 优先级 | 项目 | 适配证据 | 当前可验证缺口 | 渠道 | 阶段与下一步 |
 |---:|---|---|---|---|---|
-| 1 | Nextra 官方文档 | Next.js 16、Nextra workspace、`next start` | `/llms.txt` 404；页面请求仍返回 HTML | GitHub Discussions | 询问是否接受集成指南或示例 PR |
-| 2 | Superseed Docs | Next.js 16.1、Nextra 4.6、`next start` | `/llms.txt` 404；`/index.md` 404 | GitHub Issues | 获准后提供小范围兼容 PR |
-| 3 | Morgen Dev Docs | Next.js 15.1、Nextra 4、`next start` | `/llms.txt` 404；`/index.md` 404 | GitHub Issues | 获准后提供小范围兼容 PR |
-| 4 | WebNN Docs | Next.js 16.2、Nextra 4.6、`next start` | 已有 `/llms.txt`；页面级 `.md` 404 | GitHub Issues | 先确认现有生成方式，再提增量价值 |
+| 1 | Nextra 官方文档 | Next.js 16、Nextra workspace、`next start` | `/llms.txt` 404；页面请求仍返回 HTML | [Discussion #5054](https://github.com/shuding/nextra/discussions/5054) | `invited`；等待维护者判断是否适合官方指南或示例 |
+| 2 | Superseed Docs | Next.js 16.1、Nextra 4.6、`next start` | `/llms.txt` 404；`/index.md` 404 | [Issue #142](https://github.com/superseed-xyz/docs/issues/142) | `invited`；对方明确同意后提供小范围兼容 PR |
+| 3 | Morgen Dev Docs | Next.js 15.1、Nextra 4、`next start` | `/llms.txt` 404；`/index.md` 404 | [Issue #20](https://github.com/morgen-so/morgen-dev-docs/issues/20) | `invited`；对方明确同意后提供小范围兼容 PR |
+| 4 | WebNN Docs | Next.js 16.2、Nextra 4.6、`next start` | 已有 `/llms.txt`；页面级 `.md` 404 | GitHub Issues | `identified`；先确认现有生成方式，再提增量价值 |
 
 候选源码：
 
@@ -62,7 +62,7 @@ Nextra 当前的赞助页同时展示 Inkeep 与 xyflow；官方 Ask AI 指南�
 - https://github.com/morgen-so/morgen-dev-docs
 - https://github.com/webmachinelearning/webnn-docs
 
-## 4. 待批准公开文案
+## 4. 首批已发布文案与候选草案
 
 ### 4.1 Nextra Discussion
 
@@ -155,6 +155,8 @@ If it is useful, I can prepare a small compatibility PR; if the existing llms.tx
 covers your needs, no action is needed.
 ```
 
+WebNN 文案尚未发布，仍保留为候选草案。
+
 ## 5. 发送顺序与停止条件
 
 1. 先发布 Nextra Discussion，等待维护者确认这个集成是否适合其文档范围。
@@ -174,3 +176,13 @@ identified -> invited -> engaged -> installing -> verified -> deployed -> retain
 
 帖子数量、Stars 和曝光不算采用。只有真实项目完成安装、构建、诊断与部署，才能进入
 `verified` 或 `deployed`。
+
+### 6.1 首批发布记录
+
+| 日期 | 对象 | 公开记录 | 当前阶段 | 后续动作 |
+|---|---|---|---|---|
+| 2026-09-29 | Nextra | [Discussion #5054](https://github.com/shuding/nextra/discussions/5054) | `invited` | 等待回复，不自动追发 |
+| 2026-09-29 | Superseed Docs | [Issue #142](https://github.com/superseed-xyz/docs/issues/142) | `invited` | 获得明确同意后才创建 PR |
+| 2026-09-29 | Morgen Dev Docs | [Issue #20](https://github.com/morgen-so/morgen-dev-docs/issues/20) | `invited` | 获得明确同意后才创建 PR |
+
+截至 2026-09-29，三条邀请均刚刚发布，外部回复为 0，因此“有效维护者交流”仍为 0。

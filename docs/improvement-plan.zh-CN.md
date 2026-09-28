@@ -3,7 +3,7 @@
 > 最后更新：2026-09-29
 > 维护者视角：`next-ai-ready` 原始作者与技术负责人  
 > 当前仓库候选：`next-ai-ready@0.1.0-alpha.20`（公开 npm 状态以 dist-tags 为准）
-> 当前主分支基线：`4774531`（Nextra 4 可执行兼容夹具已合入）
+> 当前主分支基线：`6cc6cd3`（Nextra 生态采用执行单已合入）
 > 最近公开版本：`next-ai-ready@0.1.0-alpha.20` 已发布并提升为 `latest`
 
 本文是后续优化的**执行状态与决策记录**。`roadmap.md` 保留工程阶段历史，
@@ -345,6 +345,13 @@ Nextra 4.6.1 与其内部 Zod 4.4.x 的上游兼容
 `main`（`4774531`），Build & Test、E2E、Docs Site Smoke、npm/pnpm × Next.js 14/15/16、
 Vercel Preview 与 Required CI 均通过。该夹具仍是仓库内部证据，不计入外部采用；A1-06
 进入`待验证`，只有至少一次仓库外复用后才可标记完成。
+
+2026-09-29，A1-06 按兼容性筛选结果发布首批三条 opt-in 生态邀请：Nextra
+[Discussion #5054](https://github.com/shuding/nextra/discussions/5054)、Superseed Docs
+[Issue #142](https://github.com/superseed-xyz/docs/issues/142) 与 Morgen Dev Docs
+[Issue #20](https://github.com/morgen-so/morgen-dev-docs/issues/20)。三条邀请均指向同一个已测试夹具，
+承诺仅在对方明确同意后创建小范围 PR，并且没有回复时不自动追发。截至记录时外部回复为 0，
+所以“有效维护者交流”和“仓库外成功安装”仍均为 0；发帖数量不作为 A1-06 完成证据。
 
 ## 8. 维护规则
 

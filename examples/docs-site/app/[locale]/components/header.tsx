@@ -15,6 +15,11 @@ export function Header({ locale, messages }: HeaderProps) {
 
   const switchLocale = locale === "en" ? "zh" : "en";
   const switchPath = pathname.replace(`/${locale}`, `/${switchLocale}`);
+  const docsActive =
+    pathname.includes("/docs") &&
+    !pathname.includes("/docs/guides/quickstart") &&
+    !pathname.includes("/docs/api-reference") &&
+    !pathname.includes("/docs/support");
 
   return (
     <header className="fixed top-0 z-50 w-full bg-bg/80 backdrop-blur-2xl backdrop-saturate-150 border-b border-white/[0.06]">
@@ -33,7 +38,7 @@ export function Header({ locale, messages }: HeaderProps) {
 
         {/* Nav */}
         <nav className="hidden md:flex items-center gap-1">
-          <NavLink href={`/${locale}/docs/introduction`} active={pathname.includes("/docs")}>
+          <NavLink href={`/${locale}/docs/introduction`} active={docsActive}>
             {messages.docs}
           </NavLink>
           <NavLink href={`/${locale}/docs/guides/quickstart`} active={pathname.includes("/guides")}>
@@ -41,6 +46,9 @@ export function Header({ locale, messages }: HeaderProps) {
           </NavLink>
           <NavLink href={`/${locale}/docs/api-reference/config`} active={pathname.includes("/api-reference")}>
             {messages.api}
+          </NavLink>
+          <NavLink href={`/${locale}/docs/support`} active={pathname.includes("/docs/support")}>
+            {messages.support}
           </NavLink>
           <a
             href="https://github.com/mustcanbedo/next-ai-ready"

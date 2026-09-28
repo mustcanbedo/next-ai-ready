@@ -2669,6 +2669,77 @@ No. The framework adds AI routes and build artifacts alongside your current App 
 
 <!-- END /en/docs/introduction -->
 
+<!-- BEGIN /en/docs/support -->
+# Support and services
+URL: https://nextaiready.com/en/docs/support
+Updated: 2026-09-28
+
+# Support next-ai-ready
+
+`next-ai-ready` is MIT-licensed and its open-source core remains free. The most useful way to support it is to run it in a real Next.js project and tell us where the installation, generated output, or documentation falls short.
+
+## Support the open-source project
+
+- [Install the package](https://www.npmjs.com/package/next-ai-ready) in a real project.
+- [Report a reproducible issue](https://github.com/mustcanbedo/next-ai-ready/issues/new/choose).
+- Share a public implementation that other maintainers can inspect.
+- [Star the repository](https://github.com/mustcanbedo/next-ai-ready) if it has earned a place in your toolchain.
+
+These signals help more than an anonymous donation because they show which problems are worth maintaining.
+
+## Fixed-scope diagnostic
+
+The maintainer also offers a paid **Next.js search and AI visibility diagnostic** through AI Website Audit Lab. This is a professional service separate from the open-source SDK.
+
+It is a good fit when:
+
+- generated Next.js pages are not being indexed consistently;
+- canonical URLs, sitemaps, robots rules, metadata, or structured data disagree;
+- AI systems cannot discover or retrieve a clean representation of important content;
+- you need a prioritized implementation plan before changing production code.
+
+The initial diagnostic starts at **USD 299** for one production site and an agreed set of representative page templates. Before any payment, we confirm the scope, evidence available, delivery date, and exact price in writing.
+
+### What you receive
+
+- an evidence-backed map of technical and content-accessibility findings;
+- checks across rendering, HTTP status, canonical, sitemap, robots, metadata, structured data, internal discovery, and AI-readable outputs where relevant;
+- a prioritized implementation backlog with acceptance criteria;
+- one written follow-up to clarify the findings.
+
+Implementation, page redesign, ongoing content work, and analytics instrumentation are quoted separately after the diagnostic. No production access is required for the initial public-URL review. Search Console or private evidence is reviewed only after explicit authorization.
+
+## Evidence boundary
+
+The SDK and diagnostic can improve technical accessibility and reveal implementation problems. They do **not** guarantee indexing, search rankings, traffic, leads, revenue, or inclusion in an AI-generated answer.
+
+## Contact
+
+Email [Jair from AI Website Audit Lab](mailto:khuangnanyeji0113@gmail.com?subject=Next.js%20search%20and%20AI%20visibility%20diagnostic) with:
+
+1. the production URL;
+2. the main indexing, search, or AI-discovery problem;
+3. the Next.js version and content source, if known.
+
+You will receive a short reply confirming fit and next steps. Payment instructions are sent manually only after the scope is agreed. Do not send passwords, access tokens, customer data, or private source code by email.
+
+## FAQ
+
+### How can I support next-ai-ready?
+
+Install it in a real Next.js project, report reproducible issues, share what worked, or star the repository.
+
+### Do you offer paid implementation help?
+
+Yes. A fixed-scope technical diagnostic starts at USD 299, followed by a separate implementation quote only when the findings and scope are approved.
+
+### Does the diagnostic guarantee rankings, traffic, or AI citations?
+
+No. It identifies technical and content-accessibility problems and provides evidence-backed recommendations, but it cannot guarantee indexing, rankings, traffic, leads, revenue, or AI citations.
+
+
+<!-- END /en/docs/support -->
+
 <!-- BEGIN /zh -->
 # next-ai-ready
 URL: https://nextaiready.com/zh
@@ -5297,3 +5368,74 @@ SEO 面向浏览器与搜索排名；next-ai-ready 面向 AI 爬虫与 Agent，�
 
 
 <!-- END /zh/docs/introduction -->
+
+<!-- BEGIN /zh/docs/support -->
+# 支持与服务
+URL: https://nextaiready.com/zh/docs/support
+Updated: 2026-09-28
+
+# 支持 next-ai-ready
+
+`next-ai-ready` 采用 MIT 许可证，开源核心会继续免费。最有价值的支持方式，是在真实 Next.js 项目中使用它，并告诉我们安装、生成结果或文档在哪一步不够清楚。
+
+## 支持开源项目
+
+- 在真实项目中[安装 npm 包](https://www.npmjs.com/package/next-ai-ready)。
+- [提交可复现的问题](https://github.com/mustcanbedo/next-ai-ready/issues/new/choose)。
+- 分享一个其他维护者可以检查的公开接入案例。
+- 如果项目确实进入了你的工具链，可以为 [GitHub 仓库加星](https://github.com/mustcanbedo/next-ai-ready)。
+
+这些信号通常比匿名赞助更有价值，因为它们能说明哪些问题值得长期维护。
+
+## 固定范围诊断
+
+维护者同时通过 AI Website Audit Lab 提供付费的 **Next.js 搜索与 AI 可见性诊断**。这是与开源 SDK 分离的专业服务。
+
+适合以下情况：
+
+- Next.js 生成页面的 Google 收录不稳定；
+- canonical、sitemap、robots、metadata 或结构化数据互相冲突；
+- AI 系统无法发现或读取重要内容的干净版本；
+- 在修改生产代码前，需要一份有优先级的实施方案。
+
+首次诊断 **299 美元起**，范围为一个生产站点和事先约定的代表性页面模板。付款前，我们会以文字确认范围、可用证据、交付日期和准确价格。
+
+### 你会收到
+
+- 一份有证据的技术与内容可访问性问题图谱；
+- 对渲染、HTTP 状态、canonical、sitemap、robots、metadata、结构化数据、内部发现路径及相关 AI 可读产物的检查；
+- 带验收标准的实施优先级清单；
+- 一次用于解释结论的书面答疑。
+
+代码实施、页面重新设计、持续内容工作和分析埋点会在诊断后单独报价。首次公开 URL 检查不需要生产权限；只有获得明确授权后，才会查看 Search Console 或其他私有证据。
+
+## 证据边界
+
+SDK 和诊断可以改善技术可访问性并发现实现问题，但**不保证**被收录、获得排名、产生流量、线索或收入，也不保证出现在 AI 生成的回答中。
+
+## 联系方式
+
+请发送邮件给 [AI Website Audit Lab 的 Jair](mailto:khuangnanyeji0113@gmail.com?subject=Next.js%20%E6%90%9C%E7%B4%A2%E4%B8%8E%20AI%20%E5%8F%AF%E8%A7%81%E6%80%A7%E8%AF%8A%E6%96%AD)，并附上：
+
+1. 生产网站 URL；
+2. 当前最主要的收录、搜索或 AI 发现问题；
+3. 已知的 Next.js 版本与内容来源。
+
+我们会先简短回复是否匹配以及下一步。只有双方确认范围后，才会人工发送付款方式。请勿通过邮件发送密码、访问令牌、客户数据或私有源代码。
+
+## FAQ
+
+### 如何支持 next-ai-ready？
+
+在真实 Next.js 项目中安装、提交可复现问题、分享接入结果，或为 GitHub 仓库加星。
+
+### 是否提供付费实施服务？
+
+提供。固定范围的技术诊断从 299 美元起；只有在确认诊断结论和实施范围后，才会另行报价实施工作。
+
+### 诊断是否保证排名、流量或 AI 引用？
+
+不保证。诊断用于发现技术与内容可访问性问题，并给出有证据的建议，但不能保证收录、排名、流量、线索、收入或 AI 引用。
+
+
+<!-- END /zh/docs/support -->

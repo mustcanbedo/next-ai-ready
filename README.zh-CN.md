@@ -39,7 +39,7 @@ npm create next-ai-ready@alpha next-ai-ready-demo
 
 > **第三方工具基线：** 生产文档站在 2026-08-01 使用 Vercel 开源的 `@vercel/agent-readability@0.5.0` 获得 **100/100**。[查看机器可读原始结果](./docs/audit-baselines/vercel-agent-readability-0.5.0-2026-08-01.json)，或运行 `pnpm audit:vercel:site` 复现。该分数衡量技术层面的 Agent 可读性，不代表搜索排名、收录或引用效果。
 
-> **候选版本：** 本仓库与文档站跟随 `main`，当前目标为 `0.1.0-alpha.20`。公开可用性以 `npm view next-ai-ready dist-tags --json` 为准，不得根据仓库版本推断 npm 已发布。alpha.20 增加由 MCP 与 HTTP 共用的可替换页面搜索 Provider、双语搜索意图评测门禁、按用途划分的 AI 爬虫策略及可追溯的 Audit v3 判断；此前已发布的 alpha.19 已补齐 MCP 到 LLMS 的公开依赖链。
+> **候选版本：** 本仓库与文档站跟随 `main`，当前目标为 `0.1.0-alpha.21`。公开可用性以 `npm view next-ai-ready dist-tags --json` 为准，不得根据仓库版本推断 npm 已发布。alpha.21 将默认 `init` 改为 Knowledge-first：只生成 5 个 AI 可读内容文件，不再要求 Capability 依赖或产生相关警告，并通过 `--with-capabilities` 显式升级。当前已发布的 alpha.20 包含 MCP/HTTP 共用搜索、双语检索评测、爬虫策略与 Audit v3 判断。
 
 ---
 
@@ -225,7 +225,7 @@ registerAiHooks({
 
 ### 包导入
 
-消费者应用只需安装 `next-ai-ready`。仓库中的 `alpha.20` 候选版本支持以下导入：
+消费者应用只需安装 `next-ai-ready`。仓库中的 `alpha.21` 候选版本支持以下导入：
 
 | 导入 | 用途 |
 |---|---|
@@ -238,7 +238,7 @@ registerAiHooks({
 
 ## 状态
 
-🚧 **Pre-alpha**（仓库候选版本 `0.1.0-alpha.20`；公开可用性以 npm dist-tags 为准）。受保护发布工作流负责验证包与标签；正式 `0.1.0` GA 前的外部采用门槛见[当前改进台账](./docs/improvement-plan.zh-CN.md)。
+🚧 **Pre-alpha**（仓库候选版本 `0.1.0-alpha.21`；公开可用性以 npm dist-tags 为准）。受保护发布工作流负责验证包与标签；正式 `0.1.0` GA 前的外部采用门槛见[当前改进台账](./docs/improvement-plan.zh-CN.md)。
 
 - ✅ **知识平面** — MDX → 语义图 → `llms.txt` / `*.md` / `*.ai.json` / JSON-LD
 - ✅ **能力平面** — `defineAction` → `/api/actions/<name>` + OpenAPI 3.1 / `tools.json` / `ai-plugin.json`

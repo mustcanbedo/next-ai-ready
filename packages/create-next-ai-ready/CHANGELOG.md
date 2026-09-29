@@ -1,5 +1,11 @@
 # create-next-ai-ready
 
+## 0.1.0-alpha.13
+
+### Patch Changes
+
+- 27b4649: Expose the verified support and fixed-scope diagnostic page through npm funding metadata.
+
 ## 0.1.0-alpha.12
 
 ### Patch Changes

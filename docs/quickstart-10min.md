@@ -33,11 +33,13 @@ export default defineConfig({
     description: "One sentence for AI search and llms.txt.",
   },
   content: ["content/**/*.mdx"], // globs scanned at build time
-  actions: "./actions/index.mjs",   // optional Capability plane
 });
 ```
 
-Ensure `next.config` wraps your config with `withAiReady()` ( `init` does this when missing).
+Ensure `next.config` wraps your config with `withAiReady({ agentReadable: true })` (`init` does this when missing).
+When a real callable workflow is ready, install Zod and the MCP peer packages, then run
+`next-ai-ready init --with-capabilities`; the command creates the capability routes and adds
+the generated actions module to this config.
 
 ## 3. Wire the build
 

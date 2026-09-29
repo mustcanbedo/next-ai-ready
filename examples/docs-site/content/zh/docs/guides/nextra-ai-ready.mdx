@@ -52,7 +52,7 @@ pnpm --filter @next-ai-ready/example-nextra-docs test
 在 Nextra 应用目录执行：
 
 ```bash
-pnpm add next-ai-ready zod@^4
+pnpm add next-ai-ready
 pnpm exec next-ai-ready init
 ```
 
@@ -117,7 +117,7 @@ Nextra `4.6.1` 当前声明的 Zod 依赖范围可能把内部依赖解析到 `4
 }
 ```
 
-应用为 next-ai-ready 安装的直接依赖 `zod@^4` 保持不变。上游进度见
+保持 next-ai-ready 使用的 Zod 4 不变；该 override 只作用于 Nextra 的私有副本。上游进度见
 [Nextra #4989](https://github.com/shuding/nextra/issues/4989) 与
 [#5036](https://github.com/shuding/nextra/issues/5036)；修复版本通过该夹具后即可移除 override。
 

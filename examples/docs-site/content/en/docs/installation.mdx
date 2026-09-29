@@ -11,8 +11,9 @@ questions:
       and the CLI.
   - q: What does next-ai-ready init create?
     a: >-
-      ai-ready.config, route stubs under app/%5Fai-ready/, action and MCP
-      endpoints, and optional instrumentation files.
+      By default, ai-ready.config and Knowledge Plane routes under
+      app/%5Fai-ready/. Pass --with-capabilities to also add Actions, MCP,
+      OpenAPI routes, and instrumentation.
 tags:
   - installation
   - next.js
@@ -28,12 +29,12 @@ author: next-ai-ready team
 - **Node.js** 20 or later
 - **Next.js** 14.2+ with App Router (Next.js 15+ recommended; 14.2, 15, and 16 are covered by the compatibility matrix)
 - **pnpm**, npm, or yarn
-- **Zod v4** (`zod@^4`) — required for actions (uses `z.toJSONSchema()`)
+- **Zod v4** (`zod@^4`) — required only when enabling Actions (uses `z.toJSONSchema()`)
 
 ## Install
 
 ```bash
-pnpm add next-ai-ready zod@^4
+pnpm add next-ai-ready
 ```
 
 This installs the meta package which re-exports everything you need and provides the CLI.
@@ -100,13 +101,15 @@ npx next-ai-ready init
 This creates:
 
 - `ai-ready.config.ts` in TypeScript apps, or `.mjs` in JavaScript apps — your site config (includes robots strategy notes)
-- `instrumentation.ts` + `instrumentation-node.ts` — optional observability hooks (`next-ai-ready/hooks`, Edge-safe split)
-- `app/%5Fai-ready/` — route handlers for `llms.txt`, `openapi.json`, etc.
-- `app/api/actions/` — the action execution endpoint
-- `app/api/mcp/` — the MCP server endpoint
-- `actions/index.ts` in TypeScript apps, or `.mjs` in JavaScript apps — a starter action file with a `ping` health check
+- `app/%5Fai-ready/` — route handlers for `llms.txt`, full text, page Markdown, and AI JSON
+- `next.config` wiring with `agentReadable: true`, so browsers keep HTML while agents can request Markdown
 
-`init` also patches `next.config` with `withAiReady()` from the public meta package and adds `next-ai-ready build` to your build script when missing.
+`init` also adds `next-ai-ready build` to your build script when missing. To add callable Actions, MCP, OpenAPI/tool routes, and observability hooks, install Zod and opt in explicitly:
+
+```bash
+pnpm add zod@^4 @modelcontextprotocol/sdk mcp-handler
+pnpm exec next-ai-ready init --with-capabilities
+```
 
 `%5F` is the URL-encoded form of `_`. Next.js treats a literal `app/_ai-ready/` folder as private and excludes it from routing, while `app/%5Fai-ready/` correctly serves the `/_ai-ready/*` URL namespace. Do not rename the generated folder. When upgrading from alpha.10 or earlier, rerun `npx next-ai-ready init` and remove the obsolete `app/_ai-ready/` directory after reviewing local customizations.
 
@@ -124,9 +127,10 @@ export default defineConfig({
     description: "A short description for AI.",
   },
   content: ["app/**/*.mdx", "content/**/*.mdx"],
-  actions: "./actions/index.mjs",
 });
 ```
+
+Add `actions: "./actions/index.mjs"` only after running `init --with-capabilities`.
 
 ### Robots policy
 

@@ -33,11 +33,12 @@ export default defineConfig({
     description: "供 AI 搜索与 llms.txt 使用的一句话描述。",
   },
   content: ["content/**/*.mdx"], // build 时扫描的 glob
-  actions: "./actions/index.mjs",   // 可选：能力平面
 });
 ```
 
-确认 `next.config` 已用 `withAiReady()` 包裹（`init` 会在缺失时注入）。
+确认 `next.config` 已用 `withAiReady({ agentReadable: true })` 包裹（`init` 会在缺失时注入）。
+待明确的可调用工作流准备好后，安装 Zod 和 MCP peer packages，再运行
+`next-ai-ready init --with-capabilities`；该命令会生成能力路由，并把 actions 模块加入配置。
 
 ## 3. 接入构建
 

@@ -13,7 +13,7 @@ async function makeTempProject() {
 }
 
 describe("runInit()", () => {
-  it("creates config + handler stubs in an empty project", async () => {
+  it("creates Knowledge Plane config + handler stubs by default", async () => {
     const { dir, cleanup } = await makeTempProject();
     try {
       const result = await runInit({ cwd: dir, silent: true });
@@ -21,17 +21,11 @@ describe("runInit()", () => {
       expect(result.written).toContain("app/%5Fai-ready/llms-txt/route.ts");
       expect(result.written).toContain("app/%5Fai-ready/md/[...path]/route.ts");
       expect(result.written.some((path) => path.startsWith("app/_ai-ready/"))).toBe(false);
-      expect(result.written).toContain("app/api/actions/[name]/route.ts");
-      expect(result.written).toContain("app/api/mcp/[transport]/route.ts");
-      expect(result.written).toContain("actions/index.mjs");
-      expect(result.written).toContain("instrumentation.ts");
-      expect(result.written).toContain("instrumentation-node.ts");
-
-      const actionRoute = await readFile(join(dir, "app/api/actions/[name]/route.ts"), "utf8");
-      expect(actionRoute).toContain('../../../../actions/index.mjs');
-      expect(actionRoute).not.toContain("@/actions");
-      expect(actionRoute).toContain("POST(request: Request, context: any)");
-      expect(actionRoute).toContain("handleAction(request, context)");
+      expect(result.written).not.toContain("app/api/actions/[name]/route.ts");
+      expect(result.written).not.toContain("app/api/mcp/[transport]/route.ts");
+      expect(result.written).not.toContain("actions/index.mjs");
+      expect(result.written).not.toContain("instrumentation.ts");
+      expect(result.written).not.toContain("instrumentation-node.ts");
       expect(result.skipped).toHaveLength(0);
 
       const markdownRoute = await readFile(join(dir, "app/%5Fai-ready/md/[...path]/route.ts"), "utf8");
@@ -45,11 +39,51 @@ describe("runInit()", () => {
       const handler = await readFile(join(dir, "app/%5Fai-ready/llms-txt/route.ts"), "utf8");
       expect(handler).toContain('next-ai-ready/handlers/llms-txt');
 
+      const config = await readFile(join(dir, "ai-ready.config.mjs"), "utf8");
+      expect(config).not.toContain("actions:");
+    } finally {
+      await cleanup();
+    }
+  });
+
+  it("adds Capability Plane files only with --with-capabilities", async () => {
+    const { dir, cleanup } = await makeTempProject();
+    try {
+      const result = await runInit({ cwd: dir, withCapabilities: true, silent: true });
+      expect(result.written).toContain("app/api/actions/[name]/route.ts");
+      expect(result.written).toContain("app/api/mcp/[transport]/route.ts");
+      expect(result.written).toContain("actions/index.mjs");
+      expect(result.written).toContain("instrumentation.ts");
+      expect(result.written).toContain("instrumentation-node.ts");
+
+      const actionRoute = await readFile(join(dir, "app/api/actions/[name]/route.ts"), "utf8");
+      expect(actionRoute).toContain('../../../../actions/index.mjs');
+      expect(actionRoute).not.toContain("@/actions");
+      expect(actionRoute).toContain("POST(request: Request, context: any)");
+      expect(actionRoute).toContain("handleAction(request, context)");
+
       const mcp = await readFile(join(dir, "app/api/mcp/[transport]/route.ts"), "utf8");
       expect(mcp).toContain("next-ai-ready/handlers/mcp");
       expect(mcp).toContain("handlerPromise ??= createAiReadyMcpHandler()");
       expect(mcp).toContain("handlerPromise = undefined");
-      expect(mcp).not.toContain("const handler = await createAiReadyMcpHandler()");
+
+      const config = await readFile(join(dir, "ai-ready.config.mjs"), "utf8");
+      expect(config).toContain('actions: "./actions/index.mjs"');
+    } finally {
+      await cleanup();
+    }
+  });
+
+  it("upgrades an existing Knowledge-only config when capabilities are added later", async () => {
+    const { dir, cleanup } = await makeTempProject();
+    try {
+      await runInit({ cwd: dir, silent: true });
+      const result = await runInit({ cwd: dir, withCapabilities: true, silent: true });
+
+      expect(result.written).toContain("actions/index.mjs");
+      expect(result.patched).toContain("ai-ready.config.mjs (capabilities)");
+      const config = await readFile(join(dir, "ai-ready.config.mjs"), "utf8");
+      expect(config).toContain('actions: "./actions/index.mjs"');
     } finally {
       await cleanup();
     }
@@ -83,7 +117,7 @@ describe("runInit()", () => {
 
       const config = await readFile(join(dir, "next.config.mjs"), "utf8");
       expect(config).toContain('import { withAiReady } from "next-ai-ready/config"');
-      expect(config).toContain("withAiReady()(");
+      expect(config).toContain("withAiReady({ agentReadable: true })(");
       expect(config).toContain("reactStrictMode");
     } finally {
       await cleanup();
@@ -131,7 +165,7 @@ describe("runInit()", () => {
 
       const config = await readFile(join(dir, "next.config.ts"), "utf8");
       expect(config).toContain('import { withAiReady } from "next-ai-ready/config"');
-      expect(config).toContain("withAiReady()(");
+      expect(config).toContain("withAiReady({ agentReadable: true })(");
     } finally {
       await cleanup();
     }
@@ -154,7 +188,7 @@ describe("runInit()", () => {
 
       const config = await readFile(join(dir, "next.config.mjs"), "utf8");
       expect(config).toContain(preservedExpression);
-      expect(config).toContain("export default withAiReady()(nextAiReadyConfig);");
+      expect(config).toContain("export default withAiReady({ agentReadable: true })(nextAiReadyConfig);");
     } finally {
       await cleanup();
     }
@@ -187,7 +221,7 @@ describe("runInit()", () => {
     try {
       await writeFile(join(dir, "tsconfig.json"), `{"compilerOptions":{"strict":true}}\n`, "utf8");
       const result = await runInit({ cwd: dir, silent: true });
-      expect(result.written).toContain("actions/index.ts");
+      expect(result.written).not.toContain("actions/index.ts");
       expect(result.written).toContain("ai-ready.config.ts");
     } finally {
       await cleanup();

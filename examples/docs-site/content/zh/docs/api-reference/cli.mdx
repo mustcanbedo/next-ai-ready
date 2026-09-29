@@ -22,7 +22,7 @@ author: next-ai-ready 团队
 
 ### `next-ai-ready init`
 
-在项目中脚手架化 handler 桩文件和配置。
+在项目中生成知识平面的 handler 桩文件和配置。
 
 ```bash
 npx next-ai-ready init
@@ -31,10 +31,17 @@ npx next-ai-ready init
 创建：
 
 - `ai-ready.config.mjs` — 带占位值的站点配置。
-- `app/%5Fai-ready/` — route handler 桩文件（一行 re-export）。
-- `app/api/actions/[name]/route.ts` — action 执行端点。
-- `app/api/mcp/[transport]/route.ts` — MCP 服务器端点。
-- `actions/index.mjs` — 带 `ping` 健康检查的 starter action 文件。
+- `app/%5Fai-ready/` — `llms.txt`、全文、Markdown 与 AI JSON 路由。
+- 已开启 Agent Markdown 协商的 `next.config` 接线。
+
+只有项目存在明确的可调用工作流时，才增加能力平面：
+
+```bash
+npx next-ai-ready init --with-capabilities
+```
+
+该选项还会生成 Action 与 MCP 端点、`ping` 示例 Action、OpenAPI/工具路由和观测钩子。
+启用前请安装 `zod@^4`、`@modelcontextprotocol/sdk` 与 `mcp-handler`。
 
 使用 `--force` 覆盖已有文件。
 
@@ -85,16 +92,16 @@ npx next-ai-ready doctor --json    # 机器可读报告（含 actionItems）
 检查项包括：
 
 1. **配置** — `ai-ready.config.mjs` 及必填的 `site.name`、`site.baseUrl`、`site.description`。
-2. **Actions** — 公开/私有统计；公开 action 缺少 `whenToUse` 时警告。
+2. **Actions** — 配置后检查公开/私有统计及缺失的 `whenToUse`。
 3. **构建产物** — graph、OpenAPI、`package.json` 是否含 prebuild。
 4. **路由桩文件** — `app/%5Fai-ready/*` 与 `next.config` 中的 `withAiReady()`。
 5. **Robots** — `public/robots.txt` **或** `app/robots.ts`（`emit.robots: false` 时不会因缺少静态文件误报）。
-6. **MCP** — 生产环境未设置 `NEXT_AI_READY_MCP_TOKEN` 时警告。
+6. **MCP** — 仅当 MCP 路由存在时，才检查生产环境 `NEXT_AI_READY_MCP_TOKEN`。
 7. **内容质量** — `noai`、JSON-LD helper、`updatedAt` / `author` 覆盖率。
 
 发现**错误**时以代码 1 退出。警告不会导致非零退出。
 
-使用 `--score` 时会打印 **Top fixes**（如添加 prebuild、配置 MCP token、补充 frontmatter）。
+使用 `--score` 时会打印 **Top fixes**（如添加 prebuild、补充 `updatedAt` frontmatter）。对于明确采用纯知识平面的项目，能力项会被跳过，而不是扣分。
 
 在 CI 中使用：
 

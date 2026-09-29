@@ -16,7 +16,7 @@
 ## Start in 10 minutes
 
 ```bash
-pnpm add next-ai-ready zod@^4
+pnpm add next-ai-ready
 pnpm exec next-ai-ready init
 # Add or update content/**/*.mdx, then:
 pnpm exec next-ai-ready build
@@ -152,13 +152,20 @@ export default defineAction({
 
 ```bash
 pnpm add next-ai-ready
-npx next-ai-ready init     # scaffold config + route stubs + starter action
+npx next-ai-ready init     # scaffold the Knowledge Plane
 npx next-ai-ready build    # emit llms.txt, sitemap.md, graph, OpenAPI, tools, robots
 npx next-ai-ready doctor   # validate config, action exposure, route wiring (CI-friendly)
 npx next-ai-ready audit https://example.com/about  # verify the deployed page agents receive
 npx next-ai-ready audit https://example.com/about --version 2 --json  # five-dimensional report
 npx next-ai-ready audit https://example.com/about --version 3 --json  # three-plane strict preflight
 npx next-ai-ready mcp      # run an MCP server over stdio (Claude Desktop / Cursor)
+```
+
+When you need Actions and MCP, install their runtime peers and opt in:
+
+```bash
+pnpm add zod@^4 @modelcontextprotocol/sdk mcp-handler
+npx next-ai-ready init --with-capabilities
 ```
 
 Then run `next build` to expose the generated discovery, retrieval, and capability interfaces.
@@ -192,7 +199,7 @@ npx next-ai-ready init
 npm run dev
 ```
 
-The scaffold creates a runnable minimal Next.js App Router TypeScript project and starter `content/index.mdx`. It deliberately leaves AI-ready config, route handlers, actions, and `withAiReady()` wiring to the following `next-ai-ready init` step.
+The scaffold creates a runnable minimal Next.js App Router TypeScript project and starter `content/index.mdx`. It deliberately leaves AI-ready config, route handlers, and `withAiReady()` wiring to the following `next-ai-ready init` step. Actions and MCP remain opt-in through `--with-capabilities`.
 
 ### Analytics hooks
 

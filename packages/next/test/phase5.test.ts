@@ -66,7 +66,35 @@ describe("runDoctor()", () => {
       const msgs = r.diagnostics.map((d) => d.message).join("\n");
       expect(msgs).toContain("Found ai-ready.config.mjs");
       expect(msgs).toContain("No graph.json yet");
-      expect(msgs).toContain("No actions configured");
+      expect(msgs).toContain("valid Knowledge-only setup");
+      expect(
+        r.diagnostics.some(
+          (diagnostic) => diagnostic.level === "ok" && diagnostic.message.includes("valid Knowledge-only setup"),
+        ),
+      ).toBe(true);
+    } finally {
+      await cleanup();
+    }
+  });
+
+  it("does not penalize an intentionally Knowledge-only project", async () => {
+    const { dir, cleanup } = await makeProject();
+    try {
+      const result = await runDoctor({ cwd: dir, json: true });
+      const mcp = result.diagnostics.find((diagnostic) =>
+        diagnostic.message.includes("MCP route is not installed"),
+      );
+      expect(mcp?.level).toBe("ok");
+
+      const capabilityTactics = result.report?.tactics?.filter((tactic) => tactic.plane === "C") ?? [];
+      expect(capabilityTactics).toHaveLength(12);
+      expect(capabilityTactics.every((tactic) => tactic.level === "skip")).toBe(true);
+      expect(result.actionItems).not.toContain(
+        "Fix `actions` path in config or register at least one `defineAction`.",
+      );
+      expect(result.actionItems).not.toContain(
+        "Set `NEXT_AI_READY_MCP_TOKEN` in production to protect `/api/mcp`.",
+      );
     } finally {
       await cleanup();
     }

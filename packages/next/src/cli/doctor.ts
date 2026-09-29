@@ -134,6 +134,8 @@ export async function runDoctor(opts: DoctorOptions = {}): Promise<DoctorResult>
     add(CHECK.SITE_DESCRIPTION, "ok", "Site description present.", "Site description");
   }
 
+  const hasMcpRoute = await fileExists(join(cwd, ROUTE_STUBS.MCP));
+
   // 2. Actions: load + validate exposure rules (ADR-010).
   if (config.actions) {
     try {
@@ -162,7 +164,12 @@ export async function runDoctor(opts: DoctorOptions = {}): Promise<DoctorResult>
       add(CHECK.ACTIONS_LOAD, "error", `Failed to load actions: ${err instanceof Error ? err.message : String(err)}`, "Actions load");
     }
   } else {
-    add(CHECK.ACTIONS_LOAD, "warn", "No actions configured — Capability plane is empty (Knowledge-only site).", "Actions configured");
+    add(
+      CHECK.ACTIONS_LOAD,
+      "ok",
+      "No actions configured — valid Knowledge-only setup.",
+      "Actions configured",
+    );
   }
 
   // 3. Build artifacts.
@@ -318,7 +325,14 @@ export async function runDoctor(opts: DoctorOptions = {}): Promise<DoctorResult>
   }
 
   // 8. R-01: MCP token configured for production.
-  if (!process.env.NEXT_AI_READY_MCP_TOKEN) {
+  if (!hasMcpRoute) {
+    add(
+      CHECK.MCP_TOKEN,
+      "ok",
+      "MCP route is not installed — no production token is required.",
+      "MCP token",
+    );
+  } else if (!process.env.NEXT_AI_READY_MCP_TOKEN) {
     add(
       CHECK.MCP_TOKEN,
       "warn",

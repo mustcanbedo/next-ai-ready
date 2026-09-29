@@ -87,7 +87,7 @@ Run in a **clean directory outside the monorepo** (e.g. `/tmp/nair-verify`):
 mkdir -p /tmp/nair-verify && cd /tmp/nair-verify
 pnpm create next-app@latest my-app --yes
 cd my-app
-pnpm add next-ai-ready zod@^4
+pnpm add next-ai-ready
 pnpm exec next-ai-ready init
 pnpm exec next-ai-ready build
 pnpm exec next-ai-ready doctor --score

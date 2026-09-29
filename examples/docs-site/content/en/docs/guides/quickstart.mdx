@@ -43,7 +43,7 @@ The scaffold supplies a runnable minimal App Router TypeScript app and starter M
 ```bash
 npx create-next-app@latest my-site --typescript --app --tailwind
 cd my-site
-pnpm add next-ai-ready zod@^4
+pnpm add next-ai-ready
 npx next-ai-ready init
 ```
 
@@ -73,10 +73,8 @@ You should see output like:
 ```
 [next-ai-ready] scanning content
 [next-ai-ready] compiling 1 files
-[next-ai-ready] loading actions from ./actions/index.mjs
-[next-ai-ready] compiled 1 actions
-[next-ai-ready] wrote 8 files
-[next-ai-ready] build complete — 1 routes, 1 actions, 8 files written
+[next-ai-ready] wrote 5 files
+[next-ai-ready] build complete — 1 routes, 0 actions, 5 files written
 ```
 
 ## 4. Verify
@@ -87,12 +85,12 @@ npx next-ai-ready doctor --score
 
 Aim for 90+. The CLI prints **Top fixes** for any remaining warnings. Then start your dev server and visit:
 
-- `http://localhost:3000/_ai-ready/llms-txt` — your llms.txt
-- `http://localhost:3000/_ai-ready/openapi` — your OpenAPI spec
-- `http://localhost:3000/_ai-ready/tools` — your tools manifest
+- `http://localhost:3000/llms.txt` — your AI discovery index
+- `http://localhost:3000/llms-full.txt` — your complete readable corpus
+- `http://localhost:3000/<route>.md` — a page's Markdown representation
 
 ## Next steps
 
 - Read about the [Knowledge Plane](/docs/concepts/knowledge-plane) to understand content compilation
-- Read about the [Capability Plane](/docs/concepts/capability-plane) to define custom actions
+- Run `next-ai-ready init --with-capabilities` when you are ready to add the [Capability Plane](/docs/concepts/capability-plane)
 - Check the [API Reference](/docs/api-reference/config) for full configuration options

@@ -49,6 +49,10 @@ function fail(id: string, plane: "K" | "C", name: string, message: string): Tact
   return { id, plane, name, level: "fail", message };
 }
 
+function skip(id: string, plane: "K" | "C", name: string, message: string): TacticResult {
+  return { id, plane, name, level: "skip", message };
+}
+
 /** Evaluate all 24 tactics. Failures on critical missing artifacts; warns on polish gaps. */
 export async function evaluateTactics(ctx: TacticsContext): Promise<TacticResult[]> {
   const { cwd, config } = ctx;
@@ -149,6 +153,30 @@ export async function evaluateTactics(ctx: TacticsContext): Promise<TacticResult
     results.push(fail("K12", "K", "MDX → Markdown", "No graph — content pipeline not run."));
   }
 
+  const hasCapabilityPlane = Boolean(config?.actions) ||
+    (await fileExists(join(cwd, ROUTE_STUBS.ACTION))) ||
+    (await fileExists(join(cwd, ROUTE_STUBS.MCP)));
+  if (!hasCapabilityPlane) {
+    const capabilityTactics = [
+      ["C1", "defineAction registry"],
+      ["C2", "whenToUse"],
+      ["C3", "OpenAPI 3.1"],
+      ["C4", "tools.json"],
+      ["C5", "ai-plugin.json"],
+      ["C6", "MCP server"],
+      ["C7", "Default deny"],
+      ["C8", "Invocation hooks"],
+      ["C9", "Action examples"],
+      ["C10", "Input validation"],
+      ["C11", "server-only"],
+      ["C12", "MCP resources"],
+    ] as const;
+    for (const [id, name] of capabilityTactics) {
+      results.push(skip(id, "C", name, "Not enabled in this Knowledge-only project."));
+    }
+    return results;
+  }
+
   // C1 actions
   if (config?.actions) {
     results.push(pass("C1", "C", "defineAction registry", "Actions configured."));
@@ -242,11 +270,12 @@ async function appUsesJsonLd(cwd: string): Promise<boolean> {
 }
 
 export function tacticsScore(results: TacticResult[]): number {
-  if (results.length === 0) return 0;
+  const applicable = results.filter((result) => result.level !== "skip");
+  if (applicable.length === 0) return 0;
   let pts = 0;
-  for (const t of results) {
+  for (const t of applicable) {
     if (t.level === "pass") pts += 1;
     else if (t.level === "warn") pts += 0.5;
   }
-  return Math.round((pts / results.length) * 100);
+  return Math.round((pts / applicable.length) * 100);
 }

@@ -18,7 +18,7 @@ tags:
   - llms.txt
   - markdown
   - tutorial
-updatedAt: '2026-08-05'
+updatedAt: '2026-09-29'
 author: next-ai-ready team
 ---
 
@@ -81,6 +81,21 @@ This documentation site uses the same integration described below:
 
 The production site also passes all 25 checks in the pinned Vercel Agent Readability CLI baseline.
 That score measures technical readability, not search position or citation.
+
+### Inspect the implementation evidence
+
+This is a first-party production dogfood case, not an external customer testimonial. Review the
+implementation and its assertions directly instead of relying on a marketing screenshot:
+
+- [Production configuration](https://github.com/mustcanbedo/next-ai-ready/blob/main/examples/docs-site/ai-ready.config.mjs)
+- [Content used to generate this guide](https://github.com/mustcanbedo/next-ai-ready/blob/main/examples/docs-site/content/en/docs/guides/nextjs-llms-txt.mdx)
+- [Production route smoke checks](https://github.com/mustcanbedo/next-ai-ready/blob/main/examples/docs-site/scripts/docs-site-route-smoke.mjs)
+- [Executable Nextra 4 fixture](https://github.com/mustcanbedo/next-ai-ready/tree/main/examples/nextra-docs)
+
+The route smoke checks verify the HTML page, `llms.txt`, explicit Markdown URLs, content
+negotiation, canonical headers, search, MCP retrieval, and separate browser/agent missing-page
+behavior. External adoption is tracked separately and will be presented as a customer case only
+after another project deploys and verifies the integration.
 
 ## 1. Install the package
 

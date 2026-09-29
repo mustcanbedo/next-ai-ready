@@ -230,11 +230,28 @@ async function main() {
   });
   await expectResponse("/en/docs/guides/nextjs-llms-txt.md", {
     contentType: "text/markdown",
-    includes: "# Add llms.txt and Markdown endpoints to Next.js App Router",
+    includes: [
+      "# Add llms.txt and Markdown endpoints to Next.js App Router",
+      "### Inspect the implementation evidence",
+      "[Production route smoke checks](https://github.com/mustcanbedo/next-ai-ready/blob/main/examples/docs-site/scripts/docs-site-route-smoke.mjs)",
+    ],
   });
   await expectResponse("/zh/docs/guides/nextjs-llms-txt.md", {
     contentType: "text/markdown",
-    includes: "# 为 Next.js App Router 添加 llms.txt 与 Markdown 端点",
+    includes: [
+      "# 为 Next.js App Router 添加 llms.txt 与 Markdown 端点",
+      "### 检查实现证据",
+    ],
+  });
+  await expectResponse("/en/docs/installation.md", {
+    contentType: "text/markdown",
+    includes:
+      "[Next.js App Router llms.txt walkthrough](./guides/nextjs-llms-txt)",
+  });
+  await expectResponse("/zh/docs/api-reference/cli.md", {
+    contentType: "text/markdown",
+    includes:
+      "[Next.js App Router llms.txt 实战教程](../guides/nextjs-llms-txt)",
   });
   await expectResponse("/en/docs/guides/mcp-integration", {
     contentType: "text/html",
@@ -250,11 +267,17 @@ async function main() {
   });
   await expectResponse("/en/docs/guides/nextra-ai-ready.md", {
     contentType: "text/markdown",
-    includes: "# Nextra llms.txt and Markdown endpoint setup",
+    includes: [
+      "# Nextra llms.txt and Markdown endpoint setup",
+      "[Next.js App Router llms.txt walkthrough](./nextjs-llms-txt)",
+    ],
   });
   await expectResponse("/zh/docs/guides/fumadocs-ai-ready.md", {
     contentType: "text/markdown",
-    includes: "# 为 Fumadocs 添加 llms.txt 与 Markdown 端点",
+    includes: [
+      "# 为 Fumadocs 添加 llms.txt 与 Markdown 端点",
+      "[Next.js App Router llms.txt 实战教程](./nextjs-llms-txt)",
+    ],
   });
   await expectResponse("/en/docs/guides/mdx-content", {
     contentType: "text/html",

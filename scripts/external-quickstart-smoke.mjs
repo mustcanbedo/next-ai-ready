@@ -183,7 +183,6 @@ async function configureConsumerManifest(dir, artifacts, expectedMetaVersion) {
     next: `^${NEXT_VERSION}`,
     react: reactVersion,
     "react-dom": reactVersion,
-    zod: "^4",
   };
   packageJson.devDependencies = {
     "@types/node": "^20",
@@ -327,16 +326,46 @@ export default nextConfig;
     console.log("[external] build …");
     await run(dir, "node", [cli, "build"]);
 
-    for (const rel of [
+    const knowledgeFiles = [
       ".next-ai-ready/graph.json",
       "public/llms.txt",
+      "public/llms-full.txt",
       "public/sitemap.md",
-      "public/openapi.json",
-      "instrumentation.ts",
-    ]) {
+      "public/robots.txt",
+      "app/%5Fai-ready/llms-txt/route.ts",
+      "app/%5Fai-ready/llms-full/route.ts",
+      "app/%5Fai-ready/md/[...path]/route.ts",
+      "app/%5Fai-ready/ai-json/[...path]/route.ts",
+    ];
+    for (const rel of knowledgeFiles) {
       if (!(await exists(join(dir, rel)))) throw new Error(`missing ${rel}`);
       console.log(`  ✓ ${rel}`);
     }
+
+    const capabilityFiles = [
+      "public/openapi.json",
+      "public/tools.json",
+      "app/%5Fai-ready/openapi/route.ts",
+      "app/%5Fai-ready/tools/route.ts",
+      "app/api/actions/[name]/route.ts",
+      "app/api/mcp/[transport]/route.ts",
+      "actions/index.ts",
+      "instrumentation.ts",
+      "instrumentation-node.ts",
+    ];
+    for (const rel of capabilityFiles) {
+      if (await exists(join(dir, rel))) {
+        throw new Error(`default init unexpectedly created Capability Plane file ${rel}`);
+      }
+    }
+    console.log("  ✓ default init remains Knowledge-only");
+
+    const nextConfigName = NEXT_VERSION === "14" ? "next.config.mjs" : "next.config.ts";
+    const nextConfig = await readFile(join(dir, nextConfigName), "utf8");
+    if (!nextConfig.includes("withAiReady({ agentReadable: true })")) {
+      throw new Error(`${nextConfigName} does not enable Agent Markdown negotiation`);
+    }
+    console.log(`  ✓ ${nextConfigName} enables Agent Markdown negotiation`);
 
     console.log("[external] doctor --score …");
     const doctor = spawnSync("node", [cli, "doctor", "--score"], {

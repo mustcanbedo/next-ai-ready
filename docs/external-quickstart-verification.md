@@ -14,8 +14,11 @@ create-next-app → pnpm add next-ai-ready → next-ai-ready init → next-ai-re
 Then access:
 
 - `GET /llms.txt` → 200, plain text
-- `GET /openapi.json` → 200, OpenAPI 3.1 JSON
+- `GET /<route>.md` → 200, Markdown
 - `next-ai-ready doctor` → **exit 0** (warnings OK)
+
+`GET /openapi.json`, Actions, and MCP are opt-in checks after running
+`next-ai-ready init --with-capabilities` with their documented peer dependencies.
 
 ## Automated verification (CI)
 
@@ -23,7 +26,7 @@ Then access:
 
 `packages/next/test/e2e-pipeline.test.ts` runs in CI:
 
-1. `runInit()` — scaffolds config, handlers, patches `next.config.mjs` + `package.json`
+1. `runInit({ withCapabilities: true })` — scaffolds both planes and patches `next.config.mjs` + `package.json`
 2. `runBuild()` — writes graph, llms.txt, openapi.json, actions manifest
 3. Handlers — `llms-txt`, `openapi`, `POST /api/actions/ping`
 4. `runDoctor()` — **errors = 0**, score > 0
@@ -39,6 +42,7 @@ node scripts/e2e-smoke.mjs
 ```
 
 Uses workspace links; checks init → build → doctor --score.
+It runs `init --with-capabilities`, so this smoke retains full-plane coverage.
 
 ### Clean tarball install matrix
 
@@ -64,6 +68,11 @@ to an older published package fail immediately. It then runs:
 2. `next-ai-ready build`
 3. `next-ai-ready doctor --score`
 4. a real `next build`
+
+This matrix intentionally installs no Zod or MCP peer packages. It verifies the
+default Knowledge Plane files, Agent Markdown negotiation, and absence of Actions,
+MCP, OpenAPI, and instrumentation files. The in-repo E2E and docs-site smoke cover
+the explicit `--with-capabilities` path.
 
 GitHub Actions runs six combinations: npm and pnpm across Next.js 14, 15, and 16.
 This validates the current branch rather than silently fetching an older scoped
@@ -98,15 +107,16 @@ In another terminal:
 
 ```bash
 curl -sS http://localhost:3000/llms.txt | head
-curl -sS http://localhost:3000/openapi.json | head -c 200
+curl -sS http://localhost:3000/index.md | head
 ```
 
 ### Expected doctor output (after build)
 
-- ✓ Config, site fields, graph.json, openapi.json
-- ✓ `withAiReady()` in next.config
+- ✓ Config, site fields, and graph.json
+- ✓ `withAiReady({ agentReadable: true })` in next.config
 - ✓ build script includes `next-ai-ready build`
-- ⚠ Warnings OK: MCP token unset, missing updatedAt on pages, JSON-LD helpers, etc.
+- ✓ Missing Actions and MCP credentials are accepted for a Knowledge-only project
+- ⚠ Warnings OK: missing updatedAt on pages, JSON-LD helpers, etc.
 - **Exit code: 0** (no errors)
 
 ### Registry status

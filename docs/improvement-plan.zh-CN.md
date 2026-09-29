@@ -245,7 +245,7 @@ P0、P1 外部采用验证完成后再开始。
 | I3-02 | alternate URL、frontmatter locale、hreflang Link | `待开始` | Markdown、HTTP header 和 graph 信息一致 |
 | I3-03 | 首批 ContentSource Adapter | `待开始` | 先选择一个真实用户最多的生态并做端到端示例 |
 | I3-04 | `doctor --fix` | `待开始` | 可预览改动、可重复执行、不覆盖用户自定义代码 |
-| I3-05 | 减少 init 生成文件 | `待验证` | 默认初始化已从 13 个文件缩减为 5 个 Knowledge Plane 文件；Actions、MCP、OpenAPI 与观测钩子改由 `--with-capabilities` 按需生成；两阶段升级、99 项 SDK 回归和类型检查已通过，仍需合入、发布及一次仓库外复用 |
+| I3-05 | 减少 init 生成文件 | `待验证` | 默认初始化已从 13 个文件缩减为 5 个 Knowledge Plane 文件；Actions、MCP、OpenAPI 与观测钩子改由 `--with-capabilities` 按需生成；两阶段升级、99 项 SDK 回归、干净 pnpm + Next.js 15 tarball 安装及生产构建已通过，仍需合入、发布及一次仓库外复用 |
 
 ### P4-P6：后续阶段
 

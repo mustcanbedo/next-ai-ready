@@ -54,9 +54,9 @@
 | ID | 公开项目/站点 | 来源 | Next.js | 内容来源 | 阶段 | 首次成功耗时 | 主要阻塞 | 证据 | 更新日期 |
 |---|---|---|---:|---|---|---:|---|---|---|
 | CASE-001 | 官方文档站 | dogfood | 16 | MDX | `deployed` | 不计入 | 无 | https://nextaiready.com/en | 2026-08-26 |
-| CASE-002 | Nextra 官方文档 | Nextra 生态 | 16 | Nextra 4 MDX | `identified` | - | 尚无 `llms.txt` 与页面级 Markdown；先询问是否接受集成指南 | https://github.com/shuding/nextra/tree/main/docs | 2026-09-29 |
-| CASE-003 | Superseed Docs | 公开 Nextra 项目 | 16 | Nextra 4 MDX | `identified` | - | 尚无 `llms.txt` 与页面级 Markdown；可提供小范围兼容 PR | https://github.com/superseed-xyz/docs | 2026-09-29 |
-| CASE-004 | Morgen Dev Docs | 公开 Nextra 项目 | 15 | Nextra 4 MDX | `identified` | - | 尚无 `llms.txt` 与页面级 Markdown；可提供小范围兼容 PR | https://github.com/morgen-so/morgen-dev-docs | 2026-09-29 |
+| CASE-002 | Nextra 官方文档 | Nextra 生态 | 16 | Nextra 4 MDX | `invited` | - | 等待维护者判断是否接受集成指南或示例 PR；不自动追发 | [source](https://github.com/shuding/nextra/tree/main/docs) / [invitation](https://github.com/shuding/nextra/discussions/5054) | 2026-09-29 |
+| CASE-003 | Superseed Docs | 公开 Nextra 项目 | 16 | Nextra 4 MDX | `invited` | - | 等待明确同意后再提供小范围兼容 PR；不自动追发 | [source](https://github.com/superseed-xyz/docs) / [invitation](https://github.com/superseed-xyz/docs/issues/142) | 2026-09-29 |
+| CASE-004 | Morgen Dev Docs | 公开 Nextra 项目 | 15 | Nextra 4 MDX | `invited` | - | 等待明确同意后再提供小范围兼容 PR；不自动追发 | [source](https://github.com/morgen-so/morgen-dev-docs) / [invitation](https://github.com/morgen-so/morgen-dev-docs/issues/20) | 2026-09-29 |
 | CASE-005 | WebNN Docs | 公开 Nextra 项目 | 16 | Nextra 4 MDX | `identified` | - | 已有 `llms.txt`，但页面级 Markdown 与内容协商仍待验证 | https://github.com/webmachinelearning/webnn-docs | 2026-09-29 |
 
 新增记录时复制一行并使用下一个递增编号（当前为 `CASE-006`）。私有项目使用

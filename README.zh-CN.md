@@ -16,7 +16,7 @@ English | [中文文档](./README.zh-CN.md)
 ## 10 分钟开始
 
 ```bash
-pnpm add next-ai-ready zod@^4
+pnpm add next-ai-ready
 pnpm exec next-ai-ready init
 # 添加或更新 content/**/*.mdx，然后执行：
 pnpm exec next-ai-ready build
@@ -150,13 +150,20 @@ export default defineAction({
 
 ```bash
 pnpm add next-ai-ready
-npx next-ai-ready init     # 生成配置 + 路由桩文件 + 示例 action
+npx next-ai-ready init     # 生成知识平面配置与路由
 npx next-ai-ready build    # 产出 llms.txt、sitemap.md、语义图、OpenAPI、tools、robots
 npx next-ai-ready doctor   # 验证配置、action 暴露规则、路由接线（CI 友好）
 npx next-ai-ready audit https://example.com/about  # 验证 Agent 实际收到的线上页面
 npx next-ai-ready audit https://example.com/about --version 2 --json  # 五维审计报告
 npx next-ai-ready audit https://example.com/about --version 3 --json  # 三平面严格预检
 npx next-ai-ready mcp      # 通过 stdio 运行 MCP 服务器（Claude Desktop / Cursor）
+```
+
+需要 Actions 与 MCP 时，再安装运行时 peer dependencies 并显式启用：
+
+```bash
+pnpm add zod@^4 @modelcontextprotocol/sdk mcp-handler
+npx next-ai-ready init --with-capabilities
 ```
 
 然后运行 `next build`，暴露生成的发现、读取与能力接口。
@@ -190,7 +197,7 @@ npx next-ai-ready init
 npm run dev
 ```
 
-脚手架会生成可直接运行的最小 Next.js App Router TypeScript 项目和初始 `content/index.mdx`。AI-ready 配置、路由 handler、actions 与 `withAiReady()` 接线会留给随后执行的 `next-ai-ready init`，不会由模板预置。
+脚手架会生成可直接运行的最小 Next.js App Router TypeScript 项目和初始 `content/index.mdx`。AI-ready 配置、路由 handler 与 `withAiReady()` 接线会留给随后执行的 `next-ai-ready init`；Actions 与 MCP 通过 `--with-capabilities` 按需启用。
 
 ### 分析钩子
 

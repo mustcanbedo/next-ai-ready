@@ -14,7 +14,9 @@ Usage:
 Commands:
   build       Scan content, compile graph, emit llms.txt and graph.json.
   dev         Watch content globs and rebuild artifacts on change.
-  init        Write handler stubs into app/ and ai-ready.config.
+  init        Write Knowledge Plane handlers and ai-ready.config.
+              --with-capabilities  Also add Actions, MCP, and observability
+                                   (requires Zod and MCP peer packages).
   doctor      Validate config, action exposure, and route wiring (CI-friendly).
               --score   Include AI-readiness score (0–100).
               --json    Emit machine-readable JSON report (includes 24 tactics).
@@ -121,7 +123,10 @@ export async function runCli(argv: string[]): Promise<number> {
       }
 
       case "init": {
-        await runInit({ force: flags.has("--force") });
+        await runInit({
+          force: flags.has("--force"),
+          withCapabilities: flags.has("--with-capabilities"),
+        });
         console.log("[next-ai-ready] ✓ init complete");
         return 0;
       }

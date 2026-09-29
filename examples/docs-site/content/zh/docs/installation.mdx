@@ -8,7 +8,7 @@ questions:
   - q: 需要单独安装 @next-ai-ready/* 包吗？
     a: 不需要。只安装 next-ai-ready 聚合包即可，已包含 handler 与 CLI。
   - q: next-ai-ready init 会生成什么？
-    a: ai-ready.config、app/%5Fai-ready/ 路由桩、action/MCP 端点，以及可选的 instrumentation 文件。
+    a: 默认生成 ai-ready.config 与 app/%5Fai-ready/ 下的知识平面路由；传入 --with-capabilities 后才会增加 Actions、MCP、OpenAPI 路由与 instrumentation。
 tags:
   - installation
   - next.js
@@ -24,12 +24,12 @@ author: next-ai-ready 团队
 - **Node.js** 20 或更高版本
 - **Next.js** 14.2+ 且使用 App Router（推荐 Next.js 15+；兼容矩阵覆盖 14.2、15 和 16）
 - **pnpm**、npm 或 yarn
-- **Zod v4**（`zod@^4`）— actions 必需（使用 `z.toJSONSchema()`）
+- **Zod v4**（`zod@^4`）— 仅在启用 Actions 时需要（使用 `z.toJSONSchema()`）
 
 ## 安装
 
 ```bash
-pnpm add next-ai-ready zod@^4
+pnpm add next-ai-ready
 ```
 
 这会安装 meta 包，重新导出全部 API 并提供 CLI。
@@ -96,13 +96,15 @@ npx next-ai-ready init
 将创建：
 
 - TypeScript 项目中的 `ai-ready.config.ts`，或 JavaScript 项目中的 `.mjs` — 站点配置（含 robots 策略说明）
-- `instrumentation.ts` + `instrumentation-node.ts` — 可选观测 hook（`next-ai-ready/hooks`，Edge 安全拆分）
-- `app/%5Fai-ready/` — `llms.txt`、`openapi.json` 等路由 handler
-- `app/api/actions/` — action 执行端点
-- `app/api/mcp/` — MCP 服务端点
-- TypeScript 项目中的 `actions/index.ts`，或 JavaScript 项目中的 `.mjs` — 含 `ping` 健康检查的 starter action
+- `app/%5Fai-ready/` — `llms.txt`、全文、页面 Markdown 与 AI JSON 路由 handler
+- 使用 `agentReadable: true` 的 `next.config` 接线；浏览器继续获得 HTML，Agent 可请求 Markdown
 
-`init` 还会从公共 meta 包为 `next.config` 注入 `withAiReady()`，并在缺失时将 `next-ai-ready build` 加入 build 脚本。
+`init` 还会在缺失时将 `next-ai-ready build` 加入 build 脚本。需要可调用 Actions、MCP、OpenAPI/工具路由与观测钩子时，再安装 Zod 并显式启用：
+
+```bash
+pnpm add zod@^4 @modelcontextprotocol/sdk mcp-handler
+pnpm exec next-ai-ready init --with-capabilities
+```
 
 `%5F` 是 `_` 的 URL 编码。Next.js 会把字面量目录 `app/_ai-ready/` 当作私有目录并排除在路由系统之外；`app/%5Fai-ready/` 才会正确提供 `/_ai-ready/*` URL。请勿重命名生成的目录。从 alpha.10 或更早版本升级时，请重新运行 `npx next-ai-ready init`，确认没有本地定制后再删除旧的 `app/_ai-ready/` 目录。
 
@@ -120,9 +122,10 @@ export default defineConfig({
     description: "供 AI 使用的简短站点描述。",
   },
   content: ["app/**/*.mdx", "content/**/*.mdx"],
-  actions: "./actions/index.mjs",
 });
 ```
+
+仅在运行 `init --with-capabilities` 后，再增加 `actions: "./actions/index.mjs"`。
 
 ### Robots 策略
 

@@ -76,7 +76,7 @@ describe("init → build → handler pipeline (X-01)", () => {
   it("scaffolds, builds artifacts, serves handlers, and passes doctor with zero errors", async () => {
     const { dir, cleanup } = await makePipelineProject();
     try {
-      const init = await runInit({ cwd: dir, silent: true });
+      const init = await runInit({ cwd: dir, withCapabilities: true, silent: true });
       expect(init.written).toContain("ai-ready.config.ts");
       expect(init.written).toContain("actions/index.ts");
       expect(init.patched.some((p) => p.includes("next.config"))).toBe(true);

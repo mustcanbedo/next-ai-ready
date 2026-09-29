@@ -14,7 +14,7 @@ Add AI-readable discovery and Markdown endpoints to a Next.js App Router site in
 ## Start in 10 minutes
 
 ```bash
-pnpm add next-ai-ready zod@^4
+pnpm add next-ai-ready
 pnpm exec next-ai-ready init
 pnpm exec next-ai-ready build
 pnpm exec next-ai-ready doctor --score
@@ -84,7 +84,7 @@ Updated: 2026-09-29
 
 ### `next-ai-ready init`
 
-Scaffolds handler stubs and config into your project.
+Scaffolds the Knowledge Plane handler stubs and config into your project.
 
 ```bash
 npx next-ai-ready init
@@ -93,10 +93,18 @@ npx next-ai-ready init
 Creates:
 
 - `ai-ready.config.mjs` — site configuration with placeholder values.
-- `app/%5Fai-ready/` — route handler stubs (one-line re-exports).
-- `app/api/actions/[name]/route.ts` — action execution endpoint.
-- `app/api/mcp/[transport]/route.ts` — MCP server endpoint.
-- `actions/index.mjs` — starter action file with a `ping` health check.
+- `app/%5Fai-ready/` — `llms.txt`, full-text, Markdown, and AI JSON route handlers.
+- `next.config` wiring with Agent Markdown negotiation enabled.
+
+Add the Capability Plane only when the project has a concrete callable workflow:
+
+```bash
+npx next-ai-ready init --with-capabilities
+```
+
+That opt-in also creates the Action and MCP endpoints, a starter `ping` action,
+OpenAPI/tool routes, and observability hooks. Install `zod@^4`,
+`@modelcontextprotocol/sdk`, and `mcp-handler` before enabling it.
 
 Use `--force` to overwrite existing files.
 
@@ -148,16 +156,16 @@ npx next-ai-ready doctor --json    # machine-readable report (includes actionIte
 Checks include:
 
 1. **Config** — `ai-ready.config.mjs` with required `site.name`, `site.baseUrl`, and `site.description`.
-2. **Actions** — public vs private counts; warns if public actions lack `whenToUse`.
+2. **Actions** — when configured, public vs private counts and missing `whenToUse`.
 3. **Build artifacts** — graph, OpenAPI, `package.json` prebuild script.
 4. **Route stubs** — `app/%5Fai-ready/*` handler files and `withAiReady()` in `next.config`.
 5. **Robots** — static `public/robots.txt` **or** `app/robots.ts` (when `emit.robots: false`, doctor does not warn about a missing static file).
-6. **MCP** — warns if `NEXT_AI_READY_MCP_TOKEN` is unset in production.
+6. **MCP** — when the MCP route exists, warns if `NEXT_AI_READY_MCP_TOKEN` is unset.
 7. **Content quality** — `noai` meta, JSON-LD helpers, `updatedAt` / `author` coverage in the graph.
 
 Exits with code 1 if any **errors** are found. Warnings do not cause a non-zero exit.
 
-With `--score`, the CLI prints **Top fixes** (e.g. add prebuild, set MCP token, add `updatedAt` to frontmatter).
+With `--score`, the CLI prints **Top fixes** (e.g. add prebuild or add `updatedAt` to frontmatter). Capability checks are skipped instead of penalized for intentionally Knowledge-only projects.
 
 Use in CI:
 
@@ -1044,7 +1052,7 @@ They explain intent and trade-offs; the API reference and doctor checks are the 
 <!-- BEGIN /en/docs/getting-started/project-structure -->
 # Project Structure
 URL: https://nextaiready.com/en/docs/getting-started/project-structure
-Updated: 2026-06-02
+Updated: 2026-09-29
 
 # Project Structure
 
@@ -1052,7 +1060,7 @@ After running `npx next-ai-ready init`, your project gains a few files and direc
 
 ## Config file
 
-- `ai-ready.config.mjs` — your site-wide configuration. Defines `site` metadata, content globs, action module path, and emit toggles. See [Configuration](/docs/api-reference/config) for the full reference.
+- `ai-ready.config.mjs` — your site-wide configuration. Defines `site` metadata, content globs, and emit toggles. The action module path is optional. See [Configuration](/docs/api-reference/config) for the full reference.
 
 ## Build artifacts
 
@@ -1074,30 +1082,30 @@ Written to `public/` at build time:
 
 ## Route handlers
 
-Created by `init` in `app/`. Each file is a one-line re-export — readable, auditable, customisable:
+Created by the default `init` in `app/`. Each file is a small re-export — readable, auditable, customisable:
 
 - `app/%5Fai-ready/llms-txt/route.ts` — serves `/llms.txt`
 - `app/%5Fai-ready/llms-full/route.ts` — serves `/llms-full.txt`
 - `app/%5Fai-ready/md/[...path]/route.ts` — serves `/<route>.md`
 - `app/%5Fai-ready/ai-json/[...path]/route.ts` — serves `/<route>.ai.json`
+
+Created only by `init --with-capabilities`:
+
 - `app/%5Fai-ready/openapi/route.ts` — serves `/openapi.json`
 - `app/%5Fai-ready/tools/route.ts` — serves `/tools.json`
 - `app/api/actions/[name]/route.ts` — action execution endpoint
 - `app/api/mcp/[transport]/route.ts` — MCP server endpoint
 
-## Actions
+## Optional Capability Plane
 
-- `actions/index.mjs` — your action definitions. Exports an array of `defineAction()` entries. See [Actions](/docs/guides/actions) for how to write them.
-
-## Optional files
-
+- `actions/index.mjs` — action definitions created by `init --with-capabilities`. See [Actions](/docs/guides/actions).
 - `instrumentation.ts` + `instrumentation-node.ts` — Next.js instrumentation (Node-only hooks via `next-ai-ready/hooks`). See [Analytics](/docs/guides/analytics).
 
 ## FAQ
 
 ### What files does next-ai-ready add to my project?
 
-ai-ready.config, app/%5Fai-ready/ route stubs, actions/, instrumentation files, and build outputs under public/ and .next-ai-ready/.
+By default, ai-ready.config and Knowledge Plane routes under app/%5Fai-ready/. Capability and instrumentation files are added only with --with-capabilities.
 
 ### Where does the semantic graph live?
 
@@ -1284,7 +1292,7 @@ registerAiHooks({
 });
 ```
 
-`npx next-ai-ready init` scaffolds both files for you.
+`npx next-ai-ready init --with-capabilities` scaffolds both files for you.
 
 ## `onAiRequest`
 
@@ -1380,7 +1388,7 @@ a fully static `output: "export"` build because the machine-facing route handler
 From the Fumadocs Next.js application directory:
 
 ```bash
-pnpm add next-ai-ready zod@^4
+pnpm add next-ai-ready
 pnpm exec next-ai-ready init
 ```
 
@@ -1558,7 +1566,7 @@ HTTP. Both transports expose the same explicitly public actions and build-time d
 
 ```bash
 pnpm add next-ai-ready zod@^4 @modelcontextprotocol/sdk mcp-handler
-pnpm exec next-ai-ready init
+pnpm exec next-ai-ready init --with-capabilities
 pnpm exec next-ai-ready build
 ```
 
@@ -1574,7 +1582,7 @@ your actions as tools. `next-ai-ready` exposes an MCP server at `/api/mcp`.
 
 ## HTTP endpoint (production)
 
-After `next-ai-ready init`, the MCP server is available at `/api/mcp`. It handles Streamable HTTP, SSE, and session management via `vercel/mcp-handler`.
+After `next-ai-ready init --with-capabilities`, the MCP server is available at `/api/mcp`. It handles Streamable HTTP, SSE, and session management via `vercel/mcp-handler`.
 
 Connect any MCP-compatible client to `https://your-site.com/api/mcp`.
 
@@ -1935,12 +1943,12 @@ after another project deploys and verifies the integration.
 From an existing Next.js App Router project:
 
 ```bash
-pnpm add next-ai-ready zod@^4
+pnpm add next-ai-ready
 pnpm exec next-ai-ready init
 ```
 
-`init` creates explicit route handlers, an AI-ready configuration file, a starter action, and the
-Next.js rewrite configuration. Existing page components remain unchanged.
+`init` creates explicit Knowledge Plane route handlers, an AI-ready configuration file, and the
+Next.js rewrite configuration with Agent Markdown negotiation. Existing page components remain unchanged.
 
 ## 2. Add AI-readable content
 
@@ -2100,7 +2108,7 @@ pnpm --filter @next-ai-ready/example-nextra-docs test
 From the Nextra application directory:
 
 ```bash
-pnpm add next-ai-ready zod@^4
+pnpm add next-ai-ready
 pnpm exec next-ai-ready init
 ```
 
@@ -2167,7 +2175,7 @@ upstream fix ships, pin only Nextra's private copies in the workspace root:
 }
 ```
 
-Keep the application's direct `zod@^4` dependency unchanged for next-ai-ready. This workaround is
+Keep next-ai-ready's Zod 4 dependency unchanged. This workaround is scoped only to Nextra's private copies and is
 tracked upstream in [Nextra #4989](https://github.com/shuding/nextra/issues/4989) and
 [#5036](https://github.com/shuding/nextra/issues/5036); remove the override once a fixed Nextra
 release passes the fixture.
@@ -2244,7 +2252,7 @@ The scaffold supplies a runnable minimal App Router TypeScript app and starter M
 ```bash
 npx create-next-app@latest my-site --typescript --app --tailwind
 cd my-site
-pnpm add next-ai-ready zod@^4
+pnpm add next-ai-ready
 npx next-ai-ready init
 ```
 
@@ -2274,10 +2282,8 @@ You should see output like:
 ```
 [next-ai-ready] scanning content
 [next-ai-ready] compiling 1 files
-[next-ai-ready] loading actions from ./actions/index.mjs
-[next-ai-ready] compiled 1 actions
-[next-ai-ready] wrote 8 files
-[next-ai-ready] build complete — 1 routes, 1 actions, 8 files written
+[next-ai-ready] wrote 5 files
+[next-ai-ready] build complete — 1 routes, 0 actions, 5 files written
 ```
 
 ## 4. Verify
@@ -2288,14 +2294,14 @@ npx next-ai-ready doctor --score
 
 Aim for 90+. The CLI prints **Top fixes** for any remaining warnings. Then start your dev server and visit:
 
-- `http://localhost:3000/_ai-ready/llms-txt` — your llms.txt
-- `http://localhost:3000/_ai-ready/openapi` — your OpenAPI spec
-- `http://localhost:3000/_ai-ready/tools` — your tools manifest
+- `http://localhost:3000/llms.txt` — your AI discovery index
+- `http://localhost:3000/llms-full.txt` — your complete readable corpus
+- `http://localhost:3000/<route>.md` — a page's Markdown representation
 
 ## Next steps
 
 - Read about the [Knowledge Plane](/docs/concepts/knowledge-plane) to understand content compilation
-- Read about the [Capability Plane](/docs/concepts/capability-plane) to define custom actions
+- Run `next-ai-ready init --with-capabilities` when you are ready to add the [Capability Plane](/docs/concepts/capability-plane)
 - Check the [API Reference](/docs/api-reference/config) for full configuration options
 
 ## FAQ
@@ -2527,12 +2533,12 @@ Updated: 2026-09-29
 - **Node.js** 20 or later
 - **Next.js** 14.2+ with App Router (Next.js 15+ recommended; 14.2, 15, and 16 are covered by the compatibility matrix)
 - **pnpm**, npm, or yarn
-- **Zod v4** (`zod@^4`) — required for actions (uses `z.toJSONSchema()`)
+- **Zod v4** (`zod@^4`) — required only when enabling Actions (uses `z.toJSONSchema()`)
 
 ## Install
 
 ```bash
-pnpm add next-ai-ready zod@^4
+pnpm add next-ai-ready
 ```
 
 This installs the meta package which re-exports everything you need and provides the CLI.
@@ -2599,13 +2605,15 @@ npx next-ai-ready init
 This creates:
 
 - `ai-ready.config.ts` in TypeScript apps, or `.mjs` in JavaScript apps — your site config (includes robots strategy notes)
-- `instrumentation.ts` + `instrumentation-node.ts` — optional observability hooks (`next-ai-ready/hooks`, Edge-safe split)
-- `app/%5Fai-ready/` — route handlers for `llms.txt`, `openapi.json`, etc.
-- `app/api/actions/` — the action execution endpoint
-- `app/api/mcp/` — the MCP server endpoint
-- `actions/index.ts` in TypeScript apps, or `.mjs` in JavaScript apps — a starter action file with a `ping` health check
+- `app/%5Fai-ready/` — route handlers for `llms.txt`, full text, page Markdown, and AI JSON
+- `next.config` wiring with `agentReadable: true`, so browsers keep HTML while agents can request Markdown
 
-`init` also patches `next.config` with `withAiReady()` from the public meta package and adds `next-ai-ready build` to your build script when missing.
+`init` also adds `next-ai-ready build` to your build script when missing. To add callable Actions, MCP, OpenAPI/tool routes, and observability hooks, install Zod and opt in explicitly:
+
+```bash
+pnpm add zod@^4 @modelcontextprotocol/sdk mcp-handler
+pnpm exec next-ai-ready init --with-capabilities
+```
 
 `%5F` is the URL-encoded form of `_`. Next.js treats a literal `app/_ai-ready/` folder as private and excludes it from routing, while `app/%5Fai-ready/` correctly serves the `/_ai-ready/*` URL namespace. Do not rename the generated folder. When upgrading from alpha.10 or earlier, rerun `npx next-ai-ready init` and remove the obsolete `app/_ai-ready/` directory after reviewing local customizations.
 
@@ -2623,9 +2631,10 @@ export default defineConfig({
     description: "A short description for AI.",
   },
   content: ["app/**/*.mdx", "content/**/*.mdx"],
-  actions: "./actions/index.mjs",
 });
 ```
+
+Add `actions: "./actions/index.mjs"` only after running `init --with-capabilities`.
 
 ### Robots policy
 
@@ -2661,7 +2670,7 @@ No. Install only the next-ai-ready meta package; it re-exports handlers and the 
 
 ### What does next-ai-ready init create?
 
-ai-ready.config, route stubs under app/%5Fai-ready/, action and MCP endpoints, and optional instrumentation files.
+By default, ai-ready.config and Knowledge Plane routes under app/%5Fai-ready/. Pass --with-capabilities to also add Actions, MCP, OpenAPI routes, and instrumentation.
 
 
 <!-- END /en/docs/installation -->
@@ -2821,7 +2830,7 @@ Updated: 2026-08-02
 ## 10 分钟开始
 
 ```bash
-pnpm add next-ai-ready zod@^4
+pnpm add next-ai-ready
 pnpm exec next-ai-ready init
 pnpm exec next-ai-ready build
 pnpm exec next-ai-ready doctor --score
@@ -2891,7 +2900,7 @@ Updated: 2026-09-29
 
 ### `next-ai-ready init`
 
-在项目中脚手架化 handler 桩文件和配置。
+在项目中生成知识平面的 handler 桩文件和配置。
 
 ```bash
 npx next-ai-ready init
@@ -2900,10 +2909,17 @@ npx next-ai-ready init
 创建：
 
 - `ai-ready.config.mjs` — 带占位值的站点配置。
-- `app/%5Fai-ready/` — route handler 桩文件（一行 re-export）。
-- `app/api/actions/[name]/route.ts` — action 执行端点。
-- `app/api/mcp/[transport]/route.ts` — MCP 服务器端点。
-- `actions/index.mjs` — 带 `ping` 健康检查的 starter action 文件。
+- `app/%5Fai-ready/` — `llms.txt`、全文、Markdown 与 AI JSON 路由。
+- 已开启 Agent Markdown 协商的 `next.config` 接线。
+
+只有项目存在明确的可调用工作流时，才增加能力平面：
+
+```bash
+npx next-ai-ready init --with-capabilities
+```
+
+该选项还会生成 Action 与 MCP 端点、`ping` 示例 Action、OpenAPI/工具路由和观测钩子。
+启用前请安装 `zod@^4`、`@modelcontextprotocol/sdk` 与 `mcp-handler`。
 
 使用 `--force` 覆盖已有文件。
 
@@ -2954,16 +2970,16 @@ npx next-ai-ready doctor --json    # 机器可读报告（含 actionItems）
 检查项包括：
 
 1. **配置** — `ai-ready.config.mjs` 及必填的 `site.name`、`site.baseUrl`、`site.description`。
-2. **Actions** — 公开/私有统计；公开 action 缺少 `whenToUse` 时警告。
+2. **Actions** — 配置后检查公开/私有统计及缺失的 `whenToUse`。
 3. **构建产物** — graph、OpenAPI、`package.json` 是否含 prebuild。
 4. **路由桩文件** — `app/%5Fai-ready/*` 与 `next.config` 中的 `withAiReady()`。
 5. **Robots** — `public/robots.txt` **或** `app/robots.ts`（`emit.robots: false` 时不会因缺少静态文件误报）。
-6. **MCP** — 生产环境未设置 `NEXT_AI_READY_MCP_TOKEN` 时警告。
+6. **MCP** — 仅当 MCP 路由存在时，才检查生产环境 `NEXT_AI_READY_MCP_TOKEN`。
 7. **内容质量** — `noai`、JSON-LD helper、`updatedAt` / `author` 覆盖率。
 
 发现**错误**时以代码 1 退出。警告不会导致非零退出。
 
-使用 `--score` 时会打印 **Top fixes**（如添加 prebuild、配置 MCP token、补充 frontmatter）。
+使用 `--score` 时会打印 **Top fixes**（如添加 prebuild、补充 `updatedAt` frontmatter）。对于明确采用纯知识平面的项目，能力项会被跳过，而不是扣分。
 
 在 CI 中使用：
 
@@ -3836,7 +3852,7 @@ ADR 解释意图与权衡；API 参考与 doctor 检查才是运行时的权威�
 <!-- BEGIN /zh/docs/getting-started/project-structure -->
 # 项目结构
 URL: https://nextaiready.com/zh/docs/getting-started/project-structure
-Updated: 2026-06-02
+Updated: 2026-09-29
 
 # 项目结构
 
@@ -3844,7 +3860,7 @@ Updated: 2026-06-02
 
 ## 配置文件
 
-- `ai-ready.config.mjs` — 全站配置。定义 `site` 元数据、内容 glob、action 模块路径和产物开关。详见 [配置](/docs/api-reference/config)。
+- `ai-ready.config.mjs` — 全站配置。定义 `site` 元数据、内容 glob 和产物开关；action 模块路径为可选项。详见 [配置](/docs/api-reference/config)。
 
 ## 构建产物
 
@@ -3866,30 +3882,30 @@ Updated: 2026-06-02
 
 ## 路由 handler
 
-由 `init` 创建在 `app/` 下。每个文件都是一行 re-export——可读、可审计、可自定义：
+由默认 `init` 创建在 `app/` 下。每个文件都是小型 re-export——可读、可审计、可自定义：
 
 - `app/%5Fai-ready/llms-txt/route.ts` — 提供 `/llms.txt`
 - `app/%5Fai-ready/llms-full/route.ts` — 提供 `/llms-full.txt`
 - `app/%5Fai-ready/md/[...path]/route.ts` — 提供 `/<route>.md`
 - `app/%5Fai-ready/ai-json/[...path]/route.ts` — 提供 `/<route>.ai.json`
+
+仅由 `init --with-capabilities` 创建：
+
 - `app/%5Fai-ready/openapi/route.ts` — 提供 `/openapi.json`
 - `app/%5Fai-ready/tools/route.ts` — 提供 `/tools.json`
 - `app/api/actions/[name]/route.ts` — action 执行端点
 - `app/api/mcp/[transport]/route.ts` — MCP 服务器端点
 
-## Actions
+## 可选能力平面
 
-- `actions/index.mjs` — action 定义。导出 `defineAction()` 数组。详见 [Actions](/docs/guides/actions)。
-
-## 可选文件
-
+- `actions/index.mjs` — `init --with-capabilities` 生成的 action 定义。详见 [Actions](/docs/guides/actions)。
 - `instrumentation.ts` + `instrumentation-node.ts` — Next.js instrumentation（通过 `next-ai-ready/hooks` 注册 Node 专用 hook）。详见 [分析](/docs/guides/analytics)。
 
 ## FAQ
 
 ### next-ai-ready 会在项目里添加哪些文件？
 
-ai-ready.config、app/%5Fai-ready/ 路由桩、actions/、instrumentation，以及 public/ 与 .next-ai-ready/ 下的构建产物。
+默认生成 ai-ready.config 与 app/%5Fai-ready/ 下的知识平面路由；能力平面与 instrumentation 文件仅由 --with-capabilities 添加。
 
 ### 语义图谱保存在哪里？
 
@@ -4076,7 +4092,7 @@ registerAiHooks({
 });
 ```
 
-`npx next-ai-ready init` 会自动生成这两个文件。
+`npx next-ai-ready init --with-capabilities` 会自动生成这两个文件。
 
 ## `onAiRequest`
 
@@ -4172,7 +4188,7 @@ Updated: 2026-09-29
 在 Fumadocs Next.js 应用目录执行：
 
 ```bash
-pnpm add next-ai-ready zod@^4
+pnpm add next-ai-ready
 pnpm exec next-ai-ready init
 ```
 
@@ -4344,7 +4360,7 @@ Updated: 2026-08-24
 
 ```bash
 pnpm add next-ai-ready zod@^4 @modelcontextprotocol/sdk mcp-handler
-pnpm exec next-ai-ready init
+pnpm exec next-ai-ready init --with-capabilities
 pnpm exec next-ai-ready build
 ```
 
@@ -4360,7 +4376,7 @@ pnpm exec next-ai-ready build
 
 ## HTTP 端点（生产环境）
 
-运行 `next-ai-ready init` 后，MCP 服务器在 `/api/mcp` 可用。它通过 `vercel/mcp-handler` 处理 Streamable HTTP、SSE 和会话管理。
+运行 `next-ai-ready init --with-capabilities` 后，MCP 服务器在 `/api/mcp` 可用。它通过 `vercel/mcp-handler` 处理 Streamable HTTP、SSE 和会话管理。
 
 将任何 MCP 兼容客户端连接到 `https://your-site.com/api/mcp`。
 
@@ -4715,12 +4731,12 @@ npm run dev
 在已有 Next.js App Router 项目中运行：
 
 ```bash
-pnpm add next-ai-ready zod@^4
+pnpm add next-ai-ready
 pnpm exec next-ai-ready init
 ```
 
-`init` 会创建显式的 route handler、AI-ready 配置、示例 Action 和 Next.js rewrite 配置，
-不会修改现有页面组件。
+`init` 会创建显式的知识平面 route handler、AI-ready 配置，以及启用 Agent Markdown
+协商的 Next.js rewrite 配置，不会修改现有页面组件。
 
 ## 2. 添加 AI 可读内容
 
@@ -4873,7 +4889,7 @@ pnpm --filter @next-ai-ready/example-nextra-docs test
 在 Nextra 应用目录执行：
 
 ```bash
-pnpm add next-ai-ready zod@^4
+pnpm add next-ai-ready
 pnpm exec next-ai-ready init
 ```
 
@@ -4938,7 +4954,7 @@ Nextra `4.6.1` 当前声明的 Zod 依赖范围可能把内部依赖解析到 `4
 }
 ```
 
-应用为 next-ai-ready 安装的直接依赖 `zod@^4` 保持不变。上游进度见
+保持 next-ai-ready 使用的 Zod 4 不变；该 override 只作用于 Nextra 的私有副本。上游进度见
 [Nextra #4989](https://github.com/shuding/nextra/issues/4989) 与
 [#5036](https://github.com/shuding/nextra/issues/5036)；修复版本通过该夹具后即可移除 override。
 
@@ -5014,7 +5030,7 @@ npx next-ai-ready init
 ```bash
 npx create-next-app@latest my-site --typescript --app --tailwind
 cd my-site
-pnpm add next-ai-ready zod@^4
+pnpm add next-ai-ready
 npx next-ai-ready init
 ```
 
@@ -5044,10 +5060,8 @@ npx next-ai-ready build
 ```text
 [next-ai-ready] scanning content
 [next-ai-ready] compiling 1 files
-[next-ai-ready] loading actions from ./actions/index.mjs
-[next-ai-ready] compiled 1 actions
-[next-ai-ready] wrote 8 files
-[next-ai-ready] build complete — 1 routes, 1 actions, 8 files written
+[next-ai-ready] wrote 5 files
+[next-ai-ready] build complete — 1 routes, 0 actions, 5 files written
 ```
 
 ## 4. 验证
@@ -5058,14 +5072,14 @@ npx next-ai-ready doctor --score
 
 所有检查应通过。然后启动开发服务器并访问：
 
-- `http://localhost:3000/_ai-ready/llms-txt` — 你的 llms.txt
-- `http://localhost:3000/_ai-ready/openapi` — 你的 OpenAPI 规范
-- `http://localhost:3000/_ai-ready/tools` — 你的工具清单
+- `http://localhost:3000/llms.txt` — AI 发现索引
+- `http://localhost:3000/llms-full.txt` — 完整可读内容
+- `http://localhost:3000/<route>.md` — 页面 Markdown 表示
 
 ## 下一步
 
 - 阅读[知识平面](/zh/docs/concepts/knowledge-plane)了解内容编译
-- 阅读[能力平面](/zh/docs/concepts/capability-plane)了解自定义 Action
+- 准备增加能力平面时，运行 `next-ai-ready init --with-capabilities` 并阅读[能力平面](/zh/docs/concepts/capability-plane)
 - 查看 [API 参考](/docs/api-reference/config)了解完整配置选项
 
 ## FAQ
@@ -5292,12 +5306,12 @@ Updated: 2026-09-29
 - **Node.js** 20 或更高版本
 - **Next.js** 14.2+ 且使用 App Router（推荐 Next.js 15+；兼容矩阵覆盖 14.2、15 和 16）
 - **pnpm**、npm 或 yarn
-- **Zod v4**（`zod@^4`）— actions 必需（使用 `z.toJSONSchema()`）
+- **Zod v4**（`zod@^4`）— 仅在启用 Actions 时需要（使用 `z.toJSONSchema()`）
 
 ## 安装
 
 ```bash
-pnpm add next-ai-ready zod@^4
+pnpm add next-ai-ready
 ```
 
 这会安装 meta 包，重新导出全部 API 并提供 CLI。
@@ -5364,13 +5378,15 @@ npx next-ai-ready init
 将创建：
 
 - TypeScript 项目中的 `ai-ready.config.ts`，或 JavaScript 项目中的 `.mjs` — 站点配置（含 robots 策略说明）
-- `instrumentation.ts` + `instrumentation-node.ts` — 可选观测 hook（`next-ai-ready/hooks`，Edge 安全拆分）
-- `app/%5Fai-ready/` — `llms.txt`、`openapi.json` 等路由 handler
-- `app/api/actions/` — action 执行端点
-- `app/api/mcp/` — MCP 服务端点
-- TypeScript 项目中的 `actions/index.ts`，或 JavaScript 项目中的 `.mjs` — 含 `ping` 健康检查的 starter action
+- `app/%5Fai-ready/` — `llms.txt`、全文、页面 Markdown 与 AI JSON 路由 handler
+- 使用 `agentReadable: true` 的 `next.config` 接线；浏览器继续获得 HTML，Agent 可请求 Markdown
 
-`init` 还会从公共 meta 包为 `next.config` 注入 `withAiReady()`，并在缺失时将 `next-ai-ready build` 加入 build 脚本。
+`init` 还会在缺失时将 `next-ai-ready build` 加入 build 脚本。需要可调用 Actions、MCP、OpenAPI/工具路由与观测钩子时，再安装 Zod 并显式启用：
+
+```bash
+pnpm add zod@^4 @modelcontextprotocol/sdk mcp-handler
+pnpm exec next-ai-ready init --with-capabilities
+```
 
 `%5F` 是 `_` 的 URL 编码。Next.js 会把字面量目录 `app/_ai-ready/` 当作私有目录并排除在路由系统之外；`app/%5Fai-ready/` 才会正确提供 `/_ai-ready/*` URL。请勿重命名生成的目录。从 alpha.10 或更早版本升级时，请重新运行 `npx next-ai-ready init`，确认没有本地定制后再删除旧的 `app/_ai-ready/` 目录。
 
@@ -5388,9 +5404,10 @@ export default defineConfig({
     description: "供 AI 使用的简短站点描述。",
   },
   content: ["app/**/*.mdx", "content/**/*.mdx"],
-  actions: "./actions/index.mjs",
 });
 ```
+
+仅在运行 `init --with-capabilities` 后，再增加 `actions: "./actions/index.mjs"`。
 
 ### Robots 策略
 
@@ -5426,7 +5443,7 @@ Node.js 20+、Next.js 14.2+ App Router，以及用于 action 的 Zod v4；推荐
 
 ### next-ai-ready init 会生成什么？
 
-ai-ready.config、app/%5Fai-ready/ 路由桩、action/MCP 端点，以及可选的 instrumentation 文件。
+默认生成 ai-ready.config 与 app/%5Fai-ready/ 下的知识平面路由；传入 --with-capabilities 后才会增加 Actions、MCP、OpenAPI 路由与 instrumentation。
 
 
 <!-- END /zh/docs/installation -->

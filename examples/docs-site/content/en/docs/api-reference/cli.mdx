@@ -27,7 +27,7 @@ author: next-ai-ready team
 
 ### `next-ai-ready init`
 
-Scaffolds handler stubs and config into your project.
+Scaffolds the Knowledge Plane handler stubs and config into your project.
 
 ```bash
 npx next-ai-ready init
@@ -36,10 +36,18 @@ npx next-ai-ready init
 Creates:
 
 - `ai-ready.config.mjs` — site configuration with placeholder values.
-- `app/%5Fai-ready/` — route handler stubs (one-line re-exports).
-- `app/api/actions/[name]/route.ts` — action execution endpoint.
-- `app/api/mcp/[transport]/route.ts` — MCP server endpoint.
-- `actions/index.mjs` — starter action file with a `ping` health check.
+- `app/%5Fai-ready/` — `llms.txt`, full-text, Markdown, and AI JSON route handlers.
+- `next.config` wiring with Agent Markdown negotiation enabled.
+
+Add the Capability Plane only when the project has a concrete callable workflow:
+
+```bash
+npx next-ai-ready init --with-capabilities
+```
+
+That opt-in also creates the Action and MCP endpoints, a starter `ping` action,
+OpenAPI/tool routes, and observability hooks. Install `zod@^4`,
+`@modelcontextprotocol/sdk`, and `mcp-handler` before enabling it.
 
 Use `--force` to overwrite existing files.
 
@@ -91,16 +99,16 @@ npx next-ai-ready doctor --json    # machine-readable report (includes actionIte
 Checks include:
 
 1. **Config** — `ai-ready.config.mjs` with required `site.name`, `site.baseUrl`, and `site.description`.
-2. **Actions** — public vs private counts; warns if public actions lack `whenToUse`.
+2. **Actions** — when configured, public vs private counts and missing `whenToUse`.
 3. **Build artifacts** — graph, OpenAPI, `package.json` prebuild script.
 4. **Route stubs** — `app/%5Fai-ready/*` handler files and `withAiReady()` in `next.config`.
 5. **Robots** — static `public/robots.txt` **or** `app/robots.ts` (when `emit.robots: false`, doctor does not warn about a missing static file).
-6. **MCP** — warns if `NEXT_AI_READY_MCP_TOKEN` is unset in production.
+6. **MCP** — when the MCP route exists, warns if `NEXT_AI_READY_MCP_TOKEN` is unset.
 7. **Content quality** — `noai` meta, JSON-LD helpers, `updatedAt` / `author` coverage in the graph.
 
 Exits with code 1 if any **errors** are found. Warnings do not cause a non-zero exit.
 
-With `--score`, the CLI prints **Top fixes** (e.g. add prebuild, set MCP token, add `updatedAt` to frontmatter).
+With `--score`, the CLI prints **Top fixes** (e.g. add prebuild or add `updatedAt` to frontmatter). Capability checks are skipped instead of penalized for intentionally Knowledge-only projects.
 
 Use in CI:
 

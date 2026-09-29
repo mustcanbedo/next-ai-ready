@@ -35,7 +35,7 @@ HTTP. Both transports expose the same explicitly public actions and build-time d
 
 ```bash
 pnpm add next-ai-ready zod@^4 @modelcontextprotocol/sdk mcp-handler
-pnpm exec next-ai-ready init
+pnpm exec next-ai-ready init --with-capabilities
 pnpm exec next-ai-ready build
 ```
 
@@ -51,7 +51,7 @@ your actions as tools. `next-ai-ready` exposes an MCP server at `/api/mcp`.
 
 ## HTTP endpoint (production)
 
-After `next-ai-ready init`, the MCP server is available at `/api/mcp`. It handles Streamable HTTP, SSE, and session management via `vercel/mcp-handler`.
+After `next-ai-ready init --with-capabilities`, the MCP server is available at `/api/mcp`. It handles Streamable HTTP, SSE, and session management via `vercel/mcp-handler`.
 
 Connect any MCP-compatible client to `https://your-site.com/api/mcp`.
 

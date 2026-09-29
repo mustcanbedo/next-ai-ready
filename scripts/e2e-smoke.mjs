@@ -4,7 +4,7 @@
  * E2E smoke test — simulates what a user does outside the monorepo:
  *
  *   1. Create a temp directory with a minimal Next.js project
- *   2. Run `next-ai-ready init` (scaffolds handler stubs + patches config/scripts)
+ *   2. Run `next-ai-ready init --with-capabilities` (full-plane scaffold)
  *   3. Run `next-ai-ready build` (generates graph + llms.txt + openapi.json)
  *   4. Verify expected artifacts exist
  *   5. Clean up
@@ -98,8 +98,8 @@ This is a test page for the e2e smoke test.
     });
 
     // 3. Run init
-    console.log("[e2e] running init...");
-    const initResult = await run(dir, ["init"]);
+    console.log("[e2e] running init --with-capabilities...");
+    const initResult = await run(dir, ["init", "--with-capabilities"]);
     console.log(initResult.stdout.trim());
 
     // 4. Run build

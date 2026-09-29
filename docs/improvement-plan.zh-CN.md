@@ -85,6 +85,7 @@
 | npm GA | `进行中` | `0.1.0-alpha.20` 已发布并提升为 `latest`，且已从公共 registry 通过 pnpm + Next.js 16 生产构建；尚未退出 prerelease 或发布 `0.1.0` |
 | i18n 与 Content Adapter | `进行中` | alpha.17 已发布 locale 搜索过滤及 Nextra/Fumadocs 默认内容发现；完整 alternate URL 与更多 ContentSource Adapter 仍待真实采用验证 |
 | Nextra 可执行兼容夹具 | `待验证` | PR #41 已合入 `main`；Nextra 4.6.1 + Next.js 16.2.6 的生产构建、Docker smoke 和全部合并门禁通过，现只等待至少一次仓库外复用验证 |
+| Knowledge-first 初始化 | `待验证` | WebNN Docs 本地接入演练证明默认 13 个文件、空 Capability 告警和 Zod 依赖会阻碍纯文档站；候选分支将默认输出缩减为 5 个 Knowledge Plane 文件，并用 `--with-capabilities` 显式开启 Actions/MCP，待合入、发布和仓库外复用验证 |
 | 动态索引 | `待商榷` | 只保留 Provider 方向，等待真实需求证据 |
 | 商业观测 | `待商榷` | SDK 只定义开放事件和 Adapter；托管产品单独决策 |
 | 外部采用与分发 | `进行中` | 技术可信度已建立；已增加[早期采用执行记录](./early-adopter-operations.zh-CN.md)与[渠道成效记录](./distribution/results.md)，但仓库外成功安装仍为 0 |
@@ -244,7 +245,7 @@ P0、P1 外部采用验证完成后再开始。
 | I3-02 | alternate URL、frontmatter locale、hreflang Link | `待开始` | Markdown、HTTP header 和 graph 信息一致 |
 | I3-03 | 首批 ContentSource Adapter | `待开始` | 先选择一个真实用户最多的生态并做端到端示例 |
 | I3-04 | `doctor --fix` | `待开始` | 可预览改动、可重复执行、不覆盖用户自定义代码 |
-| I3-05 | 减少 init 生成文件 | `待开始` | 普通 MDX 项目三分钟接入，生成文件数量有明确下降 |
+| I3-05 | 减少 init 生成文件 | `待验证` | 默认初始化已从 13 个文件缩减为 5 个 Knowledge Plane 文件；Actions、MCP、OpenAPI 与观测钩子改由 `--with-capabilities` 按需生成；两阶段升级、99 项 SDK 回归、干净 pnpm + Next.js 15 tarball 安装及生产构建已通过，仍需合入、发布及一次仓库外复用 |
 
 ### P4-P6：后续阶段
 

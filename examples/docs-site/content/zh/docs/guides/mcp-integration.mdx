@@ -33,7 +33,7 @@ author: next-ai-ready 团队
 
 ```bash
 pnpm add next-ai-ready zod@^4 @modelcontextprotocol/sdk mcp-handler
-pnpm exec next-ai-ready init
+pnpm exec next-ai-ready init --with-capabilities
 pnpm exec next-ai-ready build
 ```
 
@@ -49,7 +49,7 @@ pnpm exec next-ai-ready build
 
 ## HTTP 端点（生产环境）
 
-运行 `next-ai-ready init` 后，MCP 服务器在 `/api/mcp` 可用。它通过 `vercel/mcp-handler` 处理 Streamable HTTP、SSE 和会话管理。
+运行 `next-ai-ready init --with-capabilities` 后，MCP 服务器在 `/api/mcp` 可用。它通过 `vercel/mcp-handler` 处理 Streamable HTTP、SSE 和会话管理。
 
 将任何 MCP 兼容客户端连接到 `https://your-site.com/api/mcp`。
 

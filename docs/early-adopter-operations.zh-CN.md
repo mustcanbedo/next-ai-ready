@@ -57,11 +57,17 @@
 | CASE-002 | Nextra 官方文档 | Nextra 生态 | 16 | Nextra 4 MDX | `invited` | - | 等待维护者判断是否接受集成指南或示例 PR；不自动追发 | [source](https://github.com/shuding/nextra/tree/main/docs) / [invitation](https://github.com/shuding/nextra/discussions/5054) | 2026-09-29 |
 | CASE-003 | Superseed Docs | 公开 Nextra 项目 | 16 | Nextra 4 MDX | `invited` | - | 等待明确同意后再提供小范围兼容 PR；不自动追发 | [source](https://github.com/superseed-xyz/docs) / [invitation](https://github.com/superseed-xyz/docs/issues/142) | 2026-09-29 |
 | CASE-004 | Morgen Dev Docs | 公开 Nextra 项目 | 15 | Nextra 4 MDX | `invited` | - | 等待明确同意后再提供小范围兼容 PR；不自动追发 | [source](https://github.com/morgen-so/morgen-dev-docs) / [invitation](https://github.com/morgen-so/morgen-dev-docs/issues/20) | 2026-09-29 |
-| CASE-005 | WebNN Docs | 公开 Nextra 项目 | 16 | Nextra 4 MDX | `identified` | - | 已有 `llms.txt`，但页面级 Markdown 与内容协商仍待验证 | https://github.com/webmachinelearning/webnn-docs | 2026-09-29 |
+| CASE-005 | WebNN Docs | 公开 Nextra 项目 | 16 | Nextra 4 MDX | `identified` | 本地演练约 20 分钟，不计入采用 | 公开包默认生成 13 个文件并产生空 Capability 告警；Nextra 私有 Zod 版本需隔离 | https://github.com/webmachinelearning/webnn-docs | 2026-09-29 |
 
 新增记录时复制一行并使用下一个递增编号（当前为 `CASE-006`）。私有项目使用
 “private adopter CASE-xxx”，
 证据列只写“maintainer-verified”，不得加入可识别信息。
+
+CASE-005 只完成了维护者侧的本地兼容演练：98 个双语 MDX 页面成功生成完整
+`llms.txt`、页面 Markdown 与 AI JSON，Next.js 16 生产构建和 Pagefind 索引通过。该演练
+没有获得 WebNN 维护者同意，也没有修改或部署对方项目，因此阶段仍为 `identified`，不得计入
+有效交流、仓库外成功安装或公开案例。它提供的产品证据已经用于推进 Knowledge-first 默认
+初始化；只有对方明确回复后才进入 `engaged` 或创建上游 PR。
 
 首批候选的兼容依据、排除项和待批准邀请文案统一维护在
 [`distribution/ecosystem-collaboration.zh-CN.md`](./distribution/ecosystem-collaboration.zh-CN.md)。

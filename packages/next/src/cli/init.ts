@@ -10,6 +10,8 @@ export interface InitOptions {
   cwd?: string;
   /** Overwrite existing handler files. */
   force?: boolean;
+  /** Also scaffold Actions, MCP, capability routes, and observability hooks. */
+  withCapabilities?: boolean;
   silent?: boolean;
 }
 
@@ -20,13 +22,13 @@ interface FileSpec {
 
 const ACTIONS_REGISTER = "../../../../actions/index";
 
-function buildFileSpecs(useTypeScript: boolean): FileSpec[] {
+function buildFileSpecs(useTypeScript: boolean, withCapabilities: boolean): FileSpec[] {
   const actionsExt = useTypeScript ? "ts" : "mjs";
   const actionsRel = `actions/index.${actionsExt}`;
   const configRel = useTypeScript ? "ai-ready.config.ts" : "ai-ready.config.mjs";
   const registerImport = `import "${ACTIONS_REGISTER}.${actionsExt}";\n`;
 
-  return [
+  const knowledgeFiles: FileSpec[] = [
     {
       relPath: configRel,
       contents: `import { defineConfig } from "next-ai-ready";
@@ -43,7 +45,6 @@ export default defineConfig({
     "src/app/**/*.{md,mdx}",
     "src/content/**/*.{md,mdx}",
   ],
-  actions: "./${actionsRel}",
   // Robots: build emits public/robots.txt. For dynamic rules use app/robots.ts + aiRobots().
 });
 `,
@@ -82,6 +83,18 @@ export async function GET(request: Request, context: any) {
 export const runtime = "nodejs";
 `,
     },
+  ];
+
+  if (!withCapabilities) return knowledgeFiles;
+
+  const config = knowledgeFiles[0]!;
+  config.contents = config.contents.replace(
+    "  // Robots:",
+    `  actions: "./${actionsRel}",\n  // Robots:`,
+  );
+
+  return [
+    ...knowledgeFiles,
     {
       relPath: "app/%5Fai-ready/openapi/route.ts",
       contents: `export { GET } from "next-ai-ready/handlers/openapi";
@@ -213,7 +226,7 @@ export async function runInit(opts: InitOptions = {}): Promise<InitResult> {
   const patched: string[] = [];
 
   const useTypeScript = await prefersTypeScript(cwd);
-  const files = buildFileSpecs(useTypeScript);
+  const files = buildFileSpecs(useTypeScript, opts.withCapabilities ?? false);
 
   for (const file of files) {
     const path = join(cwd, file.relPath);
@@ -226,6 +239,11 @@ export async function runInit(opts: InitOptions = {}): Promise<InitResult> {
     written.push(file.relPath);
   }
 
+  if (opts.withCapabilities) {
+    const capabilitiesConfigPatch = await patchCapabilitiesConfig(cwd, useTypeScript);
+    if (capabilitiesConfigPatch) patched.push(capabilitiesConfigPatch);
+  }
+
   // Patch existing project files (N-01, N-02).
   const configPatch = await patchNextConfig(cwd);
   if (configPatch) patched.push(configPatch);
@@ -236,6 +254,26 @@ export async function runInit(opts: InitOptions = {}): Promise<InitResult> {
   if (skipped.length > 0) log(`(use --force to overwrite)`);
   if (patched.length > 0) log(`patched: ${patched.join(", ")}`);
   return { written, skipped, patched };
+}
+
+async function patchCapabilitiesConfig(
+  cwd: string,
+  useTypeScript: boolean,
+): Promise<string | null> {
+  const configName = useTypeScript ? "ai-ready.config.ts" : "ai-ready.config.mjs";
+  const configPath = join(cwd, configName);
+  const source = await readFile(configPath, "utf8").catch(() => null);
+  if (!source || /\bactions\s*:/.test(source)) return null;
+
+  const marker = "  // Robots:";
+  if (!source.includes(marker)) return null;
+  const actionsExt = useTypeScript ? "ts" : "mjs";
+  const updated = source.replace(
+    marker,
+    `  actions: "./actions/index.${actionsExt}",\n${marker}`,
+  );
+  await writeFile(configPath, updated, "utf8");
+  return `${configName} (capabilities)`;
 }
 
 async function exists(p: string): Promise<boolean> {
@@ -268,14 +306,14 @@ async function patchNextConfig(cwd: string): Promise<string | null> {
       if (identifierExport.test(src)) {
         updated = importLine + src.replace(
           identifierExport,
-          (_match, id) => `export default withAiReady()(${id});`,
+          (_match, id) => `export default withAiReady({ agentReadable: true })(${id});`,
         );
       } else if (/export\s+default\s+/.test(src)) {
         // Preserve the complete default-export expression instead of trying to
         // balance object/function call delimiters with a regular expression.
         const binding = uniqueConfigBinding(src);
         updated = importLine + src.replace(/export\s+default\s+/, `const ${binding} = `);
-        updated = `${updated.trimEnd()}\n\nexport default withAiReady()(${binding});\n`;
+        updated = `${updated.trimEnd()}\n\nexport default withAiReady({ agentReadable: true })(${binding});\n`;
       }
       if (!updated) return null; // unsupported config export, skip without modifying it
 
@@ -287,7 +325,7 @@ async function patchNextConfig(cwd: string): Promise<string | null> {
   // No config file found — create a minimal one.
   const newConfig = `import { withAiReady } from "next-ai-ready/config";
 
-export default withAiReady()({
+export default withAiReady({ agentReadable: true })({
   // Your Next.js config here.
 });
 `;

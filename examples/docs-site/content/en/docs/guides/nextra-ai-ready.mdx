@@ -52,7 +52,7 @@ pnpm --filter @next-ai-ready/example-nextra-docs test
 From the Nextra application directory:
 
 ```bash
-pnpm add next-ai-ready zod@^4
+pnpm add next-ai-ready
 pnpm exec next-ai-ready init
 ```
 
@@ -119,7 +119,7 @@ upstream fix ships, pin only Nextra's private copies in the workspace root:
 }
 ```
 
-Keep the application's direct `zod@^4` dependency unchanged for next-ai-ready. This workaround is
+Keep next-ai-ready's Zod 4 dependency unchanged. This workaround is scoped only to Nextra's private copies and is
 tracked upstream in [Nextra #4989](https://github.com/shuding/nextra/issues/4989) and
 [#5036](https://github.com/shuding/nextra/issues/5036); remove the override once a fixed Nextra
 release passes the fixture.

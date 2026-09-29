@@ -1,14 +1,14 @@
 # next-ai-ready Google 自然搜索执行手册
 
 > 建立日期：2026-08-24
-> 状态更新：2026-09-28
+> 状态更新：2026-09-29
 > 目标：先获得可核验的 Google 收录与曝光，再优化点击和安装转化。
 
 ## 1. 当前诊断
 
 截至 2026-09-27，站点已迁移到独立域名 `nextaiready.com`；根域、`www` 和旧
 `next-ai-ready.vercel.app` 入口均已配置，后两者通过 `308` 永久跳转到根域。生产 sitemap
-包含 48 个真实 HTML 页面；`llms.txt`、`openapi.json` 等机器端点不再混入搜索 sitemap。线上
+包含 50 个真实 HTML 页面；`llms.txt`、`openapi.json` 等机器端点不再混入搜索 sitemap。线上
 `robots.txt`、XML sitemap、canonical 和 hreflang 均可访问。核心 URL
 抽查结果为：
 
@@ -25,6 +25,24 @@ PR #25 已从中英文首页、文档入口和 `llms.txt` 增加到目标指南�
 随后观察 7 至 14 天的抓取、收录和查询变化。
 
 `Agent Readability 100/100` 只代表机器可读取，不代表 Google 已收录、获得排名或产生点击。
+
+### 2026-09-29 核心教程收录推进
+
+Search Console 对 `/en/docs/guides/nextjs-llms-txt` 的索引检查仍显示“已发现 - 尚未编入索引”；
+实时网址测试已通过，并显示“网址可编入 Google 索引”。发现来源包括生产 sitemap 与
+`/en/docs/api-reference/cli`，说明不存在 robots、响应状态或 `noindex` 阻塞。
+
+本轮不增加竞争 URL，而是强化既有主题集群：
+
+1. 安装页与 CLI 参考页增加到核心教程的上下文链接。
+2. Nextra 与 Fumadocs 分支指南增加返回框架无关教程的链接。
+3. 核心教程增加生产配置、内容源、路由 smoke 与可执行 Nextra 夹具的可核验证据。
+4. 明确官方文档站是第一方 dogfood，不把它表述成外部客户案例。
+5. 对新增链接和证据增加 Markdown 路由 smoke 断言。
+
+生产构建已通过：50 条内容路由与 58 个静态页面成功生成；文档路由、Markdown、MCP、缺页
+契约和 AI 产物 smoke 全部通过，`doctor` 为 100/100。发布后只请求一次核心教程索引，再按
+7 天和 14 天窗口观察；在数据到达前不改 URL，也不创建同义文章。
 
 ## 1.1 当前自然搜索基线（2026-09-26）
 
@@ -107,7 +125,7 @@ GOOGLE_SITE_VERIFICATION=<Google 提供的 token>
 ## 3. 提交与请求收录
 
 旧 property 的 sitemap 保留历史记录；新 Domain property 已于 2026-09-28 提交并成功读取包含
-48 个可索引 HTML 页面的 sitemap：
+50 个可索引 HTML 页面的 sitemap：
 
 ```text
 https://nextaiready.com/sitemap.xml
@@ -176,7 +194,7 @@ https://nextaiready.com/sitemap.xml
 - Vercel Production 已设置 `SITE_URL=https://nextaiready.com`。
 - README、npm metadata、站点 canonical 与机器可读产物已切换到新域名。
 - Search Console Domain property `nextaiready.com` 已通过 DNS TXT 验证。
-- `https://nextaiready.com/sitemap.xml` 已提交成功，Google 已发现 48 个页面。
+- `https://nextaiready.com/sitemap.xml` 已提交成功，Google 已发现 50 个页面。
 
 迁移后的持续工作：
 

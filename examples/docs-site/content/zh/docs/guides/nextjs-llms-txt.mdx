@@ -18,7 +18,7 @@ tags:
   - llms.txt
   - markdown
   - tutorial
-updatedAt: '2026-08-05'
+updatedAt: '2026-09-29'
 author: next-ai-ready 团队
 ---
 
@@ -78,6 +78,19 @@ npm run dev
 
 生产站还通过了固定版本 Vercel Agent Readability CLI 的全部 25 项检查。该分数只衡量技术
 可读性，不代表搜索位置或引用效果。
+
+### 检查实现证据
+
+这是项目自身的生产 dogfood，不是外部客户评价。与其依赖营销截图，不如直接检查实现和断言：
+
+- [生产配置](https://github.com/mustcanbedo/next-ai-ready/blob/main/examples/docs-site/ai-ready.config.mjs)
+- [生成本指南的内容源](https://github.com/mustcanbedo/next-ai-ready/blob/main/examples/docs-site/content/zh/docs/guides/nextjs-llms-txt.mdx)
+- [生产路由 smoke 检查](https://github.com/mustcanbedo/next-ai-ready/blob/main/examples/docs-site/scripts/docs-site-route-smoke.mjs)
+- [可执行 Nextra 4 夹具](https://github.com/mustcanbedo/next-ai-ready/tree/main/examples/nextra-docs)
+
+路由 smoke 会验证 HTML 页面、`llms.txt`、显式 Markdown URL、内容协商、canonical 响应头、
+搜索、MCP 读取，以及相互独立的浏览器和 Agent 缺页行为。外部采用单独记录；只有其他项目完成
+部署并验证后，才会把它作为客户案例展示。
 
 ## 1. 安装
 

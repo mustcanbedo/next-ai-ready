@@ -74,7 +74,7 @@ The production documentation scored 100/100 with the pinned open-source Vercel A
 <!-- BEGIN /en/docs/api-reference/cli -->
 # CLI
 URL: https://nextaiready.com/en/docs/api-reference/cli
-Updated: 2026-08-01
+Updated: 2026-09-29
 
 # CLI
 
@@ -120,6 +120,10 @@ What it produces:
 - `public/robots.txt` — AI-bot policy.
 
 Use `--silent` to suppress console output (useful in CI).
+
+If you are deciding whether to hand-write or generate these files, use the
+[Next.js App Router llms.txt walkthrough](../guides/nextjs-llms-txt) before adding optional MCP or
+actions.
 
 Typical `package.json` setup:
 
@@ -1357,13 +1361,16 @@ Next.js loads instrumentation on Edge; Node-only hooks must stay in a separate f
 <!-- BEGIN /en/docs/guides/fumadocs-ai-ready -->
 # Add llms.txt and Markdown endpoints to Fumadocs
 URL: https://nextaiready.com/en/docs/guides/fumadocs-ai-ready
-Updated: 2026-08-02
+Updated: 2026-09-29
 
 # Add llms.txt and Markdown endpoints to Fumadocs
 
 [Fumadocs](https://www.fumadocs.dev/docs) provides the documentation UI, Source API, and search.
 `next-ai-ready` can read the same MDX collection to produce `/llms.txt`, page Markdown, semantic page
 discovery, and optional MCP resources without changing those Fumadocs responsibilities.
+
+Not using Fumadocs? Start with the framework-neutral
+[Next.js App Router llms.txt walkthrough](./nextjs-llms-txt).
 
 This integration targets Fumadocs on Next.js App Router with a server deployment. It does not support
 a fully static `output: "export"` build because the machine-facing route handlers run at request time.
@@ -1846,7 +1853,7 @@ No. File scanning, metadata extraction, chunking, and output generation are dete
 <!-- BEGIN /en/docs/guides/nextjs-llms-txt -->
 # Add llms.txt and Markdown endpoints to Next.js App Router
 URL: https://nextaiready.com/en/docs/guides/nextjs-llms-txt
-Updated: 2026-08-05
+Updated: 2026-09-29
 
 # Add llms.txt and Markdown endpoints to Next.js App Router
 
@@ -1907,6 +1914,21 @@ This documentation site uses the same integration described below:
 
 The production site also passes all 25 checks in the pinned Vercel Agent Readability CLI baseline.
 That score measures technical readability, not search position or citation.
+
+### Inspect the implementation evidence
+
+This is a first-party production dogfood case, not an external customer testimonial. Review the
+implementation and its assertions directly instead of relying on a marketing screenshot:
+
+- [Production configuration](https://github.com/mustcanbedo/next-ai-ready/blob/main/examples/docs-site/ai-ready.config.mjs)
+- [Content used to generate this guide](https://github.com/mustcanbedo/next-ai-ready/blob/main/examples/docs-site/content/en/docs/guides/nextjs-llms-txt.mdx)
+- [Production route smoke checks](https://github.com/mustcanbedo/next-ai-ready/blob/main/examples/docs-site/scripts/docs-site-route-smoke.mjs)
+- [Executable Nextra 4 fixture](https://github.com/mustcanbedo/next-ai-ready/tree/main/examples/nextra-docs)
+
+The route smoke checks verify the HTML page, `llms.txt`, explicit Markdown URLs, content
+negotiation, canonical headers, search, MCP retrieval, and separate browser/agent missing-page
+behavior. External adoption is tracked separately and will be presented as a customer case only
+after another project deploys and verifies the integration.
 
 ## 1. Install the package
 
@@ -2051,6 +2073,9 @@ Updated: 2026-09-28
 [Nextra 4](https://nextra.site/docs) is a Next.js App Router framework for content-focused sites.
 Keep Nextra responsible for the human-facing documentation experience. Add `next-ai-ready` beside it
 when you want synchronized `/llms.txt`, page Markdown, semantic discovery, and optional MCP resources.
+
+Not using Nextra? Start with the framework-neutral
+[Next.js App Router llms.txt walkthrough](./nextjs-llms-txt).
 
 This guide supports Nextra's root `content/` and `app/` layouts as well as their `src/` equivalents.
 It does not support Nextra 1-3 sites that still use the Pages Router.
@@ -2493,7 +2518,7 @@ No. Google-Extended controls certain Gemini training and grounding uses; it does
 <!-- BEGIN /en/docs/installation -->
 # Installation
 URL: https://nextaiready.com/en/docs/installation
-Updated: 2026-08-02
+Updated: 2026-09-29
 
 # Installation
 
@@ -2522,6 +2547,9 @@ pnpm exec next-ai-ready doctor --score
 ```
 
 The basic setup is complete when `doctor` reports **0 errors** and `public/llms.txt` lists your content. The detailed package map and command reference below are optional reading.
+
+For the complete decision path, generated endpoints, production evidence, and deployment checks,
+follow the [Next.js App Router llms.txt walkthrough](./guides/nextjs-llms-txt).
 
 > **Release channel:** this site tracks `main` and currently targets the `0.1.0-alpha.20` repository candidate. Verify public availability with npm dist-tags. Alpha.20 adds shared, replaceable MCP and HTTP page search, bilingual retrieval evaluation, purpose-based AI crawler policies, and traceable Audit v3 judgments; the guarded release workflow reruns the complete gate before publication.
 
@@ -2853,7 +2881,7 @@ pnpm exec next-ai-ready doctor --score
 <!-- BEGIN /zh/docs/api-reference/cli -->
 # CLI
 URL: https://nextaiready.com/zh/docs/api-reference/cli
-Updated: 2026-08-01
+Updated: 2026-09-29
 
 # CLI
 
@@ -2899,6 +2927,9 @@ npx next-ai-ready build
 - `public/robots.txt` — AI 爬虫策略。
 
 使用 `--silent` 抑制控制台输出（CI 中有用）。
+
+如果还在判断应该手写还是自动生成这些文件，请先阅读
+[Next.js App Router llms.txt 实战教程](../guides/nextjs-llms-txt)，再决定是否增加可选 MCP 或 Action。
 
 典型的 `package.json` 配置：
 
@@ -4122,13 +4153,16 @@ Next.js 在 Edge 也会加载 instrumentation；Node 专用 hooks 需在 nodejs 
 <!-- BEGIN /zh/docs/guides/fumadocs-ai-ready -->
 # 为 Fumadocs 添加 llms.txt 与 Markdown 端点
 URL: https://nextaiready.com/zh/docs/guides/fumadocs-ai-ready
-Updated: 2026-08-02
+Updated: 2026-09-29
 
 # 为 Fumadocs 添加 llms.txt 与 Markdown 端点
 
 [Fumadocs](https://www.fumadocs.dev/docs) 负责文档界面、Source API 和搜索。`next-ai-ready`
 可以读取同一个 MDX 集合，生成 `/llms.txt`、页面 Markdown、语义页面发现和可选 MCP 资源，
 无需改变 Fumadocs 的这些职责。
+
+如果没有使用 Fumadocs，请从框架无关的
+[Next.js App Router llms.txt 实战教程](./nextjs-llms-txt)开始。
 
 本接入面向使用 Next.js App Router 和服务器部署的 Fumadocs，不支持完全静态的
 `output: "export"`，因为机器端路由需要在请求时运行。
@@ -4604,7 +4638,7 @@ pnpm exec next-ai-ready audit https://docs.example.com --version 3
 <!-- BEGIN /zh/docs/guides/nextjs-llms-txt -->
 # 为 Next.js App Router 添加 llms.txt 与 Markdown 端点
 URL: https://nextaiready.com/zh/docs/guides/nextjs-llms-txt
-Updated: 2026-08-05
+Updated: 2026-09-29
 
 # 为 Next.js App Router 添加 llms.txt 与 Markdown 端点
 
@@ -4662,6 +4696,19 @@ npm run dev
 
 生产站还通过了固定版本 Vercel Agent Readability CLI 的全部 25 项检查。该分数只衡量技术
 可读性，不代表搜索位置或引用效果。
+
+### 检查实现证据
+
+这是项目自身的生产 dogfood，不是外部客户评价。与其依赖营销截图，不如直接检查实现和断言：
+
+- [生产配置](https://github.com/mustcanbedo/next-ai-ready/blob/main/examples/docs-site/ai-ready.config.mjs)
+- [生成本指南的内容源](https://github.com/mustcanbedo/next-ai-ready/blob/main/examples/docs-site/content/zh/docs/guides/nextjs-llms-txt.mdx)
+- [生产路由 smoke 检查](https://github.com/mustcanbedo/next-ai-ready/blob/main/examples/docs-site/scripts/docs-site-route-smoke.mjs)
+- [可执行 Nextra 4 夹具](https://github.com/mustcanbedo/next-ai-ready/tree/main/examples/nextra-docs)
+
+路由 smoke 会验证 HTML 页面、`llms.txt`、显式 Markdown URL、内容协商、canonical 响应头、
+搜索、MCP 读取，以及相互独立的浏览器和 Agent 缺页行为。外部采用单独记录；只有其他项目完成
+部署并验证后，才会把它作为客户案例展示。
 
 ## 1. 安装
 
@@ -4799,6 +4846,9 @@ Updated: 2026-09-28
 [Nextra 4](https://nextra.site/docs) 是基于 Next.js App Router 的内容型站点框架。Nextra 继续
 负责面向用户的文档体验；当你需要同步生成 `/llms.txt`、页面 Markdown、语义发现和可选 MCP
 资源时，再把 `next-ai-ready` 放在它旁边。
+
+如果没有使用 Nextra，请从框架无关的
+[Next.js App Router llms.txt 实战教程](./nextjs-llms-txt)开始。
 
 本指南支持 Nextra 的根目录 `content/`、`app/` 以及对应的 `src/` 目录，不支持仍使用 Pages
 Router 的 Nextra 1-3。
@@ -5233,7 +5283,7 @@ Claude-SearchBot 用于搜索索引，Claude-User 按用户要求读取页面，
 <!-- BEGIN /zh/docs/installation -->
 # 安装
 URL: https://nextaiready.com/zh/docs/installation
-Updated: 2026-08-02
+Updated: 2026-09-29
 
 # 安装
 
@@ -5262,6 +5312,9 @@ pnpm exec next-ai-ready doctor --score
 ```
 
 当 `doctor` 显示 **0 个错误**，且 `public/llms.txt` 已列出你的内容时，基础接入即完成。下方包结构和命令参考均为可选阅读。
+
+如需了解完整方案选择、生成端点、生产证据和部署检查，请继续阅读
+[Next.js App Router llms.txt 实战教程](./guides/nextjs-llms-txt)。
 
 > **发布渠道：** 本站跟随 `main`，当前目标为仓库候选版本 `0.1.0-alpha.20`。公开可用性以 npm dist-tags 为准。alpha.20 增加 MCP 与 HTTP 共用的可替换页面搜索、双语检索评测、按用途划分的 AI 爬虫策略及可追溯的 Audit v3 判断；受保护发布工作流会在发布前重新运行完整门禁。
 

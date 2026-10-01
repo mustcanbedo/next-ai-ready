@@ -1,8 +1,10 @@
 ---
 title: 为 Fumadocs 添加 llms.txt 与 Markdown 端点
-summary: 复用 Fumadocs MDX 内容集合，在 Next.js App Router 部署中生成 AI 可读的发现和页面端点。
+summary: 先检查 Fumadocs 原生 LLM 集成，再判断是否有必要让 next-ai-ready 复用其 MDX 集合来满足额外的机器接口需求。
 order: 10
 questions:
+  - q: Fumadocs 已经提供 LLM 内容与 MCP 集成吗？
+    a: 是的。其官方 LLM 指南包含 llms.txt、llms-full.txt、逐页 Markdown、内容协商与 MCP。增加另一套集成前，先评估原生方案。
   - q: next-ai-ready 会替换 Fumadocs Source API 或搜索吗？
     a: 不会。Fumadocs 继续负责文档界面、Source API 和搜索；next-ai-ready 独立读取相同源文件并生成面向机器的输出。
   - q: 可以复用 Fumadocs 已有的 description frontmatter 吗？
@@ -14,7 +16,7 @@ tags:
   - nextjs
   - llms.txt
   - mdx
-updatedAt: '2026-09-29'
+updatedAt: '2026-10-02'
 author: next-ai-ready team
 ---
 
@@ -26,6 +28,20 @@ author: next-ai-ready team
 
 如果没有使用 Fumadocs，请从框架无关的
 [Next.js App Router llms.txt 实战教程](./nextjs-llms-txt)开始。
+
+## 先检查原生集成
+
+Fumadocs 已有[官方 LLM 集成指南](https://www.fumadocs.dev/docs/integrations/llms)，包含
+`llms.txt`、`llms-full.txt`、逐页 Markdown、内容协商与 MCP。这些能力需要配置，不代表当前
+应用已经启用；如果原生接入已经满足需求，保留即可。
+
+下方是另一种实现方案，不是在修复 Fumadocs 的功能缺失，也不代表 Fumadocs 官方背书。
+只有需要 next-ai-ready 的构建期语义图或可选 Action 层时，才考虑采用。本指南属于配置
+配方；与 [Nextra 夹具](./nextra-ai-ready)不同，目前还没有配套的可执行 Fumadocs 兼容夹具。
+
+运行任何生成器前，为 `/llms.txt`、`/llms-full.txt`、每个 Markdown 路径以及 MCP 路由确定
+唯一负责人，不让两套实现覆盖同一个输出。保持 locale、canonical 和公开内容规则一致。
+[工具选型部分](./nextjs-llms-txt#安装前先比较工具职责)说明了不需要额外 SDK 的情况。
 
 本接入面向使用 Next.js App Router 和服务器部署的 Fumadocs，不支持完全静态的
 `output: "export"`，因为机器端路由需要在请求时运行。
@@ -100,5 +116,7 @@ pnpm exec next-ai-ready audit https://docs.example.com/docs/getting-started --ve
 
 ## 保持搜索职责分离
 
-Fumadocs 搜索服务于文档界面中的人类用户；next-ai-ready 页面发现通过 Markdown、HTTP 资源
-和可选 MCP 服务于 AI 客户端。两者可以索引相同内容，但不需要互相替代。
+Fumadocs 同时支持文档界面搜索与 [MCP 页面工具](https://www.fumadocs.dev/docs/headless/utils/mcp)。
+next-ai-ready 也提供 HTTP 发现入口与可选 MCP 页面工具，两者职责存在重叠。按客户端需求
+选择实现，不要把 Fumadocs 描述成只能供人类使用。添加任何一套端点，都不是排名提升或
+AI 引用增加的证明。

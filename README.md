@@ -29,6 +29,8 @@ The basic setup is complete when `doctor` reports **0 errors** and `public/llms.
 [App Router llms.txt tutorial](https://nextaiready.com/en/docs/guides/nextjs-llms-txt),
 or [add authenticated agent actions](https://nextaiready.com/en/docs/guides/action-auth).
 
+Already using Next SEO, Fumadocs, or Nextra? [Compare responsibilities before adding another integration](https://nextaiready.com/en/docs/guides/nextjs-llms-txt#compare-the-tools-before-installing). Native metadata and existing LLM endpoints may already meet your needs.
+
 Prefer a disposable demo before editing an existing project?
 
 ```bash

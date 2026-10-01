@@ -1,8 +1,10 @@
 ---
 title: Add llms.txt and Markdown endpoints to Fumadocs
-summary: Reuse a Fumadocs MDX content collection to generate AI-readable discovery and page endpoints in a Next.js App Router deployment.
+summary: Check Fumadocs' native LLM integration first, then reuse its MDX collection with next-ai-ready when an additional machine-facing requirement warrants it.
 order: 10
 questions:
+  - q: Does Fumadocs already provide LLM content and MCP integration?
+    a: Yes. Its official LLM guide covers llms.txt, llms-full.txt, page Markdown, content negotiation, and MCP. Evaluate that native setup before adding another integration.
   - q: Does next-ai-ready replace Fumadocs Source API or search?
     a: No. Fumadocs continues to power the documentation UI, Source API, and search. next-ai-ready independently reads the same source files for machine-facing outputs.
   - q: Can I use the existing Fumadocs description frontmatter?
@@ -14,7 +16,7 @@ tags:
   - nextjs
   - llms.txt
   - mdx
-updatedAt: '2026-09-29'
+updatedAt: '2026-10-02'
 author: next-ai-ready team
 ---
 
@@ -26,6 +28,22 @@ discovery, and optional MCP resources without changing those Fumadocs responsibi
 
 Not using Fumadocs? Start with the framework-neutral
 [Next.js App Router llms.txt walkthrough](./nextjs-llms-txt).
+
+## Check the native integration first
+
+Fumadocs already documents [LLM integration](https://www.fumadocs.dev/docs/integrations/llms) for
+`llms.txt`, `llms-full.txt`, page Markdown, content negotiation, and MCP. These require configuration;
+they are not necessarily enabled in your current app. If that setup meets your needs, keep it.
+
+The instructions below are an alternative implementation, not a missing-feature fix or an official
+Fumadocs endorsement. Consider them only if you need next-ai-ready's build-time semantic graph or
+its optional action layer. This guide is a configuration recipe; unlike the [Nextra fixture](./nextra-ai-ready),
+it does not yet include an executable Fumadocs compatibility fixture.
+
+Before running either generator, choose one owner for `/llms.txt`, `/llms-full.txt`, each Markdown
+path, and any MCP route. Do not let both implementations overwrite the same output. Keep locale,
+canonical, and public-content rules consistent. The [tool-selection section](./nextjs-llms-txt#compare-the-tools-before-installing)
+explains when no additional SDK is needed.
 
 This integration targets Fumadocs on Next.js App Router with a server deployment. It does not support
 a fully static `output: "export"` build because the machine-facing route handlers run at request time.
@@ -102,6 +120,7 @@ and browser requests still receive the normal Fumadocs UI.
 
 ## Keep search responsibilities separate
 
-Fumadocs search serves people inside the documentation UI. next-ai-ready page discovery serves AI
-clients through Markdown, HTTP resources, and optional MCP. They may index the same content, but one
-does not need to replace the other.
+Fumadocs supports both documentation UI search and [MCP page tools](https://www.fumadocs.dev/docs/headless/utils/mcp).
+next-ai-ready offers its own HTTP discovery and optional MCP page tools. These responsibilities
+overlap; choose the implementation your clients need rather than treating Fumadocs as human-only.
+Adding either set of endpoints is not evidence of improved search ranking or AI citation.

@@ -29,6 +29,8 @@ pnpm exec next-ai-ready doctor --score
 [App Router llms.txt 实战教程](https://nextaiready.com/zh/docs/guides/nextjs-llms-txt)，
 或[添加经过鉴权的 Agent Action](https://nextaiready.com/zh/docs/guides/action-auth)。
 
+已经使用 Next SEO、Fumadocs 或 Nextra？先[比较工具职责，再决定是否增加集成](https://nextaiready.com/zh/docs/guides/nextjs-llms-txt#安装前先比较工具职责)。原生 metadata 与已有 LLM 端点可能已经满足需求。
+
 希望先运行一个随时可删除的演示，再改动现有项目？
 
 ```bash

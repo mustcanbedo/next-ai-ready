@@ -9,6 +9,8 @@ const guideImages: Record<string, StaticImageData> = {
   "/guides/nextra/config.jpg": nextraConfig,
 };
 
+const orderedListItem = /^(\d{1,9})\. (.+)$/;
+
 interface MdxContentProps {
   content: string;
 }
@@ -72,6 +74,7 @@ export async function MdxContent({ content }: MdxContentProps) {
       const line = block.content;
       if (!line.trim()) continue;
 
+      const orderedItem = line.match(orderedListItem);
       const imageMatch = line.match(/^!\[([^\]]+)\]\((\/[^\s)]+)\)$/);
       const guideImage = imageMatch && guideImages[imageMatch[2]];
       if (imageMatch && guideImage) {
@@ -108,6 +111,29 @@ export async function MdxContent({ content }: MdxContentProps) {
         );
       } else if (line.startsWith("# ")) {
         // Skip — rendered from page header
+      } else if (orderedItem) {
+        const start = Number(orderedItem[1]);
+        const items = [orderedItem[2]];
+        while (j + 1 < blocks.length && blocks[j + 1].type === "text") {
+          const next = blocks[j + 1].content;
+          const item = next.match(orderedListItem);
+          if (item) {
+            items.push(item[2]);
+          } else if (/^ {2,}\S/.test(next)) {
+            items[items.length - 1] += ` ${next.trim()}`;
+          } else if (!next.trim() && blocks[j + 2]?.type === "text" &&
+                     orderedListItem.test(blocks[j + 2].content)) {
+            // A blank line between steps should not reset the list numbering.
+          } else {
+            break;
+          }
+          j++;
+        }
+        rendered.push(
+          <ol key={j} start={start === 1 ? undefined : start} className="my-6 list-decimal space-y-3 pl-6 text-[15px] leading-7 text-text-secondary">
+            {items.map((item, k) => <li key={k} className="pl-1"><Inline text={item} /></li>)}
+          </ol>,
+        );
       } else if (line.startsWith("- ")) {
         const items: string[] = [line.slice(2)];
         while (
@@ -184,7 +210,8 @@ export async function MdxContent({ content }: MdxContentProps) {
           j + 1 < blocks.length &&
           blocks[j + 1].type === "text" &&
           blocks[j + 1].content.trim() &&
-          !/^(#{1,3} |[->] |\||!\[)/.test(blocks[j + 1].content)
+          !/^(#{1,3} |[->] |\||!\[)/.test(blocks[j + 1].content) &&
+          !orderedListItem.test(blocks[j + 1].content)
         ) {
           j++;
           paragraph += ` ${blocks[j].content.trim()}`;

@@ -171,6 +171,45 @@ async function callAction(name, input) {
   return body.data;
 }
 
+function assertDocPresentation(html, page) {
+  let header;
+  const orderedLists = [];
+  const textContent = (node) => node.value ?? (node.childNodes ?? []).map(textContent).join("");
+  function visit(node) {
+    if (node.tagName === "article") {
+      header = node.childNodes.find((child) => child.tagName === "header");
+    }
+    if (node.tagName === "ol") orderedLists.push(node);
+    for (const child of node.childNodes ?? []) visit(child);
+  }
+  visit(parse(html));
+  if (!header) fail(`${page.route}: missing documentation header`);
+
+  const times = [];
+  function collectTimes(node) {
+    if (node.tagName === "time") times.push(node);
+    for (const child of node.childNodes ?? []) collectTimes(child);
+  }
+  collectTimes(header);
+  const expectedDate = page.updatedAt?.slice(0, 10);
+  if (times.length !== (expectedDate ? 1 : 0) || (expectedDate && (
+    times[0].attrs.find(({ name }) => name === "datetime")?.value !== expectedDate ||
+    textContent(times[0]) !== expectedDate
+  ))) {
+    fail(`${page.route}: visible date must match maintained content, not build time`);
+  }
+  if (page.author?.name && !textContent(header).includes(page.author.name)) {
+    fail(`${page.route}: visible author must match the content source`);
+  }
+  if (page.route.endsWith("/guides/mdx-content")) {
+    const items = orderedLists[0]?.childNodes.filter((node) => node.tagName === "li");
+    if (items?.length !== 4 || !textContent(items[0]).includes(".mdx") ||
+        !textContent(items[3]).includes("next-ai-ready build")) {
+      fail(`${page.route}: the four-step workflow must remain a readable ordered list`);
+    }
+  }
+}
+
 async function expectSeoReferences() {
   const graph = JSON.parse(await readFile(join(ROOT, ".next-ai-ready/graph.json"), "utf8"));
   const pages = Object.values(graph.nodes).filter((node) => node.kind === "page");
@@ -180,7 +219,8 @@ async function expectSeoReferences() {
 
   for (const page of pages) {
     const response = await fetch(`${ORIGIN}${page.route}`, { redirect: "manual" });
-    const refs = collectSeoReferences(await response.text(), new URL(page.route, siteUrl));
+    const html = await response.text();
+    const refs = collectSeoReferences(html, new URL(page.route, siteUrl));
     try {
       assertIndexableHtml(response, refs);
     } catch (error) {
@@ -190,6 +230,7 @@ async function expectSeoReferences() {
     if (page.route.includes("/docs/") && refs.breadcrumbs.length !== 1) {
       fail(`SEO ${page.route}: expected one BreadcrumbList`);
     }
+    if (page.route.includes("/docs/")) assertDocPresentation(html, page);
     const ancestorUrls = new Set(pages
       .filter((candidate) => candidate.route === "/" || candidate.route === page.route || page.route.startsWith(`${candidate.route}/`))
       .map((candidate) => new URL(candidate.citeUrl).href));
@@ -233,6 +274,7 @@ async function expectSeoReferences() {
     }
   }
   console.log(`  ok SEO breadcrumbs, locale links and fragments across ${pages.length} content pages`);
+  console.log("  ok maintained dates, authors and bilingual MDX tutorial steps");
 }
 
 async function main() {

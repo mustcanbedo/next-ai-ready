@@ -248,7 +248,7 @@ registerAiHooks({
 - ✅ **统一检索层** — MCP 与 HTTP Action 共用可替换的 `PageSearchProvider`，避免不同协议的排序结果漂移
 - ✅ **开发工具** — `build` / `init` / `doctor` / 版本化 `audit` / `mcp` CLI，`robots.txt`，分析钩子
 - ✅ **文档站** — 线上 [nextaiready.com](https://nextaiready.com/zh)（[源码](./examples/docs-site)）
-- ✅ **Nextra 4 兼容夹具** — 同一份 MDX 同时驱动 Nextra 界面和 AI 可读端点，并带生产级 smoke 契约（[运行示例](./examples/nextra-docs)）
+- ✅ **Nextra 4 兼容夹具** — 同一份 MDX 同时驱动 Nextra 界面和 AI 可读端点，并带生产级 smoke 契约（[运行示例](./examples/nextra-docs)、[带截图的第一方教程](https://nextaiready.com/zh/docs/guides/nextra-ai-ready)）
 
 详见 [`docs/`](./docs)（[**文档索引**](./docs/README.md)）：
 

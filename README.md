@@ -250,7 +250,7 @@ Install only `next-ai-ready` in consumer apps. The `alpha.21` repository candida
 - ✅ **Shared retrieval** — one replaceable `PageSearchProvider` powers MCP and HTTP actions, so ranking cannot drift between protocols
 - ✅ **Dev tooling** — `build` / `init` / `doctor` / versioned `audit` / `mcp` CLIs, `robots.txt`, analytics hooks
 - ✅ **Docs site** — live at [nextaiready.com](https://nextaiready.com/en) ([source](./examples/docs-site))
-- ✅ **Nextra 4 compatibility fixture** — one MDX collection drives the Nextra UI and AI-readable endpoints, with a production smoke contract ([run it](./examples/nextra-docs))
+- ✅ **Nextra 4 compatibility fixture** — one MDX collection drives the Nextra UI and AI-readable endpoints, with a production smoke contract ([run it](./examples/nextra-docs), [first-party walkthrough with screenshots](https://nextaiready.com/en/docs/guides/nextra-ai-ready))
 
 See [`docs/`](./docs) ([**full index**](./docs/README.md)):
 

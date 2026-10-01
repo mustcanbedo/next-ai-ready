@@ -5,6 +5,7 @@ import { readFile } from "node:fs/promises";
 import { setTimeout as delay } from "node:timers/promises";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { parse } from "parse5";
 import { assertBreadcrumbTrail, assertIndexableHtml, collectSeoReferences } from "./seo-references.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
@@ -87,6 +88,57 @@ async function expectResponse(
   }
 
   console.log(`  ok ${path} (${response.status})`);
+  return body;
+}
+
+async function expectNextraScreenshots(path) {
+  const html = await expectResponse(path, { contentType: "text/html" });
+  const images = [];
+  const paragraphs = [];
+  const listItems = [];
+  const textContent = (node) => node.value ?? (node.childNodes ?? []).map(textContent).join("");
+  function visit(node) {
+    if (node.tagName === "img") {
+      images.push(Object.fromEntries(node.attrs.map(({ name, value }) => [name, value])));
+    }
+    if (node.tagName === "p") paragraphs.push(textContent(node));
+    if (node.tagName === "li") listItems.push(textContent(node));
+    for (const child of node.childNodes ?? []) visit(child);
+  }
+  visit(parse(html));
+
+  const chinese = path.startsWith("/zh/");
+  const paragraphContinuation = chinese ? "也不是 外部采用" : "It is not an independent installation";
+  const listContinuation = chinese ? "本例通过 prebuild 调用" : "This fixture's prebuild invokes";
+  if (!paragraphs.some((text) => text.includes(paragraphContinuation)) ||
+      !listItems.some((text) => text.includes(listContinuation))) {
+    fail(`${path}: Markdown soft line breaks must stay inside their paragraph or list item`);
+  }
+
+  for (const name of ["html", "config"]) {
+    const image = images.find(({ src }) => {
+      const url = new URL(src, ORIGIN);
+      return (url.searchParams.get("url") ?? url.pathname).startsWith(`/_next/static/media/${name}.`);
+    });
+    if (!image?.alt || image.width !== "1280" || image.height !== "720") {
+      fail(`${path}: ${name} screenshot must have alt text and intrinsic dimensions`);
+    }
+    const response = await fetch(new URL(image.src, ORIGIN));
+    if (response.status !== 200 || !response.headers.get("content-type")?.startsWith("image/")) {
+      fail(`${path}: optimized ${name} screenshot did not load`);
+    }
+  }
+  console.log(`  ok ${path} (two rendered screenshots)`);
+}
+
+async function expectScreenshotAsset(path) {
+  const response = await fetch(`${ORIGIN}${path}`, { redirect: "manual" });
+  const bytes = new Uint8Array(await response.arrayBuffer());
+  if (response.status !== 200 || !response.headers.get("content-type")?.includes("image/jpeg") ||
+      bytes[0] !== 0xff || bytes[1] !== 0xd8 || bytes.length < 1000) {
+    fail(`${path}: expected a nonempty JPEG screenshot`);
+  }
+  console.log(`  ok ${path} (JPEG)`);
 }
 
 async function callMcp(id, method, params) {
@@ -332,11 +384,25 @@ async function main() {
     contentType: "text/html",
     includes: "Nextra llms.txt and Markdown endpoint setup",
   });
+  await expectNextraScreenshots("/en/docs/guides/nextra-ai-ready");
+  await expectNextraScreenshots("/zh/docs/guides/nextra-ai-ready");
+  await expectScreenshotAsset("/guides/nextra/html.jpg");
+  await expectScreenshotAsset("/guides/nextra/config.jpg");
   await expectResponse("/en/docs/guides/nextra-ai-ready.md", {
     contentType: "text/markdown",
     includes: [
       "# Nextra llms.txt and Markdown endpoint setup",
       "[Next.js App Router llms.txt walkthrough](./nextjs-llms-txt)",
+      "](/guides/nextra/html.jpg)",
+      "](/guides/nextra/config.jpg)",
+    ],
+  });
+  await expectResponse("/zh/docs/guides/nextra-ai-ready.md", {
+    contentType: "text/markdown",
+    includes: [
+      "# 为 Nextra 4 添加 llms.txt 与 Markdown 端点",
+      "](/guides/nextra/html.jpg)",
+      "](/guides/nextra/config.jpg)",
     ],
   });
   await expectResponse("/zh/docs/guides/fumadocs-ai-ready.md", {

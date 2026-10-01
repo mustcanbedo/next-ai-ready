@@ -16,7 +16,7 @@ tags:
   - nextjs
   - llms.txt
   - mdx
-updatedAt: '2026-09-28'
+updatedAt: '2026-10-02'
 author: next-ai-ready team
 ---
 
@@ -35,17 +35,56 @@ It does not support Nextra 1-3 sites that still use the Pages Router.
 ## Executable reference
 
 The repository includes an [executable Nextra 4 fixture](https://github.com/mustcanbedo/next-ai-ready/tree/main/examples/nextra-docs)
-validated with Nextra `4.6.1`, Next.js `16.2.6`, and React `19.2.4`. One `content/` MDX collection
-drives both the Nextra UI and the next-ai-ready semantic graph. Its production smoke test covers HTML,
-`/llms.txt`, `/llms-full.txt`, explicit Markdown and AI JSON URLs, content negotiation, and the separate
-browser/agent missing-page contracts.
+validated with Nextra `4.6.1`, Next.js `16.2.6`, and React `19.2.4` in a production build.
+This is a first-party compatibility demonstration using this repository's workspace source. It is not
+an independent installation test of npm latest, external adoption, Nextra endorsement, or evidence
+of increased search traffic.
 
-Run the same contract from the repository root:
+After cloning the repository, run these commands in order from its root:
 
 ```bash
-pnpm --filter @next-ai-ready/example-nextra-docs build
-pnpm --filter @next-ai-ready/example-nextra-docs test
+corepack pnpm install --frozen-lockfile
+corepack pnpm --filter next-ai-ready... build
+corepack pnpm --filter @next-ai-ready/example-nextra-docs build
+corepack pnpm --filter @next-ai-ready/example-nextra-docs test
 ```
+
+To view the production UI after the test has finished:
+
+```bash
+corepack pnpm --filter @next-ai-ready/example-nextra-docs start --hostname 127.0.0.1 --port 3321
+```
+
+![Nextra Getting started documentation rendered by the local production build](/guides/nextra/html.jpg)
+
+This screenshot is from the running production server. Visit `http://127.0.0.1:3321/getting-started`
+to inspect it yourself. The same `examples/nextra-docs/content/getting-started.mdx` feeds these outputs:
+
+| Output | Verified contract |
+| --- | --- |
+| HTML `/getting-started` | `200`, retaining the Nextra theme and page content |
+| `/llms.txt` | `200`, listing the page's canonical URL |
+| `/llms-full.txt` | `200`, including the body and frontmatter FAQ |
+| `/getting-started.md` | `200 text/markdown`, with body and canonical Link header |
+| AI JSON `/getting-started.ai.json` | `200 application/json`, with `route: /getting-started` |
+| `/getting-started`, `Accept: text/markdown` | `200`, serving the same page as Markdown |
+| Missing `/does-not-exist`, `Accept: text/html` | HTML `404` |
+| Same missing page, `Accept: text/markdown` | Markdown `200`, `document_status: "not_found"`, `X-Robots-Tag: noindex` |
+
+The example excludes MCP and callable actions. `nextra-fixture.example` is an example canonical
+domain; replace `site.baseUrl` in `ai-ready.config.mjs` with your production domain and rebuild.
+
+![ai-ready.config.mjs on the public GitHub main branch](/guides/nextra/config.jpg)
+
+This screenshot comes from the [public configuration source](https://github.com/mustcanbedo/next-ai-ready/blob/main/examples/nextra-docs/ai-ready.config.mjs).
+It shows the content glob and example domain, not a terminal test result.
+
+The production smoke passed 10 checks: one shared-content graph check and nine HTTP checks.
+Inspect the assertions in the [production smoke script](https://github.com/mustcanbedo/next-ai-ready/blob/main/examples/nextra-docs/scripts/compatibility-smoke.mjs).
+These passing contracts do not imply a warning-free diagnostic: the fixture's current `doctor`
+reports `0 errors / 5 warnings`, which still need individual review.
+Three concern diagnostic heuristics for Knowledge-only OpenAPI, JavaScript route stubs, and the
+workspace CLI prebuild. The other two flag author metadata and JSON-LD that this fixture does not configure.
 
 ## 1. Install and initialize
 
@@ -132,16 +171,26 @@ pnpm exec next-ai-ready doctor --score
 pnpm build
 ```
 
-After deployment, verify one real page and the discovery files:
+After deployment, verify one real page and the discovery files. These paths match this fixture;
+use your content's actual route rather than automatically adding a `/docs` prefix:
 
 ```bash
 curl -I https://docs.example.com/llms.txt
-curl -I https://docs.example.com/docs/getting-started.md
-pnpm exec next-ai-ready audit https://docs.example.com/docs/getting-started --version 3
+curl -I https://docs.example.com/getting-started.md
+pnpm exec next-ai-ready audit https://docs.example.com/getting-started --version 3
 ```
 
 The Nextra HTML page must remain unchanged for browsers. The corresponding `.md` URL should return
 clean Markdown, and an unknown browser URL must continue to return a real `404`.
+
+### Troubleshooting and rollback
+
+- Build order: run the AI build (`next-ai-ready build`) before `next build`. This fixture's `prebuild`
+  invokes the workspace CLI to create the graph before Nextra builds.
+- Static export: runtime handlers and content negotiation require a server, not `output: "export"`.
+- Plugin composition: retain `withNextra` and existing options; wrap only the final config with `withAiReady`.
+- Rollback: remove the `withAiReady` wrapper, AI route stubs, and the fixture-specific workspace `prebuild`
+  wiring. Keep Nextra's plugin, theme, MDX content, navigation, and search intact.
 
 ## Start with the Knowledge plane
 

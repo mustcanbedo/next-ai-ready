@@ -24,7 +24,7 @@ export default async function DocsLayout({ children, params }: DocsLayoutProps) 
           groups={groups}
           sectionLabels={t.docs.sidebar}
         />
-        <main className="flex-1 min-w-0 border-l border-border/50 px-16 py-14 lg:px-20">
+        <main className="flex-1 min-w-0 border-l border-border/50 px-6 py-14 sm:px-10 lg:px-20">
           {children}
         </main>
       </div>

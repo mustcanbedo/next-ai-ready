@@ -1,5 +1,13 @@
 import React from "react";
+import Image, { type StaticImageData } from "next/image";
 import { codeToHtml } from "shiki";
+import nextraHtml from "../../../public/guides/nextra/html.jpg";
+import nextraConfig from "../../../public/guides/nextra/config.jpg";
+
+const guideImages: Record<string, StaticImageData> = {
+  "/guides/nextra/html.jpg": nextraHtml,
+  "/guides/nextra/config.jpg": nextraConfig,
+};
 
 interface MdxContentProps {
   content: string;
@@ -64,7 +72,25 @@ export async function MdxContent({ content }: MdxContentProps) {
       const line = block.content;
       if (!line.trim()) continue;
 
-      if (line.startsWith("### ")) {
+      const imageMatch = line.match(/^!\[([^\]]+)\]\((\/[^\s)]+)\)$/);
+      const guideImage = imageMatch && guideImages[imageMatch[2]];
+      if (imageMatch && guideImage) {
+        rendered.push(
+          <figure key={j} className="my-8">
+            <a href={imageMatch[2]}>
+              <Image
+                src={guideImage}
+                alt={imageMatch[1]}
+                sizes="(max-width: 768px) 100vw, 768px"
+                className="w-full h-auto rounded-lg"
+              />
+            </a>
+            <figcaption className="mt-3 text-sm leading-6 text-text-secondary">
+              {imageMatch[1]}
+            </figcaption>
+          </figure>,
+        );
+      } else if (line.startsWith("### ")) {
         const text = line.slice(4);
         const id = text.toLowerCase().replace(/[^a-z0-9\u4e00-\u9fff]+/g, "-").replace(/(^-|-$)/g, "");
         rendered.push(
@@ -87,10 +113,14 @@ export async function MdxContent({ content }: MdxContentProps) {
         while (
           j + 1 < blocks.length &&
           blocks[j + 1].type === "text" &&
-          blocks[j + 1].content.startsWith("- ")
+          (blocks[j + 1].content.startsWith("- ") || /^ {2,}\S/.test(blocks[j + 1].content))
         ) {
           j++;
-          items.push(blocks[j].content.slice(2));
+          if (blocks[j].content.startsWith("- ")) {
+            items.push(blocks[j].content.slice(2));
+          } else {
+            items[items.length - 1] += ` ${blocks[j].content.trim()}`;
+          }
         }
         rendered.push(
           <ul key={j} className="my-6 space-y-3">
@@ -124,7 +154,7 @@ export async function MdxContent({ content }: MdxContentProps) {
         );
         rendered.push(
           <div key={j} className="my-8 overflow-x-auto rounded-2xl ring-1 ring-white/[0.08] bg-[#121212]">
-            <table className="w-full text-[14px]">
+            <table className="w-full min-w-[480px] text-[14px]">
               <thead>
                 <tr className="border-b border-white/[0.06]">
                   {headerCells.map((cell, k) => (
@@ -149,16 +179,26 @@ export async function MdxContent({ content }: MdxContentProps) {
           </div>,
         );
       } else {
+        let paragraph = line;
+        while (
+          j + 1 < blocks.length &&
+          blocks[j + 1].type === "text" &&
+          blocks[j + 1].content.trim() &&
+          !/^(#{1,3} |[->] |\||!\[)/.test(blocks[j + 1].content)
+        ) {
+          j++;
+          paragraph += ` ${blocks[j].content.trim()}`;
+        }
         rendered.push(
           <p key={j} className="mb-6 text-[16px] text-text-secondary leading-[1.85]">
-            <Inline text={line} />
+            <Inline text={paragraph} />
           </p>,
         );
       }
     }
   }
 
-  return <div className="prose-custom">{rendered}</div>;
+  return <div className="prose-custom [overflow-wrap:anywhere] [&_table]:[overflow-wrap:normal]">{rendered}</div>;
 }
 
 function Inline({ text }: { text: string }) {

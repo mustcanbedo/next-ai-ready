@@ -18,7 +18,7 @@ tags:
   - llms.txt
   - markdown
   - tutorial
-updatedAt: '2026-09-29'
+updatedAt: '2026-10-01'
 author: next-ai-ready 团队
 ---
 
@@ -53,15 +53,47 @@ npm create next-ai-ready@alpha next-ai-ready-demo
 cd next-ai-ready-demo
 npm install
 npx next-ai-ready init
+```
+
+创建 `content/docs/example.mdx`，写入以下内容：
+
+```markdown
+---
+title: 示例文档
+summary: 用于检查 Markdown 端点的非根页面。
+---
+
+# 示例文档
+
+此页面用于验证内容源是否以 Markdown 形式提供。
+```
+
+然后构建、验证本地接线并启动应用：
+
+```bash
 npm run build
+npx next-ai-ready doctor --score
 npm run dev
 ```
 
 然后打开：
 
 - `http://localhost:3000/llms.txt`
-- `http://localhost:3000/index.md`
-- `http://localhost:3000/openapi.json`
+- `http://localhost:3000/llms-full.txt`
+- `http://localhost:3000/docs/example.md`
+
+在另一个终端直接检查非根页面：
+
+```bash
+curl -i http://localhost:3000/docs/example.md
+```
+
+应返回 `200`、`Content-Type: text/markdown` 和示例页面的标题与正文，而不是缺页恢复文档。
+`content/index.mdx` 在语义图中映射为 `/`；当前适配器不会把 `/index.md` 作为根页面的别名，
+因此本演示验证明确的非根路由。
+
+alpha.21 的默认 `init` 仅启用知识平面，不会创建 `/openapi.json` 或 `/tools.json`；
+需要这些端点时，再使用下方可选的能力平面接入流程。
 
 生成目录就是一个普通的 Next.js TypeScript 项目，可以直接提交、部署，或与现有项目比较小范围
 接入差异。生成器本身也会经过仓库的干净安装与生产构建发布门禁。
@@ -138,10 +170,10 @@ pnpm exec next-ai-ready doctor --score
 
 - `/llms.txt`：简洁的站点发现入口。
 - `/llms-full.txt`：合并后的全站上下文。
-- `/<page>.md`：干净的逐页内容。
+- `/<page>.md`：读取匹配到的非根内容页面。
 - `/sitemap.md`：供 Agent 使用的页面导航。
-- `/openapi.json` 和 `/tools.json`：声明式能力描述。
-- `/api/mcp`：按需提供 MCP 资源与工具。
+
+`/openapi.json`、`/tools.json` 和 `/api/mcp` 属于可选的能力平面，不是默认 `init` 的接入结果。
 
 当 `doctor` 没有错误，并且 `llms.txt` 列出预期页面时，基础接入完成。警告表示仍需处理的
 可选质量项或生产配置。
@@ -155,8 +187,9 @@ curl -i http://localhost:3000/llms.txt
 curl -i http://localhost:3000/about.md
 ```
 
-两个请求都应返回 `200`。`llms.txt` 应返回纯文本，页面端点应返回来自预期内容源的 Markdown；
-普通浏览器访问 `/about` 时仍应返回原有 HTML 页面。
+两个请求都应返回 `200`。`llms.txt` 应返回纯文本，页面端点应返回来自预期内容源的 Markdown，
+而不是缺页恢复文档。如果应用已有 `/about` 页面，普通浏览器访问时仍应返回原有 HTML。
+仅添加 `content/about.mdx` 不会创建该浏览器页面。
 
 ## 4. 验证生产站
 
@@ -184,6 +217,37 @@ pnpm exec next-ai-ready audit https://example.com --version 3
 
 `llms.txt` 和 Markdown 首先解决 AI 系统发现、读取内容的问题。可调用 Action 是另一项生产
 决策。只有当 Agent 确实需要执行具体操作时再添加，并同时配置鉴权、输入校验和审计日志。
+
+在已经初始化的项目中显式启用：
+
+```bash
+pnpm add zod@^4 @modelcontextprotocol/sdk mcp-handler
+pnpm exec next-ai-ready init --with-capabilities
+```
+
+构建前检查 `ai-ready.config.*`。初始化器会为自己生成的配置补上接线，但无法安全定位插入点时，
+会保留已经自定义的配置。如果缺少 `actions` 选项，请手动加入现有 `defineConfig` 对象：
+
+```ts
+actions: "./actions/index.ts", // JavaScript 项目使用 index.mjs。
+```
+
+然后构建能力产物并检查接线：
+
+```bash
+pnpm exec next-ai-ready build
+pnpm exec next-ai-ready doctor --score
+```
+
+重启 dev 服务器，然后在另一个终端检查：
+
+```bash
+curl -i http://localhost:3000/openapi.json
+curl -i http://localhost:3000/tools.json
+```
+
+两个端点都应返回 `200` 和包含生成的公开 `ping` action 的 JSON。MCP 读取与调用验证请继续查看
+[MCP 接入指南](./mcp-integration)。
 
 ## 它不能保证什么
 

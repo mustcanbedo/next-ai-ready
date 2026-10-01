@@ -4,7 +4,7 @@ summary: 在 Next.js 中配置本地 MDX 内容集合、映射路由、补充有
 order: 2
 questions:
   - q: 如何在 Next.js 中创建 MDX 内容集合？
-    a: 将 Markdown 或 MDX 源文件放在固定目录，用 ai-ready.config.mjs 的 content glob 匹配该目录，然后运行 next-ai-ready build。
+    a: 先初始化 Next.js 接入，将 Markdown 或 MDX 源文件放在固定目录，用 ai-ready.config.* 的 content glob 匹配该目录，然后运行 next-ai-ready build。
   - q: next-ai-ready 会替换现有 MDX 渲染器或内容集合工具吗？
     a: 不会。它读取同一批源文件生成机器可读产物，现有 Next.js、Fumadocs、Nextra 或 MDX 渲染流程继续负责网页 UI。
   - q: MDX frontmatter 应该包含哪些字段？
@@ -18,7 +18,7 @@ tags:
   - frontmatter
   - llms.txt
   - ai-readable-docs
-updatedAt: '2026-09-26'
+updatedAt: '2026-10-01'
 author: next-ai-ready 团队
 ---
 
@@ -29,11 +29,21 @@ MDX 内容集合是一组遵循固定字段和路由规则的 Markdown 或 MDX �
 最小流程只有四步：
 
 1. 将 `.md` 或 `.mdx` 源文件保存在仓库中。
-2. 在 `ai-ready.config.mjs` 中用 `content` glob 匹配这些文件。
+2. 初始化接入，并在 `ai-ready.config.*` 中用 `content` glob 匹配这些文件。
 3. 为每一页补充清晰的 frontmatter 与直接答案。
 4. 运行 `next-ai-ready build` 并验证生成路由。
 
 ## 创建本地 MDX 内容集合
+
+在已有 Next.js App Router 项目中安装并初始化一次：
+
+```bash
+pnpm add next-ai-ready
+pnpm exec next-ai-ready init
+```
+
+如果项目已有 AI handler 与 `withAiReady()` 接线，可以跳过 `init`。仅配置内容源可以让 CLI
+构建产物，但不会安装运行时 Markdown 路由。
 
 一个小型文档集合可以采用以下结构：
 
@@ -45,10 +55,24 @@ content/
     deployment.mdx
 ```
 
-配置 next-ai-ready 扫描源文件：
+为后面的端点验证创建 `content/docs/installation.mdx`，写入以下内容：
+
+```markdown
+---
+title: 安装 Acme
+summary: 为已有 Acme 项目安装依赖。
+---
+
+# 安装 Acme
+
+在应用根目录运行 `pnpm install` 来安装依赖。
+```
+
+编辑生成的 `ai-ready.config.ts`（TypeScript）或 `ai-ready.config.mjs`（JavaScript），
+配置 next-ai-ready 扫描源文件。使用已有文件，不要另建第二个配置：
 
 ```js
-// ai-ready.config.mjs
+// ai-ready.config.ts or ai-ready.config.mjs
 import { defineConfig } from "next-ai-ready"
 
 export default defineConfig({
@@ -100,8 +124,8 @@ questions:
 | 源文件 | 生成路由 |
 | --- | --- |
 | `content/index.mdx` | `/` |
-| `content/docs/install.mdx` | `/docs/install` |
-| `content/zh/docs/install.mdx` | `/zh/docs/install` |
+| `content/docs/installation.mdx` | `/docs/installation` |
+| `content/zh/docs/installation.mdx` | `/zh/docs/installation` |
 
 部署前运行构建并检查语义图：
 
@@ -110,7 +134,8 @@ pnpm exec next-ai-ready build
 pnpm exec next-ai-ready doctor --score
 ```
 
-当页面以正确 canonical URL 出现在 `public/llms.txt` 与 `.next-ai-ready/graph.json` 中时，路由配置才算完成。
+当页面以正确 canonical URL 出现在 `public/llms.txt` 与 `.next-ai-ready/graph.json` 中时，映射配置才算完成。
+在 `content/` 下创建文件不会创建浏览器页面；对应 HTML 路由仍由现有 MDX 渲染流程提供。
 
 ## 与现有 MDX 技术栈一起使用
 
@@ -144,16 +169,22 @@ export const semantic = {
 
 ## 验证公开结果
 
-构建内容集合，启动生产应用，同时检查人类页面与机器版本：
+`init` 会在应用构建脚本中加入 `next-ai-ready build`。构建应用并启动生产服务器：
 
 ```bash
-pnpm exec next-ai-ready build
 pnpm build
 pnpm start
-
-curl -i http://localhost:3000/llms.txt
-curl -i http://localhost:3000/docs/install.md
 ```
+
+在另一个终端检查上面创建的文件：
+
+```bash
+curl -i http://localhost:3000/llms.txt
+curl -i http://localhost:3000/docs/installation.md
+```
+
+页面应返回 `200`、`Content-Type: text/markdown`、`安装 Acme` 标题与安装依赖的正文，而不是
+缺页恢复文档。如果 UI 提供 `/docs/installation`，还应检查普通浏览器响应仍为 HTML。
 
 部署后对真实域名运行审计：
 

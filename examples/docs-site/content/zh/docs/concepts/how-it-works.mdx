@@ -11,7 +11,7 @@ tags:
   - architecture
   - knowledge-plane
   - capability-plane
-updatedAt: '2026-06-02'
+updatedAt: '2026-10-01'
 author: next-ai-ready 团队
 ---
 
@@ -49,7 +49,7 @@ author: next-ai-ready 团队
 
 ## 为什么是独立的构建步骤？
 
-构建 CLI 运行在 bundler **之外**。这是刻意的设计（[ADR-006](/docs/decisions/adr-006)）：
+构建 CLI 运行在 bundler **之外**。这是刻意的设计（[ADR-006](/zh/docs/decisions/adr-index#无-bundler-插件-adr-006)）：
 
 - Turbopack 不接受自定义插件。仅 webpack 的插件会破坏 Next 15+ 默认配置。
 - 与 bundler 解耦使管线可移植——可以在 CI 中在 `next build` 之前运行。

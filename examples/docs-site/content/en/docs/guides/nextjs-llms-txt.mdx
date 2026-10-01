@@ -18,7 +18,7 @@ tags:
   - llms.txt
   - markdown
   - tutorial
-updatedAt: '2026-09-29'
+updatedAt: '2026-10-01'
 author: next-ai-ready team
 ---
 
@@ -55,15 +55,47 @@ npm create next-ai-ready@alpha next-ai-ready-demo
 cd next-ai-ready-demo
 npm install
 npx next-ai-ready init
+```
+
+Create `content/docs/example.mdx` with this content:
+
+```markdown
+---
+title: Example documentation
+summary: A non-root page for checking the Markdown endpoint.
+---
+
+# Example documentation
+
+This page verifies that the content source is served as Markdown.
+```
+
+Then build, validate the local wiring, and start the app:
+
+```bash
 npm run build
+npx next-ai-ready doctor --score
 npm run dev
 ```
 
 Then open:
 
 - `http://localhost:3000/llms.txt`
-- `http://localhost:3000/index.md`
-- `http://localhost:3000/openapi.json`
+- `http://localhost:3000/llms-full.txt`
+- `http://localhost:3000/docs/example.md`
+
+In another terminal, check the non-root page directly:
+
+```bash
+curl -i http://localhost:3000/docs/example.md
+```
+
+Expect `200`, `Content-Type: text/markdown`, and the example page's title and body, not a
+missing-page recovery document. `content/index.mdx` maps to `/` in the graph; `/index.md` is not
+an alias for that root page in the current adapter, so this demo checks an explicit non-root route.
+
+The alpha.21 default `init` is Knowledge-only. It does not create `/openapi.json` or `/tools.json`;
+use the optional capability setup below when you need them.
 
 The generated directory is an ordinary Next.js TypeScript project. You can commit it, deploy it,
 or compare its small integration diff with your existing app. The generator itself is covered by
@@ -144,10 +176,11 @@ deployment exposes:
 
 - `/llms.txt` for concise site discovery.
 - `/llms-full.txt` for combined site context.
-- `/<page>.md` for clean page retrieval.
+- `/<page>.md` for clean retrieval of matched non-root content pages.
 - `/sitemap.md` for agent-readable navigation.
-- `/openapi.json` and `/tools.json` for declared capabilities.
-- `/api/mcp` when you choose to expose MCP resources and tools.
+
+`/openapi.json`, `/tools.json`, and `/api/mcp` belong to the optional Capability Plane; they are
+not part of the default `init` setup.
 
 The setup is ready when `doctor` reports zero errors and `llms.txt` lists the intended pages.
 Warnings describe optional quality or production settings that still need attention.
@@ -162,8 +195,9 @@ curl -i http://localhost:3000/about.md
 ```
 
 Both requests should return `200`. `llms.txt` should be plain text and the page endpoint should
-return Markdown derived from the intended content source. A normal request to `/about` should still
-return the original HTML page.
+return Markdown derived from the intended content source, not a missing-page recovery document.
+If your application already serves `/about`, a normal request should still return its original HTML.
+Adding `content/about.mdx` alone does not create that browser page.
 
 ## 4. Verify the deployed site
 
@@ -195,6 +229,38 @@ normal browser pages still return HTML.
 `llms.txt` and Markdown solve the first problem: helping AI systems discover and read content.
 Callable actions are a separate production decision. Add them only when an agent needs to perform a
 specific operation, then configure authentication, input validation, and audit logging.
+
+To opt in from the initialized project:
+
+```bash
+pnpm add zod@^4 @modelcontextprotocol/sdk mcp-handler
+pnpm exec next-ai-ready init --with-capabilities
+```
+
+Before building, check `ai-ready.config.*`. The initializer patches its generated config, but
+leaves a customized config unchanged when it cannot safely locate the insertion point. If the
+`actions` option is missing, add it to the existing `defineConfig` object yourself:
+
+```ts
+actions: "./actions/index.ts", // Use index.mjs in a JavaScript project.
+```
+
+Then build the capability artifacts and check the wiring:
+
+```bash
+pnpm exec next-ai-ready build
+pnpm exec next-ai-ready doctor --score
+```
+
+Restart the dev server, then check in another terminal:
+
+```bash
+curl -i http://localhost:3000/openapi.json
+curl -i http://localhost:3000/tools.json
+```
+
+Both should return `200` with JSON containing the generated public `ping` action. For MCP
+retrieval and invocation checks, continue with the [MCP integration guide](./mcp-integration).
 
 ## What this does not guarantee
 

@@ -1,9 +1,11 @@
 #!/usr/bin/env node
 
 import { spawn } from "node:child_process";
+import { readFile } from "node:fs/promises";
 import { setTimeout as delay } from "node:timers/promises";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { assertBreadcrumbTrail, assertIndexableHtml, collectSeoReferences } from "./seo-references.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const HOST = "127.0.0.1";
@@ -117,9 +119,74 @@ async function callAction(name, input) {
   return body.data;
 }
 
+async function expectSeoReferences() {
+  const graph = JSON.parse(await readFile(join(ROOT, ".next-ai-ready/graph.json"), "utf8"));
+  const pages = Object.values(graph.nodes).filter((node) => node.kind === "page");
+  const siteUrl = new URL(graph.site.baseUrl);
+  const references = new Map();
+  const targets = new Map();
+
+  for (const page of pages) {
+    const response = await fetch(`${ORIGIN}${page.route}`, { redirect: "manual" });
+    const refs = collectSeoReferences(await response.text(), new URL(page.route, siteUrl));
+    try {
+      assertIndexableHtml(response, refs);
+    } catch (error) {
+      fail(`SEO ${page.route}: ${error.message}`);
+    }
+    references.set(page.route, refs);
+    if (page.route.includes("/docs/") && refs.breadcrumbs.length !== 1) {
+      fail(`SEO ${page.route}: expected one BreadcrumbList`);
+    }
+    const ancestorUrls = new Set(pages
+      .filter((candidate) => candidate.route === "/" || candidate.route === page.route || page.route.startsWith(`${candidate.route}/`))
+      .map((candidate) => new URL(candidate.citeUrl).href));
+    ancestorUrls.add(siteUrl.href);
+    for (const breadcrumb of refs.breadcrumbs) {
+      const items = breadcrumb.itemListElement;
+      try {
+        assertBreadcrumbTrail(items, page.citeUrl, ancestorUrls);
+      } catch (error) {
+        fail(`SEO ${page.route}: ${error.message}`);
+      }
+      refs.links.push(...items.map((item) => new URL(item.item)));
+    }
+    for (const target of refs.links) {
+      if (target.origin !== siteUrl.origin) continue;
+      if (target.pathname.startsWith("/docs/")) {
+        fail(`SEO ${page.route}: internal documentation link loses locale: ${target.href}`);
+      }
+      targets.set(`${target.pathname}${target.search}`, target);
+    }
+  }
+
+  for (const [path, target] of targets) {
+    if (references.has(target.pathname)) continue;
+    const response = await fetch(`${ORIGIN}${path}`, { headers: { accept: "text/html" } });
+    if (response.status !== 200 || response.headers.get("x-robots-tag")?.includes("noindex")) {
+      fail(`SEO internal target ${path}: expected a real page or artifact, received ${response.status}`);
+    }
+    if (response.headers.get("content-type")?.includes("text/html")) {
+      references.set(target.pathname, collectSeoReferences(await response.text(), target));
+    }
+  }
+
+  for (const [route, refs] of references) {
+    for (const target of refs.links) {
+      if (target.origin !== siteUrl.origin || !target.hash) continue;
+      const targetRefs = references.get(target.pathname);
+      if (targetRefs && !targetRefs.ids.has(decodeURIComponent(target.hash.slice(1)))) {
+        fail(`SEO ${route}: internal link has a missing fragment: ${target.href}`);
+      }
+    }
+  }
+  console.log(`  ok SEO breadcrumbs, locale links and fragments across ${pages.length} content pages`);
+}
+
 async function main() {
   console.log(`[docs-site-route-smoke] starting ${ORIGIN}`);
   await waitForServer();
+  await expectSeoReferences();
 
   await expectResponse("/llms.txt", {
     contentType: "text/plain",

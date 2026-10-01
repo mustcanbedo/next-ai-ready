@@ -4,7 +4,7 @@ summary: Configure a local MDX content collection in Next.js, map files to route
 order: 2
 questions:
   - q: How do I create an MDX content collection in Next.js?
-    a: Keep Markdown or MDX files in a source directory, match that directory with the content globs in ai-ready.config.mjs, and run next-ai-ready build.
+    a: Initialize the Next.js integration, keep Markdown or MDX files in a source directory, match that directory with the content globs in ai-ready.config.*, and run next-ai-ready build.
   - q: Does next-ai-ready replace my MDX renderer or content collection library?
     a: No. It reads the same source files to build machine-readable outputs while your existing Next.js, Fumadocs, Nextra, or MDX renderer continues to serve the human interface.
   - q: Which MDX frontmatter fields should I add?
@@ -18,7 +18,7 @@ tags:
   - frontmatter
   - llms.txt
   - ai-readable-docs
-updatedAt: '2026-09-26'
+updatedAt: '2026-10-01'
 author: next-ai-ready team
 ---
 
@@ -29,11 +29,21 @@ An MDX content collection is a directory of Markdown or MDX source files that sh
 The minimal workflow is:
 
 1. Keep the source `.md` or `.mdx` files in the repository.
-2. Match those files with `content` globs in `ai-ready.config.mjs`.
+2. Initialize the integration and match those files with `content` globs in `ai-ready.config.*`.
 3. Add clear frontmatter and direct answers to each page.
 4. Run `next-ai-ready build` and verify the generated routes.
 
 ## Create a local MDX collection
+
+From an existing Next.js App Router project, install and initialize the integration once:
+
+```bash
+pnpm add next-ai-ready
+pnpm exec next-ai-ready init
+```
+
+Skip `init` if the project already has the AI handlers and `withAiReady()` wiring. A content
+configuration alone lets the CLI build artifacts, but does not install the runtime Markdown routes.
 
 A small documentation collection can use this structure:
 
@@ -45,10 +55,24 @@ content/
     deployment.mdx
 ```
 
-Configure next-ai-ready to scan the source collection:
+For the endpoint check below, create `content/docs/installation.mdx` with this content:
+
+```markdown
+---
+title: Install Acme
+summary: Install dependencies for an existing Acme checkout.
+---
+
+# Install Acme
+
+Run `pnpm install` from the application root to install the dependencies.
+```
+
+Edit the generated `ai-ready.config.ts` (TypeScript) or `ai-ready.config.mjs` (JavaScript) to scan
+the source collection. Use the existing file rather than creating a second config:
 
 ```js
-// ai-ready.config.mjs
+// ai-ready.config.ts or ai-ready.config.mjs
 import { defineConfig } from "next-ai-ready"
 
 export default defineConfig({
@@ -100,8 +124,8 @@ The default filesystem source derives a route from each matched path. Directorie
 | Source file | Generated route |
 | --- | --- |
 | `content/index.mdx` | `/` |
-| `content/docs/install.mdx` | `/docs/install` |
-| `content/en/docs/install.mdx` | `/en/docs/install` |
+| `content/docs/installation.mdx` | `/docs/installation` |
+| `content/en/docs/installation.mdx` | `/en/docs/installation` |
 
 Run the build and inspect the graph before deployment:
 
@@ -110,7 +134,9 @@ pnpm exec next-ai-ready build
 pnpm exec next-ai-ready doctor --score
 ```
 
-The route is ready when it appears in `public/llms.txt` and `.next-ai-ready/graph.json` with the expected canonical URL.
+The mapping is ready when it appears in `public/llms.txt` and `.next-ai-ready/graph.json` with the
+expected canonical URL. Creating files under `content/` does not create browser pages; your
+existing MDX renderer must serve the corresponding HTML routes.
 
 ## Use an existing MDX stack
 
@@ -145,16 +171,24 @@ The compiler extracts headings, sections, FAQs, entities, and token-aware chunks
 
 ## Verify the public result
 
-Build the collection, start the production app, and check both human and machine representations:
+`init` adds `next-ai-ready build` to the app's build script. Build the app and start the production
+server:
 
 ```bash
-pnpm exec next-ai-ready build
 pnpm build
 pnpm start
-
-curl -i http://localhost:3000/llms.txt
-curl -i http://localhost:3000/docs/install.md
 ```
+
+In another terminal, check the file created above:
+
+```bash
+curl -i http://localhost:3000/llms.txt
+curl -i http://localhost:3000/docs/installation.md
+```
+
+Expect `200` and `Content-Type: text/markdown` for the page, with the `Install Acme` title and its
+dependency-installation instructions, not a missing-page recovery document. If the UI serves
+`/docs/installation`, check that its normal browser response is still HTML.
 
 After deployment, run the audit against the real origin:
 

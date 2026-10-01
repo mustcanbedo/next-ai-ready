@@ -39,7 +39,9 @@ The generated project is a normal Next.js TypeScript app that can be committed a
 
 > **Third-party tool baseline:** the production documentation scored **100/100** with Vercel's open-source `@vercel/agent-readability@0.5.0` on 2026-08-01. [Review the machine-readable result](./docs/audit-baselines/vercel-agent-readability-0.5.0-2026-08-01.json) or reproduce it with `pnpm audit:vercel:site`. This measures technical agent readability, not search ranking, indexing, or citation.
 
-> **Release candidate:** this repository and the documentation site track `main` and currently target `0.1.0-alpha.21`. Treat `npm view next-ai-ready dist-tags --json` as the source of truth for public availability; do not infer npm publication from the repository version. Alpha.21 makes the default `init` flow Knowledge-first: five AI-readable content files, no Capability dependencies or warnings, and an explicit `--with-capabilities` upgrade path. The currently published alpha.20 adds shared MCP/HTTP page search, bilingual retrieval evaluation, crawler policy, and Audit v3 judgments.
+> **Release candidate:** this repository and the documentation site track `main` and currently target `0.1.0-alpha.21`. Treat `npm view next-ai-ready dist-tags --json` as the source of truth for public availability. Alpha.21 makes the default `init` flow Knowledge-first: five AI-readable content files, no Capability dependencies or warnings, and an explicit `--with-capabilities` upgrade path.
+
+> **Published baseline (2026-10-01):** npm `latest` was verified as `0.1.0-alpha.21`. The graph-based breadcrumb correction is queued for the next patch release; it is not part of that published package.
 
 ---
 
@@ -67,7 +69,7 @@ From the same Next.js app, with zero changes to your UI, you get:
 | `/llms.txt`, `/llms-full.txt`   | LLMs, AI search crawlers  |
 | `/sitemap.md`                   | Agent-readable page discovery |
 | `/<route>.md`, `/<route>.ai.json` | Retrieval, RAG, AI ingestion |
-| JSON-LD (`Article`, `FAQPage`, `WebPage`) | Search engines, AI search |
+| JSON-LD (`Article`, `FAQPage`, `WebPage`, `BreadcrumbList`) | Search engines, AI search |
 | `/openapi.json`, `/tools.json`, `/.well-known/ai-plugin.json` | Agents, OpenAPI consumers |
 | `/api/mcp` (MCP server)         | MCP clients (Claude Desktop, Cursor, agents) |
 | `/robots.txt` (explicit AI-bot policy) | AI crawlers |

@@ -794,7 +794,7 @@ Use defineAction with Zod input/output schemas, then run next-ai-ready build to 
 <!-- BEGIN /en/docs/concepts/how-it-works -->
 # How It Works
 URL: https://nextaiready.com/en/docs/concepts/how-it-works
-Updated: 2026-06-02
+Updated: 2026-10-01
 
 # How It Works
 
@@ -830,7 +830,7 @@ Each handler reads its JSON source once per process and holds it in memory. Inva
 
 ## Why a separate build step?
 
-The build CLI runs **outside** the bundler. This is deliberate ([ADR-006](/docs/decisions/adr-006)):
+The build CLI runs **outside** the bundler. This is deliberate ([ADR-006](/en/docs/decisions/adr-index#no-bundler-plugin-adr-006)):
 
 - Turbopack does not accept custom plugins. A webpack-only plugin would break Next 15+ defaults.
 - Decoupling from the bundler makes the pipeline portable — it can run in CI before `next build`.
@@ -926,7 +926,7 @@ MDX and Markdown files matched by the content globs in ai-ready.config.mjs.
 <!-- BEGIN /en/docs/concepts/two-planes -->
 # Two Planes
 URL: https://nextaiready.com/en/docs/concepts/two-planes
-Updated: 2026-06-02
+Updated: 2026-10-01
 
 # Two Planes
 
@@ -943,7 +943,7 @@ The Knowledge Plane makes your **content** readable by AI. It takes your MDX fil
 
 The pipeline is **deterministic**: same input files plus same config produce byte-identical output. No LLM calls, no API keys, no randomness.
 
-See [Knowledge Plane](/docs/concepts/knowledge-plane) for details.
+See [Knowledge Plane](/en/docs/concepts/knowledge-plane) for details.
 
 ## Capability Plane
 
@@ -957,7 +957,7 @@ The Capability Plane makes your **features** callable by AI agents. It takes you
 
 Each action has a Zod schema for input validation, explicit visibility control (`public: true` required), and optional auth hooks.
 
-See [Capability Plane](/docs/concepts/capability-plane) for details.
+See [Capability Plane](/en/docs/concepts/capability-plane) for details.
 
 ## Why two planes?
 
@@ -1052,7 +1052,7 @@ They explain intent and trade-offs; the API reference and doctor checks are the 
 <!-- BEGIN /en/docs/getting-started/project-structure -->
 # Project Structure
 URL: https://nextaiready.com/en/docs/getting-started/project-structure
-Updated: 2026-09-29
+Updated: 2026-10-01
 
 # Project Structure
 
@@ -1060,7 +1060,7 @@ After running `npx next-ai-ready init`, your project gains a few files and direc
 
 ## Config file
 
-- `ai-ready.config.mjs` — your site-wide configuration. Defines `site` metadata, content globs, and emit toggles. The action module path is optional. See [Configuration](/docs/api-reference/config) for the full reference.
+- `ai-ready.config.mjs` — your site-wide configuration. Defines `site` metadata, content globs, and emit toggles. The action module path is optional. See [Configuration](/en/docs/api-reference/config) for the full reference.
 
 ## Build artifacts
 
@@ -1098,8 +1098,8 @@ Created only by `init --with-capabilities`:
 
 ## Optional Capability Plane
 
-- `actions/index.mjs` — action definitions created by `init --with-capabilities`. See [Actions](/docs/guides/actions).
-- `instrumentation.ts` + `instrumentation-node.ts` — Next.js instrumentation (Node-only hooks via `next-ai-ready/hooks`). See [Analytics](/docs/guides/analytics).
+- `actions/index.mjs` — action definitions created by `init --with-capabilities`. See [Actions](/en/docs/guides/actions).
+- `instrumentation.ts` + `instrumentation-node.ts` — Next.js instrumentation (Node-only hooks via `next-ai-ready/hooks`). See [Analytics](/en/docs/guides/analytics).
 
 ## FAQ
 
@@ -1682,7 +1682,7 @@ No. The default search is deterministic local lexical search over the build-time
 <!-- BEGIN /en/docs/guides/mdx-content -->
 # Next.js MDX content collections for AI-readable docs
 URL: https://nextaiready.com/en/docs/guides/mdx-content
-Updated: 2026-09-26
+Updated: 2026-10-01
 
 # Next.js MDX content collections for AI-readable docs
 
@@ -1691,11 +1691,21 @@ An MDX content collection is a directory of Markdown or MDX source files that sh
 The minimal workflow is:
 
 1. Keep the source `.md` or `.mdx` files in the repository.
-2. Match those files with `content` globs in `ai-ready.config.mjs`.
+2. Initialize the integration and match those files with `content` globs in `ai-ready.config.*`.
 3. Add clear frontmatter and direct answers to each page.
 4. Run `next-ai-ready build` and verify the generated routes.
 
 ## Create a local MDX collection
+
+From an existing Next.js App Router project, install and initialize the integration once:
+
+```bash
+pnpm add next-ai-ready
+pnpm exec next-ai-ready init
+```
+
+Skip `init` if the project already has the AI handlers and `withAiReady()` wiring. A content
+configuration alone lets the CLI build artifacts, but does not install the runtime Markdown routes.
 
 A small documentation collection can use this structure:
 
@@ -1707,10 +1717,24 @@ content/
     deployment.mdx
 ```
 
-Configure next-ai-ready to scan the source collection:
+For the endpoint check below, create `content/docs/installation.mdx` with this content:
+
+```markdown
+---
+title: Install Acme
+summary: Install dependencies for an existing Acme checkout.
+---
+
+# Install Acme
+
+Run `pnpm install` from the application root to install the dependencies.
+```
+
+Edit the generated `ai-ready.config.ts` (TypeScript) or `ai-ready.config.mjs` (JavaScript) to scan
+the source collection. Use the existing file rather than creating a second config:
 
 ```js
-// ai-ready.config.mjs
+// ai-ready.config.ts or ai-ready.config.mjs
 import { defineConfig } from "next-ai-ready"
 
 export default defineConfig({
@@ -1759,11 +1783,11 @@ Only publish metadata the visible page supports. A large generated FAQ block doe
 
 The default filesystem source derives a route from each matched path. Directories named `app`, `src/app`, `content`, and `src/content` are treated as source roots.
 
-| Source file                   | Generated route    |
-| ----------------------------- | ------------------ |
-| `content/index.mdx`           | `/`                |
-| `content/docs/install.mdx`    | `/docs/install`    |
-| `content/en/docs/install.mdx` | `/en/docs/install` |
+| Source file                        | Generated route         |
+| ---------------------------------- | ----------------------- |
+| `content/index.mdx`                | `/`                     |
+| `content/docs/installation.mdx`    | `/docs/installation`    |
+| `content/en/docs/installation.mdx` | `/en/docs/installation` |
 
 Run the build and inspect the graph before deployment:
 
@@ -1772,7 +1796,9 @@ pnpm exec next-ai-ready build
 pnpm exec next-ai-ready doctor --score
 ```
 
-The route is ready when it appears in `public/llms.txt` and `.next-ai-ready/graph.json` with the expected canonical URL.
+The mapping is ready when it appears in `public/llms.txt` and `.next-ai-ready/graph.json` with the
+expected canonical URL. Creating files under `content/` does not create browser pages; your
+existing MDX renderer must serve the corresponding HTML routes.
 
 ## Use an existing MDX stack
 
@@ -1807,16 +1833,24 @@ The compiler extracts headings, sections, FAQs, entities, and token-aware chunks
 
 ## Verify the public result
 
-Build the collection, start the production app, and check both human and machine representations:
+`init` adds `next-ai-ready build` to the app's build script. Build the app and start the production
+server:
 
 ```bash
-pnpm exec next-ai-ready build
 pnpm build
 pnpm start
-
-curl -i http://localhost:3000/llms.txt
-curl -i http://localhost:3000/docs/install.md
 ```
+
+In another terminal, check the file created above:
+
+```bash
+curl -i http://localhost:3000/llms.txt
+curl -i http://localhost:3000/docs/installation.md
+```
+
+Expect `200` and `Content-Type: text/markdown` for the page, with the `Install Acme` title and its
+dependency-installation instructions, not a missing-page recovery document. If the UI serves
+`/docs/installation`, check that its normal browser response is still HTML.
 
 After deployment, run the audit against the real origin:
 
@@ -1841,7 +1875,7 @@ For a complete installation, continue with the [10-minute setup](../installation
 
 ### How do I create an MDX content collection in Next.js?
 
-Keep Markdown or MDX files in a source directory, match that directory with the content globs in ai-ready.config.mjs, and run next-ai-ready build.
+Initialize the Next.js integration, keep Markdown or MDX files in a source directory, match that directory with the content globs in ai-ready.config.*, and run next-ai-ready build.
 
 ### Does next-ai-ready replace my MDX renderer or content collection library?
 
@@ -1861,7 +1895,7 @@ No. File scanning, metadata extraction, chunking, and output generation are dete
 <!-- BEGIN /en/docs/guides/nextjs-llms-txt -->
 # Add llms.txt and Markdown endpoints to Next.js App Router
 URL: https://nextaiready.com/en/docs/guides/nextjs-llms-txt
-Updated: 2026-09-29
+Updated: 2026-10-01
 
 # Add llms.txt and Markdown endpoints to Next.js App Router
 
@@ -1896,15 +1930,47 @@ npm create next-ai-ready@alpha next-ai-ready-demo
 cd next-ai-ready-demo
 npm install
 npx next-ai-ready init
+```
+
+Create `content/docs/example.mdx` with this content:
+
+```markdown
+---
+title: Example documentation
+summary: A non-root page for checking the Markdown endpoint.
+---
+
+# Example documentation
+
+This page verifies that the content source is served as Markdown.
+```
+
+Then build, validate the local wiring, and start the app:
+
+```bash
 npm run build
+npx next-ai-ready doctor --score
 npm run dev
 ```
 
 Then open:
 
 - `http://localhost:3000/llms.txt`
-- `http://localhost:3000/index.md`
-- `http://localhost:3000/openapi.json`
+- `http://localhost:3000/llms-full.txt`
+- `http://localhost:3000/docs/example.md`
+
+In another terminal, check the non-root page directly:
+
+```bash
+curl -i http://localhost:3000/docs/example.md
+```
+
+Expect `200`, `Content-Type: text/markdown`, and the example page's title and body, not a
+missing-page recovery document. `content/index.mdx` maps to `/` in the graph; `/index.md` is not
+an alias for that root page in the current adapter, so this demo checks an explicit non-root route.
+
+The alpha.21 default `init` is Knowledge-only. It does not create `/openapi.json` or `/tools.json`;
+use the optional capability setup below when you need them.
 
 The generated directory is an ordinary Next.js TypeScript project. You can commit it, deploy it,
 or compare its small integration diff with your existing app. The generator itself is covered by
@@ -1985,10 +2051,11 @@ deployment exposes:
 
 - `/llms.txt` for concise site discovery.
 - `/llms-full.txt` for combined site context.
-- `/<page>.md` for clean page retrieval.
+- `/<page>.md` for clean retrieval of matched non-root content pages.
 - `/sitemap.md` for agent-readable navigation.
-- `/openapi.json` and `/tools.json` for declared capabilities.
-- `/api/mcp` when you choose to expose MCP resources and tools.
+
+`/openapi.json`, `/tools.json`, and `/api/mcp` belong to the optional Capability Plane; they are
+not part of the default `init` setup.
 
 The setup is ready when `doctor` reports zero errors and `llms.txt` lists the intended pages.
 Warnings describe optional quality or production settings that still need attention.
@@ -2003,8 +2070,9 @@ curl -i http://localhost:3000/about.md
 ```
 
 Both requests should return `200`. `llms.txt` should be plain text and the page endpoint should
-return Markdown derived from the intended content source. A normal request to `/about` should still
-return the original HTML page.
+return Markdown derived from the intended content source, not a missing-page recovery document.
+If your application already serves `/about`, a normal request should still return its original HTML.
+Adding `content/about.mdx` alone does not create that browser page.
 
 ## 4. Verify the deployed site
 
@@ -2036,6 +2104,38 @@ normal browser pages still return HTML.
 `llms.txt` and Markdown solve the first problem: helping AI systems discover and read content.
 Callable actions are a separate production decision. Add them only when an agent needs to perform a
 specific operation, then configure authentication, input validation, and audit logging.
+
+To opt in from the initialized project:
+
+```bash
+pnpm add zod@^4 @modelcontextprotocol/sdk mcp-handler
+pnpm exec next-ai-ready init --with-capabilities
+```
+
+Before building, check `ai-ready.config.*`. The initializer patches its generated config, but
+leaves a customized config unchanged when it cannot safely locate the insertion point. If the
+`actions` option is missing, add it to the existing `defineConfig` object yourself:
+
+```ts
+actions: "./actions/index.ts", // Use index.mjs in a JavaScript project.
+```
+
+Then build the capability artifacts and check the wiring:
+
+```bash
+pnpm exec next-ai-ready build
+pnpm exec next-ai-ready doctor --score
+```
+
+Restart the dev server, then check in another terminal:
+
+```bash
+curl -i http://localhost:3000/openapi.json
+curl -i http://localhost:3000/tools.json
+```
+
+Both should return `200` with JSON containing the generated public `ping` action. For MCP
+retrieval and invocation checks, continue with the [MCP integration guide](./mcp-integration).
 
 ## What this does not guarantee
 
@@ -2228,7 +2328,7 @@ Nextra 4.6.1 can currently resolve its private Zod dependency to 4.4.x, which br
 <!-- BEGIN /en/docs/guides/quickstart -->
 # Quickstart
 URL: https://nextaiready.com/en/docs/guides/quickstart
-Updated: 2026-08-02
+Updated: 2026-10-01
 
 # Quickstart
 
@@ -2300,9 +2400,9 @@ Aim for 90+. The CLI prints **Top fixes** for any remaining warnings. Then start
 
 ## Next steps
 
-- Read about the [Knowledge Plane](/docs/concepts/knowledge-plane) to understand content compilation
-- Run `next-ai-ready init --with-capabilities` when you are ready to add the [Capability Plane](/docs/concepts/capability-plane)
-- Check the [API Reference](/docs/api-reference/config) for full configuration options
+- Read about the [Knowledge Plane](/en/docs/concepts/knowledge-plane) to understand content compilation
+- Run `next-ai-ready init --with-capabilities` when you are ready to add the [Capability Plane](/en/docs/concepts/capability-plane)
+- Check the [API Reference](/en/docs/api-reference/config) for full configuration options
 
 ## FAQ
 
@@ -3603,7 +3703,7 @@ OpenAPI 3.1、tools.json、ai-plugin.json、MCP 工具，以及 POST /api/action
 <!-- BEGIN /zh/docs/concepts/how-it-works -->
 # 工作原理
 URL: https://nextaiready.com/zh/docs/concepts/how-it-works
-Updated: 2026-06-02
+Updated: 2026-10-01
 
 # 工作原理
 
@@ -3639,7 +3739,7 @@ Updated: 2026-06-02
 
 ## 为什么是独立的构建步骤？
 
-构建 CLI 运行在 bundler **之外**。这是刻意的设计（[ADR-006](/docs/decisions/adr-006)）：
+构建 CLI 运行在 bundler **之外**。这是刻意的设计（[ADR-006](/zh/docs/decisions/adr-index#无-bundler-插件-adr-006)）：
 
 - Turbopack 不接受自定义插件。仅 webpack 的插件会破坏 Next 15+ 默认配置。
 - 与 bundler 解耦使管线可移植——可以在 CI 中在 `next build` 之前运行。
@@ -3730,7 +3830,7 @@ ai-ready.config.mjs 中 content glob 匹配的 MDX 与 Markdown 文件。
 <!-- BEGIN /zh/docs/concepts/two-planes -->
 # 双平面
 URL: https://nextaiready.com/zh/docs/concepts/two-planes
-Updated: 2026-06-02
+Updated: 2026-10-01
 
 # 双平面
 
@@ -3747,7 +3847,7 @@ Updated: 2026-06-02
 
 管线是**确定性的**：相同的输入文件加相同的配置产出字节级一致的输出。无 LLM 调用，无 API 密钥，无随机性。
 
-详见 [知识平面](/docs/concepts/knowledge-plane)。
+详见 [知识平面](/zh/docs/concepts/knowledge-plane)。
 
 ## 能力平面
 
@@ -3761,7 +3861,7 @@ Updated: 2026-06-02
 
 每个 action 都有 Zod schema 进行输入验证、显式可见性控制（需设置 `public: true`）和可选的 auth hook。
 
-详见 [能力平面](/docs/concepts/capability-plane)。
+详见 [能力平面](/zh/docs/concepts/capability-plane)。
 
 ## 为什么分两个平面？
 
@@ -3852,7 +3952,7 @@ ADR 解释意图与权衡；API 参考与 doctor 检查才是运行时的权威�
 <!-- BEGIN /zh/docs/getting-started/project-structure -->
 # 项目结构
 URL: https://nextaiready.com/zh/docs/getting-started/project-structure
-Updated: 2026-09-29
+Updated: 2026-10-01
 
 # 项目结构
 
@@ -3860,7 +3960,7 @@ Updated: 2026-09-29
 
 ## 配置文件
 
-- `ai-ready.config.mjs` — 全站配置。定义 `site` 元数据、内容 glob 和产物开关；action 模块路径为可选项。详见 [配置](/docs/api-reference/config)。
+- `ai-ready.config.mjs` — 全站配置。定义 `site` 元数据、内容 glob 和产物开关；action 模块路径为可选项。详见 [配置](/zh/docs/api-reference/config)。
 
 ## 构建产物
 
@@ -3898,8 +3998,8 @@ Updated: 2026-09-29
 
 ## 可选能力平面
 
-- `actions/index.mjs` — `init --with-capabilities` 生成的 action 定义。详见 [Actions](/docs/guides/actions)。
-- `instrumentation.ts` + `instrumentation-node.ts` — Next.js instrumentation（通过 `next-ai-ready/hooks` 注册 Node 专用 hook）。详见 [分析](/docs/guides/analytics)。
+- `actions/index.mjs` — `init --with-capabilities` 生成的 action 定义。详见 [Actions](/zh/docs/guides/actions)。
+- `instrumentation.ts` + `instrumentation-node.ts` — Next.js instrumentation（通过 `next-ai-ready/hooks` 注册 Node 专用 hook）。详见 [分析](/zh/docs/guides/analytics)。
 
 ## FAQ
 
@@ -4476,7 +4576,7 @@ Next.js 运行时走 /api/mcp HTTP 传输；Claude Desktop/Cursor 可用 npx nex
 <!-- BEGIN /zh/docs/guides/mdx-content -->
 # 用 Next.js MDX 内容集合生成 AI 可读文档
 URL: https://nextaiready.com/zh/docs/guides/mdx-content
-Updated: 2026-09-26
+Updated: 2026-10-01
 
 # 用 Next.js MDX 内容集合生成 AI 可读文档
 
@@ -4485,11 +4585,21 @@ MDX 内容集合是一组遵循固定字段和路由规则的 Markdown 或 MDX �
 最小流程只有四步：
 
 1. 将 `.md` 或 `.mdx` 源文件保存在仓库中。
-2. 在 `ai-ready.config.mjs` 中用 `content` glob 匹配这些文件。
+2. 初始化接入，并在 `ai-ready.config.*` 中用 `content` glob 匹配这些文件。
 3. 为每一页补充清晰的 frontmatter 与直接答案。
 4. 运行 `next-ai-ready build` 并验证生成路由。
 
 ## 创建本地 MDX 内容集合
+
+在已有 Next.js App Router 项目中安装并初始化一次：
+
+```bash
+pnpm add next-ai-ready
+pnpm exec next-ai-ready init
+```
+
+如果项目已有 AI handler 与 `withAiReady()` 接线，可以跳过 `init`。仅配置内容源可以让 CLI
+构建产物，但不会安装运行时 Markdown 路由。
 
 一个小型文档集合可以采用以下结构：
 
@@ -4501,10 +4611,24 @@ content/
     deployment.mdx
 ```
 
-配置 next-ai-ready 扫描源文件：
+为后面的端点验证创建 `content/docs/installation.mdx`，写入以下内容：
+
+```markdown
+---
+title: 安装 Acme
+summary: 为已有 Acme 项目安装依赖。
+---
+
+# 安装 Acme
+
+在应用根目录运行 `pnpm install` 来安装依赖。
+```
+
+编辑生成的 `ai-ready.config.ts`（TypeScript）或 `ai-ready.config.mjs`（JavaScript），
+配置 next-ai-ready 扫描源文件。使用已有文件，不要另建第二个配置：
 
 ```js
-// ai-ready.config.mjs
+// ai-ready.config.ts or ai-ready.config.mjs
 import { defineConfig } from "next-ai-ready"
 
 export default defineConfig({
@@ -4553,11 +4677,11 @@ questions:
 
 默认文件系统数据源会从匹配路径推导路由。`app`、`src/app`、`content` 与 `src/content` 目录会被视为源文件根目录。
 
-| 源文件                           | 生成路由               |
-| ----------------------------- | ------------------ |
-| `content/index.mdx`           | `/`                |
-| `content/docs/install.mdx`    | `/docs/install`    |
-| `content/zh/docs/install.mdx` | `/zh/docs/install` |
+| 源文件                                | 生成路由                    |
+| ---------------------------------- | ----------------------- |
+| `content/index.mdx`                | `/`                     |
+| `content/docs/installation.mdx`    | `/docs/installation`    |
+| `content/zh/docs/installation.mdx` | `/zh/docs/installation` |
 
 部署前运行构建并检查语义图：
 
@@ -4566,7 +4690,8 @@ pnpm exec next-ai-ready build
 pnpm exec next-ai-ready doctor --score
 ```
 
-当页面以正确 canonical URL 出现在 `public/llms.txt` 与 `.next-ai-ready/graph.json` 中时，路由配置才算完成。
+当页面以正确 canonical URL 出现在 `public/llms.txt` 与 `.next-ai-ready/graph.json` 中时，映射配置才算完成。
+在 `content/` 下创建文件不会创建浏览器页面；对应 HTML 路由仍由现有 MDX 渲染流程提供。
 
 ## 与现有 MDX 技术栈一起使用
 
@@ -4600,16 +4725,22 @@ export const semantic = {
 
 ## 验证公开结果
 
-构建内容集合，启动生产应用，同时检查人类页面与机器版本：
+`init` 会在应用构建脚本中加入 `next-ai-ready build`。构建应用并启动生产服务器：
 
 ```bash
-pnpm exec next-ai-ready build
 pnpm build
 pnpm start
-
-curl -i http://localhost:3000/llms.txt
-curl -i http://localhost:3000/docs/install.md
 ```
+
+在另一个终端检查上面创建的文件：
+
+```bash
+curl -i http://localhost:3000/llms.txt
+curl -i http://localhost:3000/docs/installation.md
+```
+
+页面应返回 `200`、`Content-Type: text/markdown`、`安装 Acme` 标题与安装依赖的正文，而不是
+缺页恢复文档。如果 UI 提供 `/docs/installation`，还应检查普通浏览器响应仍为 HTML。
 
 部署后对真实域名运行审计：
 
@@ -4634,7 +4765,7 @@ pnpm exec next-ai-ready audit https://docs.example.com --version 3
 
 ### 如何在 Next.js 中创建 MDX 内容集合？
 
-将 Markdown 或 MDX 源文件放在固定目录，用 ai-ready.config.mjs 的 content glob 匹配该目录，然后运行 next-ai-ready build。
+先初始化 Next.js 接入，将 Markdown 或 MDX 源文件放在固定目录，用 ai-ready.config.* 的 content glob 匹配该目录，然后运行 next-ai-ready build。
 
 ### next-ai-ready 会替换现有 MDX 渲染器或内容集合工具吗？
 
@@ -4654,7 +4785,7 @@ pnpm exec next-ai-ready audit https://docs.example.com --version 3
 <!-- BEGIN /zh/docs/guides/nextjs-llms-txt -->
 # 为 Next.js App Router 添加 llms.txt 与 Markdown 端点
 URL: https://nextaiready.com/zh/docs/guides/nextjs-llms-txt
-Updated: 2026-09-29
+Updated: 2026-10-01
 
 # 为 Next.js App Router 添加 llms.txt 与 Markdown 端点
 
@@ -4687,15 +4818,47 @@ npm create next-ai-ready@alpha next-ai-ready-demo
 cd next-ai-ready-demo
 npm install
 npx next-ai-ready init
+```
+
+创建 `content/docs/example.mdx`，写入以下内容：
+
+```markdown
+---
+title: 示例文档
+summary: 用于检查 Markdown 端点的非根页面。
+---
+
+# 示例文档
+
+此页面用于验证内容源是否以 Markdown 形式提供。
+```
+
+然后构建、验证本地接线并启动应用：
+
+```bash
 npm run build
+npx next-ai-ready doctor --score
 npm run dev
 ```
 
 然后打开：
 
 - `http://localhost:3000/llms.txt`
-- `http://localhost:3000/index.md`
-- `http://localhost:3000/openapi.json`
+- `http://localhost:3000/llms-full.txt`
+- `http://localhost:3000/docs/example.md`
+
+在另一个终端直接检查非根页面：
+
+```bash
+curl -i http://localhost:3000/docs/example.md
+```
+
+应返回 `200`、`Content-Type: text/markdown` 和示例页面的标题与正文，而不是缺页恢复文档。
+`content/index.mdx` 在语义图中映射为 `/`；当前适配器不会把 `/index.md` 作为根页面的别名，
+因此本演示验证明确的非根路由。
+
+alpha.21 的默认 `init` 仅启用知识平面，不会创建 `/openapi.json` 或 `/tools.json`；
+需要这些端点时，再使用下方可选的能力平面接入流程。
 
 生成目录就是一个普通的 Next.js TypeScript 项目，可以直接提交、部署，或与现有项目比较小范围
 接入差异。生成器本身也会经过仓库的干净安装与生产构建发布门禁。
@@ -4772,10 +4935,10 @@ pnpm exec next-ai-ready doctor --score
 
 - `/llms.txt`：简洁的站点发现入口。
 - `/llms-full.txt`：合并后的全站上下文。
-- `/<page>.md`：干净的逐页内容。
+- `/<page>.md`：读取匹配到的非根内容页面。
 - `/sitemap.md`：供 Agent 使用的页面导航。
-- `/openapi.json` 和 `/tools.json`：声明式能力描述。
-- `/api/mcp`：按需提供 MCP 资源与工具。
+
+`/openapi.json`、`/tools.json` 和 `/api/mcp` 属于可选的能力平面，不是默认 `init` 的接入结果。
 
 当 `doctor` 没有错误，并且 `llms.txt` 列出预期页面时，基础接入完成。警告表示仍需处理的
 可选质量项或生产配置。
@@ -4789,8 +4952,9 @@ curl -i http://localhost:3000/llms.txt
 curl -i http://localhost:3000/about.md
 ```
 
-两个请求都应返回 `200`。`llms.txt` 应返回纯文本，页面端点应返回来自预期内容源的 Markdown；
-普通浏览器访问 `/about` 时仍应返回原有 HTML 页面。
+两个请求都应返回 `200`。`llms.txt` 应返回纯文本，页面端点应返回来自预期内容源的 Markdown，
+而不是缺页恢复文档。如果应用已有 `/about` 页面，普通浏览器访问时仍应返回原有 HTML。
+仅添加 `content/about.mdx` 不会创建该浏览器页面。
 
 ## 4. 验证生产站
 
@@ -4818,6 +4982,37 @@ pnpm exec next-ai-ready audit https://example.com --version 3
 
 `llms.txt` 和 Markdown 首先解决 AI 系统发现、读取内容的问题。可调用 Action 是另一项生产
 决策。只有当 Agent 确实需要执行具体操作时再添加，并同时配置鉴权、输入校验和审计日志。
+
+在已经初始化的项目中显式启用：
+
+```bash
+pnpm add zod@^4 @modelcontextprotocol/sdk mcp-handler
+pnpm exec next-ai-ready init --with-capabilities
+```
+
+构建前检查 `ai-ready.config.*`。初始化器会为自己生成的配置补上接线，但无法安全定位插入点时，
+会保留已经自定义的配置。如果缺少 `actions` 选项，请手动加入现有 `defineConfig` 对象：
+
+```ts
+actions: "./actions/index.ts", // JavaScript 项目使用 index.mjs。
+```
+
+然后构建能力产物并检查接线：
+
+```bash
+pnpm exec next-ai-ready build
+pnpm exec next-ai-ready doctor --score
+```
+
+重启 dev 服务器，然后在另一个终端检查：
+
+```bash
+curl -i http://localhost:3000/openapi.json
+curl -i http://localhost:3000/tools.json
+```
+
+两个端点都应返回 `200` 和包含生成的公开 `ping` action 的 JSON。MCP 读取与调用验证请继续查看
+[MCP 接入指南](./mcp-integration)。
 
 ## 它不能保证什么
 
@@ -5006,7 +5201,7 @@ Nextra 4.6.1 当前可能把内部 Zod 解析到 4.4.x，导致主题 layout 校
 <!-- BEGIN /zh/docs/guides/quickstart -->
 # 快速开始
 URL: https://nextaiready.com/zh/docs/guides/quickstart
-Updated: 2026-08-02
+Updated: 2026-10-01
 
 # 快速开始
 
@@ -5080,7 +5275,7 @@ npx next-ai-ready doctor --score
 
 - 阅读[知识平面](/zh/docs/concepts/knowledge-plane)了解内容编译
 - 准备增加能力平面时，运行 `next-ai-ready init --with-capabilities` 并阅读[能力平面](/zh/docs/concepts/capability-plane)
-- 查看 [API 参考](/docs/api-reference/config)了解完整配置选项
+- 查看 [API 参考](/zh/docs/api-reference/config)了解完整配置选项
 
 ## FAQ
 

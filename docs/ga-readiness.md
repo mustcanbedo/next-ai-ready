@@ -2,7 +2,9 @@
 
 **GA** for this project means the first **generally recommendable** release: **`0.1.0`** (or final **`0.1.0-alpha.N`** before dropping the alpha tag), where a Next.js team can install, build, deploy, and get predictable AI artifacts without reading the whole monorepo.
 
-**Current repository candidate:** `0.1.0-alpha.21`. Public npm availability is determined by registry dist-tags, not by the version committed to `main`. Alpha.21 makes Knowledge-only setup the default and keeps Actions, MCP, OpenAPI, and observability behind the explicit `--with-capabilities` path. The currently published alpha.20 contains the shared search provider and Audit v3 work. See [improvement-plan.zh-CN.md](./improvement-plan.zh-CN.md) for final **`0.1.0`** GA sign-off.
+**Current repository candidate:** `0.1.0-alpha.21`. Public npm availability is determined by registry dist-tags, not by the version committed to `main`. Alpha.21 makes Knowledge-only setup the default and keeps Actions, MCP, OpenAPI, and observability behind the explicit `--with-capabilities` path. See [improvement-plan.zh-CN.md](./improvement-plan.zh-CN.md) for final **`0.1.0`** GA sign-off.
+
+**Published baseline (2026-10-01):** npm `latest` was verified as `0.1.0-alpha.21`. The graph-based breadcrumb fix is pending the next patch release and is not included in that published baseline.
 
 ---
 

@@ -39,7 +39,9 @@ npm create next-ai-ready@alpha next-ai-ready-demo
 
 > **第三方工具基线：** 生产文档站在 2026-08-01 使用 Vercel 开源的 `@vercel/agent-readability@0.5.0` 获得 **100/100**。[查看机器可读原始结果](./docs/audit-baselines/vercel-agent-readability-0.5.0-2026-08-01.json)，或运行 `pnpm audit:vercel:site` 复现。该分数衡量技术层面的 Agent 可读性，不代表搜索排名、收录或引用效果。
 
-> **候选版本：** 本仓库与文档站跟随 `main`，当前目标为 `0.1.0-alpha.21`。公开可用性以 `npm view next-ai-ready dist-tags --json` 为准，不得根据仓库版本推断 npm 已发布。alpha.21 将默认 `init` 改为 Knowledge-first：只生成 5 个 AI 可读内容文件，不再要求 Capability 依赖或产生相关警告，并通过 `--with-capabilities` 显式升级。当前已发布的 alpha.20 包含 MCP/HTTP 共用搜索、双语检索评测、爬虫策略与 Audit v3 判断。
+> **候选版本：** 本仓库与文档站跟随 `main`，当前目标为 `0.1.0-alpha.21`。公开可用性仍以 `npm view next-ai-ready dist-tags --json` 为准。alpha.21 将默认 `init` 改为 Knowledge-first：只生成 5 个 AI 可读内容文件，不再要求 Capability 依赖或产生相关警告，并通过 `--with-capabilities` 显式升级。
+
+> **发布基线（2026-10-01）：** 已核验 npm `latest` 为 `0.1.0-alpha.21`。本轮基于真实页面生成面包屑的修复已列入下一个 patch，不属于该已发布版本。
 
 ---
 
@@ -67,7 +69,7 @@ SEO 为浏览器和搜索引擎优化你的网站。
 | `/llms.txt`、`/llms-full.txt`   | LLM、AI 搜索爬虫          |
 | `/sitemap.md`                   | Agent 可读的页面发现目录  |
 | `/<route>.md`、`/<route>.ai.json` | 检索、RAG、AI 数据摄取   |
-| JSON-LD（`Article`、`FAQPage`、`WebPage`） | 搜索引擎、AI 搜索 |
+| JSON-LD（`Article`、`FAQPage`、`WebPage`、`BreadcrumbList`） | 搜索引擎、AI 搜索 |
 | `/openapi.json`、`/tools.json`、`/.well-known/ai-plugin.json` | Agent、OpenAPI 消费者 |
 | `/api/mcp`（MCP 服务器）        | MCP 客户端（Claude Desktop、Cursor、Agent） |
 | `/robots.txt`（显式 AI 爬虫策略）| AI 爬虫 |

@@ -1,7 +1,7 @@
 # next-ai-ready Google 自然搜索执行手册
 
 > 建立日期：2026-08-24
-> 状态更新：2026-09-29
+> 状态更新：2026-10-01
 > 目标：先获得可核验的 Google 收录与曝光，再优化点击和安装转化。
 
 ## 1. 当前诊断
@@ -18,7 +18,7 @@
 | `/zh` | 已收录 |
 | `/en/docs/guides/mcp-integration` | 已收录 |
 | `/en/docs/guides/robots-txt` | 已收录 |
-| `/en/docs/guides/nextjs-llms-txt` | 已发现，尚未收录 |
+| `/en/docs/guides/nextjs-llms-txt` | 已收录（2026-10-01 URL Inspection 核验，09-29 抓取） |
 
 PR #25 已从中英文首页、文档入口和 `llms.txt` 增加到目标指南的内部链接，并将机器可读
 产物的 freshness 改为内容 `updatedAt`。下一步不是反复提交 sitemap，而是请求一次重新索引，
@@ -43,6 +43,44 @@ Search Console 对 `/en/docs/guides/nextjs-llms-txt` 的索引检查仍显示“
 生产构建已通过：50 条内容路由与 58 个静态页面成功生成；文档路由、Markdown、MCP、缺页
 契约和 AI 产物 smoke 全部通过，`doctor` 为 100/100。发布后只请求一次核心教程索引，再按
 7 天和 14 天窗口观察；在数据到达前不改 URL，也不创建同义文章。
+
+### 2026-10-01 检查与修复队列
+
+核心 llms.txt 教程已收录，用户 canonical 与 Google canonical 一致。生产 50/50 个 sitemap
+HTML 页面均返回 200，title、description、H1、canonical 与语言 alternate 正常。固定工具
+`@vercel/agent-readability@0.5.0` 仍为 100/100，但不是自然搜索排名或流量成绩。
+
+新域名效果报告当前只覆盖 2026-09-26 至 09-28：1 次曝光、0 点击、平均排名 83；显示的查询
+为 `next-mdx-remote`，页面为 MDX 教程。旧 Vercel 资源实际覆盖 08-23 至 09-28：221 次曝光、
+2 次点击、CTR 0.9%、平均排名 45.3。两套资源不直接相加，也不把一次曝光解释为增长趋势。
+本次 Google `Next.js llms.txt` 第一页 10 条自然结果未出现本站。新资源的覆盖率与外链报告
+仍在处理数据，不能推断已收录总量或外链数；PageSpeed API 返回 429，本次没有性能评分。
+
+本轮只修确定的问题，保留既有标题和 URL：
+
+1. SDK 根据图谱中的真实页面生成面包屑，移除 90 个失效目录引用（12 个唯一目录）。
+2. 默认 Knowledge-only 教程只验证真实内容端点；OpenAPI 放到显式 Capability 流程。
+3. 对齐 MDX 示例文件和验证 URL，修复 ADR-006 链接，正文内链保留当前语言。
+4. 在文档站生产路由 smoke 中检查所有内容页的面包屑、内链目标和锚点。
+
+上述修复属于当前分支，尚未证明在生产生效；SDK 修复随后续 patch 发布。本轮不再次请求索引。
+MDX 内容实验的 14 天复盘点是 2026-10-10；域名迁移的 7/14 天观察点为 10-04 与 10-11。
+部署后核对失效引用是否清零，再看新资源的查询、曝光、点击与真实安装，不承诺短期排名提升。
+
+面包屑设计参考 [Google Breadcrumb 规范](https://developers.google.com/search/docs/appearance/structured-data/breadcrumb)，
+不把 URL 中每一层目录假定为真实可导航页面。
+
+#### 本轮本地验收
+
+- 新的路由检查在旧生产构建上先复现了失效面包屑；修复后 50 个内容页的面包屑、内链和锚点全部通过。
+- 文档站 Next.js 16.2.6 生产构建成功，生成 58 个静态页面；Markdown、MCP 认证/检索、HTML 404 和 Agent 缺页恢复回归通过。
+- semantic 新增 9 项面包屑测试，并对错误终点、重复 URL、非祖先条目及 HTML `noindex` 增加 SEO 检查回归；Next 集成的 99 项测试通过。
+- 十个包的公共 API、导出与打包检查通过；30 条双语检索评测未回退；README 与文档站版本同步检查通过。
+- 在仓库外临时目录，用本轮本地 tarball 完成 npm 干净安装与 Next.js 16.3.8 生产构建。这是兼容性夹具，不计为真实外部采用。
+- 将四个中英文教程中的示例原文提取到该应用：`/docs/example.md` 与 `/docs/installation.md` 均返回 200、Markdown 类型和预期正文，没有误返回缺页恢复内容。
+- 默认 Knowledge-only 模式下 `/openapi.json` 为 404；按教程安装能力依赖并运行 `init --with-capabilities` 后，生产构建通过，`/openapi.json`、`/tools.json` 均返回包含公开 `ping` 的 JSON。
+
+以上是本地候选代码的验证，不能代替合入后的生产复测，也不能推断 Google 排名提升。
 
 ## 1.1 当前自然搜索基线（2026-09-26）
 

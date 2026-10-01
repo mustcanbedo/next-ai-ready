@@ -66,7 +66,7 @@ export function pageJsonLd(graph: SemanticGraph, route: string): Record<string, 
     });
   }
 
-  const breadcrumb = buildBreadcrumb(site, route);
+  const breadcrumb = buildBreadcrumb(graph, route);
   if (breadcrumb) blocks.push(breadcrumb);
 
   return blocks.map(stripUndefined);
@@ -94,23 +94,37 @@ export function siteJsonLd(site: SiteInfo): Record<string, unknown>[] {
   return blocks.map(stripUndefined);
 }
 
-function buildBreadcrumb(site: SiteInfo, route: string): Record<string, unknown> | undefined {
+function buildBreadcrumb(graph: SemanticGraph, route: string): Record<string, unknown> | undefined {
   if (route === "/") return undefined;
   const parts = route.split("/").filter(Boolean);
   if (parts.length === 0) return undefined;
-  const items: unknown[] = [
-    { "@type": "ListItem", position: 1, name: site.name, item: site.baseUrl },
+  const site = graph.site;
+  const root = graph.nodes[graph.routes["/"] ?? ""];
+  const home = root?.kind === "page" ? root : undefined;
+  const homeUrl = home?.citeUrl ?? absoluteUrl(site.baseUrl, "/");
+  const items = [
+    { "@type": "ListItem", position: 1, name: home?.title ?? site.name, item: homeUrl },
   ];
+  const seen = new Set([new URL(homeUrl).href]);
   let accum = "";
   parts.forEach((part, i) => {
     accum += `/${part}`;
+    const ancestorRoute = i === parts.length - 1 ? route : accum;
+    const ancestor = graph.nodes[graph.routes[ancestorRoute] ?? ""];
+    // A URL directory is not necessarily a navigable content page.
+    if (ancestor?.kind !== "page") return;
+    const url = ancestor.citeUrl ?? absoluteUrl(site.baseUrl, ancestorRoute);
+    const key = new URL(url).href;
+    if (seen.has(key)) return;
+    seen.add(key);
     items.push({
       "@type": "ListItem",
-      position: i + 2,
-      name: titleize(part),
-      item: site.baseUrl + accum,
+      position: items.length + 1,
+      name: ancestor.title ?? titleize(part),
+      item: url,
     });
   });
+  if (items.length < 2) return undefined;
   return {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
@@ -121,7 +135,6 @@ function buildBreadcrumb(site: SiteInfo, route: string): Record<string, unknown>
 function titleize(s: string): string {
   return s.replace(/[-_]+/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
 }
-
 
 function stripUndefined<T extends Record<string, unknown>>(obj: T): T {
   for (const k of Object.keys(obj)) {

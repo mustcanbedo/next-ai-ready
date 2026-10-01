@@ -1,6 +1,8 @@
 # @next-ai-ready/semantic
 
-Builds `SemanticGraph` from compiled pages, emits JSON-LD (`WebPage`, `Article`, `FAQPage`), and provides deterministic page retrieval.
+Builds `SemanticGraph` from compiled pages, emits JSON-LD (`WebPage`, `Article`, `FAQPage`, `BreadcrumbList`), and provides deterministic page retrieval.
+
+Breadcrumbs include the site homepage and only ancestors present as pages in the graph. They use page titles and `citeUrl` values, skip missing directory pages and duplicate canonical URLs, and omit trails with fewer than two distinct items. Keep graph routes aligned with your application's real public pages.
 
 ```ts
 import { createGraphSearchProvider, searchGraphPages } from "@next-ai-ready/semantic/search";

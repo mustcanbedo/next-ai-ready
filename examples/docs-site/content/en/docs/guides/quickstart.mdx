@@ -4,33 +4,38 @@ summary: Complete a verified next-ai-ready setup in about 10 minutes.
 order: 1
 questions:
   - q: How long does the quickstart take?
-    a: 'About ten minutes from install through init, content, build, and doctor.'
+    a: 'Plan for about ten minutes from install through verification; dependency downloads and production builds can take longer.'
   - q: Which endpoints should work after build?
     a: >-
-      /llms.txt, /openapi.json, /tools.json, and per-page Markdown routes when
-      the dev server is running.
+      Default init enables /llms.txt, /llms-full.txt, and per-page Markdown
+      when the Next.js server is running. OpenAPI, tools, and MCP require
+      explicit Capability setup.
   - q: When should I run next-ai-ready build?
     a: >-
-      After changing MDX content or actions, and before deploy so public/ and
+      After changing content or configuration, and before deploy so public/ and
       .next-ai-ready/ artifacts stay fresh.
 tags:
   - quickstart
   - tutorial
   - getting-started
-updatedAt: '2026-10-01'
+updatedAt: '2026-10-02'
 author: next-ai-ready team
 ---
 
 # Quickstart
 
-This guide takes you from zero to a verified AI-readable Next.js setup in about 10 minutes.
+This guide takes you from install to a verified AI-readable Next.js setup. Allow about ten
+minutes, plus dependency downloads and the production build. Start with readable content;
+callable actions and MCP are optional next steps.
+
+Use Node.js 20+ and a Next.js 14.2+ App Router application. Keep your existing package manager.
 
 ## 1. Create a project
 
-**Option A — template (fastest):**
+**Option A — new project:**
 
 ```bash
-npm create next-ai-ready my-site
+npm create next-ai-ready@latest my-site
 cd my-site
 npm install
 npx next-ai-ready init
@@ -38,56 +43,91 @@ npx next-ai-ready init
 
 The scaffold supplies a runnable minimal App Router TypeScript app and starter MDX content. It does not pre-generate AI-ready config or handlers; the explicit `init` step adds that wiring after installation.
 
-**Option B — existing Next.js app:**
+**Option B — existing Next.js app:** run these commands from its root. Do not create a second app.
 
 ```bash
-npx create-next-app@latest my-site --typescript --app --tailwind
-cd my-site
 pnpm add next-ai-ready
-npx next-ai-ready init
+pnpm exec next-ai-ready init
 ```
 
-## 2. Add content
+Default `init` adds Knowledge Plane handlers and build wiring. It does not add Actions, MCP,
+`/openapi.json`, or `/tools.json`. If your project is already initialized, keep the existing
+configuration and handlers rather than forcing replacements.
 
-Create an MDX page with semantic metadata:
+## 2. Add a page and check the configuration
+
+Create `content/docs/quickstart.mdx` with this content. The default content globs include this path.
+The scaffold also includes `content/index.mdx`; keep it or replace it with your real homepage source.
 
 ```markdown
 ---
-title: Getting Started
-summary: Learn how to use our product.
+title: Quickstart Check
+summary: Install dependencies for the example project.
 ---
 
-# Getting Started
+# Quickstart Check
 
-Welcome to our product. Here's how to get started.
+Run `pnpm install` from the application root to install dependencies.
 ```
 
-## 3. Build
+Edit the existing `ai-ready.config.ts` or `ai-ready.config.mjs`: set `site.name`,
+`site.description`, and `site.baseUrl` to your site's real identity and production origin. Do not
+deploy the generated `https://example.com` placeholder. If your files live elsewhere, update the
+content globs to match the original Markdown/MDX source files.
+
+The example maps to `/docs/quickstart.md`. A file under `content/` does not create a browser page;
+your current renderer remains responsible for HTML routes. Read the [MDX collection guide](./mdx-content)
+if your content and browser route conventions differ.
+
+## 3. Build and diagnose
 
 ```bash
 npx next-ai-ready build
-```
-
-You should see output like:
-
-```
-[next-ai-ready] scanning content
-[next-ai-ready] compiling 1 files
-[next-ai-ready] wrote 5 files
-[next-ai-ready] build complete — 1 routes, 0 actions, 5 files written
-```
-
-## 4. Verify
-
-```bash
 npx next-ai-ready doctor --score
 ```
 
-Aim for 90+. The CLI prints **Top fixes** for any remaining warnings. Then start your dev server and visit:
+The build should find your source files and write `.next-ai-ready/graph.json` and the discovery
+files under `public/`. Counts depend on the actual content; zero routes means you need to fix the
+source path or glob. Check that `public/llms.txt` links to `/docs/quickstart` on your configured origin.
 
-- `http://localhost:3000/llms.txt` — your AI discovery index
-- `http://localhost:3000/llms-full.txt` — your complete readable corpus
-- `http://localhost:3000/<route>.md` — a page's Markdown representation
+`doctor` should report **0 errors**. Read and resolve or explicitly record warnings; a numeric
+score alone does not prove that the public routes return the intended content.
+
+Public alpha.21 incorrectly reports a missing OpenAPI artifact in Knowledge-only projects.
+That diagnostic fix is pending release; OpenAPI remains optional, so do not enable capabilities
+just to silence the warning.
+
+## 4. Verify the running application
+
+For the scaffold's npm workflow, build and start the production app:
+
+```bash
+npm run build
+npm run start
+```
+
+Use `pnpm build` and `pnpm start` in a pnpm app. `init` adds the AI build step to the app's build
+script; the separate CLI build above helps diagnose it before the full Next.js build.
+
+In another terminal, with the server running on port 3000:
+
+```bash
+curl -i http://localhost:3000/llms.txt
+curl -i http://localhost:3000/docs/quickstart.md
+curl -i -H 'Accept: text/html' http://localhost:3000/
+```
+
+The setup is verified when:
+
+- `/llms.txt` returns `200` and includes the configured `/docs/quickstart` link.
+- `/docs/quickstart.md` returns `200` and `Content-Type: text/markdown`, with the `Quickstart Check`
+  title and dependency-installation instructions. A recovery response containing `document_status: "not_found"`
+  is not a successful page check, even when its status is `200`.
+- The normal browser request to `/` still returns your app's HTML, not Markdown.
+
+If the Markdown page is missing, check its source file, content glob, graph route, handlers, and
+`withAiReady()` wiring. If links use the wrong hostname, correct `site.baseUrl` and rebuild.
+For production checks, continue with [the llms.txt walkthrough](./nextjs-llms-txt#check-the-expected-responses).
 
 ## Next steps
 

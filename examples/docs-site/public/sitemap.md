@@ -49,7 +49,7 @@
 - [用 Next.js MDX 内容集合生成 AI 可读文档](https://nextaiready.com/zh/docs/guides/mdx-content): 在 Next.js 中配置本地 MDX 内容集合、映射路由、补充有效 frontmatter，并生成 llms.txt、逐页 Markdown 与 JSON-LD。
 - [为 Next.js App Router 添加 llms.txt 与 Markdown 端点](https://nextaiready.com/zh/docs/guides/nextjs-llms-txt): 判断应该手写还是自动生成 llms.txt，运行一个干净的 Next.js 演示，并验证生产结果。
 - [为 Nextra 4 添加 llms.txt 与 Markdown 端点](https://nextaiready.com/zh/docs/guides/nextra-ai-ready): 在不替换 Nextra 导航、搜索、主题和 MDX 渲染的前提下，将 next-ai-ready 接入 Nextra 4 App Router 文档站。
-- [快速开始](https://nextaiready.com/zh/docs/guides/quickstart): 约 10 分钟完成可验证的 next-ai-ready 基础接入。
+- [快速开始](https://nextaiready.com/zh/docs/guides/quickstart): 按约 10 分钟的流程完成 next-ai-ready 基础接入并验证知识平面端点，实际耗时取决于安装与网络。
 - [在 Next.js 中分别配置 AI 搜索与训练爬虫](https://nextaiready.com/zh/docs/guides/robots-txt): 保留 ChatGPT 与 Claude 的搜索发现能力，同时分别决定是否允许训练爬虫和用户触发的 AI 访问。
 - [安装](https://nextaiready.com/zh/docs/installation): 安装 next-ai-ready 并生成首个配置。
 - [简介](https://nextaiready.com/zh/docs/introduction): next-ai-ready 是什么，为什么需要它。

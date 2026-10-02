@@ -21,7 +21,7 @@ export const CURATED_FAQ = {
     installation: [
       {
         q: "What are the prerequisites for next-ai-ready?",
-        a: "Node.js 20+, Next.js 15+ with App Router, and Zod v4 for actions.",
+        a: "Node.js 20+, Next.js 14.2+ with App Router, and Zod v4 for actions. Next.js 15+ is recommended.",
       },
       {
         q: "Do I need to install @next-ai-ready/* packages separately?",
@@ -29,27 +29,27 @@ export const CURATED_FAQ = {
       },
       {
         q: "What does next-ai-ready init create?",
-        a: "ai-ready.config, route stubs under app/%5Fai-ready/, action and MCP endpoints, and optional instrumentation files.",
+        a: "By default, ai-ready.config and Knowledge Plane routes under app/%5Fai-ready/. Pass --with-capabilities to also add Actions, MCP, OpenAPI routes, and instrumentation.",
       },
     ],
     "guides/quickstart": [
       {
         q: "How long does the quickstart take?",
-        a: "About five minutes from install through init, content, build, and doctor.",
+        a: "Plan for about ten minutes from install through verification; dependency downloads and production builds can take longer.",
       },
       {
         q: "Which endpoints should work after build?",
-        a: "/llms.txt, /openapi.json, /tools.json, and per-page Markdown routes when the dev server is running.",
+        a: "Default init enables /llms.txt, /llms-full.txt, and per-page Markdown when the Next.js server is running. OpenAPI, tools, and MCP require explicit Capability setup.",
       },
       {
         q: "When should I run next-ai-ready build?",
-        a: "After changing MDX content or actions, and before deploy so public/ and .next-ai-ready/ artifacts stay fresh.",
+        a: "After changing content or configuration, and before deploy so public/ and .next-ai-ready/ artifacts stay fresh.",
       },
     ],
     "getting-started/project-structure": [
       {
         q: "What files does next-ai-ready add to my project?",
-        a: "ai-ready.config, app/%5Fai-ready/ route stubs, actions/, instrumentation files, and build outputs under public/ and .next-ai-ready/.",
+        a: "By default, ai-ready.config and Knowledge Plane routes under app/%5Fai-ready/. Capability and instrumentation files are added only with --with-capabilities.",
       },
       {
         q: "Where does the semantic graph live?",
@@ -235,7 +235,7 @@ export const CURATED_FAQ = {
     installation: [
       {
         q: "安装 next-ai-ready 需要什么环境？",
-        a: "Node.js 20+、Next.js 15+ App Router，以及用于 action 的 Zod v4。",
+        a: "Node.js 20+、Next.js 14.2+ App Router，以及用于 action 的 Zod v4；推荐 Next.js 15+。",
       },
       {
         q: "需要单独安装 @next-ai-ready/* 包吗？",
@@ -243,27 +243,27 @@ export const CURATED_FAQ = {
       },
       {
         q: "next-ai-ready init 会生成什么？",
-        a: "ai-ready.config、app/%5Fai-ready/ 路由桩、action/MCP 端点，以及可选的 instrumentation 文件。",
+        a: "默认生成 ai-ready.config 与 app/%5Fai-ready/ 下的知识平面路由；传入 --with-capabilities 后才会增加 Actions、MCP、OpenAPI 路由与 instrumentation。",
       },
     ],
     "guides/quickstart": [
       {
         q: "快速开始需要多久？",
-        a: "约五分钟，完成安装、init、内容、build 和 doctor 验证。",
+        a: "预留约十分钟完成接入与验证；依赖下载和生产构建可能需要更长时间，具体取决于网络和项目情况。",
       },
       {
         q: "build 之后应能访问哪些端点？",
-        a: "/llms.txt、/openapi.json、/tools.json，以及 dev 服务器运行时的逐页 Markdown 路由。",
+        a: "构建并启动应用后，检查 /llms.txt、/llms-full.txt 和示例对应的 /docs/quickstart.md；逐页响应应包含正确标题与正文，而不是 not_found 恢复文档。",
       },
       {
         q: "什么时候需要运行 next-ai-ready build？",
-        a: "修改 MDX 或 action 后、部署前，确保 public/ 与 .next-ai-ready/ 产物最新。",
+        a: "修改内容或配置后、部署前，确保 public/ 与 .next-ai-ready/ 产物最新。",
       },
     ],
     "getting-started/project-structure": [
       {
         q: "next-ai-ready 会在项目里添加哪些文件？",
-        a: "ai-ready.config、app/%5Fai-ready/ 路由桩、actions/、instrumentation，以及 public/ 与 .next-ai-ready/ 下的构建产物。",
+        a: "默认生成 ai-ready.config 与 app/%5Fai-ready/ 下的知识平面路由；能力平面与 instrumentation 文件仅由 --with-capabilities 添加。",
       },
       {
         q: "语义图谱保存在哪里？",

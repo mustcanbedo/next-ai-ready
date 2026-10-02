@@ -1,9 +1,9 @@
 # next-ai-ready 产品改进台账
 
-> 最后更新：2026-10-01
+> 最后更新：2026-10-02
 > 维护者视角：`next-ai-ready` 原始作者与技术负责人  
 > 当前仓库候选：`next-ai-ready@0.1.0-alpha.21`（公开 npm 状态以 dist-tags 为准）
-> 当前主分支基线：`11b1ffd`（alpha.21 发布准备已合入）
+> 当前主分支基线：`d2b5fdc`（Nextra 接入证据 PR #48 已合入；本轮候选尚未合入）
 > 最近公开版本：`next-ai-ready@0.1.0-alpha.21` 已发布并提升为 `latest`（2026-10-01 registry 核验）
 
 本文是后续优化的**执行状态与决策记录**。`roadmap.md` 保留工程阶段历史，
@@ -365,6 +365,36 @@ Vercel Preview 与 Required CI 均通过。该夹具仍是仓库内部证据，�
 接线的诊断适配需后续单独修复；author 与 JSON-LD 未配置的建议保留。本轮不以截图或内部
 测试代替外部采用，A1-06 继续保持`待验证`。下一步按顺序补客观选型对比，再用已验证案例
 开展经维护者同意的生态合作，记录真实复用而不是发帖数量。
+
+2026-10-02，A1-02 开始修正首次接入路径：中英文快速开始区分新建与已有项目，标明
+具体内容文件、生产域名配置、HTML/Markdown 的独立验收与 `200 not_found` 恢复文档边界；
+FAQ 数据源同步，避免下一次应用 FAQ 时恢复错误说明。双语 README 与仓库内快速开始
+同步取消“默认包含 OpenAPI”和“alpha.21 无 Capability 告警”的错误承诺。
+
+同日通过公开 npm 脚手架 `create-next-ai-ready@0.1.0-alpha.13` 创建临时项目，安装
+`next-ai-ready@0.1.0-alpha.21` 与 Next.js 15.5.27；默认 init、内容生成和生产构建通过。
+运行中 `/llms.txt`、`/llms-full.txt`、示例 Markdown、普通 HTML 首页均通过真实 HTTP
+状态码、内容类型及正文断言；可选 `/openapi.json` 为 `404`，不影响知识平面。
+这是维护者自测，不增加仓库外真实用户采用计数，也未部署该临时项目。
+
+公开 alpha.21 的 doctor 报告 `0 error / 4 warnings / 86`，其中缺少 OpenAPI 是纯知识
+平面误报。本轮修复诊断分支并保留能力平面缺产物检查，通过 136 项 SDK 回归、包类型
+检查和修改文件零 lint 告警；仍需合入与独立发布后才更新 npm 状态。其余 author、updatedAt、JSON-LD 建议不是接入失败，也不强迫用户用
+不存在于页面的作者或日期提高分数。
+
+独立审核发现并补齐 JS/TS 能力 handler、ai-plugin 和 MCP token 检测边界；既有 `.mjs`
+仅保守识别，不声明 Next.js 支持该扩展名路由。FAQ 源与中英文快速开始、安装和项目结构
+页面精确匹配，防止应用 FAQ 时写回错误默认能力说明。复审未发现这些修复的剩余阻断。
+使用本地候选 CLI 对同一公开 npm 安装项目复测为 `0 error / 3 warnings / 91`，不是
+公开 npm 已经更新。文档站生产构建、13 项内容/引用测试、50 页内链与路由回归通过，
+10 个包的公开 API 契约未改变。SDK、README、双语教程及机器可读产物在同一候选 PR
+交付，不计入外部采用或 SEO 流量增长。
+
+公开安装同时报告 2 项依赖告警（1 moderate、1 high），链路为 Next.js → PostCSS。
+记录为后续发布评估项；不执行 `npm audit fix --force` 或静默跨 Next.js 大版本。
+风险涉及不可信 CSS 的 source map 处理，依据
+[PostCSS 官方仓库关联公告](https://github.com/advisories/GHSA-6g55-p6wh-862q)；具体受影响
+版本与完整修复须按 registry 当前完整审计结果评估，不能靠本次受控样例构建成功宣称安全。
 
 ## 8. 维护规则
 

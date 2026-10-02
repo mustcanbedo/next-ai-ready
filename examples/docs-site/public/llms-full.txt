@@ -2377,18 +2377,22 @@ Nextra 4.6.1 can currently resolve its private Zod dependency to 4.4.x, which br
 <!-- BEGIN /en/docs/guides/quickstart -->
 # Quickstart
 URL: https://nextaiready.com/en/docs/guides/quickstart
-Updated: 2026-10-01
+Updated: 2026-10-02
 
 # Quickstart
 
-This guide takes you from zero to a verified AI-readable Next.js setup in about 10 minutes.
+This guide takes you from install to a verified AI-readable Next.js setup. Allow about ten
+minutes, plus dependency downloads and the production build. Start with readable content;
+callable actions and MCP are optional next steps.
+
+Use Node.js 20+ and a Next.js 14.2+ App Router application. Keep your existing package manager.
 
 ## 1. Create a project
 
-**Option A — template (fastest):**
+**Option A — new project:**
 
 ```bash
-npm create next-ai-ready my-site
+npm create next-ai-ready@latest my-site
 cd my-site
 npm install
 npx next-ai-ready init
@@ -2396,56 +2400,91 @@ npx next-ai-ready init
 
 The scaffold supplies a runnable minimal App Router TypeScript app and starter MDX content. It does not pre-generate AI-ready config or handlers; the explicit `init` step adds that wiring after installation.
 
-**Option B — existing Next.js app:**
+**Option B — existing Next.js app:** run these commands from its root. Do not create a second app.
 
 ```bash
-npx create-next-app@latest my-site --typescript --app --tailwind
-cd my-site
 pnpm add next-ai-ready
-npx next-ai-ready init
+pnpm exec next-ai-ready init
 ```
 
-## 2. Add content
+Default `init` adds Knowledge Plane handlers and build wiring. It does not add Actions, MCP,
+`/openapi.json`, or `/tools.json`. If your project is already initialized, keep the existing
+configuration and handlers rather than forcing replacements.
 
-Create an MDX page with semantic metadata:
+## 2. Add a page and check the configuration
+
+Create `content/docs/quickstart.mdx` with this content. The default content globs include this path.
+The scaffold also includes `content/index.mdx`; keep it or replace it with your real homepage source.
 
 ```markdown
 ---
-title: Getting Started
-summary: Learn how to use our product.
+title: Quickstart Check
+summary: Install dependencies for the example project.
 ---
 
-# Getting Started
+# Quickstart Check
 
-Welcome to our product. Here's how to get started.
+Run `pnpm install` from the application root to install dependencies.
 ```
 
-## 3. Build
+Edit the existing `ai-ready.config.ts` or `ai-ready.config.mjs`: set `site.name`,
+`site.description`, and `site.baseUrl` to your site's real identity and production origin. Do not
+deploy the generated `https://example.com` placeholder. If your files live elsewhere, update the
+content globs to match the original Markdown/MDX source files.
+
+The example maps to `/docs/quickstart.md`. A file under `content/` does not create a browser page;
+your current renderer remains responsible for HTML routes. Read the [MDX collection guide](./mdx-content)
+if your content and browser route conventions differ.
+
+## 3. Build and diagnose
 
 ```bash
 npx next-ai-ready build
-```
-
-You should see output like:
-
-```
-[next-ai-ready] scanning content
-[next-ai-ready] compiling 1 files
-[next-ai-ready] wrote 5 files
-[next-ai-ready] build complete — 1 routes, 0 actions, 5 files written
-```
-
-## 4. Verify
-
-```bash
 npx next-ai-ready doctor --score
 ```
 
-Aim for 90+. The CLI prints **Top fixes** for any remaining warnings. Then start your dev server and visit:
+The build should find your source files and write `.next-ai-ready/graph.json` and the discovery
+files under `public/`. Counts depend on the actual content; zero routes means you need to fix the
+source path or glob. Check that `public/llms.txt` links to `/docs/quickstart` on your configured origin.
 
-- `http://localhost:3000/llms.txt` — your AI discovery index
-- `http://localhost:3000/llms-full.txt` — your complete readable corpus
-- `http://localhost:3000/<route>.md` — a page's Markdown representation
+`doctor` should report **0 errors**. Read and resolve or explicitly record warnings; a numeric
+score alone does not prove that the public routes return the intended content.
+
+Public alpha.21 incorrectly reports a missing OpenAPI artifact in Knowledge-only projects.
+That diagnostic fix is pending release; OpenAPI remains optional, so do not enable capabilities
+just to silence the warning.
+
+## 4. Verify the running application
+
+For the scaffold's npm workflow, build and start the production app:
+
+```bash
+npm run build
+npm run start
+```
+
+Use `pnpm build` and `pnpm start` in a pnpm app. `init` adds the AI build step to the app's build
+script; the separate CLI build above helps diagnose it before the full Next.js build.
+
+In another terminal, with the server running on port 3000:
+
+```bash
+curl -i http://localhost:3000/llms.txt
+curl -i http://localhost:3000/docs/quickstart.md
+curl -i -H 'Accept: text/html' http://localhost:3000/
+```
+
+The setup is verified when:
+
+- `/llms.txt` returns `200` and includes the configured `/docs/quickstart` link.
+- `/docs/quickstart.md` returns `200` and `Content-Type: text/markdown`, with the `Quickstart Check`
+  title and dependency-installation instructions. A recovery response containing `document_status: "not_found"`
+  is not a successful page check, even when its status is `200`.
+- The normal browser request to `/` still returns your app's HTML, not Markdown.
+
+If the Markdown page is missing, check its source file, content glob, graph route, handlers, and
+`withAiReady()` wiring. If links use the wrong hostname, correct `site.baseUrl` and rebuild.
+For production checks, continue with [the llms.txt walkthrough](./nextjs-llms-txt#check-the-expected-responses).
 
 ## Next steps
 
@@ -2457,15 +2496,15 @@ Aim for 90+. The CLI prints **Top fixes** for any remaining warnings. Then start
 
 ### How long does the quickstart take?
 
-About ten minutes from install through init, content, build, and doctor.
+Plan for about ten minutes from install through verification; dependency downloads and production builds can take longer.
 
 ### Which endpoints should work after build?
 
-/llms.txt, /openapi.json, /tools.json, and per-page Markdown routes when the dev server is running.
+Default init enables /llms.txt, /llms-full.txt, and per-page Markdown when the Next.js server is running. OpenAPI, tools, and MCP require explicit Capability setup.
 
 ### When should I run next-ai-ready build?
 
-After changing MDX content or actions, and before deploy so public/ and .next-ai-ready/ artifacts stay fresh.
+After changing content or configuration, and before deploy so public/ and .next-ai-ready/ artifacts stay fresh.
 
 
 <!-- END /en/docs/guides/quickstart -->
@@ -5298,18 +5337,24 @@ Nextra 4.6.1 当前可能把内部 Zod 解析到 4.4.x，导致主题 layout 校
 <!-- BEGIN /zh/docs/guides/quickstart -->
 # 快速开始
 URL: https://nextaiready.com/zh/docs/guides/quickstart
-Updated: 2026-10-01
+Updated: 2026-10-02
 
 # 快速开始
 
-本指南带你从零开始，在约 10 分钟内完成可验证的 AI 可读 Next.js 基础接入。
+本指南按约 10 分钟的基础接入流程组织，目标是验证知识平面端点能返回真实内容。依赖下载和生产构建可能需要更长时间，具体取决于网络和项目情况。
+
+## 前置要求
+
+- Node.js 20 或更高版本。
+- Next.js 14.2+，使用 App Router。
+- npm；已有 pnpm 项目继续使用 pnpm。
 
 ## 1. 创建项目
 
-**方式 A — 模板（最快）：**
+**新项目：**
 
 ```bash
-npm create next-ai-ready my-site
+npm create next-ai-ready@latest my-site
 cd my-site
 npm install
 npx next-ai-ready init
@@ -5317,76 +5362,128 @@ npx next-ai-ready init
 
 脚手架会提供可运行的最小 App Router TypeScript 应用和初始 MDX 内容，但不会预生成 AI-ready 配置或 handler；安装后显式执行 `init` 才会添加这些接线。
 
-**方式 B — 已有 Next.js 项目：**
+**已有 Next.js App Router 项目：**
+
+在现有项目根目录执行，不需要重新创建应用：
 
 ```bash
-npx create-next-app@latest my-site --typescript --app --tailwind
-cd my-site
 pnpm add next-ai-ready
-npx next-ai-ready init
+pnpm exec next-ai-ready init
 ```
+
+`init` 默认只接入知识平面（Knowledge-only）：生成配置、知识平面路由，并接好 `next.config` 与构建脚本。它不会默认启用 OpenAPI、MCP 或 Actions；这些不属于本次基础验收。
 
 ## 2. 添加内容
 
-创建包含语义元数据的 MDX 页面：
+在项目根目录创建 `content/docs/quickstart.mdx`，保存以下内容：
 
 ```markdown
 ---
-title: 快速上手
-summary: 了解如何使用我们的产品。
+title: 快速接入检查
+summary: 安装项目依赖并验证逐页 Markdown 输出。
 ---
 
-# 快速上手
+# 快速接入检查
 
-欢迎使用我们的产品，以下是开始步骤。
+在项目根目录运行 `pnpm install` 安装依赖。
 ```
 
-## 3. 构建
+这个文件匹配 `init` 默认的 `content/**/*.{md,mdx}` glob，并映射到 `/docs/quickstart.md`。在 `content/` 下保存源文件不会创建浏览器 HTML 页面；网页仍由原有 Next.js 页面或 MDX 渲染流程提供。
+
+### 修改站点配置
+
+编辑已有的 `ai-ready.config.ts` 或 `ai-ready.config.mjs`，不要另建第二个配置。将 `site.name`、`site.description` 改为实际站点信息，`site.baseUrl` 改为真实生产域名，不要保留示例域名或填写 localhost。
+
+下面展示默认配置结构；`https://docs.example.com` 只是占位，必须替换：
+
+```js
+import { defineConfig } from "next-ai-ready";
+
+export default defineConfig({
+  site: {
+    name: "你的站点名称",
+    baseUrl: "https://docs.example.com",
+    description: "描述站点实际提供的内容。",
+  },
+  content: [
+    "app/**/*.{md,mdx}",
+    "content/**/*.{md,mdx}",
+    "src/app/**/*.{md,mdx}",
+    "src/content/**/*.{md,mdx}",
+  ],
+});
+```
+
+默认 glob 已能覆盖本例，无需为此修改。已有项目应保留或按真实内容目录调整 glob；若已有 Content Source Adapter，继续使用实际的数据源与路由映射，不要用示例配置覆盖。
+
+## 3. 构建与检查
 
 ```bash
 npx next-ai-ready build
-```
-
-你会看到类似输出：
-
-```text
-[next-ai-ready] scanning content
-[next-ai-ready] compiling 1 files
-[next-ai-ready] wrote 5 files
-[next-ai-ready] build complete — 1 routes, 0 actions, 5 files written
-```
-
-## 4. 验证
-
-```bash
 npx next-ai-ready doctor --score
 ```
 
-所有检查应通过。然后启动开发服务器并访问：
+已有 pnpm 项目对应使用 `pnpm exec next-ai-ready build` 和 `pnpm exec next-ai-ready doctor --score`。
 
-- `http://localhost:3000/llms.txt` — AI 发现索引
-- `http://localhost:3000/llms-full.txt` — 完整可读内容
-- `http://localhost:3000/<route>.md` — 页面 Markdown 表示
+构建会扫描内容并写入 `public/` 与 `.next-ai-ready/`。生成文件和路由数量取决于实际内容与配置，不应按固定数量判断成功。
+
+`doctor` 应报告 **0 个错误**。逐条理解 warning 和 **Top fixes**，确认哪些需要修复、哪些暂时接受；没有错误不代表所有 warning 都已解决，也不能代替 HTTP 验证。
+
+公开 alpha.21 会误报纯知识平面缺少 OpenAPI，诊断修复尚待发布。OpenAPI 仍是可选能力，
+不要为消除这条告警而启用能力平面。
+
+## 4. 验证公开端点
+
+构建应用并启动生产服务器：
+
+```bash
+npm run build
+npm run start
+```
+
+已有 pnpm 项目使用 `pnpm run build` 和 `pnpm run start`。`init` 会在缺失时将 `next-ai-ready build` 接入应用构建脚本，确保应用构建前更新知识平面产物。
+
+在另一个终端执行：
+
+```bash
+curl -i http://localhost:3000/llms.txt
+curl -i http://localhost:3000/docs/quickstart.md
+curl -i -H 'Accept: text/html' http://localhost:3000/
+```
+
+检查响应头与正文：
+
+- `/llms.txt` 返回 `200`，索引包含“快速接入检查”及生产域名下的正确页面链接。
+- `/docs/quickstart.md` 返回 `200`、`Content-Type: text/markdown`，正文包含“快速接入检查”和 `pnpm install`，而不是 `not_found` 恢复文档。仅有 `200` 不足以说明找到了内容。
+- 普通首页 `/` 仍返回原有 HTML，`Content-Type` 为 `text/html`。接入不会替换原有浏览器页面。
+
+还可检查 `/llms-full.txt` 是否包含完整内容。部署后，应在真实生产域名下重复检查端点及链接。
+
+若响应不符合预期，按以下方向排查：
+
+- **缺少内容或出现 `not_found`：** 确认 `content/docs/quickstart.mdx` 已保存、被 glob 或 adapter 读取，并已重新构建；检查 `.next-ai-ready/graph.json` 是否包含 `/docs/quickstart`。
+- **路由返回 404 或 HTML：** 检查 `init` 生成的 handler、`withAiReady({ agentReadable: true })` 接线，以及源文件到路由的映射。不要把 `app/%5Fai-ready/` 改名为 `app/_ai-ready/`。
+- **索引或 canonical 链接使用错误域名：** 修正现有配置的 `site.baseUrl`，重新构建并重启生产服务器。
 
 ## 下一步
 
 - 阅读[知识平面](/zh/docs/concepts/knowledge-plane)了解内容编译
-- 准备增加能力平面时，运行 `next-ai-ready init --with-capabilities` 并阅读[能力平面](/zh/docs/concepts/capability-plane)
+- 需要 OpenAPI、MCP 或 Actions 时，再阅读[能力平面](/zh/docs/concepts/capability-plane)并按指南安装可选依赖、运行 `next-ai-ready init --with-capabilities`
 - 查看 [API 参考](/zh/docs/api-reference/config)了解完整配置选项
 
 ## FAQ
 
 ### 快速开始需要多久？
 
-约十分钟，完成安装、init、内容、build 和 doctor 验证。
+预留约十分钟完成接入与验证；依赖下载和生产构建可能需要更长时间，具体取决于网络和项目情况。
 
 ### build 之后应能访问哪些端点？
 
-/llms.txt、/openapi.json、/tools.json，以及 dev 服务器运行时的逐页 Markdown 路由。
+构建并启动应用后，检查 /llms.txt、/llms-full.txt 和示例对应的 /docs/quickstart.md；逐页响应应包含正确标题与正文，而不是 not_found 恢复文档。
 
 ### 什么时候需要运行 next-ai-ready build？
 
-修改 MDX 或 action 后、部署前，确保 public/ 与 .next-ai-ready/ 产物最新。
+修改内容或配置后、部署前，确保 public/ 与 .next-ai-ready/ 产物最新。
 
 
 <!-- END /zh/docs/guides/quickstart -->

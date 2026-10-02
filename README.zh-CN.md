@@ -39,7 +39,11 @@ npm create next-ai-ready@alpha next-ai-ready-demo
 
 > **第三方工具基线：** 生产文档站在 2026-08-01 使用 Vercel 开源的 `@vercel/agent-readability@0.5.0` 获得 **100/100**。[查看机器可读原始结果](./docs/audit-baselines/vercel-agent-readability-0.5.0-2026-08-01.json)，或运行 `pnpm audit:vercel:site` 复现。该分数衡量技术层面的 Agent 可读性，不代表搜索排名、收录或引用效果。
 
-> **候选版本：** 本仓库与文档站跟随 `main`，当前目标为 `0.1.0-alpha.21`。公开可用性仍以 `npm view next-ai-ready dist-tags --json` 为准。alpha.21 将默认 `init` 改为 Knowledge-first：只生成 5 个 AI 可读内容文件，不再要求 Capability 依赖或产生相关警告，并通过 `--with-capabilities` 显式升级。
+> **候选版本：** 本仓库与文档站跟随 `main`，当前目标为 `0.1.0-alpha.21`。公开可用性仍以 `npm view next-ai-ready dist-tags --json` 为准。alpha.21 将默认 `init` 改为 Knowledge-first：只生成 5 个 AI 可读内容文件，不强制要求 Capability 依赖，并通过 `--with-capabilities` 显式升级。
+
+公开 alpha.21 仍会在纯知识平面项目提示缺少 OpenAPI 产物。OpenAPI 是可选能力，不要为了
+消除此告警开启能力平面；诊断修复尚待发布。按[快速开始的 HTTP 检查](./docs/quickstart-10min.zh-CN.md)
+验证实际内容，而不是仅看分数。
 
 > **发布基线（2026-10-01）：** 已核验 npm `latest` 为 `0.1.0-alpha.21`。本轮基于真实页面生成面包屑的修复已列入下一个 patch，不属于该已发布版本。
 

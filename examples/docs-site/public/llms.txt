@@ -27,7 +27,7 @@
 ## Quickstart
 
 - [Quickstart](https://nextaiready.com/en/docs/guides/quickstart): Complete a verified next-ai-ready setup in about 10 minutes.
-- [快速开始](https://nextaiready.com/zh/docs/guides/quickstart): 约 10 分钟完成可验证的 next-ai-ready 基础接入。
+- [快速开始](https://nextaiready.com/zh/docs/guides/quickstart): 按约 10 分钟的流程完成 next-ai-ready 基础接入并验证知识平面端点，实际耗时取决于安装与网络。
 
 ## Concepts
 

@@ -1,5 +1,30 @@
 # @next-ai-ready/next
 
+## 0.1.0-alpha.22
+
+### Patch Changes
+
+- 7a9a133: Stop doctor from warning about missing OpenAPI artifacts in valid Knowledge-only
+  projects or suggesting optional capability output in Top fixes. Keep the
+  existing OpenAPI check ID, score weight, and missing-artifact warning when
+  actions are configured or OpenAPI, AI plugin, Tools, Actions, or MCP route stubs are
+  installed, including empty actions and action modules that fail to load.
+
+  Recognize JavaScript and TypeScript route file variants and conservatively detect
+  existing `.mjs` files for diagnostics, without claiming Next.js supports `.mjs`
+  routes. Use the same file detection for MCP token checks so missing production
+  credentials remain visible.
+
+- Updated dependencies [980abbf]
+- Updated dependencies [fd5937d]
+  - @next-ai-ready/actions@0.1.0-alpha.16
+  - @next-ai-ready/core@0.1.0-alpha.16
+  - @next-ai-ready/llms@0.1.0-alpha.18
+  - @next-ai-ready/mcp@0.1.0-alpha.18
+  - @next-ai-ready/mdx@0.1.0-alpha.16
+  - @next-ai-ready/openapi@0.1.0-alpha.16
+  - @next-ai-ready/semantic@0.1.0-alpha.16
+
 ## 0.1.0-alpha.21
 
 ### Patch Changes

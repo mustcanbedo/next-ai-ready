@@ -1,5 +1,16 @@
 # @next-ai-ready/actions
 
+## 0.1.0-alpha.16
+
+### Patch Changes
+
+- 980abbf: Publish the canonical nextaiready.com homepage metadata already present in the
+  workspace manifests. The existing published versions of these seven packages
+  still point to the previous Vercel origin. This is a metadata correction, not a
+  runtime API change or a claim that all package dist-tags have been promoted.
+- Updated dependencies [980abbf]
+  - @next-ai-ready/core@0.1.0-alpha.16
+
 ## 0.1.0-alpha.15
 
 ### Patch Changes

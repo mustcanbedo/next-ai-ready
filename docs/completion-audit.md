@@ -4,7 +4,7 @@
 >
 > **审查日期：** 2026-07-26（alpha.11 + deployed audit + agent readability）
 >
-> **当前候选发布补充（2026-09-29）：** 仓库候选版本为 `0.1.0-alpha.21`，公开 npm 状态以 registry dist-tags 为准。alpha.21 将默认初始化收敛为 5 个 Knowledge Plane 文件，并以 `--with-capabilities` 显式开启 Actions、MCP、OpenAPI 与观测；当前公开 `latest` 仍为 alpha.20。历史发布门禁、manifest 核验、公共 registry 构建及生产 MCP 带认证调用均已通过；当前优先级见 [`improvement-plan.zh-CN.md`](./improvement-plan.zh-CN.md)。下方正文保留 alpha.11 审查快照。
+> **当前候选发布补充（2026-10-03）：** 仓库候选版本为 `0.1.0-alpha.22`，公开 npm 状态以 registry dist-tags 为准。当前公开 `latest` 为 alpha.21；alpha.22 准备发布真实页面面包屑、知识平面 OpenAPI 诊断修复及七个底层包的官网元数据，公开 API 与知识平面默认接入不变。候选不等于已发布，也不等于 GA；当前优先级见 [`improvement-plan.zh-CN.md`](./improvement-plan.zh-CN.md)。下方正文保留 alpha.11 审查快照。
 > **测试状态：** 145+ tests / 9 packages · CI 含 `docs-site-smoke`
 
 ### 相关文档（分工）

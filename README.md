@@ -46,13 +46,17 @@ The generated project is a normal Next.js TypeScript app that can be committed a
 
 > **Third-party tool baseline:** the production documentation scored **100/100** with Vercel's open-source `@vercel/agent-readability@0.5.0` on 2026-08-01. [Review the machine-readable result](./docs/audit-baselines/vercel-agent-readability-0.5.0-2026-08-01.json) or reproduce it with `pnpm audit:vercel:site`. This measures technical agent readability, not search ranking, indexing, or citation.
 
-> **Release candidate:** this repository and the documentation site track `main` and currently target `0.1.0-alpha.21`. Treat `npm view next-ai-ready dist-tags --json` as the source of truth for public availability. Alpha.21 makes the default `init` flow Knowledge-first: five AI-readable content files, no mandatory Capability dependencies, and an explicit `--with-capabilities` upgrade path.
+> **Release candidate:** this repository and the documentation site track `main` and currently target `0.1.0-alpha.22`. Treat `npm view next-ai-ready dist-tags --json` as the source of truth for public availability. Alpha.21 makes the default `init` flow Knowledge-first: five AI-readable content files, no mandatory Capability dependencies, and an explicit `--with-capabilities` upgrade path.
 
 Public alpha.21 still reports a missing OpenAPI artifact in Knowledge-only projects. OpenAPI is
 optional; do not enable capabilities just to remove that warning. A diagnostic fix is pending
 release. Follow the [quickstart HTTP checks](./docs/quickstart-10min.md) to verify actual content.
 
-> **Published baseline (2026-10-01):** npm `latest` was verified as `0.1.0-alpha.21`. The graph-based breadcrumb correction is queued for the next patch release; it is not part of that published package.
+The alpha.22 candidate removes that false warning while retaining checks for configured capabilities,
+builds breadcrumbs only from existing graph pages, and includes canonical `nextaiready.com` homepage
+metadata for seven internal packages. Public APIs and the Knowledge-only default remain unchanged.
+
+> **Published baseline (2026-10-03):** npm `latest` was verified as `0.1.0-alpha.21`. The alpha.22 fixes and internal-package homepage corrections are not published yet.
 
 ---
 
@@ -240,7 +244,7 @@ Use `next-ai-ready/hooks` — not the main package entry — so Turbopack does n
 
 ### Package imports
 
-Install only `next-ai-ready` in consumer apps. The `alpha.21` repository candidate supports these imports:
+Install only `next-ai-ready` in consumer apps. The `alpha.22` repository candidate supports these imports:
 
 | Import | Use for |
 |---|---|
@@ -253,7 +257,7 @@ Install only `next-ai-ready` in consumer apps. The `alpha.21` repository candida
 
 ## Status
 
-🚧 **Pre-alpha** (`0.1.0-alpha.21` repository candidate; verify published availability through npm dist-tags). The guarded release workflow validates packages and tags; see the [current improvement ledger](./docs/improvement-plan.zh-CN.md) for the external-adoption gate before the final `0.1.0` GA release.
+🚧 **Pre-alpha** (`0.1.0-alpha.22` repository candidate; verify published availability through npm dist-tags). The guarded release workflow validates packages and tags; see the [current improvement ledger](./docs/improvement-plan.zh-CN.md) for the external-adoption gate before the final `0.1.0` GA release.
 
 - ✅ **Knowledge plane** — MDX → semantic graph → `llms.txt` / `*.md` / `*.ai.json` / JSON-LD
 - ✅ **Capability plane** — `defineAction` → `/api/actions/<name>` + OpenAPI 3.1 / `tools.json` / `ai-plugin.json`

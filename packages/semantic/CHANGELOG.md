@@ -1,5 +1,17 @@
 # @next-ai-ready/semantic
 
+## 0.1.0-alpha.16
+
+### Patch Changes
+
+- 980abbf: Publish the canonical nextaiready.com homepage metadata already present in the
+  workspace manifests. The existing published versions of these seven packages
+  still point to the previous Vercel origin. This is a metadata correction, not a
+  runtime API change or a claim that all package dist-tags have been promoted.
+- fd5937d: Build JSON-LD breadcrumbs from existing SemanticGraph pages instead of inventing parent URLs from route segments. Use page titles and canonical citation URLs, skip missing ancestors and duplicate canonical URLs, and normalize the site base URL.
+- Updated dependencies [980abbf]
+  - @next-ai-ready/core@0.1.0-alpha.16
+
 ## 0.1.0-alpha.15
 
 ### Minor Changes

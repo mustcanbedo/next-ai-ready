@@ -18,7 +18,7 @@ tags:
   - installation
   - next.js
   - zod
-updatedAt: '2026-09-29'
+updatedAt: '2026-10-03'
 author: next-ai-ready team
 ---
 
@@ -53,7 +53,11 @@ The basic setup is complete when `doctor` reports **0 errors** and `public/llms.
 For the complete decision path, generated endpoints, production evidence, and deployment checks,
 follow the [Next.js App Router llms.txt walkthrough](./guides/nextjs-llms-txt).
 
-> **Release channel:** this site tracks `main` and currently targets the `0.1.0-alpha.21` repository candidate. Verify public availability with npm dist-tags. Alpha.21 makes Knowledge-only setup the five-file default; use `--with-capabilities` when you need Actions, MCP, OpenAPI, and observability. The guarded release workflow reruns the complete gate before publication.
+> **Release channel:** this site tracks `main` and currently targets the `0.1.0-alpha.22` repository candidate. Verify public availability with npm dist-tags. Alpha.21 makes Knowledge-only setup the five-file default; use `--with-capabilities` when you need Actions, MCP, OpenAPI, and observability. The guarded release workflow reruns the complete gate before publication.
+
+In the alpha.22 candidate, `doctor` no longer expects OpenAPI artifacts in a Knowledge-only project.
+Configured capabilities still require their relevant artifacts and credentials. Public alpha.21
+does not include this diagnostic fix yet; do not enable capabilities solely to silence its warning.
 
 ## Package exports
 

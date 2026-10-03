@@ -405,13 +405,26 @@ async function main() {
       "](/guides/nextra/config.jpg)",
     ],
   });
-  await expectResponse("/zh/docs/guides/fumadocs-ai-ready.md", {
-    contentType: "text/markdown",
-    includes: [
-      "# 为 Fumadocs 添加 llms.txt 与 Markdown 端点",
-      "[Next.js App Router llms.txt 实战教程](./nextjs-llms-txt)",
-    ],
-  });
+  for (const [locale, heading, boundary] of [
+    ["en", "Add llms.txt and Markdown endpoints to Fumadocs", "Choose native Fumadocs or next-ai-ready"],
+    ["zh", "为 Fumadocs 添加 llms.txt 与 Markdown 端点", "选择原生 Fumadocs 还是 next-ai-ready"],
+  ]) {
+    await expectResponse(`/${locale}/docs/guides/fumadocs-ai-ready`, {
+      contentType: "text/html",
+      includes: [heading, boundary, "https://www.fumadocs.dev/docs/integrations/llms"],
+    });
+    await expectResponse(`/${locale}/docs/guides/fumadocs-ai-ready.md`, {
+      contentType: "text/markdown",
+      includes: [
+        `# ${heading}`,
+        boundary,
+        "npx @fumadocs/cli feature llms",
+        "npx @fumadocs/cli feature mcp",
+        "withAiReady({ agentReadable: true })(withMDX(nextConfig))",
+        'document_status: "not_found"',
+      ],
+    });
+  }
   await expectResponse("/en/docs/guides/mdx-content", {
     contentType: "text/html",
     includes: "Next.js MDX content collections for AI-readable docs",

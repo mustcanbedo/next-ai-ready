@@ -38,4 +38,25 @@ for (const [locale, title] of [["en", "Quickstart Check"], ["zh", "快速接入�
     assert.ok(content.includes("site.baseUrl"));
     assert.doesNotMatch(content, /create-next-app/, "existing apps must not be recreated");
   });
+
+  test(`${locale} Fumadocs guide distinguishes native retrieval from SDK integration`, async () => {
+    const source = new URL(`../content/${locale}/docs/guides/fumadocs-ai-ready.mdx`, import.meta.url);
+    const { data, content } = matter(await readFile(source, "utf8"));
+    assert.ok(data.questions.some(({ a }) => a.includes("Fumadocs") && a.includes("MCP")));
+    for (const text of [
+      "https://www.fumadocs.dev/docs/integrations/llms",
+      "npx @fumadocs/cli feature llms",
+      "npx @fumadocs/cli feature mcp",
+      'import { createMDX } from "fumadocs-mdx/next"',
+      "withAiReady({ agentReadable: true })(withMDX(nextConfig))",
+      "content/docs/getting-started.mdx",
+      "curl -i -H 'Accept: text/markdown'",
+      "curl -i -H 'Accept: text/html'",
+      'document_status: "not_found"',
+      "./actions",
+    ]) assert.ok(content.includes(text), `missing native-first integration detail: ${text}`);
+    assert.doesNotMatch(content, /curl -I /, "HEAD-only checks do not verify page content");
+    const boundary = locale === "en" ? "not a Fumadocs Source API adapter" : "不是 Fumadocs Source API Adapter";
+    assert.ok(content.includes(boundary), "file scanning must not be presented as a native adapter");
+  });
 }

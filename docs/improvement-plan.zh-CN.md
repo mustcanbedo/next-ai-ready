@@ -1,9 +1,9 @@
 # next-ai-ready 产品改进台账
 
-> 最后更新：2026-10-02
+> 最后更新：2026-10-03
 > 维护者视角：`next-ai-ready` 原始作者与技术负责人  
 > 当前仓库候选：`next-ai-ready@0.1.0-alpha.21`（公开 npm 状态以 dist-tags 为准）
-> 当前主分支基线：`d2b5fdc`（Nextra 接入证据 PR #48 已合入；本轮候选尚未合入）
+> 当前主分支基线：`cd5b938`（快速接入诊断 PR #51 已合入；本轮候选尚未合入）
 > 最近公开版本：`next-ai-ready@0.1.0-alpha.21` 已发布并提升为 `latest`（2026-10-01 registry 核验）
 
 本文是后续优化的**执行状态与决策记录**。`roadmap.md` 保留工程阶段历史，
@@ -175,6 +175,23 @@ Nuxt 的全部功能。
 Capability Plane 继续作为差异化能力，但不要求首次访问者在安装前理解完整架构。
 
 ### P1B：发布 0.1 GA
+
+2026-10-03 GEO 实测后的增量任务（本轮分支尚未合入）：
+
+| 任务 | 状态 | 证据与验收 |
+|---|---|---|
+| 官网身份和 npm 元数据一致性 | `进行中` | GitHub About 与三个入口包当前已指向 nextaiready.com；七个底层包的精确已发布版本与 alpha 标签仍指向旧 Vercel 域名，latest 仍为 alpha.0。本轮增加 canonical-package-homepages changeset；需要后续发布并重新核验，不能把本地 manifest 当作 npm 已更新 |
+| Fumadocs 原生优先的接入选择 | `进行中` | 本轮同步双语 README、双语教程、FAQ、createMDX 组合示例与 HTML/Markdown 回归；保留 URL 和主标题，不将文件扫描称为 Source API Adapter，也不把文档 MCP 称为独占功能；待合入部署后核验 |
+| 实际 GEO 效果与技术评分分开 | `待验证` | ChatGPT 两个非品牌问题中一次推荐并引用项目 GitHub；Google AI 模式两次均未提及，六条回答均未直接引用新官网。品牌题不加入自然推荐分母；这是单次小样本，不代表流量、安装或收入增长 |
+
+底层包的旧标签不等于入口包的精确依赖链安装失败；是否将底层包 latest 同步提升，属于下一次
+发布策略决策，本轮不直接改变 npm 标签。Fumadocs 完整生产夹具仍待需求驱动验证，当前
+文档站和 Nextra 示例不能替代这一证据。
+
+本轮本地验证：SDK 依赖链构建与文档站生产构建通过；15 项文档单测、9 项发布文档/changeset
+回归通过；50 个内容页面的 SEO 内链、锚点和面包屑，以及 HTML、Markdown、MCP 路由 smoke
+全部通过，doctor 为 0 错误、0 警告。llms.txt、llms-full.txt 与 sitemap.md 已同步重建。
+这些结果验证的是技术与内容契约，不等于 Google 排名或 AI 引用已提升。
 
 | ID | 任务 | 状态 | 验收标准 |
 |---|---|---|---|

@@ -114,8 +114,9 @@ npx next-ai-ready doctor --score
 ```
 
 Require **0 errors**, then resolve or record warnings. A high score cannot replace the HTTP
-checks above. Public alpha.21 incorrectly warns about missing OpenAPI in Knowledge-only projects;
-that diagnostic fix is pending release. Do not enable capabilities just to silence it.
+checks above. The false missing-OpenAPI warning in Knowledge-only projects was fixed and
+released in alpha.22. If you installed alpha.21, upgrade; OpenAPI remains optional, so do not
+enable capabilities just to silence that warning.
 
 Other warnings may need these changes:
 

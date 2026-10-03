@@ -2480,7 +2480,7 @@ Nextra 4.6.1 can currently resolve its private Zod dependency to 4.4.x, which br
 <!-- BEGIN /en/docs/guides/quickstart -->
 # Quickstart
 URL: https://nextaiready.com/en/docs/guides/quickstart
-Updated: 2026-10-02
+Updated: 2026-10-04
 
 # Quickstart
 
@@ -2553,9 +2553,9 @@ source path or glob. Check that `public/llms.txt` links to `/docs/quickstart` on
 `doctor` should report **0 errors**. Read and resolve or explicitly record warnings; a numeric
 score alone does not prove that the public routes return the intended content.
 
-Public alpha.21 incorrectly reports a missing OpenAPI artifact in Knowledge-only projects.
-That diagnostic fix is pending release; OpenAPI remains optional, so do not enable capabilities
-just to silence the warning.
+The false missing-OpenAPI warning in Knowledge-only projects was fixed and released in alpha.22.
+If you installed alpha.21, upgrade; OpenAPI remains optional, so do not enable capabilities
+just to silence that warning.
 
 ## 4. Verify the running application
 
@@ -5543,7 +5543,7 @@ Nextra 4.6.1 当前可能把内部 Zod 解析到 4.4.x，导致主题 layout 校
 <!-- BEGIN /zh/docs/guides/quickstart -->
 # 快速开始
 URL: https://nextaiready.com/zh/docs/guides/quickstart
-Updated: 2026-10-02
+Updated: 2026-10-04
 
 # 快速开始
 
@@ -5635,8 +5635,8 @@ npx next-ai-ready doctor --score
 
 `doctor` 应报告 **0 个错误**。逐条理解 warning 和 **Top fixes**，确认哪些需要修复、哪些暂时接受；没有错误不代表所有 warning 都已解决，也不能代替 HTTP 验证。
 
-公开 alpha.21 会误报纯知识平面缺少 OpenAPI，诊断修复尚待发布。OpenAPI 仍是可选能力，
-不要为消除这条告警而启用能力平面。
+纯知识平面缺少 OpenAPI 的误报修复已随 alpha.22 发布；已安装 alpha.21 的用户请升级。
+OpenAPI 仍是可选能力，不要仅为消除此告警启用能力平面。
 
 ## 4. 验证公开端点
 

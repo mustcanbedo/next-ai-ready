@@ -43,8 +43,13 @@ pnpm exec next-ai-ready doctor --score
 
 本文档站跟随 `main`，当前目标为仓库候选版本 `0.1.0-alpha.22`。公开可用性以 npm dist-tags 为准，不得从仓库版本推断。alpha.21 默认只生成 5 个 Knowledge Plane 文件，并通过 `--with-capabilities` 显式开启 Actions、MCP、OpenAPI 与观测能力。
 
-alpha.22 候选修复纯知识平面的 OpenAPI 缺失误报，面包屑只引用图中存在的页面，并准备更新
-底层包的官网元数据。这些修复尚未包含在公开 alpha.21 中，也没有增加新的运行时 API。
+已发布的 alpha.22 修复纯知识平面的 OpenAPI 缺失误报，面包屑只引用图中存在的页面，
+并包含底层包的官网元数据更新，没有增加新的运行时 API。
+
+2026 年 10 月 3 日，[Release Alpha #11](https://github.com/mustcanbedo/next-ai-ready/actions/runs/37134126837)
+完成发布，`next-ai-ready` 与 `@next-ai-ready/next` 的 npm `latest`、`alpha` 均已核验为
+`0.1.0-alpha.22`。公开 registry 的 pnpm / Next.js 16.3.8 干净安装通过初始化、产物生成、
+doctor 和生产构建。未改动的脚手架仍为 alpha.13；维护者验证不等于外部采用或 GA 验收。
 
 ## 已验证的可读性基线
 

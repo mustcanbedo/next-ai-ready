@@ -47,14 +47,14 @@ npm create next-ai-ready@alpha next-ai-ready-demo
 
 > **候选版本：** 本仓库与文档站跟随 `main`，当前目标为 `0.1.0-alpha.22`。公开可用性仍以 `npm view next-ai-ready dist-tags --json` 为准。alpha.21 将默认 `init` 改为 Knowledge-first：只生成 5 个 AI 可读内容文件，不强制要求 Capability 依赖，并通过 `--with-capabilities` 显式升级。
 
-公开 alpha.21 仍会在纯知识平面项目提示缺少 OpenAPI 产物。OpenAPI 是可选能力，不要为了
-消除此告警开启能力平面；诊断修复尚待发布。按[快速开始的 HTTP 检查](./docs/quickstart-10min.zh-CN.md)
+已安装 alpha.21 的用户请升级到 alpha.22，消除纯知识平面项目中缺少 OpenAPI 的误报。
+OpenAPI 是可选能力，不要仅为消除此告警开启能力平面。按[快速开始的 HTTP 检查](./docs/quickstart-10min.zh-CN.md)
 验证实际内容，而不是仅看分数。
 
-alpha.22 候选移除上述误报，同时保留已配置能力的检查；面包屑只引用图中存在的页面，
+已发布的 alpha.22 移除上述误报，同时保留已配置能力的检查；面包屑只引用图中存在的页面，
 并包含七个底层包的 `nextaiready.com` 官网元数据。公开 API 与默认知识平面接入保持不变。
 
-> **发布基线（2026-10-03）：** 已核验 npm `latest` 为 `0.1.0-alpha.21`。alpha.22 修复与底层包的官网元数据修正尚未发布。
+> **发布基线（2026-10-03）：** 已核验 `next-ai-ready` 与 `@next-ai-ready/next` 的 npm `latest`、`alpha` 均为 `0.1.0-alpha.22`。[Release Alpha #11](https://github.com/mustcanbedo/next-ai-ready/actions/runs/37134126837) 完成完整门禁、发布及标签核验。公开 registry 的 pnpm / Next.js 16.3.8 干净安装通过初始化、产物生成、doctor 和生产构建。未改动的 `create-next-ai-ready` 仍为 alpha.13；本次不是正式 GA 发布。
 
 ---
 
@@ -253,7 +253,7 @@ registerAiHooks({
 
 ## 状态
 
-🚧 **Pre-alpha**（仓库候选版本 `0.1.0-alpha.22`；公开可用性以 npm dist-tags 为准）。受保护发布工作流负责验证包与标签；正式 `0.1.0` GA 前的外部采用门槛见[当前改进台账](./docs/improvement-plan.zh-CN.md)。
+🚧 **Pre-alpha**（仓库候选版本 `0.1.0-alpha.22`；npm 可用性见上方带日期的发布基线）。受保护发布工作流负责验证包与标签；正式 `0.1.0` GA 前的外部采用门槛见[当前改进台账](./docs/improvement-plan.zh-CN.md)。
 
 - ✅ **知识平面** — MDX → 语义图 → `llms.txt` / `*.md` / `*.ai.json` / JSON-LD
 - ✅ **能力平面** — `defineAction` → `/api/actions/<name>` + OpenAPI 3.1 / `tools.json` / `ai-plugin.json`

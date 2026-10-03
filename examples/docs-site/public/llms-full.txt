@@ -31,9 +31,15 @@ The basic setup is complete when `doctor` reports **0 errors** and `public/llms.
 
 This documentation site tracks `main` and currently targets the `0.1.0-alpha.22` repository candidate. Public availability is determined by npm dist-tags, not by the repository version. Alpha.21 makes the five-file Knowledge Plane the default and keeps Actions, MCP, OpenAPI, and observability behind the explicit `--with-capabilities` path.
 
-The alpha.22 candidate fixes the false missing-OpenAPI warning in Knowledge-only projects, uses
-existing graph pages for breadcrumbs, and prepares canonical homepage metadata for internal packages.
-These fixes are not yet included in the public alpha.21 package; no new runtime API is introduced.
+Published alpha.22 fixes the false missing-OpenAPI warning in Knowledge-only projects, uses
+existing graph pages for breadcrumbs, and includes canonical homepage metadata for internal packages.
+No new runtime API is introduced.
+
+On October 3, 2026, [Release Alpha #11](https://github.com/mustcanbedo/next-ai-ready/actions/runs/37134126837)
+published the fixes and promoted `next-ai-ready` and `@next-ai-ready/next` to npm `latest` and `alpha`
+at `0.1.0-alpha.22`. A fresh public-registry pnpm / Next.js 16.3.8 install passed initialization,
+artifact generation, doctor, and the production build. The unchanged scaffolder remains alpha.13;
+this maintainer verification is not independent-adopter evidence or a GA sign-off.
 
 ## Verified readability baseline
 
@@ -2844,9 +2850,12 @@ follow the [Next.js App Router llms.txt walkthrough](./guides/nextjs-llms-txt).
 
 > **Release channel:** this site tracks `main` and currently targets the `0.1.0-alpha.22` repository candidate. Verify public availability with npm dist-tags. Alpha.21 makes Knowledge-only setup the five-file default; use `--with-capabilities` when you need Actions, MCP, OpenAPI, and observability. The guarded release workflow reruns the complete gate before publication.
 
-In the alpha.22 candidate, `doctor` no longer expects OpenAPI artifacts in a Knowledge-only project.
-Configured capabilities still require their relevant artifacts and credentials. Public alpha.21
-does not include this diagnostic fix yet; do not enable capabilities solely to silence its warning.
+Published alpha.22 is available on npm `latest` and `alpha`, verified on October 3, 2026 by
+[Release Alpha #11](https://github.com/mustcanbedo/next-ai-ready/actions/runs/37134126837).
+A clean public-registry pnpm / Next.js 16.3.8 install passed `init`, artifact generation, doctor,
+and the production build. `doctor` no longer expects OpenAPI artifacts in a Knowledge-only project;
+configured capabilities still require their relevant artifacts and credentials. If you installed
+alpha.21, upgrade rather than enabling capabilities solely to silence its false warning.
 
 ## Package exports
 
@@ -3136,8 +3145,13 @@ pnpm exec next-ai-ready doctor --score
 
 本文档站跟随 `main`，当前目标为仓库候选版本 `0.1.0-alpha.22`。公开可用性以 npm dist-tags 为准，不得从仓库版本推断。alpha.21 默认只生成 5 个 Knowledge Plane 文件，并通过 `--with-capabilities` 显式开启 Actions、MCP、OpenAPI 与观测能力。
 
-alpha.22 候选修复纯知识平面的 OpenAPI 缺失误报，面包屑只引用图中存在的页面，并准备更新
-底层包的官网元数据。这些修复尚未包含在公开 alpha.21 中，也没有增加新的运行时 API。
+已发布的 alpha.22 修复纯知识平面的 OpenAPI 缺失误报，面包屑只引用图中存在的页面，
+并包含底层包的官网元数据更新，没有增加新的运行时 API。
+
+2026 年 10 月 3 日，[Release Alpha #11](https://github.com/mustcanbedo/next-ai-ready/actions/runs/37134126837)
+完成发布，`next-ai-ready` 与 `@next-ai-ready/next` 的 npm `latest`、`alpha` 均已核验为
+`0.1.0-alpha.22`。公开 registry 的 pnpm / Next.js 16.3.8 干净安装通过初始化、产物生成、
+doctor 和生产构建。未改动的脚手架仍为 alpha.13；维护者验证不等于外部采用或 GA 验收。
 
 ## 已验证的可读性基线
 
@@ -5913,8 +5927,11 @@ pnpm exec next-ai-ready doctor --score
 
 > **发布渠道：** 本站跟随 `main`，当前目标为仓库候选版本 `0.1.0-alpha.22`。公开可用性以 npm dist-tags 为准。alpha.21 默认采用 5 文件 Knowledge-only 接入；需要 Actions、MCP、OpenAPI 与观测时再使用 `--with-capabilities`。受保护发布工作流会在发布前重新运行完整门禁。
 
-alpha.22 候选的 `doctor` 不再要求纯知识平面项目生成 OpenAPI；已配置的能力仍检查相应
-产物与凭证。公开 alpha.21 尚未包含此诊断修复，不要仅为消除它的告警而启用能力平面。
+已发布的 alpha.22 已进入 npm `latest` 与 `alpha`，由 2026 年 10 月 3 日的
+[Release Alpha #11](https://github.com/mustcanbedo/next-ai-ready/actions/runs/37134126837) 核验。
+公开 registry 的 pnpm / Next.js 16.3.8 干净安装通过 `init`、产物生成、doctor 和生产构建。
+`doctor` 不再要求纯知识平面项目生成 OpenAPI；已配置的能力仍检查相应产物与凭证。
+已安装 alpha.21 的用户应升级，而不是仅为消除误报告警启用能力平面。
 
 ## 包导出说明
 

@@ -3,8 +3,8 @@
 > 最后更新：2026-10-03
 > 维护者视角：`next-ai-ready` 原始作者与技术负责人  
 > 当前仓库候选：`next-ai-ready@0.1.0-alpha.22`（公开 npm 状态以 dist-tags 为准）
-> 当前主分支基线：`8021e56`（PR #49、#50 已合入并完成生产正文核验；alpha.22 发布候选尚未合入）
-> 最近公开版本：`next-ai-ready@0.1.0-alpha.21` 已发布并提升为 `latest`（2026-10-03 registry 核验）
+> 当前主分支基线：`6ee0c17`（PR #53 已合入；Release Alpha #11 已完成发布与标签核验）
+> 最近公开版本：`next-ai-ready@0.1.0-alpha.22` 已发布并提升为 `latest`（2026-10-03 registry 核验）
 
 本文是后续优化的**执行状态与决策记录**。`roadmap.md` 保留工程阶段历史，
 `post-ga.md` 保留候选方向；当它们与本文的当前优先级冲突时，以本文为准。
@@ -180,7 +180,7 @@ Capability Plane 继续作为差异化能力，但不要求首次访问者在安
 
 | 任务 | 状态 | 证据与验收 |
 |---|---|---|
-| 官网身份和 npm 元数据一致性 | `进行中` | GitHub About 与三个入口包当前已指向 nextaiready.com；七个底层包的精确已发布版本与 alpha 标签仍指向旧 Vercel 域名，latest 仍为 alpha.0。canonical-package-homepages 已纳入 alpha.22 依赖链版本候选；需要后续发布并重新核验，不能把本地 manifest 当作 npm 已更新 |
+| 官网身份和 npm 元数据一致性 | `已完成` | GitHub About 与三个入口包指向 nextaiready.com；Release Alpha #11 已发布七个底层包的官网元数据更新，精确依赖版本和 alpha 标签均已核验，十个公开 manifest 与源码一致。底层包 latest 保留 alpha.0，属于独立标签策略，不等于当前入口包安装使用旧依赖 |
 | Fumadocs 原生优先的接入选择 | `已完成` | PR #52 已合入，main 的 10 个 CI 检查通过，双语教程与 Markdown 协商生产核验通过，llms.txt、llms-full.txt 与 sitemap.md 的线上哈希与合并产物一致；完整 Fumadocs 生产兼容夹具仍属独立待验证事项 |
 | 实际 GEO 效果与技术评分分开 | `待验证` | ChatGPT 两个非品牌问题中一次推荐并引用项目 GitHub；Google AI 模式两次均未提及，六条回答均未直接引用新官网。品牌题不加入自然推荐分母；这是单次小样本，不代表流量、安装或收入增长 |
 
@@ -201,7 +201,7 @@ Capability Plane 继续作为差异化能力，但不要求首次访问者在安
 | G1-04 | 冻结 0.1 公共 API | `已完成` | 十个发布包的 entrypoint、命名导出、类型声明哈希与 bin 基线均已通过；程序化 Audit 已收口到独立入口，不再暴露 CLI 调度 API |
 | G1-05 | 建立最小回滚流程 | `已完成` | 2026-08-02 完成只读演练；计划器兼容 pnpm 透传的 `--`，并生成精确 deprecate/dist-tag 命令，不执行写操作 |
 | G1-06 | 更新 GA 文案并发布 `0.1.0` | `待验证` | README、官网与机器可读首页已统一为“承诺、可复制流程、成功标准”；至少 3 个仓库外真实项目接入并修复共同阻塞后，再决定稳定版发布 |
-| G1-07 | 消除 `main`、npm 与网站文档的发布漂移 | `进行中` | alpha.22 为当前仓库同步目标；三个 changeset 已应用到九个包的版本与依赖链，并同步修复说明、README、双语文档与机器可读产物；待候选 PR 合入及授权发布后再核验 registry，不得将待发布 patch 写成已发布功能 |
+| G1-07 | 消除 `main`、npm 与网站文档的发布漂移 | `待验证` | alpha.22 为当前仓库同步目标；公开发布的完整事实见顶部带日期的 registry 基线与下方 Release Alpha #11 记录。README、双语教程和机器可读产物补录已发布事实；发布状态文档 PR 的合入与生产部署仍待核验，不从仓库候选版本推断 npm 可用性 |
 | G1-08 | 恢复 GitHub Actions npm 发布身份 | `已完成` | 仓库 Secret `NPM_TOKEN` 已配置；2026-09-26 Release Alpha 完成身份验证、完整门禁、alpha.20 发布及 `latest` 提升 |
 
 GA 之前不加入数据库、IndexNow、大型 DevTools 或托管后台。
@@ -434,7 +434,7 @@ FAQ 数据源同步，避免下一次应用 FAQ 时恢复错误说明。双语 R
 正文均通过实际 HTTP 与 HTML 结构核验；alpha.21 生产版本、HTML 404、Markdown
 缺页恢复及 sitemap 边界通过独立生产契约检查。此验证不代表自然搜索或 GEO 引用增长。
 
-alpha.22 发布准备同步上述合入内容，不重复执行 Changesets 递增。生产契约单测原本
+以下为发布前记录：alpha.22 发布准备同步上述合入内容，不重复执行 Changesets 递增。生产契约单测原本
 写死 alpha.20 却读取真实仓库 manifest，版本升级后会误报；改为隔离的 manifest 夹具，
 覆盖旧 alpha、新 alpha 和稳定版本，并纳入 CI 与本地发布门禁。候选仍未发布 npm；
 完整门禁、候选 PR 合入及授权发布后的 registry 核验仍按顺序执行。
@@ -445,6 +445,16 @@ manifest 和 pnpm / Next.js 15.5.27 的候选 tarball 干净安装及生产构�
 为零错误、零警告。主分支 `8021e56` 的 10 个 CI 门禁均通过；生产 Vercel
 `@vercel/agent-readability@0.5.0` 独立工具复测仍为 100/100。npm 入口包的 latest/alpha
 仍为 alpha.21，脚手架仍为 alpha.13；本地候选验证不等于已发布，也不增加外部采用计数。
+
+同日，PR #53 已合入 main `6ee0c17`，10 个 CI 检查及 Vercel 生产部署通过。用户授权后，
+[Release Alpha #11](https://github.com/mustcanbedo/next-ai-ready/actions/runs/37134126837)
+重跑完整门禁，按依赖顺序发布九个变更包，并将 `next-ai-ready` 与 `@next-ai-ready/next`
+的 latest 和 alpha 提升到 `0.1.0-alpha.22`；未改动的脚手架仍为 alpha.13。
+十个精确版本、alpha 标签、三个入口 latest 标签及公开 manifest 均通过 registry 复核。
+公开 npm 的 pnpm / Next.js 16.3.8 干净项目成功完成 init、内容生成、doctor exit 0
+和生产构建。这是维护者验证，仓库外真实采用仍为 0/3，不将其计为用户或收入增长。
+README、双语首页、安装教程与机器可读产物同步补录发布事实，状态说明仍需通过文档 PR
+合入和部署；本轮不变更 SDK、包版本或公共 API。
 
 ## 8. 维护规则
 

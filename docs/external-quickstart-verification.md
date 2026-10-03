@@ -123,8 +123,9 @@ curl -sS http://localhost:3000/index.md | head
 
 As of 2026-10-03:
 
-- **Repository candidate:** `0.1.0-alpha.22` — public availability must be read from npm dist-tags. This candidate corrects Knowledge-only OpenAPI diagnostics, graph-page breadcrumbs, and internal-package homepage metadata without changing the default setup or public APIs. The guarded Release Alpha workflow reruns the complete gate before publication.
-- **Published registry baseline:** `next-ai-ready` and `@next-ai-ready/next` `latest` remain `0.1.0-alpha.21`; `create-next-ai-ready` remains `0.1.0-alpha.13`. Candidate tarball verification is not public-registry or independent-adopter evidence.
+- **Repository candidate:** `0.1.0-alpha.22` — public availability must be read from npm dist-tags and the dated baseline below, not inferred from the repository version.
+- **Published registry baseline:** [Release Alpha #11](https://github.com/mustcanbedo/next-ai-ready/actions/runs/37134126837) published from merged main `6ee0c17`. `next-ai-ready` and `@next-ai-ready/next` `latest` and `alpha` are `0.1.0-alpha.22`; the unchanged `create-next-ai-ready` remains `0.1.0-alpha.13`. All ten exact versions, their alpha tags, the three user-facing latest tags, and public manifests were independently checked against the registry. Knowledge-only OpenAPI diagnostics, graph-page breadcrumbs, and internal-package homepage metadata are corrected without changing the default setup or public APIs.
+- **Public-registry verification (2026-10-03):** a fresh pnpm / Next.js 16.3.8 app installed `next-ai-ready@latest` as `0.1.0-alpha.22`. Knowledge-only initialization, generated artifacts, `next.config.ts` integration, doctor exit 0, and the production build passed. This is a maintainer-run public-registry check, not an independent adoption.
 - **Candidate verification (2026-10-03):** the full `pnpm verify:release` gate passed after merging main `8021e56`, including a fresh pnpm / Next.js 15.5.27 tarball install, Knowledge-only initialization, generated artifacts, doctor exit 0, and a production build with `next-ai-ready@0.1.0-alpha.22`. This is a maintainer-run candidate check, not an independent adoption or an alpha.22 registry install.
 - **alpha.13:** superseded after registry smoke exposed an incomplete published Semantic/Core export chain; use alpha.14 or newer.
 - **alpha.4:** deprecated for pnpm users (scoped import bug); use ≥ alpha.5
@@ -150,4 +151,5 @@ As of 2026-10-03:
 - [x] npm `latest` and `alpha` promoted to alpha.17; all public manifests match the registry — 2026-08-02
 - [x] npm `latest` alpha.17 verified with pnpm/Next.js 16.2.12 — 2026-08-02
 - [x] Full npm/pnpm × Next.js 14/15/16 tarball matrix on `main` CI
+- [x] npm `latest` alpha.22 verified with pnpm / Next.js 16.3.8; all public manifests and release tags match — 2026-10-03
 - [ ] Manual `/tmp` + `create-next-app` + dev + curl (optional full UX)

@@ -4,7 +4,8 @@
 >
 > **审查日期：** 2026-07-26（alpha.11 + deployed audit + agent readability）
 >
-> **当前候选发布补充（2026-10-03）：** 仓库候选版本为 `0.1.0-alpha.22`，公开 npm 状态以 registry dist-tags 为准。当前公开 `latest` 为 alpha.21；alpha.22 准备发布真实页面面包屑、知识平面 OpenAPI 诊断修复及七个底层包的官网元数据，公开 API 与知识平面默认接入不变。候选不等于已发布，也不等于 GA；当前优先级见 [`improvement-plan.zh-CN.md`](./improvement-plan.zh-CN.md)。下方正文保留 alpha.11 审查快照。
+> **当前候选发布补充（2026-10-03）：** 仓库候选版本为 `0.1.0-alpha.22`，公开 npm 状态应依据带日期的 registry 核验记录，不能从候选版本推断。当前优先级见 [`improvement-plan.zh-CN.md`](./improvement-plan.zh-CN.md)。下方正文保留 alpha.11 审查快照。
+> **已发布基线（2026-10-03）：** [Release Alpha #11](https://github.com/mustcanbedo/next-ai-ready/actions/runs/37134126837) 完成发布，两个入口包的公开 `latest` 与 `alpha` 均已核验为 alpha.22。真实页面面包屑、知识平面 OpenAPI 诊断修复及七个底层包的官网元数据已进入公开依赖链，公开 API 与知识平面默认接入不变。公开 registry 的 pnpm / Next.js 16.3.8 干净安装通过，十个包的公开 manifest 与源码一致；这不等于外部采用或 GA。
 > **测试状态：** 145+ tests / 9 packages · CI 含 `docs-site-smoke`
 
 ### 相关文档（分工）

@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import { test } from "node:test";
+import { URL } from "node:url";
 import matter from "gray-matter";
 import { CURATED_FAQ } from "./faq-curated.mjs";
 
@@ -37,6 +38,20 @@ for (const [locale, title] of [["en", "Quickstart Check"], ["zh", "快速接入�
     assert.ok(content.includes("text/markdown"));
     assert.ok(content.includes("site.baseUrl"));
     assert.doesNotMatch(content, /create-next-app/, "existing apps must not be recreated");
+  });
+
+  test(`${locale} quickstarts describe the released OpenAPI diagnostic fix consistently`, async () => {
+    const repositoryGuide = new URL(
+      `../../../docs/quickstart-10min${locale === "zh" ? ".zh-CN" : ""}.md`,
+      import.meta.url,
+    );
+    const releasedFix = locale === "en" ? /released in alpha\.22/ : /已随 alpha\.22 发布/;
+    for (const source of [repositoryGuide, path]) {
+      const content = await readFile(source, "utf8");
+      assert.match(content, releasedFix, `${source.pathname}: record the published fix`);
+      assert.match(content, /alpha\.21/, "keep upgrade guidance for the affected release");
+      assert.doesNotMatch(content, /diagnostic fix is pending release|诊断修复尚待发布/);
+    }
   });
 
   test(`${locale} Fumadocs guide distinguishes native retrieval from SDK integration`, async () => {

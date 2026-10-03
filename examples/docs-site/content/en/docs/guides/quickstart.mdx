@@ -18,7 +18,7 @@ tags:
   - quickstart
   - tutorial
   - getting-started
-updatedAt: '2026-10-02'
+updatedAt: '2026-10-04'
 author: next-ai-ready team
 ---
 
@@ -93,9 +93,9 @@ source path or glob. Check that `public/llms.txt` links to `/docs/quickstart` on
 `doctor` should report **0 errors**. Read and resolve or explicitly record warnings; a numeric
 score alone does not prove that the public routes return the intended content.
 
-Public alpha.21 incorrectly reports a missing OpenAPI artifact in Knowledge-only projects.
-That diagnostic fix is pending release; OpenAPI remains optional, so do not enable capabilities
-just to silence the warning.
+The false missing-OpenAPI warning in Knowledge-only projects was fixed and released in alpha.22.
+If you installed alpha.21, upgrade; OpenAPI remains optional, so do not enable capabilities
+just to silence that warning.
 
 ## 4. Verify the running application
 

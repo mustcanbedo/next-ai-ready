@@ -43,9 +43,15 @@ The basic setup is complete when `doctor` reports **0 errors** and `public/llms.
 
 This documentation site tracks `main` and currently targets the `0.1.0-alpha.22` repository candidate. Public availability is determined by npm dist-tags, not by the repository version. Alpha.21 makes the five-file Knowledge Plane the default and keeps Actions, MCP, OpenAPI, and observability behind the explicit `--with-capabilities` path.
 
-The alpha.22 candidate fixes the false missing-OpenAPI warning in Knowledge-only projects, uses
-existing graph pages for breadcrumbs, and prepares canonical homepage metadata for internal packages.
-These fixes are not yet included in the public alpha.21 package; no new runtime API is introduced.
+Published alpha.22 fixes the false missing-OpenAPI warning in Knowledge-only projects, uses
+existing graph pages for breadcrumbs, and includes canonical homepage metadata for internal packages.
+No new runtime API is introduced.
+
+On October 3, 2026, [Release Alpha #11](https://github.com/mustcanbedo/next-ai-ready/actions/runs/37134126837)
+published the fixes and promoted `next-ai-ready` and `@next-ai-ready/next` to npm `latest` and `alpha`
+at `0.1.0-alpha.22`. A fresh public-registry pnpm / Next.js 16.3.8 install passed initialization,
+artifact generation, doctor, and the production build. The unchanged scaffolder remains alpha.13;
+this maintainer verification is not independent-adopter evidence or a GA sign-off.
 
 ## Verified readability baseline
 

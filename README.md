@@ -48,15 +48,15 @@ The generated project is a normal Next.js TypeScript app that can be committed a
 
 > **Release candidate:** this repository and the documentation site track `main` and currently target `0.1.0-alpha.22`. Treat `npm view next-ai-ready dist-tags --json` as the source of truth for public availability. Alpha.21 makes the default `init` flow Knowledge-first: five AI-readable content files, no mandatory Capability dependencies, and an explicit `--with-capabilities` upgrade path.
 
-Public alpha.21 still reports a missing OpenAPI artifact in Knowledge-only projects. OpenAPI is
-optional; do not enable capabilities just to remove that warning. A diagnostic fix is pending
-release. Follow the [quickstart HTTP checks](./docs/quickstart-10min.md) to verify actual content.
+If you installed alpha.21, upgrade to alpha.22 to remove its false missing-OpenAPI warning in
+Knowledge-only projects. OpenAPI is optional; do not enable capabilities just to remove that
+warning. Follow the [quickstart HTTP checks](./docs/quickstart-10min.md) to verify actual content.
 
-The alpha.22 candidate removes that false warning while retaining checks for configured capabilities,
+Published alpha.22 removes that false warning while retaining checks for configured capabilities,
 builds breadcrumbs only from existing graph pages, and includes canonical `nextaiready.com` homepage
 metadata for seven internal packages. Public APIs and the Knowledge-only default remain unchanged.
 
-> **Published baseline (2026-10-03):** npm `latest` was verified as `0.1.0-alpha.21`. The alpha.22 fixes and internal-package homepage corrections are not published yet.
+> **Published baseline (2026-10-03):** npm `latest` and `alpha` were verified as `0.1.0-alpha.22` for `next-ai-ready` and `@next-ai-ready/next`. [Release Alpha #11](https://github.com/mustcanbedo/next-ai-ready/actions/runs/37134126837) passed the full gate, publication, and tag checks. A fresh public-registry pnpm / Next.js 16.3.8 install passed initialization, artifact generation, doctor, and the production build. The unchanged `create-next-ai-ready` remains alpha.13; this is not the final GA release.
 
 ---
 
@@ -257,7 +257,7 @@ Install only `next-ai-ready` in consumer apps. The `alpha.22` repository candida
 
 ## Status
 
-🚧 **Pre-alpha** (`0.1.0-alpha.22` repository candidate; verify published availability through npm dist-tags). The guarded release workflow validates packages and tags; see the [current improvement ledger](./docs/improvement-plan.zh-CN.md) for the external-adoption gate before the final `0.1.0` GA release.
+🚧 **Pre-alpha** (`0.1.0-alpha.22` repository candidate; see the dated published baseline above for npm availability). The guarded release workflow validates packages and tags; see the [current improvement ledger](./docs/improvement-plan.zh-CN.md) for the external-adoption gate before the final `0.1.0` GA release.
 
 - ✅ **Knowledge plane** — MDX → semantic graph → `llms.txt` / `*.md` / `*.ai.json` / JSON-LD
 - ✅ **Capability plane** — `defineAction` → `/api/actions/<name>` + OpenAPI 3.1 / `tools.json` / `ai-plugin.json`

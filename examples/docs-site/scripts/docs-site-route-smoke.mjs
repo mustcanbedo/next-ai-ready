@@ -423,41 +423,28 @@ async function main() {
       "](/guides/nextra/config.jpg)",
     ],
   });
-  await expectResponse("/en/docs/guides/fumadocs-ai-ready", {
-    contentType: "text/html",
-    includes: [
-      "Check the native integration first",
-      'href="https://www.fumadocs.dev/docs/integrations/llms"',
-      'href="./nextjs-llms-txt#compare-the-tools-before-installing"',
-    ],
-    excludes: "Fumadocs search serves people inside the documentation UI.",
-  });
-  await expectResponse("/zh/docs/guides/fumadocs-ai-ready", {
-    contentType: "text/html",
-    includes: [
-      "先检查原生集成",
-      'href="https://www.fumadocs.dev/docs/integrations/llms"',
-      'href="./nextjs-llms-txt#安装前先比较工具职责"',
-    ],
-    excludes: "Fumadocs 搜索服务于文档界面中的人类用户",
-  });
-  await expectResponse("/en/docs/guides/fumadocs-ai-ready.md", {
-    contentType: "text/markdown",
-    includes: [
-      "## Check the native integration first",
-      "it does not yet include an executable Fumadocs compatibility fixture.",
-      "[tool-selection section](./nextjs-llms-txt#compare-the-tools-before-installing)",
-    ],
-  });
-  await expectResponse("/zh/docs/guides/fumadocs-ai-ready.md", {
-    contentType: "text/markdown",
-    includes: [
-      "# 为 Fumadocs 添加 llms.txt 与 Markdown 端点",
-      "[Next.js App Router llms.txt 实战教程](./nextjs-llms-txt)",
-      "## 先检查原生集成",
-      "[工具选型部分](./nextjs-llms-txt#安装前先比较工具职责)",
-    ],
-  });
+  for (const [locale, heading, boundary, selectionAnchor] of [
+    ["en", "Add llms.txt and Markdown endpoints to Fumadocs", "Choose native Fumadocs or next-ai-ready", "compare-the-tools-before-installing"],
+    ["zh", "为 Fumadocs 添加 llms.txt 与 Markdown 端点", "选择原生 Fumadocs 还是 next-ai-ready", "安装前先比较工具职责"],
+  ]) {
+    await expectResponse(`/${locale}/docs/guides/fumadocs-ai-ready`, {
+      contentType: "text/html",
+      includes: [heading, boundary, "https://www.fumadocs.dev/docs/integrations/llms", `href="./nextjs-llms-txt#${selectionAnchor}"`],
+      excludes: locale === "en" ? "Fumadocs search serves people inside the documentation UI." : "Fumadocs 搜索服务于文档界面中的人类用户",
+    });
+    await expectResponse(`/${locale}/docs/guides/fumadocs-ai-ready.md`, {
+      contentType: "text/markdown",
+      includes: [
+        `# ${heading}`,
+        boundary,
+        `./nextjs-llms-txt#${selectionAnchor}`,
+        "npx @fumadocs/cli feature llms",
+        "npx @fumadocs/cli feature mcp",
+        "withAiReady({ agentReadable: true })(withMDX(nextConfig))",
+        'document_status: "not_found"',
+      ],
+    });
+  }
   await expectResponse("/en/docs/guides/mdx-content", {
     contentType: "text/html",
     includes: "Next.js MDX content collections for AI-readable docs",

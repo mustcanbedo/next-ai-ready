@@ -27,7 +27,11 @@ pnpm exec next-ai-ready doctor --score
 
 **下一步：** [完成 10 分钟指南](./docs/quickstart-10min.zh-CN.md)、阅读
 [App Router llms.txt 实战教程](https://nextaiready.com/zh/docs/guides/nextjs-llms-txt)，
-或[添加经过鉴权的 Agent Action](https://nextaiready.com/zh/docs/guides/action-auth)。
+或[添加经过鉴权的 Agent Action](https://nextaiready.com/zh/docs/guides/actions)。
+
+**已经使用 Fumadocs？** 原生 LLM 与文档 MCP 路由可能已经够用。
+增加第二套内容流水线前，先看[原生优先的接入选择](https://nextaiready.com/zh/docs/guides/fumadocs-ai-ready)。
+需要跨内容集合共享语义图、结构化输出，或可选的应用 Action 时，再考虑 next-ai-ready。
 
 已经使用 Next SEO、Fumadocs 或 Nextra？先[比较工具职责，再决定是否增加集成](https://nextaiready.com/zh/docs/guides/nextjs-llms-txt#安装前先比较工具职责)。原生 metadata 与已有 LLM 端点可能已经满足需求。
 
@@ -41,7 +45,11 @@ npm create next-ai-ready@alpha next-ai-ready-demo
 
 > **第三方工具基线：** 生产文档站在 2026-08-01 使用 Vercel 开源的 `@vercel/agent-readability@0.5.0` 获得 **100/100**。[查看机器可读原始结果](./docs/audit-baselines/vercel-agent-readability-0.5.0-2026-08-01.json)，或运行 `pnpm audit:vercel:site` 复现。该分数衡量技术层面的 Agent 可读性，不代表搜索排名、收录或引用效果。
 
-> **候选版本：** 本仓库与文档站跟随 `main`，当前目标为 `0.1.0-alpha.21`。公开可用性仍以 `npm view next-ai-ready dist-tags --json` 为准。alpha.21 将默认 `init` 改为 Knowledge-first：只生成 5 个 AI 可读内容文件，不再要求 Capability 依赖或产生相关警告，并通过 `--with-capabilities` 显式升级。
+> **候选版本：** 本仓库与文档站跟随 `main`，当前目标为 `0.1.0-alpha.21`。公开可用性仍以 `npm view next-ai-ready dist-tags --json` 为准。alpha.21 将默认 `init` 改为 Knowledge-first：只生成 5 个 AI 可读内容文件，不强制要求 Capability 依赖，并通过 `--with-capabilities` 显式升级。
+
+公开 alpha.21 仍会在纯知识平面项目提示缺少 OpenAPI 产物。OpenAPI 是可选能力，不要为了
+消除此告警开启能力平面；诊断修复尚待发布。按[快速开始的 HTTP 检查](./docs/quickstart-10min.zh-CN.md)
+验证实际内容，而不是仅看分数。
 
 > **发布基线（2026-10-01）：** 已核验 npm `latest` 为 `0.1.0-alpha.21`。本轮基于真实页面生成面包屑的修复已列入下一个 patch，不属于该已发布版本。
 

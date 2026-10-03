@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { z } from "zod";
 import { mkdtemp, rm, mkdir, writeFile, readFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
@@ -10,10 +10,18 @@ import { runDoctor } from "../src/cli/doctor.js";
 import { runBuild } from "../src/cli/build.js";
 import { POST as actionPOST } from "../src/handlers/action.js";
 import { registerAiHooks, clearAiHooks } from "../src/runtime/observability.js";
-import { publicRobotsTxtPath, publicOpenApiPath } from "../src/paths.js";
+import { graphPath, publicRobotsTxtPath, publicOpenApiPath, ROUTE_STUBS } from "../src/paths.js";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const SAMPLE = join(here, "fixtures", "sample-app");
+const CAPABILITY_ROUTES = [
+  ["OpenAPI", ROUTE_STUBS.OPENAPI],
+  ["MCP", ROUTE_STUBS.MCP],
+  ["Actions", ROUTE_STUBS.ACTION],
+  ["Tools", ROUTE_STUBS.TOOLS],
+  ["AI plugin", "app/%5Fai-ready/ai-plugin/route.ts"],
+] as const;
+const ROUTE_EXTENSIONS = ["ts", "tsx", "js", "jsx", "mjs"] as const;
 
 const CONFIG = `export default {
   site: { name: "Doc", baseUrl: "https://doc.test", description: "x" },
@@ -43,6 +51,30 @@ async function makeProject(config = CONFIG) {
   const dir = await mkdtemp(join(tmpdir(), "nair-doctor-"));
   await writeFile(join(dir, "ai-ready.config.mjs"), config, "utf8");
   return { dir, cleanup: () => rm(dir, { recursive: true, force: true }) };
+}
+
+async function makeReadyDoctorProject(config = CONFIG) {
+  const project = await makeProject(config);
+  const { dir } = project;
+  await mkdir(dirname(graphPath(dir)), { recursive: true });
+  await writeFile(graphPath(dir), JSON.stringify({ routes: {}, nodes: {} }), "utf8");
+  await mkdir(dirname(publicRobotsTxtPath(dir)), { recursive: true });
+  await writeFile(publicRobotsTxtPath(dir), "User-agent: *\nAllow: /\n", "utf8");
+  for (const route of [ROUTE_STUBS.LLMS_TXT, ROUTE_STUBS.PAGE_MD]) {
+    await mkdir(dirname(join(dir, route)), { recursive: true });
+    await writeFile(join(dir, route), "export const runtime = 'nodejs';\n", "utf8");
+  }
+  await writeFile(
+    join(dir, "next.config.mjs"),
+    `import { withAiReady } from "next-ai-ready";\nexport default withAiReady()({});\n`,
+    "utf8",
+  );
+  await writeFile(
+    join(dir, "package.json"),
+    JSON.stringify({ scripts: { build: "next-ai-ready build && next build" } }),
+    "utf8",
+  );
+  return project;
 }
 
 describe("runDoctor()", () => {
@@ -78,9 +110,17 @@ describe("runDoctor()", () => {
   });
 
   it("does not penalize an intentionally Knowledge-only project", async () => {
-    const { dir, cleanup } = await makeProject();
+    const { dir, cleanup } = await makeReadyDoctorProject();
     try {
       const result = await runDoctor({ cwd: dir, json: true });
+      expect(result.errors).toBe(0);
+      expect(result.warnings).toBe(0);
+      expect(result.score).toBe(100);
+      expect(result.report?.checks.find((check) => check.id === "build-openapi")).toMatchObject({
+        name: "OpenAPI artifact",
+        level: "ok",
+        message: expect.stringContaining("not required"),
+      });
       const mcp = result.diagnostics.find((diagnostic) =>
         diagnostic.message.includes("MCP route is not installed"),
       );
@@ -95,6 +135,161 @@ describe("runDoctor()", () => {
       expect(result.actionItems).not.toContain(
         "Set `NEXT_AI_READY_MCP_TOKEN` in production to protect `/api/mcp`.",
       );
+      expect(result.actionItems).toEqual([]);
+    } finally {
+      await cleanup();
+    }
+  });
+
+  it.each([
+    ["empty inline actions", { actions: [] }, "ok"],
+    ["an empty actions module", { actions: "./actions.mjs" }, "ok"],
+    ["an unloadable actions module", { actions: "./missing-actions.mjs" }, "error"],
+    ["actions with OpenAPI emission disabled", { actions: [], emit: { openapi: false } }, "ok"],
+  ] as const)("warns about missing OpenAPI with %s", async (_label, capabilities, loadLevel) => {
+    const config = `export default ${JSON.stringify({
+      site: { name: "Doc", baseUrl: "https://doc.test", description: "x" },
+      content: [],
+      ...capabilities,
+    })};\n`;
+    const { dir, cleanup } = await makeReadyDoctorProject(config);
+    try {
+      await writeFile(join(dir, "actions.mjs"), "export default [];\n", "utf8");
+      const result = await runDoctor({ cwd: dir, json: true });
+      expect(result.report?.checks.find((check) => check.id === "actions-load")?.level).toBe(loadLevel);
+      expect(result.report?.checks.find((check) => check.id === "build-openapi")).toMatchObject({
+        name: "OpenAPI artifact",
+        level: "warn",
+        message: "No public/openapi.json yet. Run `next-ai-ready build` before deploying.",
+      });
+      expect(result.actionItems).toContain("Run `npx next-ai-ready build` to emit openapi.json.");
+
+      await writeFile(publicOpenApiPath(dir), JSON.stringify({ openapi: "3.1.0", paths: {} }), "utf8");
+      const built = await runDoctor({ cwd: dir, json: true });
+      expect(built.report?.checks.find((check) => check.id === "actions-load")?.level).toBe(loadLevel);
+      expect(built.report?.checks.find((check) => check.id === "build-openapi")?.level).toBe("ok");
+      expect(built.actionItems).not.toContain("Run `npx next-ai-ready build` to emit openapi.json.");
+    } finally {
+      await cleanup();
+    }
+  });
+
+  it.each(CAPABILITY_ROUTES.flatMap(([label, route]) =>
+    ROUTE_EXTENSIONS.map((extension) => [label, join(dirname(route), `route.${extension}`)] as const),
+  ))("warns about missing OpenAPI with only the %s handler at %s", async (_label, route) => {
+    const { dir, cleanup } = await makeReadyDoctorProject();
+    try {
+      await mkdir(dirname(join(dir, route)), { recursive: true });
+      await writeFile(join(dir, route), "export const runtime = 'nodejs';\n", "utf8");
+      const result = await runDoctor({ cwd: dir, json: true });
+      expect(result.report?.checks.find((check) => check.id === "build-openapi")?.level).toBe("warn");
+      expect(result.report?.checks.find((check) => check.id === "actions-load")?.message).not.toContain(
+        "valid Knowledge-only setup",
+      );
+      expect(result.actionItems).toContain("Run `npx next-ai-ready build` to emit openapi.json.");
+
+      await writeFile(publicOpenApiPath(dir), JSON.stringify({ openapi: "3.1.0", paths: {} }), "utf8");
+      const built = await runDoctor({ cwd: dir, json: true });
+      expect(built.report?.checks.find((check) => check.id === "build-openapi")?.level).toBe("ok");
+      expect(built.actionItems).not.toContain("Run `npx next-ai-ready build` to emit openapi.json.");
+    } finally {
+      await cleanup();
+    }
+  });
+
+  it.each(ROUTE_EXTENSIONS)("keeps MCP token diagnostics for route.%s", async (extension) => {
+    const { dir, cleanup } = await makeReadyDoctorProject();
+    vi.stubEnv("NEXT_AI_READY_MCP_TOKEN", "");
+    try {
+      const route = join(dir, dirname(ROUTE_STUBS.MCP), `route.${extension}`);
+      await mkdir(dirname(route), { recursive: true });
+      await writeFile(route, "export const runtime = 'nodejs';\n", "utf8");
+      const missing = await runDoctor({ cwd: dir, json: true });
+      expect(missing.report?.checks.find((check) => check.id === "build-openapi")?.level).toBe("warn");
+      expect(missing.report?.checks.find((check) => check.id === "mcp-token")?.level).toBe("warn");
+      expect(missing.actionItems).toContain("Run `npx next-ai-ready build` to emit openapi.json.");
+      expect(missing.actionItems).toContain(
+        "Set `NEXT_AI_READY_MCP_TOKEN` in production to protect `/api/mcp`.",
+      );
+
+      await writeFile(publicOpenApiPath(dir), JSON.stringify({ openapi: "3.1.0", paths: {} }), "utf8");
+      const built = await runDoctor({ cwd: dir, json: true });
+      expect(built.report?.checks.find((check) => check.id === "build-openapi")?.level).toBe("ok");
+      expect(built.report?.checks.find((check) => check.id === "mcp-token")?.level).toBe("warn");
+
+      vi.stubEnv("NEXT_AI_READY_MCP_TOKEN", "doctor-test-token");
+      const configured = await runDoctor({ cwd: dir, json: true });
+      expect(configured.report?.checks.find((check) => check.id === "mcp-token")?.level).toBe("ok");
+      expect(configured.warnings).toBe(0);
+      expect(configured.score).toBe(100);
+      expect(configured.actionItems).toEqual([]);
+    } finally {
+      vi.unstubAllEnvs();
+      await cleanup();
+    }
+  });
+
+  it("preserves the OpenAPI check ID and score weight for a capability project", async () => {
+    const { dir, cleanup } = await makeReadyDoctorProject();
+    try {
+      await mkdir(dirname(join(dir, ROUTE_STUBS.OPENAPI)), { recursive: true });
+      await writeFile(join(dir, ROUTE_STUBS.OPENAPI), "export const runtime = 'nodejs';\n", "utf8");
+      const missing = await runDoctor({ cwd: dir, json: true });
+      expect(missing.warnings).toBe(1);
+      expect(missing.score).toBe(95);
+      expect(missing.actionItems).toEqual(["Run `npx next-ai-ready build` to emit openapi.json."]);
+
+      await writeFile(publicOpenApiPath(dir), JSON.stringify({ openapi: "3.1.0", paths: {} }), "utf8");
+      const built = await runDoctor({ cwd: dir, json: true });
+      expect(built.warnings).toBe(0);
+      expect(built.score).toBe(100);
+      expect(built.report?.checks.map((check) => check.id)).toEqual(
+        missing.report?.checks.map((check) => check.id),
+      );
+      expect(built.report?.checks.find((check) => check.id === "build-openapi")?.message).toBe(
+        "Canonical artifact public/openapi.json present.",
+      );
+    } finally {
+      await cleanup();
+    }
+  });
+
+  it("accepts an existing OpenAPI artifact without capability configuration", async () => {
+    const { dir, cleanup } = await makeReadyDoctorProject();
+    try {
+      await writeFile(publicOpenApiPath(dir), JSON.stringify({ openapi: "3.1.0", paths: {} }), "utf8");
+      const result = await runDoctor({ cwd: dir, json: true });
+      expect(result.report?.checks.find((check) => check.id === "build-openapi")).toMatchObject({
+        level: "ok",
+        message: "Canonical artifact public/openapi.json present.",
+      });
+      expect(result.warnings).toBe(0);
+      expect(result.actionItems).toEqual([]);
+    } finally {
+      await cleanup();
+    }
+  });
+
+  it("does not mistake a directory for a capability handler or OpenAPI artifact", async () => {
+    const { dir, cleanup } = await makeReadyDoctorProject();
+    try {
+      for (const [, route] of CAPABILITY_ROUTES) {
+        for (const extension of ROUTE_EXTENSIONS) {
+          await mkdir(join(dir, dirname(route), `route.${extension}`), { recursive: true });
+        }
+      }
+      await mkdir(publicOpenApiPath(dir));
+      const result = await runDoctor({ cwd: dir, json: true });
+      expect(result.report?.checks.find((check) => check.id === "build-openapi")?.level).toBe("ok");
+      expect(result.report?.checks.find((check) => check.id === "mcp-token")?.level).toBe("ok");
+      expect(result.warnings).toBe(0);
+      expect(result.actionItems).toEqual([]);
+
+      await rm(join(dir, ROUTE_STUBS.OPENAPI), { recursive: true });
+      await writeFile(join(dir, ROUTE_STUBS.OPENAPI), "export const runtime = 'nodejs';\n", "utf8");
+      const capability = await runDoctor({ cwd: dir, json: true });
+      expect(capability.report?.checks.find((check) => check.id === "build-openapi")?.level).toBe("warn");
+      expect(capability.actionItems).toContain("Run `npx next-ai-ready build` to emit openapi.json.");
     } finally {
       await cleanup();
     }

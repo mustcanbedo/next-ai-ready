@@ -1,17 +1,18 @@
 # 10 分钟上手
 
-本指南帮助你在 Next.js App Router 项目中用 `next-ai-ready` 快速接入 AI 可读 + Agent 可调用能力。
+本指南验证 Next.js App Router 项目的知识平面基础接入。预留约十分钟，依赖下载与生产构建
+可能需要更长时间；Actions 与 MCP 留待有实际需求时接入。
 
 ## 前置条件
 
 - Node.js 20+
-- Next.js 15+（App Router）
+- Next.js 14.2+（App Router）；脚手架使用 Next.js 15
 - 若定义 actions，需 Zod v4（`zod@^4`）
 
 ## 1. 脚手架（推荐）
 
 ```bash
-npm create next-ai-ready my-app
+npm create next-ai-ready@latest my-app
 cd my-app
 npm install
 npx next-ai-ready init
@@ -21,7 +22,8 @@ npx next-ai-ready init
 
 ## 2. 配置站点
 
-编辑 `ai-ready.config.mjs`：
+编辑已有 `ai-ready.config.ts` 或 `ai-ready.config.mjs`，不要另建第二个配置。下面的站点
+信息和域名仅为示例，必须替换为实际生产值，不要部署占位域名：
 
 ```js
 import { defineConfig } from "next-ai-ready";
@@ -54,43 +56,53 @@ export default defineConfig({
 }
 ```
 
-`prebuild` 保证在 `next build` 前生成 `public/llms.txt`、`.next-ai-ready/graph.json`、OpenAPI 等产物。
+`init` 会在缺失时添加构建接线；保留已有脚本，不要直接用示例覆盖。AI 构建生成
+`public/llms.txt` 与 `.next-ai-ready/graph.json`，OpenAPI 是可选产物。
 
 ## 4. 添加内容（知识平面）
 
 创建 `content/docs/intro.mdx`：
 
-```mdx
-export const semantic = {
-  summary: "一句话说明产品做什么。",
-  questions: [
-    { q: "这是什么产品？", a: "供 AI 引用的简短回答。" },
-  ],
-}
+```markdown
+---
+title: 简介
+summary: 安装示例项目依赖。
+---
 
 # 简介
 
-正文内容。
+在项目根目录运行 `pnpm install` 安装依赖。
 ```
 
 执行：
 
 ```bash
 npx next-ai-ready build
-npm run dev
+npm run build
+npm run start
 ```
 
 ## 5. 验证 AI 端点
 
-浏览器或 curl 访问：
+在另一个终端检查响应头和正文：
+
+```bash
+curl -i http://localhost:3000/llms.txt
+curl -i http://localhost:3000/docs/intro.md
+curl -i -H 'Accept: text/html' http://localhost:3000/
+```
+
+发现索引应包含配置域名下的 `/docs/intro` 链接；逐页端点应返回 `200`、`text/markdown`、
+“简介”标题和安装依赖说明。包含 `document_status: "not_found"` 的 `200` 是恢复文档，不能
+当作成功。普通 `/` 请求应继续返回 HTML；在 `content/` 下添加 MDX 不会创建网页路由。
 
 | URL | 用途 |
 |-----|------|
 | `/llms.txt` | 站点 LLM 索引 |
 | `/llms-full.txt` | 全文 dump（含 FAQ） |
 | `/docs/intro.md` | 单页 Markdown（路由与 graph 一致） |
-| `/openapi.json` | Agent API |
-| `/tools.json` | 工具定义 |
+
+OpenAPI、`/tools.json` 与 MCP 需要显式配置能力平面，不属于默认 `init` 或本次基础验收。
 
 ## 6. 运行 doctor
 
@@ -98,7 +110,10 @@ npm run dev
 npx next-ai-ready doctor --score
 ```
 
-建议 **90+**。常见 **100 分**修复项：
+要求 **0 个错误**，再逐条修复或记录告警。高分不能代替上述 HTTP 检查。公开 alpha.21
+会误报纯知识平面缺少 OpenAPI，诊断修复尚待发布；不要为消除它而开启能力平面。
+
+其他告警可按以下方向处理：
 
 | 告警 | 修复 |
 |------|------|

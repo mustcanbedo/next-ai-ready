@@ -1369,35 +1369,50 @@ Next.js loads instrumentation on Edge; Node-only hooks must stay in a separate f
 <!-- BEGIN /en/docs/guides/fumadocs-ai-ready -->
 # Add llms.txt and Markdown endpoints to Fumadocs
 URL: https://nextaiready.com/en/docs/guides/fumadocs-ai-ready
-Updated: 2026-10-02
+Updated: 2026-10-03
 
 # Add llms.txt and Markdown endpoints to Fumadocs
 
-[Fumadocs](https://www.fumadocs.dev/docs) provides the documentation UI, Source API, and search.
-`next-ai-ready` can read the same MDX collection to produce `/llms.txt`, page Markdown, semantic page
-discovery, and optional MCP resources without changing those Fumadocs responsibilities.
+[Fumadocs](https://www.fumadocs.dev/docs) provides the documentation UI, Source API, search, and
+[native AI integrations](https://www.fumadocs.dev/docs/integrations/llms). You do not need
+`next-ai-ready` just to expose documentation to AI clients.
+
+Use this guide when you want the same source files to also feed next-ai-ready's semantic graph,
+structured page outputs, or optional application actions. Keep Fumadocs responsible for the UI.
 
 Not using Fumadocs? Start with the framework-neutral
 [Next.js App Router llms.txt walkthrough](./nextjs-llms-txt).
 
-## Check the native integration first
-
-Fumadocs already documents [LLM integration](https://www.fumadocs.dev/docs/integrations/llms) for
-`llms.txt`, `llms-full.txt`, page Markdown, content negotiation, and MCP. These require configuration;
-they are not necessarily enabled in your current app. If that setup meets your needs, keep it.
-
-The instructions below are an alternative implementation, not a missing-feature fix or an official
-Fumadocs endorsement. Consider them only if you need next-ai-ready's build-time semantic graph or
-its optional action layer. This guide is a configuration recipe; unlike the [Nextra fixture](./nextra-ai-ready),
-it does not yet include an executable Fumadocs compatibility fixture.
-
-Before running either generator, choose one owner for `/llms.txt`, `/llms-full.txt`, each Markdown
-path, and any MCP route. Do not let both implementations overwrite the same output. Keep locale,
-canonical, and public-content rules consistent. The [tool-selection section](./nextjs-llms-txt#compare-the-tools-before-installing)
-explains when no additional SDK is needed.
-
 This integration targets Fumadocs on Next.js App Router with a server deployment. It does not support
 a fully static `output: "export"` build because the machine-facing route handlers run at request time.
+
+## Choose native Fumadocs or next-ai-ready
+
+For documentation-only retrieval, start with the official Fumadocs setup:
+
+```bash
+npx @fumadocs/cli feature llms
+# Optional documentation search and retrieval over MCP:
+npx @fumadocs/cli feature mcp
+```
+
+Those commands belong to Fumadocs, not this SDK. Check its documentation against your installed version.
+
+| Need                                                                                             | Smallest useful setup                                                         |
+| ------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------- |
+| Only llms.txt, page Markdown, or documentation MCP                                               | Native Fumadocs; another SDK is not required.                                 |
+| One semantic graph for docs and other local MDX collections, with .ai.json and curated discovery | Consider next-ai-ready alongside the existing UI.                             |
+| Agents need to invoke application functions, not just retrieve docs                              | Evaluate the optional [Action and authorization model](./actions) separately. |
+
+Markdown and documentation MCP are not exclusive next-ai-ready features. Neither integration
+guarantees indexing, ranking, or AI citations.
+
+Pick one owner for each public discovery URL. Do not combine this wrapper with existing native
+`/llms.txt`, Markdown rewrites, negotiation middleware, or `/api/mcp` without reviewing which handler
+will serve each request. The steps below assume next-ai-ready owns the machine-facing routes.
+
+The [tool-selection section](./nextjs-llms-txt#compare-the-tools-before-installing) compares these
+responsibilities with native Next.js, Next SEO, and Nextra before adding another integration.
 
 ## 1. Install and initialize
 
@@ -1409,7 +1424,8 @@ pnpm exec next-ai-ready init
 ```
 
 Keep `source.config.ts`, the generated Fumadocs source module, page layouts, and search routes intact.
-The initializer adds separate AI-facing handlers and configuration.
+The initializer adds separate AI-facing handlers and configuration. Default `init` is Knowledge-only;
+it does not install MCP or callable actions. Review existing configuration rather than overwriting it.
 
 ## 2. Reuse the Fumadocs content collection
 
@@ -1433,22 +1449,32 @@ If the collection lives under `src/content/docs`, use that path instead. Existin
 `description`, `date`, and `author` frontmatter are reused. Add `updatedAt` only when the date is
 truthful and maintained.
 
+This is file-based reuse, not a Fumadocs Source API adapter. The SDK does not run Fumadocs-specific
+plugins or reproduce its processed Markdown. Check custom MDX components and generated content
+before choosing a second pipeline. Its derived routes must match the actual UI URLs: for example,
+`content/docs/getting-started.mdx` maps to `/docs/getting-started`. A custom Fumadocs `baseUrl` or slug
+layout is not automatically imported.
+
 ## 3. Wrap the Next.js config
 
-Fumadocs does not require a competing Next.js wrapper for its Source API. Preserve the project's
-existing options and wrap them with `withAiReady()`:
+For Fumadocs MDX, preserve the [existing createMDX plugin](https://www.fumadocs.dev/docs/mdx/next)
+and wrap its resulting configuration in `next.config.mjs`:
 
 ```js
+import { createMDX } from "fumadocs-mdx/next"
 import { withAiReady } from "next-ai-ready/config"
 
+const withMDX = createMDX()
 const nextConfig = {
   // Existing Fumadocs and Next.js options stay here.
 }
 
-export default withAiReady({ agentReadable: true })(nextConfig)
+export default withAiReady({ agentReadable: true })(withMDX(nextConfig))
 ```
 
 If another plugin already wraps the config, apply `withAiReady()` to that plugin's final result.
+Retain your existing `createMDX` options. This is a configuration example, not a claim that a
+complete Fumadocs application or your custom plugins have passed a production compatibility test.
 
 ## 4. Build and verify
 
@@ -1461,26 +1487,37 @@ pnpm build
 After deployment:
 
 ```bash
-curl -I https://docs.example.com/llms.txt
-curl -I https://docs.example.com/docs/getting-started.md
+curl -i https://docs.example.com/llms.txt
+curl -i https://docs.example.com/docs/getting-started.md
+curl -i -H 'Accept: text/markdown' https://docs.example.com/docs/getting-started
+curl -i -H 'Accept: text/html' https://docs.example.com/docs/getting-started
 pnpm exec next-ai-ready audit https://docs.example.com/docs/getting-started --version 3
 ```
 
-Confirm that `/llms.txt` lists the intended Fumadocs pages, Markdown URLs use production canonicals,
-and browser requests still receive the normal Fumadocs UI.
+Replace the example domain and route with a real, public page. Confirm that `/llms.txt` lists its
+canonical HTML URL, both Markdown requests return `text/markdown` and the intended title and body,
+and the HTML request retains the Fumadocs UI. A `200` recovery document containing
+`document_status: "not_found"` is not a successful page retrieval. Check the canonical `Link` header
+as well as the body; a HEAD-only check cannot prove that the correct content was served.
+
+For a runnable first-party reference, inspect the
+[Next.js production walkthrough and smoke assertions](./nextjs-llms-txt#inspect-the-implementation-evidence).
+That site is not a Fumadocs compatibility fixture or an external customer case. Fumadocs-specific
+production evidence remains a separate validation task.
 
 ## Keep search responsibilities separate
 
-Fumadocs supports both documentation UI search and [MCP page tools](https://www.fumadocs.dev/docs/headless/utils/mcp).
-next-ai-ready offers its own HTTP discovery and optional MCP page tools. These responsibilities
-overlap; choose the implementation your clients need rather than treating Fumadocs as human-only.
-Adding either set of endpoints is not evidence of improved search ranking or AI citation.
+Keep Fumadocs UI search intact. Both [Fumadocs native MCP](https://www.fumadocs.dev/docs/headless/utils/mcp)
+and next-ai-ready can serve documentation
+retrieval; adding a second search index is a maintenance choice, not a prerequisite for AI access.
+An application Action is a different boundary: review authorization and deployment behavior before
+enabling it, rather than treating every documentation request as a callable business operation.
 
 ## FAQ
 
-### Does Fumadocs already provide LLM content and MCP integration?
+### Do I need next-ai-ready just for Fumadocs llms.txt or documentation MCP?
 
-Yes. Its official LLM guide covers llms.txt, llms-full.txt, page Markdown, content negotiation, and MCP. Evaluate that native setup before adding another integration.
+No. Fumadocs provides native LLM and documentation MCP integrations. Use next-ai-ready when you also need its shared semantic graph, structured outputs, or optional application actions.
 
 ### Does next-ai-ready replace Fumadocs Source API or search?
 
@@ -2433,18 +2470,22 @@ Nextra 4.6.1 can currently resolve its private Zod dependency to 4.4.x, which br
 <!-- BEGIN /en/docs/guides/quickstart -->
 # Quickstart
 URL: https://nextaiready.com/en/docs/guides/quickstart
-Updated: 2026-10-01
+Updated: 2026-10-02
 
 # Quickstart
 
-This guide takes you from zero to a verified AI-readable Next.js setup in about 10 minutes.
+This guide takes you from install to a verified AI-readable Next.js setup. Allow about ten
+minutes, plus dependency downloads and the production build. Start with readable content;
+callable actions and MCP are optional next steps.
+
+Use Node.js 20+ and a Next.js 14.2+ App Router application. Keep your existing package manager.
 
 ## 1. Create a project
 
-**Option A — template (fastest):**
+**Option A — new project:**
 
 ```bash
-npm create next-ai-ready my-site
+npm create next-ai-ready@latest my-site
 cd my-site
 npm install
 npx next-ai-ready init
@@ -2452,56 +2493,91 @@ npx next-ai-ready init
 
 The scaffold supplies a runnable minimal App Router TypeScript app and starter MDX content. It does not pre-generate AI-ready config or handlers; the explicit `init` step adds that wiring after installation.
 
-**Option B — existing Next.js app:**
+**Option B — existing Next.js app:** run these commands from its root. Do not create a second app.
 
 ```bash
-npx create-next-app@latest my-site --typescript --app --tailwind
-cd my-site
 pnpm add next-ai-ready
-npx next-ai-ready init
+pnpm exec next-ai-ready init
 ```
 
-## 2. Add content
+Default `init` adds Knowledge Plane handlers and build wiring. It does not add Actions, MCP,
+`/openapi.json`, or `/tools.json`. If your project is already initialized, keep the existing
+configuration and handlers rather than forcing replacements.
 
-Create an MDX page with semantic metadata:
+## 2. Add a page and check the configuration
+
+Create `content/docs/quickstart.mdx` with this content. The default content globs include this path.
+The scaffold also includes `content/index.mdx`; keep it or replace it with your real homepage source.
 
 ```markdown
 ---
-title: Getting Started
-summary: Learn how to use our product.
+title: Quickstart Check
+summary: Install dependencies for the example project.
 ---
 
-# Getting Started
+# Quickstart Check
 
-Welcome to our product. Here's how to get started.
+Run `pnpm install` from the application root to install dependencies.
 ```
 
-## 3. Build
+Edit the existing `ai-ready.config.ts` or `ai-ready.config.mjs`: set `site.name`,
+`site.description`, and `site.baseUrl` to your site's real identity and production origin. Do not
+deploy the generated `https://example.com` placeholder. If your files live elsewhere, update the
+content globs to match the original Markdown/MDX source files.
+
+The example maps to `/docs/quickstart.md`. A file under `content/` does not create a browser page;
+your current renderer remains responsible for HTML routes. Read the [MDX collection guide](./mdx-content)
+if your content and browser route conventions differ.
+
+## 3. Build and diagnose
 
 ```bash
 npx next-ai-ready build
-```
-
-You should see output like:
-
-```
-[next-ai-ready] scanning content
-[next-ai-ready] compiling 1 files
-[next-ai-ready] wrote 5 files
-[next-ai-ready] build complete — 1 routes, 0 actions, 5 files written
-```
-
-## 4. Verify
-
-```bash
 npx next-ai-ready doctor --score
 ```
 
-Aim for 90+. The CLI prints **Top fixes** for any remaining warnings. Then start your dev server and visit:
+The build should find your source files and write `.next-ai-ready/graph.json` and the discovery
+files under `public/`. Counts depend on the actual content; zero routes means you need to fix the
+source path or glob. Check that `public/llms.txt` links to `/docs/quickstart` on your configured origin.
 
-- `http://localhost:3000/llms.txt` — your AI discovery index
-- `http://localhost:3000/llms-full.txt` — your complete readable corpus
-- `http://localhost:3000/<route>.md` — a page's Markdown representation
+`doctor` should report **0 errors**. Read and resolve or explicitly record warnings; a numeric
+score alone does not prove that the public routes return the intended content.
+
+Public alpha.21 incorrectly reports a missing OpenAPI artifact in Knowledge-only projects.
+That diagnostic fix is pending release; OpenAPI remains optional, so do not enable capabilities
+just to silence the warning.
+
+## 4. Verify the running application
+
+For the scaffold's npm workflow, build and start the production app:
+
+```bash
+npm run build
+npm run start
+```
+
+Use `pnpm build` and `pnpm start` in a pnpm app. `init` adds the AI build step to the app's build
+script; the separate CLI build above helps diagnose it before the full Next.js build.
+
+In another terminal, with the server running on port 3000:
+
+```bash
+curl -i http://localhost:3000/llms.txt
+curl -i http://localhost:3000/docs/quickstart.md
+curl -i -H 'Accept: text/html' http://localhost:3000/
+```
+
+The setup is verified when:
+
+- `/llms.txt` returns `200` and includes the configured `/docs/quickstart` link.
+- `/docs/quickstart.md` returns `200` and `Content-Type: text/markdown`, with the `Quickstart Check`
+  title and dependency-installation instructions. A recovery response containing `document_status: "not_found"`
+  is not a successful page check, even when its status is `200`.
+- The normal browser request to `/` still returns your app's HTML, not Markdown.
+
+If the Markdown page is missing, check its source file, content glob, graph route, handlers, and
+`withAiReady()` wiring. If links use the wrong hostname, correct `site.baseUrl` and rebuild.
+For production checks, continue with [the llms.txt walkthrough](./nextjs-llms-txt#check-the-expected-responses).
 
 ## Next steps
 
@@ -2513,15 +2589,15 @@ Aim for 90+. The CLI prints **Top fixes** for any remaining warnings. Then start
 
 ### How long does the quickstart take?
 
-About ten minutes from install through init, content, build, and doctor.
+Plan for about ten minutes from install through verification; dependency downloads and production builds can take longer.
 
 ### Which endpoints should work after build?
 
-/llms.txt, /openapi.json, /tools.json, and per-page Markdown routes when the dev server is running.
+Default init enables /llms.txt, /llms-full.txt, and per-page Markdown when the Next.js server is running. OpenAPI, tools, and MCP require explicit Capability setup.
 
 ### When should I run next-ai-ready build?
 
-After changing MDX content or actions, and before deploy so public/ and .next-ai-ready/ artifacts stay fresh.
+After changing content or configuration, and before deploy so public/ and .next-ai-ready/ artifacts stay fresh.
 
 
 <!-- END /en/docs/guides/quickstart -->
@@ -4374,33 +4450,49 @@ Next.js 在 Edge 也会加载 instrumentation；Node 专用 hooks 需在 nodejs 
 <!-- BEGIN /zh/docs/guides/fumadocs-ai-ready -->
 # 为 Fumadocs 添加 llms.txt 与 Markdown 端点
 URL: https://nextaiready.com/zh/docs/guides/fumadocs-ai-ready
-Updated: 2026-10-02
+Updated: 2026-10-03
 
 # 为 Fumadocs 添加 llms.txt 与 Markdown 端点
 
-[Fumadocs](https://www.fumadocs.dev/docs) 负责文档界面、Source API 和搜索。`next-ai-ready`
-可以读取同一个 MDX 集合，生成 `/llms.txt`、页面 Markdown、语义页面发现和可选 MCP 资源，
-无需改变 Fumadocs 的这些职责。
+[Fumadocs](https://www.fumadocs.dev/docs) 提供文档界面、Source API、搜索和
+[原生 AI 接入](https://www.fumadocs.dev/docs/integrations/llms)。仅让 AI 客户端读取文档，
+不必安装 `next-ai-ready`。
+
+同一批源文件还需要生成 next-ai-ready 语义图、结构化页面输出，或增加可选的应用 Action
+时，再使用本指南；文档界面继续由 Fumadocs 负责。
 
 如果没有使用 Fumadocs，请从框架无关的
 [Next.js App Router llms.txt 实战教程](./nextjs-llms-txt)开始。
 
-## 先检查原生集成
-
-Fumadocs 已有[官方 LLM 集成指南](https://www.fumadocs.dev/docs/integrations/llms)，包含
-`llms.txt`、`llms-full.txt`、逐页 Markdown、内容协商与 MCP。这些能力需要配置，不代表当前
-应用已经启用；如果原生接入已经满足需求，保留即可。
-
-下方是另一种实现方案，不是在修复 Fumadocs 的功能缺失，也不代表 Fumadocs 官方背书。
-只有需要 next-ai-ready 的构建期语义图或可选 Action 层时，才考虑采用。本指南属于配置
-配方；与 [Nextra 夹具](./nextra-ai-ready)不同，目前还没有配套的可执行 Fumadocs 兼容夹具。
-
-运行任何生成器前，为 `/llms.txt`、`/llms-full.txt`、每个 Markdown 路径以及 MCP 路由确定
-唯一负责人，不让两套实现覆盖同一个输出。保持 locale、canonical 和公开内容规则一致。
-[工具选型部分](./nextjs-llms-txt#安装前先比较工具职责)说明了不需要额外 SDK 的情况。
-
 本接入面向使用 Next.js App Router 和服务器部署的 Fumadocs，不支持完全静态的
 `output: "export"`，因为机器端路由需要在请求时运行。
+
+## 选择原生 Fumadocs 还是 next-ai-ready
+
+只需要文档读取时，先使用 Fumadocs 官方方案：
+
+```bash
+npx @fumadocs/cli feature llms
+# 可选：通过 MCP 搜索和读取文档
+npx @fumadocs/cli feature mcp
+```
+
+这些命令属于 Fumadocs，不是本 SDK 的命令；使用前请对照已安装版本的官方文档。
+
+| 需求                                   | 最小合适方案                             |
+| ------------------------------------ | ---------------------------------- |
+| 只要 llms.txt、页面 Markdown 或文档 MCP      | 原生 Fumadocs 即可，不必再安装 SDK。          |
+| 文档和其他本地 MDX 集合共享语义图、.ai.json 与策展发现入口 | 考虑在现有界面旁接入 next-ai-ready。          |
+| Agent 需要调用应用功能，而不只是读文档               | 单独评估可选的 [Action 与鉴权模型](./actions)。 |
+
+Markdown 和文档 MCP 不是 next-ai-ready 的独占能力。两种接入都不保证收录、排名或 AI 引用。
+
+每个公开发现 URL 只选择一个提供方。已有原生 `/llms.txt`、Markdown rewrites、内容协商
+middleware 或 `/api/mcp` 时，先审查实际请求由谁响应，不要直接叠加 wrapper。
+下面步骤假设由 next-ai-ready 提供机器端路由。
+
+[工具选型部分](./nextjs-llms-txt#安装前先比较工具职责)对比了原生 Next.js、Next SEO、
+Nextra 与这些能力的职责，增加另一套集成前可以先检查。
 
 ## 1. 安装并初始化
 
@@ -4412,7 +4504,8 @@ pnpm exec next-ai-ready init
 ```
 
 保留 `source.config.ts`、Fumadocs 生成的 source 模块、页面布局和搜索路由。初始化器只增加独立
-的 AI 路由与配置。
+的 AI 路由与配置。默认 `init` 仅启用知识平面，不会安装 MCP 或应用 Action；对已有配置
+进行合并审查，不要直接覆盖。
 
 ## 2. 复用 Fumadocs 内容集合
 
@@ -4434,22 +4527,31 @@ export default defineConfig({
 如果集合位于 `src/content/docs`，改用对应路径。已有 `title`、`description`、`date` 与
 `author` frontmatter 会被复用；只有在日期真实且持续维护时才增加 `updatedAt`。
 
+这是文件复用，不是 Fumadocs Source API Adapter；SDK 不会运行 Fumadocs 专有插件，也不会
+复现它处理后的 Markdown。使用自定义 MDX 组件或生成内容时，先检查第二套流水线的结果。
+派生路由必须与实际界面 URL 一致，例如 `content/docs/getting-started.mdx` 对应
+`/docs/getting-started`；自定义 Fumadocs `baseUrl` 或 slug 布局不会自动导入。
+
 ## 3. 包装 Next.js 配置
 
-Fumadocs Source API 本身不需要竞争性的 Next.js wrapper。保留项目现有配置，再用
-`withAiReady()` 包装：
+使用 Fumadocs MDX 时，在 `next.config.mjs` 中保留
+[已有的 createMDX 插件](https://www.fumadocs.dev/docs/mdx/next)，再包装它返回的配置：
 
 ```js
+import { createMDX } from "fumadocs-mdx/next"
 import { withAiReady } from "next-ai-ready/config"
 
+const withMDX = createMDX()
 const nextConfig = {
   // 原有 Fumadocs 与 Next.js 配置保留在这里。
 }
 
-export default withAiReady({ agentReadable: true })(nextConfig)
+export default withAiReady({ agentReadable: true })(withMDX(nextConfig))
 ```
 
 如果已有其他插件包装配置，把 `withAiReady()` 应用到该插件最终返回的结果。
+已有 `createMDX` 选项也应保留。这是配置示例，不代表完整 Fumadocs 应用或自定义插件
+已经通过生产兼容性测试。
 
 ## 4. 构建并验证
 
@@ -4462,26 +4564,34 @@ pnpm build
 部署后执行：
 
 ```bash
-curl -I https://docs.example.com/llms.txt
-curl -I https://docs.example.com/docs/getting-started.md
+curl -i https://docs.example.com/llms.txt
+curl -i https://docs.example.com/docs/getting-started.md
+curl -i -H 'Accept: text/markdown' https://docs.example.com/docs/getting-started
+curl -i -H 'Accept: text/html' https://docs.example.com/docs/getting-started
 pnpm exec next-ai-ready audit https://docs.example.com/docs/getting-started --version 3
 ```
 
-确认 `/llms.txt` 已列出预期 Fumadocs 页面、Markdown URL 使用生产 canonical，并且浏览器请求
-仍返回正常的 Fumadocs 界面。
+将示例域名和路径替换成真实公开页面。确认 `/llms.txt` 列出它的 canonical HTML URL，
+两种 Markdown 请求均返回 `text/markdown`、预期标题与正文，HTML 请求仍保留 Fumadocs 界面。
+HTTP `200` 但含有 `document_status: "not_found"` 的恢复文档不算读取成功。同时检查
+canonical `Link` 响应头与正文，不能只用 HEAD 请求证明取到了正确内容。
+
+可运行的第一方参考见
+[Next.js 生产接入过程与 smoke 断言](./nextjs-llms-txt#检查实现证据)。该站点不是 Fumadocs
+兼容性夹具，也不是外部客户案例；Fumadocs 专项生产证据仍需要单独验证。
 
 ## 保持搜索职责分离
 
-Fumadocs 同时支持文档界面搜索与 [MCP 页面工具](https://www.fumadocs.dev/docs/headless/utils/mcp)。
-next-ai-ready 也提供 HTTP 发现入口与可选 MCP 页面工具，两者职责存在重叠。按客户端需求
-选择实现，不要把 Fumadocs 描述成只能供人类使用。添加任何一套端点，都不是排名提升或
-AI 引用增加的证明。
+保留 Fumadocs 的界面搜索。[原生 MCP](https://www.fumadocs.dev/docs/headless/utils/mcp)
+和 next-ai-ready 都能服务文档检索，增加第二个索引
+是维护成本选择，不是让 AI 读取内容的前提。应用 Action 属于另一条边界：启用前审查鉴权
+和部署行为，不要把文档读取一概包装成业务操作。
 
 ## FAQ
 
-### Fumadocs 已经提供 LLM 内容与 MCP 集成吗？
+### 只是需要 Fumadocs llms.txt 或文档 MCP，也必须安装 next-ai-ready 吗？
 
-是的。其官方 LLM 指南包含 llms.txt、llms-full.txt、逐页 Markdown、内容协商与 MCP。增加另一套集成前，先评估原生方案。
+不必。Fumadocs 已提供原生 LLM 和文档 MCP 接入；需要共享语义图、结构化输出或可选的应用 Action 时，再考虑 next-ai-ready。
 
 ### next-ai-ready 会替换 Fumadocs Source API 或搜索吗？
 
@@ -5408,18 +5518,24 @@ Nextra 4.6.1 当前可能把内部 Zod 解析到 4.4.x，导致主题 layout 校
 <!-- BEGIN /zh/docs/guides/quickstart -->
 # 快速开始
 URL: https://nextaiready.com/zh/docs/guides/quickstart
-Updated: 2026-10-01
+Updated: 2026-10-02
 
 # 快速开始
 
-本指南带你从零开始，在约 10 分钟内完成可验证的 AI 可读 Next.js 基础接入。
+本指南按约 10 分钟的基础接入流程组织，目标是验证知识平面端点能返回真实内容。依赖下载和生产构建可能需要更长时间，具体取决于网络和项目情况。
+
+## 前置要求
+
+- Node.js 20 或更高版本。
+- Next.js 14.2+，使用 App Router。
+- npm；已有 pnpm 项目继续使用 pnpm。
 
 ## 1. 创建项目
 
-**方式 A — 模板（最快）：**
+**新项目：**
 
 ```bash
-npm create next-ai-ready my-site
+npm create next-ai-ready@latest my-site
 cd my-site
 npm install
 npx next-ai-ready init
@@ -5427,76 +5543,128 @@ npx next-ai-ready init
 
 脚手架会提供可运行的最小 App Router TypeScript 应用和初始 MDX 内容，但不会预生成 AI-ready 配置或 handler；安装后显式执行 `init` 才会添加这些接线。
 
-**方式 B — 已有 Next.js 项目：**
+**已有 Next.js App Router 项目：**
+
+在现有项目根目录执行，不需要重新创建应用：
 
 ```bash
-npx create-next-app@latest my-site --typescript --app --tailwind
-cd my-site
 pnpm add next-ai-ready
-npx next-ai-ready init
+pnpm exec next-ai-ready init
 ```
+
+`init` 默认只接入知识平面（Knowledge-only）：生成配置、知识平面路由，并接好 `next.config` 与构建脚本。它不会默认启用 OpenAPI、MCP 或 Actions；这些不属于本次基础验收。
 
 ## 2. 添加内容
 
-创建包含语义元数据的 MDX 页面：
+在项目根目录创建 `content/docs/quickstart.mdx`，保存以下内容：
 
 ```markdown
 ---
-title: 快速上手
-summary: 了解如何使用我们的产品。
+title: 快速接入检查
+summary: 安装项目依赖并验证逐页 Markdown 输出。
 ---
 
-# 快速上手
+# 快速接入检查
 
-欢迎使用我们的产品，以下是开始步骤。
+在项目根目录运行 `pnpm install` 安装依赖。
 ```
 
-## 3. 构建
+这个文件匹配 `init` 默认的 `content/**/*.{md,mdx}` glob，并映射到 `/docs/quickstart.md`。在 `content/` 下保存源文件不会创建浏览器 HTML 页面；网页仍由原有 Next.js 页面或 MDX 渲染流程提供。
+
+### 修改站点配置
+
+编辑已有的 `ai-ready.config.ts` 或 `ai-ready.config.mjs`，不要另建第二个配置。将 `site.name`、`site.description` 改为实际站点信息，`site.baseUrl` 改为真实生产域名，不要保留示例域名或填写 localhost。
+
+下面展示默认配置结构；`https://docs.example.com` 只是占位，必须替换：
+
+```js
+import { defineConfig } from "next-ai-ready";
+
+export default defineConfig({
+  site: {
+    name: "你的站点名称",
+    baseUrl: "https://docs.example.com",
+    description: "描述站点实际提供的内容。",
+  },
+  content: [
+    "app/**/*.{md,mdx}",
+    "content/**/*.{md,mdx}",
+    "src/app/**/*.{md,mdx}",
+    "src/content/**/*.{md,mdx}",
+  ],
+});
+```
+
+默认 glob 已能覆盖本例，无需为此修改。已有项目应保留或按真实内容目录调整 glob；若已有 Content Source Adapter，继续使用实际的数据源与路由映射，不要用示例配置覆盖。
+
+## 3. 构建与检查
 
 ```bash
 npx next-ai-ready build
-```
-
-你会看到类似输出：
-
-```text
-[next-ai-ready] scanning content
-[next-ai-ready] compiling 1 files
-[next-ai-ready] wrote 5 files
-[next-ai-ready] build complete — 1 routes, 0 actions, 5 files written
-```
-
-## 4. 验证
-
-```bash
 npx next-ai-ready doctor --score
 ```
 
-所有检查应通过。然后启动开发服务器并访问：
+已有 pnpm 项目对应使用 `pnpm exec next-ai-ready build` 和 `pnpm exec next-ai-ready doctor --score`。
 
-- `http://localhost:3000/llms.txt` — AI 发现索引
-- `http://localhost:3000/llms-full.txt` — 完整可读内容
-- `http://localhost:3000/<route>.md` — 页面 Markdown 表示
+构建会扫描内容并写入 `public/` 与 `.next-ai-ready/`。生成文件和路由数量取决于实际内容与配置，不应按固定数量判断成功。
+
+`doctor` 应报告 **0 个错误**。逐条理解 warning 和 **Top fixes**，确认哪些需要修复、哪些暂时接受；没有错误不代表所有 warning 都已解决，也不能代替 HTTP 验证。
+
+公开 alpha.21 会误报纯知识平面缺少 OpenAPI，诊断修复尚待发布。OpenAPI 仍是可选能力，
+不要为消除这条告警而启用能力平面。
+
+## 4. 验证公开端点
+
+构建应用并启动生产服务器：
+
+```bash
+npm run build
+npm run start
+```
+
+已有 pnpm 项目使用 `pnpm run build` 和 `pnpm run start`。`init` 会在缺失时将 `next-ai-ready build` 接入应用构建脚本，确保应用构建前更新知识平面产物。
+
+在另一个终端执行：
+
+```bash
+curl -i http://localhost:3000/llms.txt
+curl -i http://localhost:3000/docs/quickstart.md
+curl -i -H 'Accept: text/html' http://localhost:3000/
+```
+
+检查响应头与正文：
+
+- `/llms.txt` 返回 `200`，索引包含“快速接入检查”及生产域名下的正确页面链接。
+- `/docs/quickstart.md` 返回 `200`、`Content-Type: text/markdown`，正文包含“快速接入检查”和 `pnpm install`，而不是 `not_found` 恢复文档。仅有 `200` 不足以说明找到了内容。
+- 普通首页 `/` 仍返回原有 HTML，`Content-Type` 为 `text/html`。接入不会替换原有浏览器页面。
+
+还可检查 `/llms-full.txt` 是否包含完整内容。部署后，应在真实生产域名下重复检查端点及链接。
+
+若响应不符合预期，按以下方向排查：
+
+- **缺少内容或出现 `not_found`：** 确认 `content/docs/quickstart.mdx` 已保存、被 glob 或 adapter 读取，并已重新构建；检查 `.next-ai-ready/graph.json` 是否包含 `/docs/quickstart`。
+- **路由返回 404 或 HTML：** 检查 `init` 生成的 handler、`withAiReady({ agentReadable: true })` 接线，以及源文件到路由的映射。不要把 `app/%5Fai-ready/` 改名为 `app/_ai-ready/`。
+- **索引或 canonical 链接使用错误域名：** 修正现有配置的 `site.baseUrl`，重新构建并重启生产服务器。
 
 ## 下一步
 
 - 阅读[知识平面](/zh/docs/concepts/knowledge-plane)了解内容编译
-- 准备增加能力平面时，运行 `next-ai-ready init --with-capabilities` 并阅读[能力平面](/zh/docs/concepts/capability-plane)
+- 需要 OpenAPI、MCP 或 Actions 时，再阅读[能力平面](/zh/docs/concepts/capability-plane)并按指南安装可选依赖、运行 `next-ai-ready init --with-capabilities`
 - 查看 [API 参考](/zh/docs/api-reference/config)了解完整配置选项
 
 ## FAQ
 
 ### 快速开始需要多久？
 
-约十分钟，完成安装、init、内容、build 和 doctor 验证。
+预留约十分钟完成接入与验证；依赖下载和生产构建可能需要更长时间，具体取决于网络和项目情况。
 
 ### build 之后应能访问哪些端点？
 
-/llms.txt、/openapi.json、/tools.json，以及 dev 服务器运行时的逐页 Markdown 路由。
+构建并启动应用后，检查 /llms.txt、/llms-full.txt 和示例对应的 /docs/quickstart.md；逐页响应应包含正确标题与正文，而不是 not_found 恢复文档。
 
 ### 什么时候需要运行 next-ai-ready build？
 
-修改 MDX 或 action 后、部署前，确保 public/ 与 .next-ai-ready/ 产物最新。
+修改内容或配置后、部署前，确保 public/ 与 .next-ai-ready/ 产物最新。
 
 
 <!-- END /zh/docs/guides/quickstart -->

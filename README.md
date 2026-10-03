@@ -27,7 +27,12 @@ The basic setup is complete when `doctor` reports **0 errors** and `public/llms.
 
 **Next:** [follow the 10-minute guide](./docs/quickstart-10min.md), read the
 [App Router llms.txt tutorial](https://nextaiready.com/en/docs/guides/nextjs-llms-txt),
-or [add authenticated agent actions](https://nextaiready.com/en/docs/guides/action-auth).
+or [add authenticated agent actions](https://nextaiready.com/en/docs/guides/actions).
+
+**Already using Fumadocs?** Its native LLM and documentation MCP routes may be enough.
+Read the [native-first integration decision](https://nextaiready.com/en/docs/guides/fumadocs-ai-ready)
+before adding another content pipeline. Choose next-ai-ready for a shared semantic graph and
+structured outputs across content collections, or optional callable application actions.
 
 Already using Next SEO, Fumadocs, or Nextra? [Compare responsibilities before adding another integration](https://nextaiready.com/en/docs/guides/nextjs-llms-txt#compare-the-tools-before-installing). Native metadata and existing LLM endpoints may already meet your needs.
 
@@ -41,7 +46,11 @@ The generated project is a normal Next.js TypeScript app that can be committed a
 
 > **Third-party tool baseline:** the production documentation scored **100/100** with Vercel's open-source `@vercel/agent-readability@0.5.0` on 2026-08-01. [Review the machine-readable result](./docs/audit-baselines/vercel-agent-readability-0.5.0-2026-08-01.json) or reproduce it with `pnpm audit:vercel:site`. This measures technical agent readability, not search ranking, indexing, or citation.
 
-> **Release candidate:** this repository and the documentation site track `main` and currently target `0.1.0-alpha.21`. Treat `npm view next-ai-ready dist-tags --json` as the source of truth for public availability. Alpha.21 makes the default `init` flow Knowledge-first: five AI-readable content files, no Capability dependencies or warnings, and an explicit `--with-capabilities` upgrade path.
+> **Release candidate:** this repository and the documentation site track `main` and currently target `0.1.0-alpha.21`. Treat `npm view next-ai-ready dist-tags --json` as the source of truth for public availability. Alpha.21 makes the default `init` flow Knowledge-first: five AI-readable content files, no mandatory Capability dependencies, and an explicit `--with-capabilities` upgrade path.
+
+Public alpha.21 still reports a missing OpenAPI artifact in Knowledge-only projects. OpenAPI is
+optional; do not enable capabilities just to remove that warning. A diagnostic fix is pending
+release. Follow the [quickstart HTTP checks](./docs/quickstart-10min.md) to verify actual content.
 
 > **Published baseline (2026-10-01):** npm `latest` was verified as `0.1.0-alpha.21`. The graph-based breadcrumb correction is queued for the next patch release; it is not part of that published package.
 

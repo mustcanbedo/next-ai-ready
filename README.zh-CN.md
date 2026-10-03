@@ -27,7 +27,11 @@ pnpm exec next-ai-ready doctor --score
 
 **下一步：** [完成 10 分钟指南](./docs/quickstart-10min.zh-CN.md)、阅读
 [App Router llms.txt 实战教程](https://nextaiready.com/zh/docs/guides/nextjs-llms-txt)，
-或[添加经过鉴权的 Agent Action](https://nextaiready.com/zh/docs/guides/action-auth)。
+或[添加经过鉴权的 Agent Action](https://nextaiready.com/zh/docs/guides/actions)。
+
+**已经使用 Fumadocs？** 原生 LLM 与文档 MCP 路由可能已经够用。
+增加第二套内容流水线前，先看[原生优先的接入选择](https://nextaiready.com/zh/docs/guides/fumadocs-ai-ready)。
+需要跨内容集合共享语义图、结构化输出，或可选的应用 Action 时，再考虑 next-ai-ready。
 
 希望先运行一个随时可删除的演示，再改动现有项目？
 

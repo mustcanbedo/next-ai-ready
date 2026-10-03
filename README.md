@@ -27,7 +27,12 @@ The basic setup is complete when `doctor` reports **0 errors** and `public/llms.
 
 **Next:** [follow the 10-minute guide](./docs/quickstart-10min.md), read the
 [App Router llms.txt tutorial](https://nextaiready.com/en/docs/guides/nextjs-llms-txt),
-or [add authenticated agent actions](https://nextaiready.com/en/docs/guides/action-auth).
+or [add authenticated agent actions](https://nextaiready.com/en/docs/guides/actions).
+
+**Already using Fumadocs?** Its native LLM and documentation MCP routes may be enough.
+Read the [native-first integration decision](https://nextaiready.com/en/docs/guides/fumadocs-ai-ready)
+before adding another content pipeline. Choose next-ai-ready for a shared semantic graph and
+structured outputs across content collections, or optional callable application actions.
 
 Prefer a disposable demo before editing an existing project?
 

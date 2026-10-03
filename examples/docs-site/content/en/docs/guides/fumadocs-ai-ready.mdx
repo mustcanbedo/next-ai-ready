@@ -1,8 +1,10 @@
 ---
 title: Add llms.txt and Markdown endpoints to Fumadocs
-summary: Reuse a Fumadocs MDX content collection to generate AI-readable discovery and page endpoints in a Next.js App Router deployment.
+summary: Choose native Fumadocs LLM and MCP routes or a shared next-ai-ready semantic graph, preserve createMDX, and verify content rather than only HTTP status.
 order: 10
 questions:
+  - q: Do I need next-ai-ready just for Fumadocs llms.txt or documentation MCP?
+    a: No. Fumadocs provides native LLM and documentation MCP integrations. Use next-ai-ready when you also need its shared semantic graph, structured outputs, or optional application actions.
   - q: Does next-ai-ready replace Fumadocs Source API or search?
     a: No. Fumadocs continues to power the documentation UI, Source API, and search. next-ai-ready independently reads the same source files for machine-facing outputs.
   - q: Can I use the existing Fumadocs description frontmatter?
@@ -14,21 +16,49 @@ tags:
   - nextjs
   - llms.txt
   - mdx
-updatedAt: '2026-09-29'
+updatedAt: '2026-10-03'
 author: next-ai-ready team
 ---
 
 # Add llms.txt and Markdown endpoints to Fumadocs
 
-[Fumadocs](https://www.fumadocs.dev/docs) provides the documentation UI, Source API, and search.
-`next-ai-ready` can read the same MDX collection to produce `/llms.txt`, page Markdown, semantic page
-discovery, and optional MCP resources without changing those Fumadocs responsibilities.
+[Fumadocs](https://www.fumadocs.dev/docs) provides the documentation UI, Source API, search, and
+[native AI integrations](https://www.fumadocs.dev/docs/integrations/llms). You do not need
+`next-ai-ready` just to expose documentation to AI clients.
+
+Use this guide when you want the same source files to also feed next-ai-ready's semantic graph,
+structured page outputs, or optional application actions. Keep Fumadocs responsible for the UI.
 
 Not using Fumadocs? Start with the framework-neutral
 [Next.js App Router llms.txt walkthrough](./nextjs-llms-txt).
 
 This integration targets Fumadocs on Next.js App Router with a server deployment. It does not support
 a fully static `output: "export"` build because the machine-facing route handlers run at request time.
+
+## Choose native Fumadocs or next-ai-ready
+
+For documentation-only retrieval, start with the official Fumadocs setup:
+
+```bash
+npx @fumadocs/cli feature llms
+# Optional documentation search and retrieval over MCP:
+npx @fumadocs/cli feature mcp
+```
+
+Those commands belong to Fumadocs, not this SDK. Check its documentation against your installed version.
+
+| Need | Smallest useful setup |
+| --- | --- |
+| Only llms.txt, page Markdown, or documentation MCP | Native Fumadocs; another SDK is not required. |
+| One semantic graph for docs and other local MDX collections, with .ai.json and curated discovery | Consider next-ai-ready alongside the existing UI. |
+| Agents need to invoke application functions, not just retrieve docs | Evaluate the optional [Action and authorization model](./actions) separately. |
+
+Markdown and documentation MCP are not exclusive next-ai-ready features. Neither integration
+guarantees indexing, ranking, or AI citations.
+
+Pick one owner for each public discovery URL. Do not combine this wrapper with existing native
+`/llms.txt`, Markdown rewrites, negotiation middleware, or `/api/mcp` without reviewing which handler
+will serve each request. The steps below assume next-ai-ready owns the machine-facing routes.
 
 ## 1. Install and initialize
 
@@ -40,7 +70,8 @@ pnpm exec next-ai-ready init
 ```
 
 Keep `source.config.ts`, the generated Fumadocs source module, page layouts, and search routes intact.
-The initializer adds separate AI-facing handlers and configuration.
+The initializer adds separate AI-facing handlers and configuration. Default `init` is Knowledge-only;
+it does not install MCP or callable actions. Review existing configuration rather than overwriting it.
 
 ## 2. Reuse the Fumadocs content collection
 
@@ -64,22 +95,32 @@ If the collection lives under `src/content/docs`, use that path instead. Existin
 `description`, `date`, and `author` frontmatter are reused. Add `updatedAt` only when the date is
 truthful and maintained.
 
+This is file-based reuse, not a Fumadocs Source API adapter. The SDK does not run Fumadocs-specific
+plugins or reproduce its processed Markdown. Check custom MDX components and generated content
+before choosing a second pipeline. Its derived routes must match the actual UI URLs: for example,
+`content/docs/getting-started.mdx` maps to `/docs/getting-started`. A custom Fumadocs `baseUrl` or slug
+layout is not automatically imported.
+
 ## 3. Wrap the Next.js config
 
-Fumadocs does not require a competing Next.js wrapper for its Source API. Preserve the project's
-existing options and wrap them with `withAiReady()`:
+For Fumadocs MDX, preserve the [existing createMDX plugin](https://www.fumadocs.dev/docs/mdx/next)
+and wrap its resulting configuration in `next.config.mjs`:
 
 ```js
+import { createMDX } from "fumadocs-mdx/next"
 import { withAiReady } from "next-ai-ready/config"
 
+const withMDX = createMDX()
 const nextConfig = {
   // Existing Fumadocs and Next.js options stay here.
 }
 
-export default withAiReady({ agentReadable: true })(nextConfig)
+export default withAiReady({ agentReadable: true })(withMDX(nextConfig))
 ```
 
 If another plugin already wraps the config, apply `withAiReady()` to that plugin's final result.
+Retain your existing `createMDX` options. This is a configuration example, not a claim that a
+complete Fumadocs application or your custom plugins have passed a production compatibility test.
 
 ## 4. Build and verify
 
@@ -92,16 +133,27 @@ pnpm build
 After deployment:
 
 ```bash
-curl -I https://docs.example.com/llms.txt
-curl -I https://docs.example.com/docs/getting-started.md
+curl -i https://docs.example.com/llms.txt
+curl -i https://docs.example.com/docs/getting-started.md
+curl -i -H 'Accept: text/markdown' https://docs.example.com/docs/getting-started
+curl -i -H 'Accept: text/html' https://docs.example.com/docs/getting-started
 pnpm exec next-ai-ready audit https://docs.example.com/docs/getting-started --version 3
 ```
 
-Confirm that `/llms.txt` lists the intended Fumadocs pages, Markdown URLs use production canonicals,
-and browser requests still receive the normal Fumadocs UI.
+Replace the example domain and route with a real, public page. Confirm that `/llms.txt` lists its
+canonical HTML URL, both Markdown requests return `text/markdown` and the intended title and body,
+and the HTML request retains the Fumadocs UI. A `200` recovery document containing
+`document_status: "not_found"` is not a successful page retrieval. Check the canonical `Link` header
+as well as the body; a HEAD-only check cannot prove that the correct content was served.
+
+For a runnable first-party reference, inspect the
+[Next.js production walkthrough and smoke assertions](./nextjs-llms-txt#inspect-the-implementation-evidence).
+That site is not a Fumadocs compatibility fixture or an external customer case. Fumadocs-specific
+production evidence remains a separate validation task.
 
 ## Keep search responsibilities separate
 
-Fumadocs search serves people inside the documentation UI. next-ai-ready page discovery serves AI
-clients through Markdown, HTTP resources, and optional MCP. They may index the same content, but one
-does not need to replace the other.
+Keep Fumadocs UI search intact. Both Fumadocs native MCP and next-ai-ready can serve documentation
+retrieval; adding a second search index is a maintenance choice, not a prerequisite for AI access.
+An application Action is a different boundary: review authorization and deployment behavior before
+enabling it, rather than treating every documentation request as a callable business operation.

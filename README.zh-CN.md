@@ -33,6 +33,8 @@ pnpm exec next-ai-ready doctor --score
 增加第二套内容流水线前，先看[原生优先的接入选择](https://nextaiready.com/zh/docs/guides/fumadocs-ai-ready)。
 需要跨内容集合共享语义图、结构化输出，或可选的应用 Action 时，再考虑 next-ai-ready。
 
+已经使用 Next SEO、Fumadocs 或 Nextra？先[比较工具职责，再决定是否增加集成](https://nextaiready.com/zh/docs/guides/nextjs-llms-txt#安装前先比较工具职责)。原生 metadata 与已有 LLM 端点可能已经满足需求。
+
 希望先运行一个随时可删除的演示，再改动现有项目？
 
 ```bash

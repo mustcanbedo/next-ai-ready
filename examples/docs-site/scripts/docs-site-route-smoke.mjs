@@ -387,13 +387,28 @@ async function main() {
   });
   await expectResponse("/en/docs/guides/nextjs-llms-txt", {
     contentType: "text/html",
-    includes: "Add llms.txt and Markdown endpoints to Next.js App Router",
+    includes: [
+      "Add llms.txt and Markdown endpoints to Next.js App Router",
+      'id="compare-the-tools-before-installing"',
+      'href="https://www.fumadocs.dev/docs/integrations/llms"',
+      'href="https://github.com/garmeeh/next-seo#readme"',
+    ],
+  });
+  await expectResponse("/zh/docs/guides/nextjs-llms-txt", {
+    contentType: "text/html",
+    includes: [
+      'id="安装前先比较工具职责"',
+      'href="https://www.fumadocs.dev/docs/integrations/llms"',
+    ],
   });
   await expectResponse("/en/docs/guides/nextjs-llms-txt.md", {
     contentType: "text/markdown",
     includes: [
       "# Add llms.txt and Markdown endpoints to Next.js App Router",
       "### Inspect the implementation evidence",
+      "## Compare the tools before installing",
+      "### Keep one owner per output",
+      "[Fumadocs' native LLM integration](https://www.fumadocs.dev/docs/integrations/llms)",
       "[Production route smoke checks](https://github.com/mustcanbedo/next-ai-ready/blob/main/examples/docs-site/scripts/docs-site-route-smoke.mjs)",
     ],
   });
@@ -402,6 +417,9 @@ async function main() {
     includes: [
       "# 为 Next.js App Router 添加 llms.txt 与 Markdown 端点",
       "### 检查实现证据",
+      "## 安装前先比较工具职责",
+      "### 每种输出只保留一个负责人",
+      "[Fumadocs 自带的 LLM 集成](https://www.fumadocs.dev/docs/integrations/llms)",
     ],
   });
   await expectResponse("/en/docs/installation.md", {
@@ -447,19 +465,21 @@ async function main() {
       "](/guides/nextra/config.jpg)",
     ],
   });
-  for (const [locale, heading, boundary] of [
-    ["en", "Add llms.txt and Markdown endpoints to Fumadocs", "Choose native Fumadocs or next-ai-ready"],
-    ["zh", "为 Fumadocs 添加 llms.txt 与 Markdown 端点", "选择原生 Fumadocs 还是 next-ai-ready"],
+  for (const [locale, heading, boundary, selectionAnchor] of [
+    ["en", "Add llms.txt and Markdown endpoints to Fumadocs", "Choose native Fumadocs or next-ai-ready", "compare-the-tools-before-installing"],
+    ["zh", "为 Fumadocs 添加 llms.txt 与 Markdown 端点", "选择原生 Fumadocs 还是 next-ai-ready", "安装前先比较工具职责"],
   ]) {
     await expectResponse(`/${locale}/docs/guides/fumadocs-ai-ready`, {
       contentType: "text/html",
-      includes: [heading, boundary, "https://www.fumadocs.dev/docs/integrations/llms"],
+      includes: [heading, boundary, "https://www.fumadocs.dev/docs/integrations/llms", `href="./nextjs-llms-txt#${selectionAnchor}"`],
+      excludes: locale === "en" ? "Fumadocs search serves people inside the documentation UI." : "Fumadocs 搜索服务于文档界面中的人类用户",
     });
     await expectResponse(`/${locale}/docs/guides/fumadocs-ai-ready.md`, {
       contentType: "text/markdown",
       includes: [
         `# ${heading}`,
         boundary,
+        `./nextjs-llms-txt#${selectionAnchor}`,
         "npx @fumadocs/cli feature llms",
         "npx @fumadocs/cli feature mcp",
         "withAiReady({ agentReadable: true })(withMDX(nextConfig))",

@@ -125,6 +125,7 @@ As of 2026-10-03:
 
 - **Repository candidate:** `0.1.0-alpha.22` — public availability must be read from npm dist-tags. This candidate corrects Knowledge-only OpenAPI diagnostics, graph-page breadcrumbs, and internal-package homepage metadata without changing the default setup or public APIs. The guarded Release Alpha workflow reruns the complete gate before publication.
 - **Published registry baseline:** `next-ai-ready` and `@next-ai-ready/next` `latest` remain `0.1.0-alpha.21`; `create-next-ai-ready` remains `0.1.0-alpha.13`. Candidate tarball verification is not public-registry or independent-adopter evidence.
+- **Candidate verification (2026-10-03):** the full `pnpm verify:release` gate passed after merging main `8021e56`, including a fresh pnpm / Next.js 15.5.27 tarball install, Knowledge-only initialization, generated artifacts, doctor exit 0, and a production build with `next-ai-ready@0.1.0-alpha.22`. This is a maintainer-run candidate check, not an independent adoption or an alpha.22 registry install.
 - **alpha.13:** superseded after registry smoke exposed an incomplete published Semantic/Core export chain; use alpha.14 or newer.
 - **alpha.4:** deprecated for pnpm users (scoped import bug); use ≥ alpha.5
 

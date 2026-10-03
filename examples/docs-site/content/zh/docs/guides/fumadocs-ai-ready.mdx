@@ -59,6 +59,9 @@ Markdown 和文档 MCP 不是 next-ai-ready 的独占能力。两种接入都不
 middleware 或 `/api/mcp` 时，先审查实际请求由谁响应，不要直接叠加 wrapper。
 下面步骤假设由 next-ai-ready 提供机器端路由。
 
+[工具选型部分](./nextjs-llms-txt#安装前先比较工具职责)对比了原生 Next.js、Next SEO、
+Nextra 与这些能力的职责，增加另一套集成前可以先检查。
+
 ## 1. 安装并初始化
 
 在 Fumadocs Next.js 应用目录执行：
@@ -147,6 +150,7 @@ canonical `Link` 响应头与正文，不能只用 HEAD 请求证明取到了正
 
 ## 保持搜索职责分离
 
-保留 Fumadocs 的界面搜索。原生 MCP 和 next-ai-ready 都能服务文档检索，增加第二个索引
+保留 Fumadocs 的界面搜索。[原生 MCP](https://www.fumadocs.dev/docs/headless/utils/mcp)
+和 next-ai-ready 都能服务文档检索，增加第二个索引
 是维护成本选择，不是让 AI 读取内容的前提。应用 Action 属于另一条边界：启用前审查鉴权
 和部署行为，不要把文档读取一概包装成业务操作。

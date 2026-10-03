@@ -1415,6 +1415,9 @@ Pick one owner for each public discovery URL. Do not combine this wrapper with e
 `/llms.txt`, Markdown rewrites, negotiation middleware, or `/api/mcp` without reviewing which handler
 will serve each request. The steps below assume next-ai-ready owns the machine-facing routes.
 
+The [tool-selection section](./nextjs-llms-txt#compare-the-tools-before-installing) compares these
+responsibilities with native Next.js, Next SEO, and Nextra before adding another integration.
+
 ## 1. Install and initialize
 
 From the Fumadocs Next.js application directory:
@@ -1508,7 +1511,8 @@ production evidence remains a separate validation task.
 
 ## Keep search responsibilities separate
 
-Keep Fumadocs UI search intact. Both Fumadocs native MCP and next-ai-ready can serve documentation
+Keep Fumadocs UI search intact. Both [Fumadocs native MCP](https://www.fumadocs.dev/docs/headless/utils/mcp)
+and next-ai-ready can serve documentation
 retrieval; adding a second search index is a maintenance choice, not a prerequisite for AI access.
 An application Action is a different boundary: review authorization and deployment behavior before
 enabling it, rather than treating every documentation request as a callable business operation.
@@ -1953,7 +1957,7 @@ No. File scanning, metadata extraction, chunking, and output generation are dete
 <!-- BEGIN /en/docs/guides/nextjs-llms-txt -->
 # Add llms.txt and Markdown endpoints to Next.js App Router
 URL: https://nextaiready.com/en/docs/guides/nextjs-llms-txt
-Updated: 2026-10-01
+Updated: 2026-10-02
 
 # Add llms.txt and Markdown endpoints to Next.js App Router
 
@@ -1978,6 +1982,37 @@ Using a documentation framework? Follow the dedicated [Nextra 4 guide](./nextra-
 Do not add MCP, a database, or callable actions just to claim that a site is AI-ready. Start with
 content discovery and retrieval, verify them in production, and add capabilities when a real use
 case requires them.
+
+## Compare the tools before installing
+
+These tools work at different layers. This is a needs-based selection guide, not a scorecard or a
+claim that another project lacks a feature. Upstream references were checked on 2026-10-02.
+
+| What you need                                                        | Start with                                                                                                                                                                                                                    | When to consider next-ai-ready                                                                                                                        |
+| -------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Titles, descriptions, canonical URLs, and social cards in App Router | [Native Next.js Metadata](https://nextjs.org/docs/app/getting-started/metadata-and-og-images).                                                                                                                                | Not for metadata alone. Keep that implementation and add a machine-facing layer only when needed.                                                     |
+| Reusable JSON-LD components                                          | [Next SEO](https://github.com/garmeeh/next-seo#readme), which recommends native Metadata for App Router metadata.                                                                                                             | Only if you also need generated discovery or Markdown. Keep one owner for each JSON-LD entity.                                                        |
+| A small, stable public content index                                 | A hand-written `public/llms.txt`, served through the [Next.js public folder](https://nextjs.org/docs/app/api-reference/file-conventions/public-folder).                                                                       | When manual synchronization becomes a real problem. A static file alone does not generate page Markdown.                                              |
+| AI-readable documentation already using Fumadocs                     | [Fumadocs' native LLM integration](https://www.fumadocs.dev/docs/integrations/llms), including discovery, Markdown, and MCP examples.                                                                                         | Only for an unmet requirement. Do not install a second generator just to obtain the same endpoints.                                                   |
+| A Nextra documentation UI                                            | Keep Nextra, including its [Copy Page implementation](https://github.com/shuding/nextra/blob/main/packages/nextra-theme-docs/src/components/copy-page.tsx). Check your installed version's machine-facing outputs separately. | If you need this SDK's build-time graph and handlers; inspect the [tested Nextra fixture and screenshots](./nextra-ai-ready) before changing the app. |
+| An existing Nuxt application                                         | [nuxt-ai-ready](https://github.com/harlan-zw/nuxt-ai-ready), a Nuxt module.                                                                                                                                                   | Not a reason to migrate frameworks: next-ai-ready targets Next.js App Router, not Nuxt.                                                               |
+
+For this SDK, the default path is a build-time content graph with generated discovery and page
+representations. Actions, OpenAPI, and MCP are an explicit capability upgrade, not installation
+requirements. It is not a replacement for a documentation UI, native metadata, or a complete SEO
+suite. The [Fumadocs guide](./fumadocs-ai-ready) explains the overlapping responsibilities.
+
+### Keep one owner per output
+
+Before adding any integration, list what the deployed site already serves:
+
+- `/llms.txt`, `/llms-full.txt`, and each page Markdown URL: choose one generator and one route owner.
+- Metadata and JSON-LD: preserve the existing implementation; do not emit duplicate entities for the same page.
+- Search and MCP: Fumadocs also documents AI-facing access. Choose the endpoint and authentication model your clients actually need.
+
+If the current setup already returns the correct public content, production canonical URLs, and
+language variants, keep it. Test a missing page and a private page too: an HTTP `200` by itself is
+not proof of correct retrieval. None of these tools guarantees Google indexing or AI citation.
 
 ## Try a clean runnable demo first
 
@@ -2225,6 +2260,10 @@ Open /llms.txt and a page Markdown URL, then run next-ai-ready audit against the
 ### Should I hand-write llms.txt or generate it?
 
 Hand-write it for a small, rarely changing site. Generate it when routes, locales, summaries, or Markdown pages must stay synchronized.
+
+### Do I need next-ai-ready if I already use Next SEO or Fumadocs?
+
+Not necessarily. Keep native Next.js metadata and Next SEO JSON-LD. Check Fumadocs' own LLM integration first; add next-ai-ready only for an unmet machine-facing requirement, with one owner per endpoint.
 
 
 <!-- END /en/docs/guides/nextjs-llms-txt -->
@@ -4463,6 +4502,9 @@ Markdown 和文档 MCP 不是 next-ai-ready 的独占能力。两种接入都不
 middleware 或 `/api/mcp` 时，先审查实际请求由谁响应，不要直接叠加 wrapper。
 下面步骤假设由 next-ai-ready 提供机器端路由。
 
+[工具选型部分](./nextjs-llms-txt#安装前先比较工具职责)对比了原生 Next.js、Next SEO、
+Nextra 与这些能力的职责，增加另一套集成前可以先检查。
+
 ## 1. 安装并初始化
 
 在 Fumadocs Next.js 应用目录执行：
@@ -4551,7 +4593,8 @@ canonical `Link` 响应头与正文，不能只用 HEAD 请求证明取到了正
 
 ## 保持搜索职责分离
 
-保留 Fumadocs 的界面搜索。原生 MCP 和 next-ai-ready 都能服务文档检索，增加第二个索引
+保留 Fumadocs 的界面搜索。[原生 MCP](https://www.fumadocs.dev/docs/headless/utils/mcp)
+和 next-ai-ready 都能服务文档检索，增加第二个索引
 是维护成本选择，不是让 AI 读取内容的前提。应用 Action 属于另一条边界：启用前审查鉴权
 和部署行为，不要把文档读取一概包装成业务操作。
 
@@ -4988,7 +5031,7 @@ pnpm exec next-ai-ready audit https://docs.example.com --version 3
 <!-- BEGIN /zh/docs/guides/nextjs-llms-txt -->
 # 为 Next.js App Router 添加 llms.txt 与 Markdown 端点
 URL: https://nextaiready.com/zh/docs/guides/nextjs-llms-txt
-Updated: 2026-10-01
+Updated: 2026-10-02
 
 # 为 Next.js App Router 添加 llms.txt 与 Markdown 端点
 
@@ -5011,6 +5054,36 @@ Updated: 2026-10-01
 
 不要为了宣称网站“AI-ready”就立即加入 MCP、数据库或可调用 Action。先完成内容发现与读取，
 在生产环境验证，再根据真实使用场景添加能力。
+
+## 安装前先比较工具职责
+
+这些工具负责不同层次。下面按需求选型，不做评分榜单，也不把未核实的能力写成其他项目的
+缺点。上游参考资料核对日期为 2026-10-02。
+
+| 你需要解决的问题                          | 优先使用                                                                                                                                              | 何时考虑 next-ai-ready                                                            |
+| --------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
+| App Router 的标题、描述、canonical 与社交卡片 | [Next.js 原生 Metadata](https://nextjs.org/docs/app/getting-started/metadata-and-og-images)。                                                        | 只为 metadata 不需要安装；保留原实现，有机器接口需求时再增加内容层。                                       |
+| 可复用的 JSON-LD 组件                   | [Next SEO](https://github.com/garmeeh/next-seo#readme)，其 App Router metadata 也推荐使用原生 Metadata。                                                    | 同时需要自动生成发现入口或 Markdown 时再考虑；每个 JSON-LD 实体只保留一套输出。                             |
+| 少量稳定公开页面的索引                       | 手写 `public/llms.txt`，通过 [Next.js public 目录](https://nextjs.org/docs/app/api-reference/file-conventions/public-folder)提供。                          | 人工同步真的成为问题时再引入生成器；一个静态文件不会自动生成逐页 Markdown。                                    |
+| 已使用 Fumadocs 的文档站需要 AI 读取         | [Fumadocs 自带的 LLM 集成](https://www.fumadocs.dev/docs/integrations/llms)，包含发现入口、Markdown 与 MCP 示例。                                                  | 现有方案无法满足具体需求时再考虑，不要只为相同端点安装第二套生成器。                                            |
+| 需要 Nextra 文档界面                    | 保留 Nextra，包括其 [Copy Page 实现](https://github.com/shuding/nextra/blob/main/packages/nextra-theme-docs/src/components/copy-page.tsx)；单独核查所装版本的机器端输出。 | 需要本 SDK 的构建期语义图和 handlers 时，先检查[经过测试的 Nextra 夹具与截图](./nextra-ai-ready)，再改动应用。 |
+| 已有 Nuxt 应用                        | Nuxt 模块 [nuxt-ai-ready](https://github.com/harlan-zw/nuxt-ai-ready)。                                                                              | 不需要为此迁移框架：next-ai-ready 面向 Next.js App Router，不适用于 Nuxt。                      |
+
+本 SDK 默认从构建期内容图生成发现入口与页面表示。Actions、OpenAPI 与 MCP 是显式开启的
+能力平面升级，不是安装前提。它不替代文档界面、原生 metadata 或完整 SEO 套件。
+[Fumadocs 指南](./fumadocs-ai-ready)进一步说明两套方案的职责重叠。
+
+### 每种输出只保留一个负责人
+
+接入任何新工具前，先列出生产站已经提供的内容：
+
+- `/llms.txt`、`/llms-full.txt` 与每个页面 Markdown URL：只保留一个生成器和一套路由。
+- Metadata 与 JSON-LD：保留既有实现，避免为同一页面重复输出相同实体。
+- 搜索与 MCP：Fumadocs 也有面向 AI 的接入说明，按客户端真实需求选择端点与鉴权模型。
+
+如果现有方案已经正确返回公开内容、生产 canonical 与语言版本，就可以保留。也要检查缺失
+页面与私有页面：仅返回 HTTP `200` 不能证明读取正确。这些工具都不能保证 Google 收录或
+AI 引用。
 
 ## 先运行一个干净的演示
 
@@ -5246,6 +5319,10 @@ curl -i http://localhost:3000/tools.json
 ### 应该手写还是自动生成 llms.txt？
 
 页面少且很少更新时可以手写；当路由、语言、摘要或 Markdown 页面需要保持同步时应自动生成。
+
+### 已经使用 Next SEO 或 Fumadocs，还需要 next-ai-ready 吗？
+
+不一定。保留 Next.js 原生 metadata 和 Next SEO JSON-LD；先检查 Fumadocs 自带的 LLM 集成，只有机器接口需求尚未满足时再添加 next-ai-ready，每个端点只保留一个负责人。
 
 
 <!-- END /zh/docs/guides/nextjs-llms-txt -->

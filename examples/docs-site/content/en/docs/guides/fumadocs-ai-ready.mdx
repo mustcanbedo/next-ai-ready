@@ -60,6 +60,9 @@ Pick one owner for each public discovery URL. Do not combine this wrapper with e
 `/llms.txt`, Markdown rewrites, negotiation middleware, or `/api/mcp` without reviewing which handler
 will serve each request. The steps below assume next-ai-ready owns the machine-facing routes.
 
+The [tool-selection section](./nextjs-llms-txt#compare-the-tools-before-installing) compares these
+responsibilities with native Next.js, Next SEO, and Nextra before adding another integration.
+
 ## 1. Install and initialize
 
 From the Fumadocs Next.js application directory:
@@ -153,7 +156,8 @@ production evidence remains a separate validation task.
 
 ## Keep search responsibilities separate
 
-Keep Fumadocs UI search intact. Both Fumadocs native MCP and next-ai-ready can serve documentation
+Keep Fumadocs UI search intact. Both [Fumadocs native MCP](https://www.fumadocs.dev/docs/headless/utils/mcp)
+and next-ai-ready can serve documentation
 retrieval; adding a second search index is a maintenance choice, not a prerequisite for AI access.
 An application Action is a different boundary: review authorization and deployment behavior before
 enabling it, rather than treating every documentation request as a callable business operation.

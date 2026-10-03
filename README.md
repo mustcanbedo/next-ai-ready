@@ -34,6 +34,8 @@ Read the [native-first integration decision](https://nextaiready.com/en/docs/gui
 before adding another content pipeline. Choose next-ai-ready for a shared semantic graph and
 structured outputs across content collections, or optional callable application actions.
 
+Already using Next SEO, Fumadocs, or Nextra? [Compare responsibilities before adding another integration](https://nextaiready.com/en/docs/guides/nextjs-llms-txt#compare-the-tools-before-installing). Native metadata and existing LLM endpoints may already meet your needs.
+
 Prefer a disposable demo before editing an existing project?
 
 ```bash

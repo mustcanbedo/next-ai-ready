@@ -82,6 +82,17 @@ export default async function DocPage({ params }: PageProps) {
               {doc.summary}
             </p>
           )}
+          {(doc.author || doc.updatedAt) && (
+            <p className="mt-5 flex flex-wrap gap-x-5 gap-y-2 text-sm leading-6 text-text-secondary">
+              {doc.author && <span>{doc.author}</span>}
+              {doc.updatedAt && (
+                <span>
+                  {locale === "en" ? "Last updated: " : "最后更新："}
+                  <time dateTime={doc.updatedAt}>{doc.updatedAt}</time>
+                </span>
+              )}
+            </p>
+          )}
         </header>
         <MdxContent content={doc.content} />
 

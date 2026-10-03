@@ -13,7 +13,8 @@
     "@next-ai-ready/mcp": "0.1.0-alpha.8",
     "docs-site": "0.1.0",
     "@next-ai-ready/example-ecommerce": "0.0.0",
-    "create-next-ai-ready": "0.1.0-alpha.8"
+    "create-next-ai-ready": "0.1.0-alpha.8",
+    "@next-ai-ready/example-nextra-docs": "0.0.0"
   },
   "changesets": [
     "adopter-ux-alpha10",
@@ -21,8 +22,10 @@
     "audit-deployed-pages",
     "audit-v2-dimensions",
     "audit-v3-three-planes",
+    "canonical-package-homepages",
     "clear-stingrays-support",
     "deterministic-llms-freshness",
+    "doctor-knowledge-only-openapi",
     "fix-escaped-ai-routes",
     "fix-next-config-cjs",
     "focused-runtime-entrypoints",
@@ -32,6 +35,7 @@
     "next-route-context-compat",
     "nextra-fumadocs-content-roots",
     "published-semantic-jsonld",
+    "real-page-breadcrumbs",
     "release-mcp-with-llms-alpha16",
     "release-registry-verification",
     "runnable-next-scaffold",

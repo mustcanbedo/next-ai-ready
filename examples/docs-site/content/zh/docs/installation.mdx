@@ -13,7 +13,7 @@ tags:
   - installation
   - next.js
   - zod
-updatedAt: '2026-09-29'
+updatedAt: '2026-10-03'
 author: next-ai-ready 团队
 ---
 
@@ -48,7 +48,10 @@ pnpm exec next-ai-ready doctor --score
 如需了解完整方案选择、生成端点、生产证据和部署检查，请继续阅读
 [Next.js App Router llms.txt 实战教程](./guides/nextjs-llms-txt)。
 
-> **发布渠道：** 本站跟随 `main`，当前目标为仓库候选版本 `0.1.0-alpha.21`。公开可用性以 npm dist-tags 为准。alpha.21 默认采用 5 文件 Knowledge-only 接入；需要 Actions、MCP、OpenAPI 与观测时再使用 `--with-capabilities`。受保护发布工作流会在发布前重新运行完整门禁。
+> **发布渠道：** 本站跟随 `main`，当前目标为仓库候选版本 `0.1.0-alpha.22`。公开可用性以 npm dist-tags 为准。alpha.21 默认采用 5 文件 Knowledge-only 接入；需要 Actions、MCP、OpenAPI 与观测时再使用 `--with-capabilities`。受保护发布工作流会在发布前重新运行完整门禁。
+
+alpha.22 候选的 `doctor` 不再要求纯知识平面项目生成 OpenAPI；已配置的能力仍检查相应
+产物与凭证。公开 alpha.21 尚未包含此诊断修复，不要仅为消除它的告警而启用能力平面。
 
 ## 包导出说明
 

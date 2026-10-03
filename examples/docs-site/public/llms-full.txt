@@ -5,7 +5,7 @@
 <!-- BEGIN /en -->
 # next-ai-ready
 URL: https://nextaiready.com/en
-Updated: 2026-08-02
+Updated: 2026-10-03
 
 # next-ai-ready
 
@@ -29,7 +29,11 @@ The basic setup is complete when `doctor` reports **0 errors** and `public/llms.
 - **Deployment checks** through `next-ai-ready doctor` and `next-ai-ready audit <url>`.
 - **Open standards** with no dependency on a single AI provider.
 
-This documentation site tracks `main` and currently targets the `0.1.0-alpha.21` repository candidate. Public availability is determined by npm dist-tags, not by the repository version. Alpha.21 makes the five-file Knowledge Plane the default and keeps Actions, MCP, OpenAPI, and observability behind the explicit `--with-capabilities` path.
+This documentation site tracks `main` and currently targets the `0.1.0-alpha.22` repository candidate. Public availability is determined by npm dist-tags, not by the repository version. Alpha.21 makes the five-file Knowledge Plane the default and keeps Actions, MCP, OpenAPI, and observability behind the explicit `--with-capabilities` path.
+
+The alpha.22 candidate fixes the false missing-OpenAPI warning in Knowledge-only projects, uses
+existing graph pages for breadcrumbs, and prepares canonical homepage metadata for internal packages.
+These fixes are not yet included in the public alpha.21 package; no new runtime API is introduced.
 
 ## Verified readability baseline
 
@@ -2766,7 +2770,7 @@ No. Google-Extended controls certain Gemini training and grounding uses; it does
 <!-- BEGIN /en/docs/installation -->
 # Installation
 URL: https://nextaiready.com/en/docs/installation
-Updated: 2026-09-29
+Updated: 2026-10-03
 
 # Installation
 
@@ -2799,7 +2803,11 @@ The basic setup is complete when `doctor` reports **0 errors** and `public/llms.
 For the complete decision path, generated endpoints, production evidence, and deployment checks,
 follow the [Next.js App Router llms.txt walkthrough](./guides/nextjs-llms-txt).
 
-> **Release channel:** this site tracks `main` and currently targets the `0.1.0-alpha.21` repository candidate. Verify public availability with npm dist-tags. Alpha.21 makes Knowledge-only setup the five-file default; use `--with-capabilities` when you need Actions, MCP, OpenAPI, and observability. The guarded release workflow reruns the complete gate before publication.
+> **Release channel:** this site tracks `main` and currently targets the `0.1.0-alpha.22` repository candidate. Verify public availability with npm dist-tags. Alpha.21 makes Knowledge-only setup the five-file default; use `--with-capabilities` when you need Actions, MCP, OpenAPI, and observability. The guarded release workflow reruns the complete gate before publication.
+
+In the alpha.22 candidate, `doctor` no longer expects OpenAPI artifacts in a Knowledge-only project.
+Configured capabilities still require their relevant artifacts and credentials. Public alpha.21
+does not include this diagnostic fix yet; do not enable capabilities solely to silence its warning.
 
 ## Package exports
 
@@ -3063,7 +3071,7 @@ No. It identifies technical and content-accessibility problems and provides evid
 <!-- BEGIN /zh -->
 # next-ai-ready
 URL: https://nextaiready.com/zh
-Updated: 2026-08-02
+Updated: 2026-10-03
 
 # next-ai-ready
 
@@ -3087,7 +3095,10 @@ pnpm exec next-ai-ready doctor --score
 - 通过 `next-ai-ready doctor` 和 `next-ai-ready audit <url>` 提供**部署检查**。
 - 使用开放标准，不锁定单一 AI 提供商。
 
-本文档站跟随 `main`，当前目标为仓库候选版本 `0.1.0-alpha.21`。公开可用性以 npm dist-tags 为准，不得从仓库版本推断。alpha.21 默认只生成 5 个 Knowledge Plane 文件，并通过 `--with-capabilities` 显式开启 Actions、MCP、OpenAPI 与观测能力。
+本文档站跟随 `main`，当前目标为仓库候选版本 `0.1.0-alpha.22`。公开可用性以 npm dist-tags 为准，不得从仓库版本推断。alpha.21 默认只生成 5 个 Knowledge Plane 文件，并通过 `--with-capabilities` 显式开启 Actions、MCP、OpenAPI 与观测能力。
+
+alpha.22 候选修复纯知识平面的 OpenAPI 缺失误报，面包屑只引用图中存在的页面，并准备更新
+底层包的官网元数据。这些修复尚未包含在公开 alpha.21 中，也没有增加新的运行时 API。
 
 ## 已验证的可读性基线
 
@@ -5790,7 +5801,7 @@ Claude-SearchBot 用于搜索索引，Claude-User 按用户要求读取页面，
 <!-- BEGIN /zh/docs/installation -->
 # 安装
 URL: https://nextaiready.com/zh/docs/installation
-Updated: 2026-09-29
+Updated: 2026-10-03
 
 # 安装
 
@@ -5823,7 +5834,10 @@ pnpm exec next-ai-ready doctor --score
 如需了解完整方案选择、生成端点、生产证据和部署检查，请继续阅读
 [Next.js App Router llms.txt 实战教程](./guides/nextjs-llms-txt)。
 
-> **发布渠道：** 本站跟随 `main`，当前目标为仓库候选版本 `0.1.0-alpha.21`。公开可用性以 npm dist-tags 为准。alpha.21 默认采用 5 文件 Knowledge-only 接入；需要 Actions、MCP、OpenAPI 与观测时再使用 `--with-capabilities`。受保护发布工作流会在发布前重新运行完整门禁。
+> **发布渠道：** 本站跟随 `main`，当前目标为仓库候选版本 `0.1.0-alpha.22`。公开可用性以 npm dist-tags 为准。alpha.21 默认采用 5 文件 Knowledge-only 接入；需要 Actions、MCP、OpenAPI 与观测时再使用 `--with-capabilities`。受保护发布工作流会在发布前重新运行完整门禁。
+
+alpha.22 候选的 `doctor` 不再要求纯知识平面项目生成 OpenAPI；已配置的能力仍检查相应
+产物与凭证。公开 alpha.21 尚未包含此诊断修复，不要仅为消除它的告警而启用能力平面。
 
 ## 包导出说明
 

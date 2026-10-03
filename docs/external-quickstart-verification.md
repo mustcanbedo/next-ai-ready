@@ -121,9 +121,10 @@ curl -sS http://localhost:3000/index.md | head
 
 ### Registry status
 
-As of 2026-08-27:
+As of 2026-10-03:
 
-- **Repository candidate:** `0.1.0-alpha.21` — public availability must be read from npm dist-tags. This candidate makes the five-file Knowledge Plane the default and moves Actions, MCP, OpenAPI, and observability behind `--with-capabilities`. The guarded Release Alpha workflow reruns the complete gate before publication. The currently published alpha.20 passed public-registry installation and production-build verification.
+- **Repository candidate:** `0.1.0-alpha.22` — public availability must be read from npm dist-tags. This candidate corrects Knowledge-only OpenAPI diagnostics, graph-page breadcrumbs, and internal-package homepage metadata without changing the default setup or public APIs. The guarded Release Alpha workflow reruns the complete gate before publication.
+- **Published registry baseline:** `next-ai-ready` and `@next-ai-ready/next` `latest` remain `0.1.0-alpha.21`; `create-next-ai-ready` remains `0.1.0-alpha.13`. Candidate tarball verification is not public-registry or independent-adopter evidence.
 - **alpha.13:** superseded after registry smoke exposed an incomplete published Semantic/Core export chain; use alpha.14 or newer.
 - **alpha.4:** deprecated for pnpm users (scoped import bug); use ≥ alpha.5
 

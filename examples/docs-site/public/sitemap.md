@@ -22,7 +22,7 @@
 - [i18n and AI-friendly URLs](https://nextaiready.com/en/docs/guides/i18n-ai-urls): Middleware, locale prefixes, and SemanticGraph routes for multilingual sites.
 - [How to add an MCP server to Next.js App Router](https://nextaiready.com/en/docs/guides/mcp-integration): Add local stdio and authenticated Streamable HTTP MCP endpoints to Next.js, then expose page search and explicitly public actions as tools.
 - [Next.js MDX content collections for AI-readable docs](https://nextaiready.com/en/docs/guides/mdx-content): Configure a local MDX content collection in Next.js, map files to routes, add useful frontmatter, and generate llms.txt, page Markdown, and JSON-LD.
-- [Add llms.txt and Markdown endpoints to Next.js App Router](https://nextaiready.com/en/docs/guides/nextjs-llms-txt): Choose between a static llms.txt and generated AI-readable endpoints, run a clean Next.js demo, and verify the production result.
+- [Add llms.txt and Markdown endpoints to Next.js App Router](https://nextaiready.com/en/docs/guides/nextjs-llms-txt): Compare native Next.js, Next SEO, Fumadocs, and Nextra options before adding AI-readable endpoints, then run and verify a clean Next.js demo.
 - [Nextra llms.txt and Markdown endpoint setup](https://nextaiready.com/en/docs/guides/nextra-ai-ready): Integrate next-ai-ready with a Nextra 4 App Router documentation site without replacing Nextra navigation, search, themes, or MDX rendering.
 - [Quickstart](https://nextaiready.com/en/docs/guides/quickstart): Complete a verified next-ai-ready setup in about 10 minutes.
 - [Configure robots.txt for AI search and training crawlers in Next.js](https://nextaiready.com/en/docs/guides/robots-txt): Keep ChatGPT and Claude search discovery available while making a separate robots.txt decision for training and user-triggered AI access.
@@ -47,7 +47,7 @@
 - [国际化与 AI 友好 URL](https://nextaiready.com/zh/docs/guides/i18n-ai-urls): 多语言站点的 middleware、locale 前缀与 SemanticGraph 路由策略。
 - [如何为 Next.js App Router 添加 MCP Server](https://nextaiready.com/zh/docs/guides/mcp-integration): 为 Next.js 添加本地 stdio 与经过鉴权的 Streamable HTTP MCP 端点，并将页面搜索和显式公开的 Action 暴露为工具。
 - [用 Next.js MDX 内容集合生成 AI 可读文档](https://nextaiready.com/zh/docs/guides/mdx-content): 在 Next.js 中配置本地 MDX 内容集合、映射路由、补充有效 frontmatter，并生成 llms.txt、逐页 Markdown 与 JSON-LD。
-- [为 Next.js App Router 添加 llms.txt 与 Markdown 端点](https://nextaiready.com/zh/docs/guides/nextjs-llms-txt): 判断应该手写还是自动生成 llms.txt，运行一个干净的 Next.js 演示，并验证生产结果。
+- [为 Next.js App Router 添加 llms.txt 与 Markdown 端点](https://nextaiready.com/zh/docs/guides/nextjs-llms-txt): 先比较 Next.js 原生能力、Next SEO、Fumadocs 与 Nextra 的职责，再添加 AI 可读端点，运行并验证干净的 Next.js 演示。
 - [为 Nextra 4 添加 llms.txt 与 Markdown 端点](https://nextaiready.com/zh/docs/guides/nextra-ai-ready): 在不替换 Nextra 导航、搜索、主题和 MDX 渲染的前提下，将 next-ai-ready 接入 Nextra 4 App Router 文档站。
 - [快速开始](https://nextaiready.com/zh/docs/guides/quickstart): 按约 10 分钟的流程完成 next-ai-ready 基础接入并验证知识平面端点，实际耗时取决于安装与网络。
 - [在 Next.js 中分别配置 AI 搜索与训练爬虫](https://nextaiready.com/zh/docs/guides/robots-txt): 保留 ChatGPT 与 Claude 的搜索发现能力，同时分别决定是否允许训练爬虫和用户触发的 AI 访问。

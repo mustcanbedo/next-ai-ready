@@ -1,5 +1,5 @@
 import { readFile, stat } from "node:fs/promises";
-import { join, resolve } from "node:path";
+import { dirname, join, resolve } from "node:path";
 import { AI_BOTS, scanContent } from "@next-ai-ready/core";
 import {
   buildActionsManifest,
@@ -134,7 +134,12 @@ export async function runDoctor(opts: DoctorOptions = {}): Promise<DoctorResult>
     add(CHECK.SITE_DESCRIPTION, "ok", "Site description present.", "Site description");
   }
 
-  const hasMcpRoute = await fileExists(join(cwd, ROUTE_STUBS.MCP));
+  const hasMcpRoute = await routeFileExists(join(cwd, ROUTE_STUBS.MCP));
+  const hasCapabilityPlane = Boolean(config.actions) || hasMcpRoute ||
+    (await routeFileExists(join(cwd, ROUTE_STUBS.ACTION))) ||
+    (await routeFileExists(join(cwd, ROUTE_STUBS.OPENAPI))) ||
+    (await routeFileExists(join(cwd, ROUTE_STUBS.TOOLS))) ||
+    (await routeFileExists(join(cwd, "app/%5Fai-ready/ai-plugin/route.ts")));
 
   // 2. Actions: load + validate exposure rules (ADR-010).
   if (config.actions) {
@@ -167,7 +172,9 @@ export async function runDoctor(opts: DoctorOptions = {}): Promise<DoctorResult>
     add(
       CHECK.ACTIONS_LOAD,
       "ok",
-      "No actions configured — valid Knowledge-only setup.",
+      hasCapabilityPlane
+        ? "No actions configured; capability route stubs are installed."
+        : "No actions configured — valid Knowledge-only setup.",
       "Actions configured",
     );
   }
@@ -181,8 +188,15 @@ export async function runDoctor(opts: DoctorOptions = {}): Promise<DoctorResult>
 
   if (await fileExists(publicOpenApiPath(cwd))) {
     add(CHECK.BUILD_OPENAPI, "ok", "Canonical artifact public/openapi.json present.", "OpenAPI artifact");
-  } else {
+  } else if (hasCapabilityPlane) {
     add(CHECK.BUILD_OPENAPI, "warn", "No public/openapi.json yet. Run `next-ai-ready build` before deploying.", "OpenAPI artifact");
+  } else {
+    add(
+      CHECK.BUILD_OPENAPI,
+      "ok",
+      "No capability configuration or route stubs installed; OpenAPI is not required for this Knowledge-only setup.",
+      "OpenAPI artifact",
+    );
   }
 
   // 4. Route stubs (the codemod output). Missing → endpoints 404.
@@ -614,6 +628,15 @@ async function fileExists(p: string): Promise<boolean> {
   } catch {
     return false;
   }
+}
+
+async function routeFileExists(routeStub: string): Promise<boolean> {
+  const routeDir = dirname(routeStub);
+  // Detect existing .mjs files conservatively; this is not a Next.js route support guarantee.
+  for (const extension of ["ts", "tsx", "js", "jsx", "mjs"]) {
+    if (await fileExists(join(routeDir, `route.${extension}`))) return true;
+  }
+  return false;
 }
 
 async function readTextFile(p: string): Promise<string | null> {

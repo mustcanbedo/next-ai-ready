@@ -1,8 +1,10 @@
 ---
 title: 为 Fumadocs 添加 llms.txt 与 Markdown 端点
-summary: 复用 Fumadocs MDX 内容集合，在 Next.js App Router 部署中生成 AI 可读的发现和页面端点。
+summary: 选择 Fumadocs 原生 LLM 与 MCP 路由或 next-ai-ready 共享语义图，保留 createMDX，并验证实际内容而不只看 HTTP 状态。
 order: 10
 questions:
+  - q: 只是需要 Fumadocs llms.txt 或文档 MCP，也必须安装 next-ai-ready 吗？
+    a: 不必。Fumadocs 已提供原生 LLM 和文档 MCP 接入；需要共享语义图、结构化输出或可选的应用 Action 时，再考虑 next-ai-ready。
   - q: next-ai-ready 会替换 Fumadocs Source API 或搜索吗？
     a: 不会。Fumadocs 继续负责文档界面、Source API 和搜索；next-ai-ready 独立读取相同源文件并生成面向机器的输出。
   - q: 可以复用 Fumadocs 已有的 description frontmatter 吗？
@@ -14,21 +16,48 @@ tags:
   - nextjs
   - llms.txt
   - mdx
-updatedAt: '2026-09-29'
+updatedAt: '2026-10-03'
 author: next-ai-ready team
 ---
 
 # 为 Fumadocs 添加 llms.txt 与 Markdown 端点
 
-[Fumadocs](https://www.fumadocs.dev/docs) 负责文档界面、Source API 和搜索。`next-ai-ready`
-可以读取同一个 MDX 集合，生成 `/llms.txt`、页面 Markdown、语义页面发现和可选 MCP 资源，
-无需改变 Fumadocs 的这些职责。
+[Fumadocs](https://www.fumadocs.dev/docs) 提供文档界面、Source API、搜索和
+[原生 AI 接入](https://www.fumadocs.dev/docs/integrations/llms)。仅让 AI 客户端读取文档，
+不必安装 `next-ai-ready`。
+
+同一批源文件还需要生成 next-ai-ready 语义图、结构化页面输出，或增加可选的应用 Action
+时，再使用本指南；文档界面继续由 Fumadocs 负责。
 
 如果没有使用 Fumadocs，请从框架无关的
 [Next.js App Router llms.txt 实战教程](./nextjs-llms-txt)开始。
 
 本接入面向使用 Next.js App Router 和服务器部署的 Fumadocs，不支持完全静态的
 `output: "export"`，因为机器端路由需要在请求时运行。
+
+## 选择原生 Fumadocs 还是 next-ai-ready
+
+只需要文档读取时，先使用 Fumadocs 官方方案：
+
+```bash
+npx @fumadocs/cli feature llms
+# 可选：通过 MCP 搜索和读取文档
+npx @fumadocs/cli feature mcp
+```
+
+这些命令属于 Fumadocs，不是本 SDK 的命令；使用前请对照已安装版本的官方文档。
+
+| 需求 | 最小合适方案 |
+| --- | --- |
+| 只要 llms.txt、页面 Markdown 或文档 MCP | 原生 Fumadocs 即可，不必再安装 SDK。 |
+| 文档和其他本地 MDX 集合共享语义图、.ai.json 与策展发现入口 | 考虑在现有界面旁接入 next-ai-ready。 |
+| Agent 需要调用应用功能，而不只是读文档 | 单独评估可选的 [Action 与鉴权模型](./actions)。 |
+
+Markdown 和文档 MCP 不是 next-ai-ready 的独占能力。两种接入都不保证收录、排名或 AI 引用。
+
+每个公开发现 URL 只选择一个提供方。已有原生 `/llms.txt`、Markdown rewrites、内容协商
+middleware 或 `/api/mcp` 时，先审查实际请求由谁响应，不要直接叠加 wrapper。
+下面步骤假设由 next-ai-ready 提供机器端路由。
 
 ## 1. 安装并初始化
 
@@ -40,7 +69,8 @@ pnpm exec next-ai-ready init
 ```
 
 保留 `source.config.ts`、Fumadocs 生成的 source 模块、页面布局和搜索路由。初始化器只增加独立
-的 AI 路由与配置。
+的 AI 路由与配置。默认 `init` 仅启用知识平面，不会安装 MCP 或应用 Action；对已有配置
+进行合并审查，不要直接覆盖。
 
 ## 2. 复用 Fumadocs 内容集合
 
@@ -62,22 +92,31 @@ export default defineConfig({
 如果集合位于 `src/content/docs`，改用对应路径。已有 `title`、`description`、`date` 与
 `author` frontmatter 会被复用；只有在日期真实且持续维护时才增加 `updatedAt`。
 
+这是文件复用，不是 Fumadocs Source API Adapter；SDK 不会运行 Fumadocs 专有插件，也不会
+复现它处理后的 Markdown。使用自定义 MDX 组件或生成内容时，先检查第二套流水线的结果。
+派生路由必须与实际界面 URL 一致，例如 `content/docs/getting-started.mdx` 对应
+`/docs/getting-started`；自定义 Fumadocs `baseUrl` 或 slug 布局不会自动导入。
+
 ## 3. 包装 Next.js 配置
 
-Fumadocs Source API 本身不需要竞争性的 Next.js wrapper。保留项目现有配置，再用
-`withAiReady()` 包装：
+使用 Fumadocs MDX 时，在 `next.config.mjs` 中保留
+[已有的 createMDX 插件](https://www.fumadocs.dev/docs/mdx/next)，再包装它返回的配置：
 
 ```js
+import { createMDX } from "fumadocs-mdx/next"
 import { withAiReady } from "next-ai-ready/config"
 
+const withMDX = createMDX()
 const nextConfig = {
   // 原有 Fumadocs 与 Next.js 配置保留在这里。
 }
 
-export default withAiReady({ agentReadable: true })(nextConfig)
+export default withAiReady({ agentReadable: true })(withMDX(nextConfig))
 ```
 
 如果已有其他插件包装配置，把 `withAiReady()` 应用到该插件最终返回的结果。
+已有 `createMDX` 选项也应保留。这是配置示例，不代表完整 Fumadocs 应用或自定义插件
+已经通过生产兼容性测试。
 
 ## 4. 构建并验证
 
@@ -90,15 +129,24 @@ pnpm build
 部署后执行：
 
 ```bash
-curl -I https://docs.example.com/llms.txt
-curl -I https://docs.example.com/docs/getting-started.md
+curl -i https://docs.example.com/llms.txt
+curl -i https://docs.example.com/docs/getting-started.md
+curl -i -H 'Accept: text/markdown' https://docs.example.com/docs/getting-started
+curl -i -H 'Accept: text/html' https://docs.example.com/docs/getting-started
 pnpm exec next-ai-ready audit https://docs.example.com/docs/getting-started --version 3
 ```
 
-确认 `/llms.txt` 已列出预期 Fumadocs 页面、Markdown URL 使用生产 canonical，并且浏览器请求
-仍返回正常的 Fumadocs 界面。
+将示例域名和路径替换成真实公开页面。确认 `/llms.txt` 列出它的 canonical HTML URL，
+两种 Markdown 请求均返回 `text/markdown`、预期标题与正文，HTML 请求仍保留 Fumadocs 界面。
+HTTP `200` 但含有 `document_status: "not_found"` 的恢复文档不算读取成功。同时检查
+canonical `Link` 响应头与正文，不能只用 HEAD 请求证明取到了正确内容。
+
+可运行的第一方参考见
+[Next.js 生产接入过程与 smoke 断言](./nextjs-llms-txt#检查实现证据)。该站点不是 Fumadocs
+兼容性夹具，也不是外部客户案例；Fumadocs 专项生产证据仍需要单独验证。
 
 ## 保持搜索职责分离
 
-Fumadocs 搜索服务于文档界面中的人类用户；next-ai-ready 页面发现通过 Markdown、HTTP 资源
-和可选 MCP 服务于 AI 客户端。两者可以索引相同内容，但不需要互相替代。
+保留 Fumadocs 的界面搜索。原生 MCP 和 next-ai-ready 都能服务文档检索，增加第二个索引
+是维护成本选择，不是让 AI 读取内容的前提。应用 Action 属于另一条边界：启用前审查鉴权
+和部署行为，不要把文档读取一概包装成业务操作。

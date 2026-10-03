@@ -1,17 +1,18 @@
 # Get started in 10 minutes
 
-This guide gets a new Next.js App Router project AI-ready with `next-ai-ready`.
+This guide verifies the Knowledge Plane in a Next.js App Router project. Allow about ten
+minutes, plus dependency downloads and the production build; actions and MCP are optional.
 
 ## Prerequisites
 
 - Node.js 20+
-- Next.js 15+ (App Router)
+- Next.js 14.2+ (App Router); the scaffold uses Next.js 15
 - Zod v4 (`zod@^4`) if you define actions
 
 ## 1. Scaffold (recommended)
 
 ```bash
-npm create next-ai-ready my-app
+npm create next-ai-ready@latest my-app
 cd my-app
 npm install
 npx next-ai-ready init
@@ -21,7 +22,8 @@ The scaffold creates a runnable minimal Next.js App Router TypeScript app, inclu
 
 ## 2. Configure your site
 
-Edit `ai-ready.config.mjs`:
+Edit the existing `ai-ready.config.ts` or `ai-ready.config.mjs`. Replace the example identity and
+origin with your real production values; do not create a second config or deploy the placeholder:
 
 ```js
 import { defineConfig } from "next-ai-ready";
@@ -55,43 +57,55 @@ In `package.json`:
 }
 ```
 
-`prebuild` ensures `public/llms.txt`, `.next-ai-ready/graph.json`, and OpenAPI artifacts exist before Next.js builds.
+`init` adds build wiring when missing. Keep existing scripts rather than replacing them with this
+example. The AI build writes `public/llms.txt` and `.next-ai-ready/graph.json`; OpenAPI is optional.
 
 ## 4. Add content (Knowledge plane)
 
 Create `content/docs/intro.mdx`:
 
-```mdx
-export const semantic = {
-  summary: "What this product does in one line.",
-  questions: [
-    { q: "What is My Site?", a: "A short answer for AI citations." },
-  ],
-}
+```markdown
+---
+title: Introduction
+summary: Install dependencies for the example project.
+---
 
 # Introduction
 
-Your page body here.
+Run `pnpm install` from the application root to install dependencies.
 ```
 
 Run:
 
 ```bash
 npx next-ai-ready build
-npm run dev
+npm run build
+npm run start
 ```
 
 ## 5. Verify AI endpoints
 
-Open or curl:
+In another terminal, inspect the response headers and bodies:
+
+```bash
+curl -i http://localhost:3000/llms.txt
+curl -i http://localhost:3000/docs/intro.md
+curl -i -H 'Accept: text/html' http://localhost:3000/
+```
+
+The discovery index must include the configured `/docs/intro` link; the page endpoint must return
+`200`, `text/markdown`, the `Introduction` title and the dependency instructions. HTTP `200` with
+`document_status: "not_found"` is a recovery document, not successful retrieval. A normal `/`
+request must still return HTML. Adding an MDX source under `content/` does not create an HTML route.
 
 | URL | Purpose |
 |-----|---------|
 | `/llms.txt` | Site index for LLMs |
 | `/llms-full.txt` | Full content dump (includes FAQ when present) |
 | `/docs/intro.md` | Per-page Markdown (route matches your graph) |
-| `/openapi.json` | Agent API spec |
-| `/tools.json` | Tool definitions |
+
+`/openapi.json`, `/tools.json`, and MCP require explicit Capability setup; they are not part of
+default `init` or this acceptance check.
 
 ## 6. Run doctor
 
@@ -99,7 +113,11 @@ Open or curl:
 npx next-ai-ready doctor --score
 ```
 
-Aim for **90+**. Common fixes to reach **100**:
+Require **0 errors**, then resolve or record warnings. A high score cannot replace the HTTP
+checks above. Public alpha.21 incorrectly warns about missing OpenAPI in Knowledge-only projects;
+that diagnostic fix is pending release. Do not enable capabilities just to silence it.
+
+Other warnings may need these changes:
 
 | Warning | Fix |
 |---------|-----|

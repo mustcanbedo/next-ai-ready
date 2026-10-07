@@ -30,6 +30,7 @@ export function Sidebar({ locale, groups, sectionLabels }: SidebarProps) {
                   <li key={doc.slug}>
                     <Link
                       href={href}
+                      prefetch={false}
                       className={`relative block rounded-lg px-3 py-2 text-[13px] transition-all ${
                         isActive
                           ? "bg-white/[0.04] text-text font-medium before:absolute before:left-0 before:top-1/2 before:-translate-y-1/2 before:h-4 before:w-[2px] before:rounded-full before:bg-accent"

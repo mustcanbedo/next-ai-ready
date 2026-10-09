@@ -29,6 +29,7 @@ export async function generateMetadata({
 
   return {
     metadataBase: new URL(getSiteBaseUrl()),
+    icons: { icon: "/icon.svg" },
     title: { default: defaultTitle, template: "%s — next-ai-ready" },
     description,
     verification: verification ? { google: verification } : undefined,
@@ -64,7 +65,7 @@ export default async function LocaleLayout({
   const siteJsonLd = await getSiteJsonLd();
 
   return (
-    <html lang={locale} className={`${geist.variable} ${geistMono.variable}`}>
+    <html lang={locale} data-scroll-behavior="smooth" className={`${geist.variable} ${geistMono.variable}`}>
       <body>
         <JsonLd data={siteJsonLd} />
         {children}

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ArrowLeft, ArrowRight, ChevronRight, FileText } from "lucide-react";
 import { notFound } from "next/navigation";
 import { getPageJsonLd } from "next-ai-ready/json-ld";
 import { JsonLd } from "../../../components/json-ld";
@@ -7,6 +8,7 @@ import { MdxContent } from "../../components/mdx-content";
 import { TableOfContents } from "../../components/toc";
 import { locales, type Locale } from "@/lib/i18n";
 import { docPageMetadata, graphRoute } from "@/lib/seo";
+import { getMessages } from "@/messages";
 
 interface PageProps {
   params: Promise<{ locale: string; slug: string[] }>;
@@ -65,25 +67,27 @@ export default async function DocPage({ params }: PageProps) {
   const prev = currentIndex > 0 ? allDocs[currentIndex - 1] : null;
   const next = currentIndex < allDocs.length - 1 ? allDocs[currentIndex + 1] : null;
   const headings = extractHeadings(doc.content);
+  const sectionLabels = getMessages(locale as Locale).docs.sidebar;
+  const sectionLabel = sectionLabels[doc.section as keyof typeof sectionLabels] ?? doc.section;
 
   return (
-    <div className="flex gap-10">
+    <div className="doc-grid">
       <JsonLd data={pageJsonLd} />
-      <article className="min-w-0 flex-1 max-w-[740px]">
-        <header className="mb-14 pb-8 border-b border-white/[0.04]">
-          <p className="mb-4 text-[11px] font-medium uppercase tracking-[0.15em] text-accent/70">
-            {doc.section.replace("-", " ")}
-          </p>
-          <h1 className="text-[2.5rem] font-bold tracking-[-0.02em] text-text leading-[1.12]">
+      <article className="doc-article">
+        <header className="doc-header">
+          <nav className="doc-breadcrumb" aria-label={locale === "zh" ? "面包屑导航" : "Breadcrumb"}>
+            <Link href={`/${locale}/docs/introduction`}>{locale === "zh" ? "文档" : "Docs"}</Link>
+            <ChevronRight aria-hidden="true" /><span>{sectionLabel}</span>
+          </nav>
+          <h1>
             {doc.title}
           </h1>
           {doc.summary && (
-            <p className="mt-5 text-[17px] text-text-secondary/80 leading-relaxed">
+            <p className="doc-summary">
               {doc.summary}
             </p>
           )}
-          {(doc.author || doc.updatedAt) && (
-            <p className="mt-5 flex flex-wrap gap-x-5 gap-y-2 text-sm leading-6 text-text-secondary">
+            <div className="doc-meta">
               {doc.author && <span>{doc.author}</span>}
               {doc.updatedAt && (
                 <span>
@@ -91,22 +95,24 @@ export default async function DocPage({ params }: PageProps) {
                   <time dateTime={doc.updatedAt}>{doc.updatedAt}</time>
                 </span>
               )}
-            </p>
-          )}
+              <a href={`/${locale}/docs/${doc.slug}.md`}><FileText size={13} aria-hidden="true" />Markdown</a>
+            </div>
         </header>
-        <MdxContent content={doc.content} />
+        {headings.length > 0 && <details className="mobile-toc"><summary>{locale === "zh" ? "本页目录" : "On this page"}</summary><ul>{headings.map((heading) => <li key={heading.id}><a href={`#${heading.id}`}>{heading.text}</a></li>)}</ul></details>}
+        <MdxContent content={doc.content} locale={locale as Locale} />
 
         {/* Prev / Next */}
-        <nav className="mt-20 pt-8 border-t border-white/[0.04] grid grid-cols-2 gap-4">
+        <nav className="doc-pagination" aria-label={locale === "zh" ? "相邻文档" : "Adjacent documentation"}>
           {prev ? (
             <Link
               href={`/${locale}/docs/${prev.slug}`}
-              className="group rounded-xl border border-white/[0.06] p-5 hover:border-white/[0.12] hover:bg-white/[0.02] transition-all"
+              className="previous-page"
+              prefetch={false}
             >
-              <span className="text-[11px] uppercase tracking-widest text-text-tertiary/60 mb-2 block">
+              <span className="page-label"><ArrowLeft size={13} aria-hidden="true" />
                 {locale === "en" ? "Previous" : "上一篇"}
               </span>
-              <span className="text-[14px] font-medium text-text group-hover:text-white transition-colors">
+              <span className="page-title">
                 {prev.title}
               </span>
             </Link>
@@ -114,12 +120,14 @@ export default async function DocPage({ params }: PageProps) {
           {next ? (
             <Link
               href={`/${locale}/docs/${next.slug}`}
-              className="group rounded-xl border border-white/[0.06] p-5 hover:border-white/[0.12] hover:bg-white/[0.02] transition-all text-right"
+              className="next-page"
+              prefetch={false}
             >
-              <span className="text-[11px] uppercase tracking-widest text-text-tertiary/60 mb-2 block">
+              <span className="page-label">
                 {locale === "en" ? "Next" : "下一篇"}
+                <ArrowRight size={13} aria-hidden="true" />
               </span>
-              <span className="text-[14px] font-medium text-text group-hover:text-white transition-colors">
+              <span className="page-title">
                 {next.title}
               </span>
             </Link>

@@ -1,6 +1,8 @@
 import React from "react";
 import Image, { type StaticImageData } from "next/image";
 import { codeToHtml } from "shiki";
+import { CopyButton } from "./copy-button";
+import type { Locale } from "@/lib/i18n";
 import nextraHtml from "../../../public/guides/nextra/html.jpg";
 import nextraConfig from "../../../public/guides/nextra/config.jpg";
 
@@ -13,16 +15,17 @@ const orderedListItem = /^(\d{1,9})\. (.+)$/;
 
 interface MdxContentProps {
   content: string;
+  locale?: Locale;
 }
 
 async function highlight(code: string, lang: string): Promise<string> {
   return codeToHtml(code, {
     lang: lang || "text",
-    theme: "vitesse-dark",
+    theme: "github-light",
   });
 }
 
-export async function MdxContent({ content }: MdxContentProps) {
+export async function MdxContent({ content, locale = "en" }: MdxContentProps) {
   const lines = content.trim().split("\n");
   const blocks: { type: string; content: string; lang?: string }[] = [];
 
@@ -53,21 +56,15 @@ export async function MdxContent({ content }: MdxContentProps) {
       const lang = block.lang || "text";
       const html = await highlight(block.content, lang);
       rendered.push(
-        <figure key={j} className="my-8 group">
-          <div className="rounded-2xl bg-[#121212] ring-1 ring-white/[0.08] overflow-hidden shadow-2xl shadow-black/20">
-            <div className="flex items-center gap-2 px-4 h-10 border-b border-white/[0.04]">
-              <div className="flex gap-1.5 mr-3">
-                <span className="h-3 w-3 rounded-full bg-white/[0.08]" />
-                <span className="h-3 w-3 rounded-full bg-white/[0.08]" />
-                <span className="h-3 w-3 rounded-full bg-white/[0.08]" />
-              </div>
-              <span className="text-[11px] font-mono text-white/30 tracking-wide">{lang}</span>
+        <figure key={j} className="code-frame">
+            <div className="code-bar">
+              <span>{lang}</span>
+              <CopyButton text={block.content} locale={locale} />
             </div>
             <div
-              className="overflow-x-auto px-5 py-4 text-[13.5px] leading-7 [&_pre]:!bg-transparent [&_pre]:!m-0 [&_pre]:!p-0 [&_code]:!text-[13.5px] [&_code]:!leading-7"
+              className="code-content"
               dangerouslySetInnerHTML={{ __html: html }}
             />
-          </div>
         </figure>,
       );
     } else {
@@ -97,7 +94,7 @@ export async function MdxContent({ content }: MdxContentProps) {
         const text = line.slice(4);
         const id = text.toLowerCase().replace(/[^a-z0-9\u4e00-\u9fff]+/g, "-").replace(/(^-|-$)/g, "");
         rendered.push(
-          <h3 key={j} id={id} className="text-[17px] font-semibold mt-12 mb-4 text-text tracking-tight scroll-mt-20">
+          <h3 key={j} id={id}>
             {text}
           </h3>,
         );
@@ -105,7 +102,7 @@ export async function MdxContent({ content }: MdxContentProps) {
         const text = line.slice(3);
         const id = text.toLowerCase().replace(/[^a-z0-9\u4e00-\u9fff]+/g, "-").replace(/(^-|-$)/g, "");
         rendered.push(
-          <h2 key={j} id={id} className="group text-2xl font-semibold tracking-tight mt-16 mb-5 pt-8 text-text border-t border-white/[0.04] first:border-0 first:pt-0 first:mt-0 scroll-mt-20">
+          <h2 key={j} id={id}>
             {text}
           </h2>,
         );
@@ -130,8 +127,8 @@ export async function MdxContent({ content }: MdxContentProps) {
           j++;
         }
         rendered.push(
-          <ol key={j} start={start === 1 ? undefined : start} className="my-6 list-decimal space-y-3 pl-6 text-[15px] leading-7 text-text-secondary">
-            {items.map((item, k) => <li key={k} className="pl-1"><Inline text={item} /></li>)}
+          <ol key={j} start={start === 1 ? undefined : start}>
+            {items.map((item, k) => <li key={k}><Inline text={item} /></li>)}
           </ol>,
         );
       } else if (line.startsWith("- ")) {
@@ -149,18 +146,17 @@ export async function MdxContent({ content }: MdxContentProps) {
           }
         }
         rendered.push(
-          <ul key={j} className="my-6 space-y-3">
+          <ul key={j}>
             {items.map((item, k) => (
-              <li key={k} className="flex gap-3 text-[15px] leading-7 text-text-secondary">
-                <span className="mt-[11px] h-1.5 w-1.5 shrink-0 rounded-full bg-accent/60" />
-                <span><Inline text={item} /></span>
+              <li key={k}>
+                <Inline text={item} />
               </li>
             ))}
           </ul>,
         );
       } else if (line.startsWith("> ")) {
         rendered.push(
-          <blockquote key={j} className="my-8 rounded-xl bg-accent/[0.04] border border-accent/10 px-5 py-4 text-[15px] text-text-secondary leading-7">
+          <blockquote key={j}>
             <Inline text={line.slice(2)} />
           </blockquote>,
         );
@@ -179,12 +175,12 @@ export async function MdxContent({ content }: MdxContentProps) {
           row.split("|").filter(Boolean).map((c) => c.trim()),
         );
         rendered.push(
-          <div key={j} className="my-8 overflow-x-auto rounded-2xl ring-1 ring-white/[0.08] bg-[#121212]">
-            <table className="w-full min-w-[480px] text-[14px]">
+          <div key={j} className="prose-table">
+            <table>
               <thead>
-                <tr className="border-b border-white/[0.06]">
+                <tr>
                   {headerCells.map((cell, k) => (
-                    <th key={k} className="text-left font-medium text-text px-5 py-3.5">
+                    <th key={k} scope="col">
                       {cell}
                     </th>
                   ))}
@@ -192,9 +188,9 @@ export async function MdxContent({ content }: MdxContentProps) {
               </thead>
               <tbody>
                 {bodyRows.map((row, ri) => (
-                  <tr key={ri} className="border-b border-white/[0.04] last:border-0">
+                  <tr key={ri}>
                     {row.map((cell, ci) => (
-                      <td key={ci} className="px-5 py-3 text-text-secondary">
+                      <td key={ci}>
                         <Inline text={cell} />
                       </td>
                     ))}
@@ -217,7 +213,7 @@ export async function MdxContent({ content }: MdxContentProps) {
           paragraph += ` ${blocks[j].content.trim()}`;
         }
         rendered.push(
-          <p key={j} className="mb-6 text-[16px] text-text-secondary leading-[1.85]">
+          <p key={j}>
             <Inline text={paragraph} />
           </p>,
         );
@@ -255,16 +251,16 @@ function Inline({ text }: { text: string }) {
     if (first.index > 0) parts.push(remaining.slice(0, first.index));
 
     if (first.type === "bold") {
-      parts.push(<strong key={k++} className="font-medium text-text">{first.match[1]}</strong>);
+      parts.push(<strong key={k++}>{first.match[1]}</strong>);
     } else if (first.type === "code") {
       parts.push(
-        <code key={k++} className="text-[0.9em] font-mono bg-white/[0.06] px-[5px] py-[2px] rounded text-text/90">
+        <code key={k++}>
           {first.match[1]}
         </code>,
       );
     } else if (first.type === "link") {
       parts.push(
-        <a key={k++} href={first.match[2]} className="text-accent underline underline-offset-[3px] decoration-accent/30 hover:decoration-accent transition-colors">
+        <a key={k++} href={first.match[2]}>
           {first.match[1]}
         </a>,
       );

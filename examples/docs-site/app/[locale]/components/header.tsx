@@ -1,104 +1,122 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { ArrowUpRight, Braces, CodeXml, FileText, Menu, Search, X } from "lucide-react";
 import type { Messages } from "@/messages";
 import type { Locale } from "@/lib/i18n";
+import type { DocMeta } from "@/lib/docs";
+import { searchDocs } from "@/lib/doc-search";
 
 interface HeaderProps {
   locale: Locale;
   messages: Messages["nav"];
+  docs: DocMeta[];
 }
 
-export function Header({ locale, messages }: HeaderProps) {
+export function Header({ locale, messages, docs }: HeaderProps) {
   const pathname = usePathname();
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [query, setQuery] = useState("");
+  const dialog = useRef<HTMLDialogElement>(null);
+  const searchInput = useRef<HTMLInputElement>(null);
+  const menuButton = useRef<HTMLButtonElement>(null);
+  const chinese = locale === "zh";
+  const searchLabel = chinese ? "搜索文档" : "Search documentation";
+  const closeLabel = chinese ? "关闭搜索" : "Close search";
+  const switchPath = pathname.replace(/^\/(en|zh)(?=\/|$)/, `/${chinese ? "en" : "zh"}`);
+  const results = searchDocs(docs, query);
+  const links = [
+    { href: `/${locale}/docs/introduction`, label: messages.docs, active: pathname.includes("/docs") && !/\/docs\/(guides|api-reference|support)/.test(pathname) },
+    { href: `/${locale}/docs/guides/quickstart`, label: messages.quickstart, active: pathname.includes("/docs/guides/") },
+    { href: `/${locale}/docs/api-reference/config`, label: messages.api, active: pathname.includes("/docs/api-reference/") },
+    { href: `/${locale}/docs/support`, label: messages.support, active: pathname.endsWith("/docs/support") },
+  ];
 
-  const switchLocale = locale === "en" ? "zh" : "en";
-  const switchPath = pathname.replace(`/${locale}`, `/${switchLocale}`);
-  const docsActive =
-    pathname.includes("/docs") &&
-    !pathname.includes("/docs/guides/quickstart") &&
-    !pathname.includes("/docs/api-reference") &&
-    !pathname.includes("/docs/support");
+  function openSearch() {
+    setMenuOpen(false);
+    dialog.current?.showModal();
+    searchInput.current?.focus();
+  }
 
-  return (
-    <header className="fixed top-0 z-50 w-full bg-bg/80 backdrop-blur-2xl backdrop-saturate-150 border-b border-white/[0.06]">
-      <div className="mx-auto flex h-[60px] max-w-[1400px] items-center px-8">
-        {/* Logo */}
-        <Link
-          href={`/${locale}`}
-          className="group flex items-center mr-10"
-        >
-          <span className="text-[17px] tracking-[-0.02em] text-text/90 group-hover:text-white transition-colors">
-            <span className="font-normal">next</span>
-            <span className="text-text-tertiary/50 mx-[2px]">/</span>
-            <span className="font-semibold">ai-ready</span>
-          </span>
+  useEffect(() => {
+    function shortcut(event: KeyboardEvent) {
+      if (event.key === "Escape" && dialog.current?.open) {
+        event.preventDefault();
+        dialog.current.close();
+        return;
+      }
+      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") {
+        event.preventDefault();
+        setMenuOpen(false);
+        dialog.current?.showModal();
+        searchInput.current?.focus();
+      }
+      if (event.key === "Escape" && menuOpen) {
+        setMenuOpen(false);
+        menuButton.current?.focus();
+      }
+    }
+    document.addEventListener("keydown", shortcut);
+    return () => document.removeEventListener("keydown", shortcut);
+  }, [menuOpen]);
+
+  useEffect(() => {
+    dialog.current?.close();
+    setMenuOpen(false);
+  }, [pathname]);
+
+  const navLinks = links.map((link) => (
+    <Link key={link.href} href={link.href} prefetch={false} aria-current={link.active ? "page" : undefined} onClick={() => setMenuOpen(false)}>
+      {link.label}
+    </Link>
+  ));
+
+  return <>
+    <a className="skip-link" href="#main-content">{chinese ? "跳到正文" : "Skip to content"}</a>
+    <header className="site-header">
+      <div className="header-inner">
+        <Link href={`/${locale}`} className="brand" aria-label="next-ai-ready">
+          <span className="brand-mark"><Braces size={17} aria-hidden="true" /></span>
+          <span>next-ai-ready</span>
         </Link>
-
-        {/* Nav */}
-        <nav className="hidden md:flex items-center gap-1">
-          <NavLink href={`/${locale}/docs/introduction`} active={docsActive}>
-            {messages.docs}
-          </NavLink>
-          <NavLink href={`/${locale}/docs/guides/quickstart`} active={pathname.includes("/guides")}>
-            {messages.quickstart}
-          </NavLink>
-          <NavLink href={`/${locale}/docs/api-reference/config`} active={pathname.includes("/api-reference")}>
-            {messages.api}
-          </NavLink>
-          <NavLink href={`/${locale}/docs/support`} active={pathname.includes("/docs/support")}>
-            {messages.support}
-          </NavLink>
-          <a
-            href="https://github.com/mustcanbedo/next-ai-ready"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center h-9 px-3 text-[13px] text-text-tertiary hover:text-text rounded-lg hover:bg-white/[0.03] transition-all"
-          >
-            GitHub
-          </a>
-        </nav>
-
-        {/* Spacer */}
-        <div className="flex-1" />
-
-        {/* Docs entry — search UI is not wired yet; link to docs index */}
-        <Link
-          href={`/${locale}/docs/introduction`}
-          className="hidden lg:flex items-center gap-2 h-9 px-3.5 rounded-lg bg-white/[0.04] border border-white/[0.06] text-text-tertiary/60 text-[13px] mr-4 hover:bg-white/[0.06] hover:border-white/[0.08] hover:text-text-secondary transition-all w-56"
-        >
-          <svg className="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
-          </svg>
-          <span>{locale === "en" ? "Browse docs" : "浏览文档"}</span>
-        </Link>
-
-        {/* Actions */}
-        <div className="flex items-center gap-1">
-          <Link
-            href={switchPath}
-            className="flex items-center h-9 px-3 text-[13px] font-medium text-text-tertiary hover:text-text rounded-lg hover:bg-white/[0.04] transition-all"
-          >
-            {locale === "en" ? "中文" : "EN"}
-          </Link>
+        <nav className="header-nav" aria-label={chinese ? "主导航" : "Main navigation"}>{navLinks}</nav>
+        <div className="header-actions">
+          <button type="button" className="search-trigger" onClick={openSearch} aria-label={searchLabel} title={searchLabel} aria-haspopup="dialog">
+            <Search aria-hidden="true" /><span>{chinese ? "搜索文档…" : "Search docs…"}</span>
+          </button>
+          <a className="icon-button header-github" href="https://github.com/mustcanbedo/next-ai-ready" aria-label="GitHub" title="GitHub"><CodeXml aria-hidden="true" /></a>
+          <Link href={switchPath} className="locale-link" hrefLang={chinese ? "en" : "zh"} aria-label={chinese ? "Switch to English" : "切换到中文"}>{chinese ? "EN" : "中文"}</Link>
+          <button ref={menuButton} type="button" className="icon-button mobile-menu-button" onClick={() => setMenuOpen(!menuOpen)} aria-label={chinese ? "主菜单" : "Main menu"} aria-controls="mobile-main-nav" aria-expanded={menuOpen} title={chinese ? "主菜单" : "Main menu"}>
+            {menuOpen ? <X aria-hidden="true" /> : <Menu aria-hidden="true" />}
+          </button>
         </div>
       </div>
+      <nav id="mobile-main-nav" className={`mobile-header-nav ${menuOpen ? "is-open" : ""}`} aria-label={chinese ? "移动主导航" : "Mobile navigation"}>
+        {navLinks}
+        <a href="https://github.com/mustcanbedo/next-ai-ready">GitHub</a>
+      </nav>
     </header>
-  );
-}
-
-function NavLink({ href, active, children }: { href: string; active: boolean; children: React.ReactNode }) {
-  return (
-    <Link
-      href={href}
-      className={`relative flex items-center h-9 px-3.5 text-[14px] rounded-lg transition-all ${
-        active
-          ? "text-text font-medium bg-white/[0.05]"
-          : "text-text-tertiary hover:text-text hover:bg-white/[0.03]"
-      }`}
-    >
-      {children}
-    </Link>
-  );
+    <dialog ref={dialog} className="search-dialog" aria-label={searchLabel} onClose={() => setQuery("")} onClick={(event) => {
+      if (event.target === dialog.current) {
+        const rect = dialog.current.getBoundingClientRect();
+        if (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom) dialog.current.close();
+      }
+    }}>
+      <div className="search-input-row">
+        <Search size={18} className="shrink-0 text-accent" aria-hidden="true" />
+        <input ref={searchInput} type="search" aria-label={searchLabel} placeholder={chinese ? "查找指南、配置或 API" : "Find a guide, config or API"} value={query} onChange={(event) => setQuery(event.target.value)} />
+        <button type="button" className="icon-button" onClick={() => dialog.current?.close()} aria-label={closeLabel} title={closeLabel}><X aria-hidden="true" /></button>
+      </div>
+      <p className="px-5 pt-4 text-xs text-text-tertiary" role="status">{query.trim() ? (chinese ? `${results.length} 条结果` : `${results.length} results`) : (chinese ? "开始阅读" : "Start reading")}</p>
+      <div className="search-results">
+        {results.length ? results.map((doc) => <Link href={`/${locale}/docs/${doc.slug}`} prefetch={false} key={doc.slug} className="search-result" onClick={() => dialog.current?.close()}>
+          <FileText size={18} className="shrink-0 text-accent" aria-hidden="true" />
+          <div className="min-w-0 flex-1"><strong>{doc.title}</strong><p>{doc.summary}</p></div>
+          <ArrowUpRight size={15} className="shrink-0 text-text-tertiary" aria-hidden="true" />
+        </Link>) : <p className="p-5 text-sm text-text-secondary">{chinese ? "没有找到对应文档。" : "No matching documentation."}</p>}
+      </div>
+    </dialog>
+  </>;
 }

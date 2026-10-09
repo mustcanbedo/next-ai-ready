@@ -18,13 +18,16 @@ tags:
   - frontmatter
   - llms.txt
   - ai-readable-docs
-updatedAt: '2026-10-01'
+updatedAt: '2026-10-09'
 author: next-ai-ready 团队
 ---
 
 # 用 Next.js MDX 内容集合生成 AI 可读文档
 
 MDX 内容集合是一组遵循固定字段和路由规则的 Markdown 或 MDX 源文件。在 Next.js 项目中，next-ai-ready 可以在构建时读取这些文件，生成 `llms.txt`、逐页 Markdown、JSON-LD 与可搜索的语义图，同时保留现有的人类页面和组件系统。
+
+完整的端点接入从 [Next.js llms.txt 实战教程](./nextjs-llms-txt) 开始。本篇用于选择内容源文件、
+映射路由，以及排查页面为什么没有进入机器输出。
 
 最小流程只有四步：
 
@@ -196,9 +199,50 @@ pnpm exec next-ai-ready audit https://docs.example.com --version 3
 
 ## 常见内容集合问题
 
-- **内容集合为空。** 从项目根目录检查 glob 与忽略规则。
+### 内容集合为空
+
+**症状：** 构建成功，但 `public/llms.txt` 和 `.next-ai-ready/graph.json` 中没有预期页面。
+构建流程可能没有扫描到实际的源目录。
+
+**修复：** 从包含 `ai-ready.config.*` 的应用根目录运行命令，匹配原始源文件，而不是其他工具
+生成的 JavaScript 目录。上面的示例应使用 `content/docs/**/*.{md,mdx}`，确认
+`content/docs/installation.mdx` 存在且未被排除。重新构建应用并启动新的服务器进程，运行中的
+handler 会缓存语义图：
+
+```bash
+pnpm build
+pnpm start
+```
+
+在另一个终端检查：
+
+```bash
+curl -i http://localhost:3000/llms.txt
+curl -i http://localhost:3000/docs/installation.md
+```
+
+**复验：** 索引列出 `/docs/installation`，页面返回 `text/markdown`、`安装 Acme` 标题和安装
+依赖的正文。HTTP `200` 中出现 `document_status: "not_found"` 仍然表示缺页；图谱正确但读取
+结果不对时，继续用 [端点排障步骤](./nextjs-llms-txt) 检查。
+
+### 生产产物出现本地 URL
+
+**症状：** 部署后的索引 URL、页面 canonical 或 Markdown 的 canonical `Link` 响应头仍指向
+`localhost` 或开发域名。
+
+**修复：** 将生产构建所用配置的 `site.baseUrl` 设为真实公开域名，重新构建并部署该产物。
+只改配置、不重新构建，不会更新已生成的 URL。将下面的示例域名替换为你的站点：
+
+```bash
+curl -i https://docs.example.com/llms.txt
+curl -i https://docs.example.com/docs/installation.md
+```
+
+**复验：** 索引和页面 canonical `Link` 响应头使用生产域名，Markdown 正文属于预期页面。
+如果渲染器提供对应 HTML 路由，也检查它的 canonical。`site.baseUrl` 不负责配置域名、修正
+错误路由，也不能保证收录。
+
 - **路由包含 `content/` 或 `src/app/`。** 升级软件包并检查源目录规则。
-- **生成产物出现本地 URL。** 构建前将 `site.baseUrl` 设置为生产域名。
 - **UI 路由与语义图路由不一致。** 使用带显式 route 的 Content Source Adapter。
 - **私有草稿进入 `llms.txt`。** 从匹配源中排除草稿；除非部署层保护，否则生成产物都是公开的。
 - **页面出现在错误搜索词下。** 让 title、summary、H1 与第一段回答同一个具体问题，而不是继续堆标签。

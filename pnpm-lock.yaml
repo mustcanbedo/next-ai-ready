@@ -60,6 +60,9 @@ importers:
       next-ai-ready:
         specifier: workspace:*
         version: link:../../packages/meta
+      next-themes:
+        specifier: 0.4.6
+        version: 0.4.6(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       react:
         specifier: 19.2.4
         version: 19.2.4

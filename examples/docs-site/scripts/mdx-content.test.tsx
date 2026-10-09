@@ -12,6 +12,14 @@ async function render(content: string) {
 }
 
 describe("documentation tutorial steps", () => {
+  it("ships both syntax themes without moving code rendering to the client", async () => {
+    const html = await render('```typescript\nconst ready = true;\n```');
+    expect(html).toContain("github-light");
+    expect(html).toContain("github-dark");
+    expect(html).toContain("--shiki-dark:");
+    expect(html).toContain("const");
+  });
+
   it("renders numbered steps as a semantic ordered list with inline formatting", async () => {
     const html = await render("1. Install `next-ai-ready`.\n2. **Configure** the [content](./mdx-content).\n3. Build.\n4. Verify.");
     expect(html).toContain("<ol");

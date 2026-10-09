@@ -21,6 +21,21 @@ beforeEach(() => {
 });
 
 describe("documentation sidebar crawling", () => {
+  it.each(["en", "zh"] as const)("uses a concise %s guide label while preserving its full title and URL", (locale) => {
+    pathname.mockReturnValue(`/${locale}/docs/guides/nextjs-llms-txt`);
+    const html = renderToStaticMarkup(createElement(Sidebar, {
+      locale,
+      groups: { guides: [docs[1]] },
+      sectionLabels: { guides: "Guides" },
+    }));
+    const props = link.mock.calls[0][0];
+    expect(props.children).toBe(locale === "zh" ? "llms.txt 与 Markdown" : "llms.txt & Markdown");
+    expect(props.title).toBe(docs[1].title);
+    expect(props.href).toBe(`/${locale}/docs/${docs[1].slug}`);
+    expect(props["aria-current"]).toBe("page");
+    expect(html).toContain('aria-controls="docs-sidebar-nav"');
+  });
+
   it.each(["en", "zh"] as const)("keeps %s anchors and active styling without automatic prefetch", (locale) => {
     pathname.mockReturnValue(`/${locale}/docs/installation`);
     const html = renderToStaticMarkup(createElement(Sidebar, {

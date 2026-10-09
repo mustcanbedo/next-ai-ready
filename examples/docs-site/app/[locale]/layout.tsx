@@ -6,6 +6,7 @@ import { getSiteJsonLd } from "next-ai-ready/json-ld";
 import { JsonLd } from "../components/json-ld";
 import { locales, type Locale } from "@/lib/i18n";
 import { getSiteBaseUrl, getSiteDescription, SITE_NAME } from "@/lib/site";
+import { DocsThemeProvider } from "./components/theme-provider";
 
 const geist = Geist({ subsets: ["latin"], variable: "--font-geist" });
 const geistMono = Geist_Mono({
@@ -29,6 +30,7 @@ export async function generateMetadata({
 
   return {
     metadataBase: new URL(getSiteBaseUrl()),
+    icons: { icon: "/icon.svg" },
     title: { default: defaultTitle, template: "%s — next-ai-ready" },
     description,
     verification: verification ? { google: verification } : undefined,
@@ -64,10 +66,10 @@ export default async function LocaleLayout({
   const siteJsonLd = await getSiteJsonLd();
 
   return (
-    <html lang={locale} className={`${geist.variable} ${geistMono.variable}`}>
+    <html lang={locale} suppressHydrationWarning data-scroll-behavior="smooth" className={`${geist.variable} ${geistMono.variable}`}>
       <body>
         <JsonLd data={siteJsonLd} />
-        {children}
+        <DocsThemeProvider>{children}</DocsThemeProvider>
         <Analytics />
       </body>
     </html>

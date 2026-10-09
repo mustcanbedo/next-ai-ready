@@ -8,6 +8,63 @@ import { CURATED_FAQ } from "./faq-curated.mjs";
 for (const [locale, title] of [["en", "Quickstart Check"], ["zh", "快速接入检查"]]) {
   const path = new URL(`../content/${locale}/docs/guides/quickstart.mdx`, import.meta.url);
 
+  test(`${locale} llms and MDX guides connect the endpoint and content tasks`, async () => {
+    for (const [slug, target] of [["nextjs-llms-txt", "mdx-content"], ["mdx-content", "nextjs-llms-txt"]]) {
+      const source = new URL(`../content/${locale}/docs/guides/${slug}.mdx`, import.meta.url);
+      const { content } = matter(await readFile(source, "utf8"));
+      assert.ok(content.includes(`](./${target})`), `${slug}: missing contextual guide link`);
+      await readFile(new URL(`./${target}.mdx`, source), "utf8");
+    }
+  });
+
+  test(`${locale} llms troubleshooting distinguishes HTML fallback from missing-page recovery`, async () => {
+    const source = new URL(`../content/${locale}/docs/guides/nextjs-llms-txt.mdx`, import.meta.url);
+    const { content } = matter(await readFile(source, "utf8"));
+    const heading = locale === "en" ? "## Common mistakes" : "## 常见问题";
+    const diagnostics = content.split(heading)[1]?.split(/\n## /)[0];
+    assert.ok(diagnostics, "troubleshooting must be part of the guide");
+    for (const text of [
+      "withAiReady()",
+      "text/html",
+      "Content-Type: text/markdown",
+      'document_status: "not_found"',
+      "X-Robots-Tag: noindex",
+      ".next-ai-ready/graph.json",
+      "public/llms.txt",
+      "curl -i -H 'Accept: text/markdown' http://localhost:3000/about.md",
+      "curl -i http://localhost:3000/about.md",
+    ]) assert.ok(diagnostics.includes(text), `missing retrieval diagnostic: ${text}`);
+    for (const label of locale === "en" ? ["**Symptom:**", "**Fix:**", "**Verify:**"] : ["**症状：**", "**修复：**", "**复验：**"]) {
+      assert.equal(diagnostics.split(label).length - 1, 2, `both retrieval failures need ${label}`);
+    }
+    assert.doesNotMatch(diagnostics, /curl -I /, "inspect the body, not only HEAD");
+  });
+
+  test(`${locale} MDX troubleshooting rebuilds content and verifies production canonical URLs`, async () => {
+    const source = new URL(`../content/${locale}/docs/guides/mdx-content.mdx`, import.meta.url);
+    const { content } = matter(await readFile(source, "utf8"));
+    const heading = locale === "en" ? "## Common content collection problems" : "## 常见内容集合问题";
+    const diagnostics = content.split(heading)[1];
+    assert.ok(diagnostics, "collection diagnostics must be part of the guide");
+    for (const text of [
+      "content/docs/**/*.{md,mdx}",
+      "content/docs/installation.mdx",
+      ".next-ai-ready/graph.json",
+      "pnpm build\npnpm start",
+      "curl -i http://localhost:3000/docs/installation.md",
+      "curl -i https://docs.example.com/llms.txt",
+      "curl -i https://docs.example.com/docs/installation.md",
+      'document_status: "not_found"',
+      "site.baseUrl",
+      "canonical",
+      "`Link`",
+    ]) assert.ok(diagnostics.includes(text), `missing collection diagnostic: ${text}`);
+    for (const label of locale === "en" ? ["**Symptom:**", "**Fix:**", "**Verify:**"] : ["**症状：**", "**修复：**", "**复验：**"]) {
+      assert.equal(diagnostics.split(label).length - 1, 2, `both collection failures need ${label}`);
+    }
+    assert.doesNotMatch(diagnostics, /curl -I /, "verify the deployed page body");
+  });
+
   for (const slug of ["guides/quickstart", "installation", "getting-started/project-structure"]) {
     test(`${locale} ${slug} FAQ agrees with its curated source`, async () => {
       const source = new URL(`../content/${locale}/docs/${slug}.mdx`, import.meta.url);

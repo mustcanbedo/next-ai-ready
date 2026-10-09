@@ -1750,11 +1750,14 @@ No. The default search is deterministic local lexical search over the build-time
 <!-- BEGIN /en/docs/guides/mdx-content -->
 # Next.js MDX content collections for AI-readable docs
 URL: https://nextaiready.com/en/docs/guides/mdx-content
-Updated: 2026-10-01
+Updated: 2026-10-09
 
 # Next.js MDX content collections for AI-readable docs
 
 An MDX content collection is a directory of Markdown or MDX source files that share a predictable schema and route convention. In a Next.js project, next-ai-ready can read that collection at build time and generate `llms.txt`, per-page Markdown, JSON-LD, and a searchable semantic graph without replacing the UI that already renders the content.
+
+For the complete endpoint setup, start with the [Next.js llms.txt walkthrough](./nextjs-llms-txt).
+Use this guide when you need to select source files, map routes, or diagnose a missing page.
 
 The minimal workflow is:
 
@@ -1930,9 +1933,52 @@ Confirm that normal page URLs still return HTML, `.md` URLs return Markdown, and
 
 ## Common content collection problems
 
-- **The collection is empty.** Run the content glob against the project root and check ignored paths.
+### The collection is empty
+
+**Symptom:** a successful build leaves the intended page out of `public/llms.txt` and
+`.next-ai-ready/graph.json`. The build may not be scanning your source directory.
+
+**Fix:** run from the application root containing `ai-ready.config.*` and match the actual source
+files, not another tool's generated JavaScript directory. For the example above, use
+`content/docs/**/*.{md,mdx}` and confirm `content/docs/installation.mdx` exists and is not excluded.
+Rebuild the app and start a new server process; the running handler caches its graph:
+
+```bash
+pnpm build
+pnpm start
+```
+
+In another terminal:
+
+```bash
+curl -i http://localhost:3000/llms.txt
+curl -i http://localhost:3000/docs/installation.md
+```
+
+**Verify:** the index lists `/docs/installation`, and the page returns `text/markdown` with the
+`Install Acme` title and dependency-installation instructions. A `200` response containing
+`document_status: "not_found"` is still a missing page; use the [endpoint troubleshooting
+steps](./nextjs-llms-txt) if the graph is correct but retrieval is not.
+
+### Production output contains local URLs
+
+**Symptom:** an index URL, page canonical, or Markdown canonical `Link` header points to
+`localhost` or a development host after deployment.
+
+**Fix:** set `site.baseUrl` in the config used by the production build to the real public origin.
+Rebuild and redeploy that artifact; changing config without a new build leaves the generated URLs
+unchanged. Replace this example origin with your own domain:
+
+```bash
+curl -i https://docs.example.com/llms.txt
+curl -i https://docs.example.com/docs/installation.md
+```
+
+**Verify:** the index and the page's canonical `Link` header use the production origin, and the
+Markdown body is the intended page. If your renderer serves the HTML route, check its canonical
+too. Setting `site.baseUrl` does not configure a domain, fix a wrong route, or guarantee indexing.
+
 - **Routes contain `content/` or `src/app/`.** Upgrade the package and verify the source-root rules.
-- **Generated output contains local URLs.** Set `site.baseUrl` to the production origin before build.
 - **The UI route differs from the graph route.** Add a content source adapter with explicit routes.
 - **Private drafts appear in `llms.txt`.** Exclude drafts from the matched source; generated artifacts are public unless the deployment protects them.
 - **The page ranks for the wrong query.** Make the title, summary, H1, and first paragraph answer the same specific problem instead of adding more tags.
@@ -1963,7 +2009,7 @@ No. File scanning, metadata extraction, chunking, and output generation are dete
 <!-- BEGIN /en/docs/guides/nextjs-llms-txt -->
 # Add llms.txt and Markdown endpoints to Next.js App Router
 URL: https://nextaiready.com/en/docs/guides/nextjs-llms-txt
-Updated: 2026-10-02
+Updated: 2026-10-09
 
 # Add llms.txt and Markdown endpoints to Next.js App Router
 
@@ -2138,6 +2184,9 @@ Acme gives support teams one searchable source for verified product answers.
 Clear titles, summaries, authorship, freshness, and direct answers are useful to people as well as
 AI consumers. Do not add claims or FAQ answers that the visible page cannot support.
 
+For a collection of pages, follow the [MDX content collection guide](./mdx-content) to match the
+source directory and verify how each file maps to a public route before generating the interfaces.
+
 ## 3. Generate the interfaces
 
 ```bash
@@ -2187,12 +2236,46 @@ normal browser pages still return HTML.
 
 ## Common mistakes
 
-- **The endpoint returns the app's HTML shell.** Check that `withAiReady()` wraps the exported
-  Next.js config and that the generated route handlers exist.
-- **`llms.txt` is empty or misses pages.** Check the `content` globs in `ai-ready.config.*`, then run
-  the build again.
-- **Local URLs appear in production output.** Set the production `site.baseUrl` and rebuild before
-  deployment.
+### A Markdown endpoint returns HTML
+
+**Symptom:** `/about.md` returns `text/html` or the app's HTML shell instead of the source page.
+The Markdown request is reaching the app rather than the AI handler.
+
+**Fix:** check that `withAiReady()` wraps the exported Next.js config and that the Markdown route
+handler generated by `init` exists. Preserve existing plugins and customized config; do not create
+a second config file. Rebuild the app and restart its server before repeating the request:
+
+```bash
+curl -i -H 'Accept: text/markdown' http://localhost:3000/about.md
+```
+
+**Verify:** expect `200`, `Content-Type: text/markdown`, the `About Acme` title, and its actual body.
+If the app already serves `/about` as a browser page, also request it with `Accept: text/html` and
+confirm it still returns HTML. A source file alone does not create that browser route.
+
+### A page returns 200 but is missing
+
+**Symptom:** the Markdown response has `document_status: "not_found"` and `X-Robots-Tag: noindex`.
+This is the handler's missing-page recovery document, not the requested page, even though its HTTP
+status is `200`.
+
+**Fix:** find the intended route in `.next-ai-ready/graph.json` and `public/llms.txt`. If it is absent,
+check the matched source files and [MDX route mapping](./mdx-content). For this guide,
+`content/about.mdx` maps to `/about`; do not guess the URL from the source filename. Rebuild and
+restart after correcting the source or route.
+
+```bash
+curl -i http://localhost:3000/llms.txt
+curl -i http://localhost:3000/about.md
+```
+
+**Verify:** the index lists `/about` and the page response contains the expected title and body,
+without the `not_found` marker. A genuinely missing page should still return the recovery document;
+do not remove that safeguard just to make a test pass.
+
+For an empty content index or local URLs in production, use the [MDX collection troubleshooting
+steps](./mdx-content). Repeat the same GET checks against your deployed origin after fixing them.
+
 - **Private content appears in a generated artifact.** Remove it from the content source or apply an
   explicit exclusion; generated files are public unless the deployment protects them.
 - **The audit is high but citations do not increase.** Readability is an input, not a ranking or
@@ -4836,11 +4919,14 @@ Next.js 运行时走 /api/mcp HTTP 传输；Claude Desktop/Cursor 可用 npx nex
 <!-- BEGIN /zh/docs/guides/mdx-content -->
 # 用 Next.js MDX 内容集合生成 AI 可读文档
 URL: https://nextaiready.com/zh/docs/guides/mdx-content
-Updated: 2026-10-01
+Updated: 2026-10-09
 
 # 用 Next.js MDX 内容集合生成 AI 可读文档
 
 MDX 内容集合是一组遵循固定字段和路由规则的 Markdown 或 MDX 源文件。在 Next.js 项目中，next-ai-ready 可以在构建时读取这些文件，生成 `llms.txt`、逐页 Markdown、JSON-LD 与可搜索的语义图，同时保留现有的人类页面和组件系统。
+
+完整的端点接入从 [Next.js llms.txt 实战教程](./nextjs-llms-txt) 开始。本篇用于选择内容源文件、
+映射路由，以及排查页面为什么没有进入机器输出。
 
 最小流程只有四步：
 
@@ -5012,9 +5098,50 @@ pnpm exec next-ai-ready audit https://docs.example.com --version 3
 
 ## 常见内容集合问题
 
-- **内容集合为空。** 从项目根目录检查 glob 与忽略规则。
+### 内容集合为空
+
+**症状：** 构建成功，但 `public/llms.txt` 和 `.next-ai-ready/graph.json` 中没有预期页面。
+构建流程可能没有扫描到实际的源目录。
+
+**修复：** 从包含 `ai-ready.config.*` 的应用根目录运行命令，匹配原始源文件，而不是其他工具
+生成的 JavaScript 目录。上面的示例应使用 `content/docs/**/*.{md,mdx}`，确认
+`content/docs/installation.mdx` 存在且未被排除。重新构建应用并启动新的服务器进程，运行中的
+handler 会缓存语义图：
+
+```bash
+pnpm build
+pnpm start
+```
+
+在另一个终端检查：
+
+```bash
+curl -i http://localhost:3000/llms.txt
+curl -i http://localhost:3000/docs/installation.md
+```
+
+**复验：** 索引列出 `/docs/installation`，页面返回 `text/markdown`、`安装 Acme` 标题和安装
+依赖的正文。HTTP `200` 中出现 `document_status: "not_found"` 仍然表示缺页；图谱正确但读取
+结果不对时，继续用 [端点排障步骤](./nextjs-llms-txt) 检查。
+
+### 生产产物出现本地 URL
+
+**症状：** 部署后的索引 URL、页面 canonical 或 Markdown 的 canonical `Link` 响应头仍指向
+`localhost` 或开发域名。
+
+**修复：** 将生产构建所用配置的 `site.baseUrl` 设为真实公开域名，重新构建并部署该产物。
+只改配置、不重新构建，不会更新已生成的 URL。将下面的示例域名替换为你的站点：
+
+```bash
+curl -i https://docs.example.com/llms.txt
+curl -i https://docs.example.com/docs/installation.md
+```
+
+**复验：** 索引和页面 canonical `Link` 响应头使用生产域名，Markdown 正文属于预期页面。
+如果渲染器提供对应 HTML 路由，也检查它的 canonical。`site.baseUrl` 不负责配置域名、修正
+错误路由，也不能保证收录。
+
 - **路由包含 `content/` 或 `src/app/`。** 升级软件包并检查源目录规则。
-- **生成产物出现本地 URL。** 构建前将 `site.baseUrl` 设置为生产域名。
 - **UI 路由与语义图路由不一致。** 使用带显式 route 的 Content Source Adapter。
 - **私有草稿进入 `llms.txt`。** 从匹配源中排除草稿；除非部署层保护，否则生成产物都是公开的。
 - **页面出现在错误搜索词下。** 让 title、summary、H1 与第一段回答同一个具体问题，而不是继续堆标签。
@@ -5045,7 +5172,7 @@ pnpm exec next-ai-ready audit https://docs.example.com --version 3
 <!-- BEGIN /zh/docs/guides/nextjs-llms-txt -->
 # 为 Next.js App Router 添加 llms.txt 与 Markdown 端点
 URL: https://nextaiready.com/zh/docs/guides/nextjs-llms-txt
-Updated: 2026-10-02
+Updated: 2026-10-09
 
 # 为 Next.js App Router 添加 llms.txt 与 Markdown 端点
 
@@ -5214,6 +5341,9 @@ Acme 为客服团队提供一个可搜索的可信产品答案来源。
 清晰的标题、摘要、作者、更新时间和直接回答同时服务人类与 AI。不要添加可见页面无法支持
 的营销主张或 FAQ 答案。
 
+如果有多篇页面，继续查看 [MDX 内容集合指南](./mdx-content)，先匹配源目录、确认每个文件的
+公开路由，再生成机器接口。
+
 ## 3. 生成机器接口
 
 ```bash
@@ -5259,10 +5389,43 @@ pnpm exec next-ai-ready audit https://example.com --version 3
 
 ## 常见问题
 
-- **端点返回应用的 HTML 外壳。** 检查导出的 Next.js config 是否由 `withAiReady()` 包装，并确认
-  生成的 route handler 已存在。
-- **`llms.txt` 为空或缺少页面。** 检查 `ai-ready.config.*` 的 `content` glob，再重新构建。
-- **生产产物中出现本地 URL。** 设置生产环境的 `site.baseUrl`，然后重新构建与部署。
+### Markdown 端点返回 HTML
+
+**症状：** `/about.md` 返回 `text/html` 或应用的 HTML 外壳，而不是源页面。Markdown 请求落到
+了应用页面，没有到达 AI handler。
+
+**修复：** 检查导出的 Next.js config 是否由 `withAiReady()` 包装，以及 `init` 生成的 Markdown
+route handler 是否存在。保留已有插件和自定义配置，不要创建第二份 config。重新构建应用、
+重启服务器后再请求：
+
+```bash
+curl -i -H 'Accept: text/markdown' http://localhost:3000/about.md
+```
+
+**复验：** 应得到 `200`、`Content-Type: text/markdown`、`关于 Acme` 标题和对应正文。如果应用
+已有 `/about` 浏览器页面，再用 `Accept: text/html` 请求它，确认仍返回 HTML。源文件本身不会
+创建该浏览器路由。
+
+### 返回 200 但页面实际缺失
+
+**症状：** Markdown 响应包含 `document_status: "not_found"`，响应头含 `X-Robots-Tag: noindex`。
+这是 handler 的缺页恢复文档，不是请求的页面；HTTP `200` 不能算读取成功。
+
+**修复：** 在 `.next-ai-ready/graph.json` 和 `public/llms.txt` 中查找预期路由。如果没有，检查
+匹配到的源文件，并对照 [MDX 路由映射](./mdx-content)。本指南的 `content/about.mdx` 对应
+`/about`，不要只根据文件名猜 URL。修正内容源或路由后重新构建并重启。
+
+```bash
+curl -i http://localhost:3000/llms.txt
+curl -i http://localhost:3000/about.md
+```
+
+**复验：** 索引列出 `/about`，页面响应包含预期标题与正文，不含 `not_found` 标记。真正不存在
+的页面仍应返回恢复文档，不要为了通过检查而移除这项保护。
+
+内容索引为空或生产 URL 指向本机时，使用 [MDX 内容集合排障步骤](./mdx-content)。修复后还要
+将这些 GET 请求换成部署域名再检查一次。
+
 - **私有内容出现在生成产物中。** 将它从内容源移除或显式排除；除非部署层另有保护，生成文件
   默认公开。
 - **审计分数很高但引用没有增加。** 可读性只是输入条件，不是排名或引用保证；应另行衡量真实

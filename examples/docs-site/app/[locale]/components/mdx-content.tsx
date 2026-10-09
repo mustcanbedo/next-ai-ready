@@ -21,7 +21,7 @@ interface MdxContentProps {
 async function highlight(code: string, lang: string): Promise<string> {
   return codeToHtml(code, {
     lang: lang || "text",
-    theme: "github-light",
+    themes: { light: "github-light", dark: "github-dark" },
   });
 }
 

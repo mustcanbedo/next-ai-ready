@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowLeft, ArrowRight, ChevronRight, FileText } from "lucide-react";
+import { ArrowLeft, ArrowRight, ChevronRight, FileText, SquarePen } from "lucide-react";
 import { notFound } from "next/navigation";
 import { getPageJsonLd } from "next-ai-ready/json-ld";
 import { JsonLd } from "../../../components/json-ld";
@@ -75,10 +75,13 @@ export default async function DocPage({ params }: PageProps) {
       <JsonLd data={pageJsonLd} />
       <article className="doc-article">
         <header className="doc-header">
-          <nav className="doc-breadcrumb" aria-label={locale === "zh" ? "面包屑导航" : "Breadcrumb"}>
-            <Link href={`/${locale}/docs/introduction`}>{locale === "zh" ? "文档" : "Docs"}</Link>
-            <ChevronRight aria-hidden="true" /><span>{sectionLabel}</span>
-          </nav>
+          <div className="doc-toolbar">
+            <nav className="doc-breadcrumb" aria-label={locale === "zh" ? "面包屑导航" : "Breadcrumb"}>
+              <Link href={`/${locale}/docs/introduction`}>{locale === "zh" ? "文档" : "Docs"}</Link>
+              <ChevronRight aria-hidden="true" /><span>{sectionLabel}</span>
+            </nav>
+            <a href={`/${locale}/docs/${doc.slug}.md`} className="doc-markdown"><FileText size={13} aria-hidden="true" />Markdown</a>
+          </div>
           <h1>
             {doc.title}
           </h1>
@@ -87,19 +90,19 @@ export default async function DocPage({ params }: PageProps) {
               {doc.summary}
             </p>
           )}
-            <div className="doc-meta">
-              {doc.author && <span>{doc.author}</span>}
-              {doc.updatedAt && (
-                <span>
-                  {locale === "en" ? "Last updated: " : "最后更新："}
-                  <time dateTime={doc.updatedAt}>{doc.updatedAt}</time>
-                </span>
-              )}
-              <a href={`/${locale}/docs/${doc.slug}.md`}><FileText size={13} aria-hidden="true" />Markdown</a>
-            </div>
+          <div className="doc-meta">
+            {doc.author && <span>{doc.author}</span>}
+            {doc.updatedAt && (
+              <span>
+                {locale === "en" ? "Last updated: " : "最后更新："}
+                <time dateTime={doc.updatedAt}>{doc.updatedAt}</time>
+              </span>
+            )}
+          </div>
         </header>
         {headings.length > 0 && <details className="mobile-toc"><summary>{locale === "zh" ? "本页目录" : "On this page"}</summary><ul>{headings.map((heading) => <li key={heading.id}><a href={`#${heading.id}`}>{heading.text}</a></li>)}</ul></details>}
         <MdxContent content={doc.content} locale={locale as Locale} />
+        <a className="doc-edit" href={`https://github.com/mustcanbedo/next-ai-ready/edit/main/examples/docs-site/content/${locale}/docs/${doc.slug}.mdx`}><SquarePen size={14} aria-hidden="true" />{locale === "zh" ? "在 GitHub 上编辑此页" : "Edit this page on GitHub"}</a>
 
         {/* Prev / Next */}
         <nav className="doc-pagination" aria-label={locale === "zh" ? "相邻文档" : "Adjacent documentation"}>

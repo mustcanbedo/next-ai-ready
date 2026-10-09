@@ -8,6 +8,7 @@ import type { Messages } from "@/messages";
 import type { Locale } from "@/lib/i18n";
 import type { DocMeta } from "@/lib/docs";
 import { searchDocs } from "@/lib/doc-search";
+import { ThemeSelect } from "./theme-select";
 
 interface HeaderProps {
   locale: Locale;
@@ -84,9 +85,10 @@ export function Header({ locale, messages, docs }: HeaderProps) {
         <nav className="header-nav" aria-label={chinese ? "主导航" : "Main navigation"}>{navLinks}</nav>
         <div className="header-actions">
           <button type="button" className="search-trigger" onClick={openSearch} aria-label={searchLabel} title={searchLabel} aria-haspopup="dialog">
-            <Search aria-hidden="true" /><span>{chinese ? "搜索文档…" : "Search docs…"}</span>
+            <Search aria-hidden="true" /><span>{chinese ? "搜索文档…" : "Search docs…"}</span><kbd aria-hidden="true">⌘ K</kbd>
           </button>
           <a className="icon-button header-github" href="https://github.com/mustcanbedo/next-ai-ready" aria-label="GitHub" title="GitHub"><CodeXml aria-hidden="true" /></a>
+          <ThemeSelect locale={locale} />
           <Link href={switchPath} className="locale-link" hrefLang={chinese ? "en" : "zh"} aria-label={chinese ? "Switch to English" : "切换到中文"}>{chinese ? "EN" : "中文"}</Link>
           <button ref={menuButton} type="button" className="icon-button mobile-menu-button" onClick={() => setMenuOpen(!menuOpen)} aria-label={chinese ? "主菜单" : "Main menu"} aria-controls="mobile-main-nav" aria-expanded={menuOpen} title={chinese ? "主菜单" : "Main menu"}>
             {menuOpen ? <X aria-hidden="true" /> : <Menu aria-hidden="true" />}

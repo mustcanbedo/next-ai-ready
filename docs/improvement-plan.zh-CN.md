@@ -1,9 +1,9 @@
 # next-ai-ready 产品改进台账
 
-> 最后更新：2026-10-07
+> 最后更新：2026-10-09
 > 维护者视角：`next-ai-ready` 原始作者与技术负责人  
 > 当前仓库候选：`next-ai-ready@0.1.0-alpha.22`（公开 npm 状态以 dist-tags 为准）
-> 当前主分支基线：`a11b44c`（PR #54 已合入；Release Alpha #11 已完成发布与标签核验）
+> 当前主分支基线：`96482c5`（PR #57 已合入；Release Alpha #11 的发布与标签核验保留为历史发布记录）
 > 最近公开版本：`next-ai-ready@0.1.0-alpha.22` 已发布并提升为 `latest`（2026-10-03 registry 核验）
 
 本文是后续优化的**执行状态与决策记录**。`roadmap.md` 保留工程阶段历史，
@@ -174,6 +174,35 @@ Nuxt 的全部功能。
 > Make any Next.js site readable by AI in 10 minutes. Add callable agent actions when you are ready.
 
 Capability Plane 继续作为差异化能力，但不要求首次访问者在安装前理解完整架构。
+
+#### 文档结构优化执行顺序
+
+2026-10-09 使用 Firecrawl 抽样读取 Next.js MDX、Nuxt SEO 学习路径、Fumadocs LLM 集成和本站
+llms 教程，区分正文区域与侧栏链接。Fumadocs 样本为 10-07 缓存；这是四页结构样本，不是
+全站爬取，也不能从链接数量推断排名或未收录根因。
+
+优先改进已有教程的任务衔接与排障，不批量新增相近文章、不改现有 URL、不扩大 SDK 的
+SEO 功能。步骤分别形成小 PR，测试通过后合入；不能将本地通过写成线上生效。
+
+| 顺序 | ID | 任务 | 状态 | 验收标准 |
+|---:|---|---|---|---|
+| 1 | D1-01 | 串联 llms 与 MDX 教程并补可执行排障 | `进行中` | 双语正文有任务语境的双向链接；覆盖 HTML fallback、200 缺页恢复、空内容索引及生产 localhost；每项有症状、修复和 GET 复验；HTML、Markdown、生成全文及全站内链回归通过，合入后复验生产四页 |
+| 2 | D1-02 | 核对版本与接入证据 | `待开始` | 核对安装、Nextra 与可选 MCP 的适用版本、验证日期和可执行证据；原生能力、内部夹具、第一方部署与外部采用分别标注；Fumadocs 不冒充已验证的完整生产适配 |
+| 3 | D1-03 | 补现有入口的任务分流 | `待开始` | introduction 与安装页连接最短 Knowledge-only 路径、内容源配置和可选授权调用；复用已有指南，不建立竞争性同义主题页；明确不需要 SDK 的场景 |
+| 4 | D1-04 | 部署后复测搜索与接入效果 | `待开始` | 记录合入及部署时间；对照 7/14 天 GSC 收录、曝光、点击、查询与落地页，按语言及新旧域名区分；Google 搜索与 GEO 仅按有日期的小样本报告；真实安装与咨询另计 |
+
+D1-01 仅修改内容与文档测试，不改 SDK 公共 API、npm 版本或发布标签。`updatedAt` 只随本轮
+实质内容改动更新；README 的现有指南链接保持有效，无需为文案修改制造 SDK 发布。
+外部维护者接入与 Nextra 复用继续沿 A1-02/A1-06 推进，不等待所有文档优化完成。
+
+D1-01 本地实现与验证已通过：SDK 依赖链和文档站生产构建、53 项界面回归、23 项内容与
+SEO 回归（新增 6 项）、50 页的内链/锚点/面包屑及 HTML/Markdown/搜索/MCP 路由检查。
+独立只读审查未发现问题，`llms.txt` 与 `llms-full.txt` 已重建；仍待 PR 合入和生产复验，
+因此保持 `进行中`，不宣称收录或引用改善。
+
+学习依据：[Next.js MDX](https://nextjs.org/docs/app/guides/mdx)的任务配置与验证、
+[Nuxt SEO 学习路径](https://nuxtseo.com/learn-seo/nuxt)的正文专题分流，以及
+[Fumadocs LLM 集成](https://www.fumadocs.dev/docs/integrations/llms)的原生能力与部署边界。
 
 ### P1B：发布 0.1 GA
 

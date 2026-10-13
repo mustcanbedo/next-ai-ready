@@ -392,6 +392,7 @@ async function main() {
       'id="compare-the-tools-before-installing"',
       'href="https://www.fumadocs.dev/docs/integrations/llms"',
       'href="https://github.com/garmeeh/next-seo#readme"',
+      'href="./mdx-content"',
     ],
   });
   await expectResponse("/zh/docs/guides/nextjs-llms-txt", {
@@ -399,6 +400,7 @@ async function main() {
     includes: [
       'id="安装前先比较工具职责"',
       'href="https://www.fumadocs.dev/docs/integrations/llms"',
+      'href="./mdx-content"',
     ],
   });
   await expectResponse("/en/docs/guides/nextjs-llms-txt.md", {
@@ -410,6 +412,10 @@ async function main() {
       "### Keep one owner per output",
       "[Fumadocs' native LLM integration](https://www.fumadocs.dev/docs/integrations/llms)",
       "[Production route smoke checks](https://github.com/mustcanbedo/next-ai-ready/blob/main/examples/docs-site/scripts/docs-site-route-smoke.mjs)",
+      "[MDX content collection guide](./mdx-content)",
+      "### A Markdown endpoint returns HTML",
+      "### A page returns 200 but is missing",
+      'document_status: "not_found"',
     ],
   });
   await expectResponse("/zh/docs/guides/nextjs-llms-txt.md", {
@@ -420,6 +426,10 @@ async function main() {
       "## 安装前先比较工具职责",
       "### 每种输出只保留一个负责人",
       "[Fumadocs 自带的 LLM 集成](https://www.fumadocs.dev/docs/integrations/llms)",
+      "[MDX 内容集合指南](./mdx-content)",
+      "### Markdown 端点返回 HTML",
+      "### 返回 200 但页面实际缺失",
+      'document_status: "not_found"',
     ],
   });
   await expectResponse("/en/docs/installation.md", {
@@ -489,15 +499,31 @@ async function main() {
   }
   await expectResponse("/en/docs/guides/mdx-content", {
     contentType: "text/html",
-    includes: "Next.js MDX content collections for AI-readable docs",
+    includes: ["Next.js MDX content collections for AI-readable docs", 'href="./nextjs-llms-txt"'],
+  });
+  await expectResponse("/zh/docs/guides/mdx-content", {
+    contentType: "text/html",
+    includes: ["用 Next.js MDX 内容集合生成 AI 可读文档", 'href="./nextjs-llms-txt"'],
   });
   await expectResponse("/en/docs/guides/mdx-content.md", {
     contentType: "text/markdown",
-    includes: "# Next.js MDX content collections for AI-readable docs",
+    includes: [
+      "# Next.js MDX content collections for AI-readable docs",
+      "[Next.js llms.txt walkthrough](./nextjs-llms-txt)",
+      "### The collection is empty",
+      "### Production output contains local URLs",
+      "curl -i https://docs.example.com/docs/installation.md",
+    ],
   });
   await expectResponse("/zh/docs/guides/mdx-content.md", {
     contentType: "text/markdown",
-    includes: "# 用 Next.js MDX 内容集合生成 AI 可读文档",
+    includes: [
+      "# 用 Next.js MDX 内容集合生成 AI 可读文档",
+      "[Next.js llms.txt 实战教程](./nextjs-llms-txt)",
+      "### 内容集合为空",
+      "### 生产产物出现本地 URL",
+      "curl -i https://docs.example.com/docs/installation.md",
+    ],
   });
   await expectResponse("/en/docs/introduction.ai.json", {
     contentType: "application/json",

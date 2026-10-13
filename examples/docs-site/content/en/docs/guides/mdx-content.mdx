@@ -18,13 +18,16 @@ tags:
   - frontmatter
   - llms.txt
   - ai-readable-docs
-updatedAt: '2026-10-01'
+updatedAt: '2026-10-09'
 author: next-ai-ready team
 ---
 
 # Next.js MDX content collections for AI-readable docs
 
 An MDX content collection is a directory of Markdown or MDX source files that share a predictable schema and route convention. In a Next.js project, next-ai-ready can read that collection at build time and generate `llms.txt`, per-page Markdown, JSON-LD, and a searchable semantic graph without replacing the UI that already renders the content.
+
+For the complete endpoint setup, start with the [Next.js llms.txt walkthrough](./nextjs-llms-txt).
+Use this guide when you need to select source files, map routes, or diagnose a missing page.
 
 The minimal workflow is:
 
@@ -200,9 +203,52 @@ Confirm that normal page URLs still return HTML, `.md` URLs return Markdown, and
 
 ## Common content collection problems
 
-- **The collection is empty.** Run the content glob against the project root and check ignored paths.
+### The collection is empty
+
+**Symptom:** a successful build leaves the intended page out of `public/llms.txt` and
+`.next-ai-ready/graph.json`. The build may not be scanning your source directory.
+
+**Fix:** run from the application root containing `ai-ready.config.*` and match the actual source
+files, not another tool's generated JavaScript directory. For the example above, use
+`content/docs/**/*.{md,mdx}` and confirm `content/docs/installation.mdx` exists and is not excluded.
+Rebuild the app and start a new server process; the running handler caches its graph:
+
+```bash
+pnpm build
+pnpm start
+```
+
+In another terminal:
+
+```bash
+curl -i http://localhost:3000/llms.txt
+curl -i http://localhost:3000/docs/installation.md
+```
+
+**Verify:** the index lists `/docs/installation`, and the page returns `text/markdown` with the
+`Install Acme` title and dependency-installation instructions. A `200` response containing
+`document_status: "not_found"` is still a missing page; use the [endpoint troubleshooting
+steps](./nextjs-llms-txt) if the graph is correct but retrieval is not.
+
+### Production output contains local URLs
+
+**Symptom:** an index URL, page canonical, or Markdown canonical `Link` header points to
+`localhost` or a development host after deployment.
+
+**Fix:** set `site.baseUrl` in the config used by the production build to the real public origin.
+Rebuild and redeploy that artifact; changing config without a new build leaves the generated URLs
+unchanged. Replace this example origin with your own domain:
+
+```bash
+curl -i https://docs.example.com/llms.txt
+curl -i https://docs.example.com/docs/installation.md
+```
+
+**Verify:** the index and the page's canonical `Link` header use the production origin, and the
+Markdown body is the intended page. If your renderer serves the HTML route, check its canonical
+too. Setting `site.baseUrl` does not configure a domain, fix a wrong route, or guarantee indexing.
+
 - **Routes contain `content/` or `src/app/`.** Upgrade the package and verify the source-root rules.
-- **Generated output contains local URLs.** Set `site.baseUrl` to the production origin before build.
 - **The UI route differs from the graph route.** Add a content source adapter with explicit routes.
 - **Private drafts appear in `llms.txt`.** Exclude drafts from the matched source; generated artifacts are public unless the deployment protects them.
 - **The page ranks for the wrong query.** Make the title, summary, H1, and first paragraph answer the same specific problem instead of adding more tags.

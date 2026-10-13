@@ -20,7 +20,7 @@ tags:
   - llms.txt
   - markdown
   - tutorial
-updatedAt: '2026-10-02'
+updatedAt: '2026-10-09'
 author: next-ai-ready 团队
 ---
 
@@ -191,6 +191,9 @@ Acme 为客服团队提供一个可搜索的可信产品答案来源。
 清晰的标题、摘要、作者、更新时间和直接回答同时服务人类与 AI。不要添加可见页面无法支持
 的营销主张或 FAQ 答案。
 
+如果有多篇页面，继续查看 [MDX 内容集合指南](./mdx-content)，先匹配源目录、确认每个文件的
+公开路由，再生成机器接口。
+
 ## 3. 生成机器接口
 
 ```bash
@@ -236,10 +239,43 @@ pnpm exec next-ai-ready audit https://example.com --version 3
 
 ## 常见问题
 
-- **端点返回应用的 HTML 外壳。** 检查导出的 Next.js config 是否由 `withAiReady()` 包装，并确认
-  生成的 route handler 已存在。
-- **`llms.txt` 为空或缺少页面。** 检查 `ai-ready.config.*` 的 `content` glob，再重新构建。
-- **生产产物中出现本地 URL。** 设置生产环境的 `site.baseUrl`，然后重新构建与部署。
+### Markdown 端点返回 HTML
+
+**症状：** `/about.md` 返回 `text/html` 或应用的 HTML 外壳，而不是源页面。Markdown 请求落到
+了应用页面，没有到达 AI handler。
+
+**修复：** 检查导出的 Next.js config 是否由 `withAiReady()` 包装，以及 `init` 生成的 Markdown
+route handler 是否存在。保留已有插件和自定义配置，不要创建第二份 config。重新构建应用、
+重启服务器后再请求：
+
+```bash
+curl -i -H 'Accept: text/markdown' http://localhost:3000/about.md
+```
+
+**复验：** 应得到 `200`、`Content-Type: text/markdown`、`关于 Acme` 标题和对应正文。如果应用
+已有 `/about` 浏览器页面，再用 `Accept: text/html` 请求它，确认仍返回 HTML。源文件本身不会
+创建该浏览器路由。
+
+### 返回 200 但页面实际缺失
+
+**症状：** Markdown 响应包含 `document_status: "not_found"`，响应头含 `X-Robots-Tag: noindex`。
+这是 handler 的缺页恢复文档，不是请求的页面；HTTP `200` 不能算读取成功。
+
+**修复：** 在 `.next-ai-ready/graph.json` 和 `public/llms.txt` 中查找预期路由。如果没有，检查
+匹配到的源文件，并对照 [MDX 路由映射](./mdx-content)。本指南的 `content/about.mdx` 对应
+`/about`，不要只根据文件名猜 URL。修正内容源或路由后重新构建并重启。
+
+```bash
+curl -i http://localhost:3000/llms.txt
+curl -i http://localhost:3000/about.md
+```
+
+**复验：** 索引列出 `/about`，页面响应包含预期标题与正文，不含 `not_found` 标记。真正不存在
+的页面仍应返回恢复文档，不要为了通过检查而移除这项保护。
+
+内容索引为空或生产 URL 指向本机时，使用 [MDX 内容集合排障步骤](./mdx-content)。修复后还要
+将这些 GET 请求换成部署域名再检查一次。
+
 - **私有内容出现在生成产物中。** 将它从内容源移除或显式排除；除非部署层另有保护，生成文件
   默认公开。
 - **审计分数很高但引用没有增加。** 可读性只是输入条件，不是排名或引用保证；应另行衡量真实

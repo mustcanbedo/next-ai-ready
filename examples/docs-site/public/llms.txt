@@ -2,7 +2,7 @@
 
 > AEO + Agent-API layer for Next.js App Router. Make your site readable by AI and callable by agents.
 
-<!-- Last updated: 2026-10-04 -->
+<!-- Last updated: 2026-10-09 -->
 
 ## Home
 
@@ -42,14 +42,14 @@
 
 ## Guides
 
+- [Next.js MDX content collections for AI-readable docs](https://nextaiready.com/en/docs/guides/mdx-content): Configure a local MDX content collection in Next.js, map files to routes, add useful frontmatter, and generate llms.txt, page Markdown, and JSON-LD.
+- [Add llms.txt and Markdown endpoints to Next.js App Router](https://nextaiready.com/en/docs/guides/nextjs-llms-txt): Compare native Next.js, Next SEO, Fumadocs, and Nextra options before adding AI-readable endpoints, then run and verify a clean Next.js demo.
+- [用 Next.js MDX 内容集合生成 AI 可读文档](https://nextaiready.com/zh/docs/guides/mdx-content): 在 Next.js 中配置本地 MDX 内容集合、映射路由、补充有效 frontmatter，并生成 llms.txt、逐页 Markdown 与 JSON-LD。
+- [为 Next.js App Router 添加 llms.txt 与 Markdown 端点](https://nextaiready.com/zh/docs/guides/nextjs-llms-txt): 先比较 Next.js 原生能力、Next SEO、Fumadocs 与 Nextra 的职责，再添加 AI 可读端点，运行并验证干净的 Next.js 演示。
 - [Add llms.txt and Markdown endpoints to Fumadocs](https://nextaiready.com/en/docs/guides/fumadocs-ai-ready): Choose native Fumadocs LLM and MCP routes or a shared next-ai-ready semantic graph, preserve createMDX, and verify content rather than only HTTP status.
 - [为 Fumadocs 添加 llms.txt 与 Markdown 端点](https://nextaiready.com/zh/docs/guides/fumadocs-ai-ready): 选择 Fumadocs 原生 LLM 与 MCP 路由或 next-ai-ready 共享语义图，保留 createMDX，并验证实际内容而不只看 HTTP 状态。
-- [Add llms.txt and Markdown endpoints to Next.js App Router](https://nextaiready.com/en/docs/guides/nextjs-llms-txt): Compare native Next.js, Next SEO, Fumadocs, and Nextra options before adding AI-readable endpoints, then run and verify a clean Next.js demo.
 - [Nextra llms.txt and Markdown endpoint setup](https://nextaiready.com/en/docs/guides/nextra-ai-ready): Integrate next-ai-ready with a Nextra 4 App Router documentation site without replacing Nextra navigation, search, themes, or MDX rendering.
-- [为 Next.js App Router 添加 llms.txt 与 Markdown 端点](https://nextaiready.com/zh/docs/guides/nextjs-llms-txt): 先比较 Next.js 原生能力、Next SEO、Fumadocs 与 Nextra 的职责，再添加 AI 可读端点，运行并验证干净的 Next.js 演示。
 - [为 Nextra 4 添加 llms.txt 与 Markdown 端点](https://nextaiready.com/zh/docs/guides/nextra-ai-ready): 在不替换 Nextra 导航、搜索、主题和 MDX 渲染的前提下，将 next-ai-ready 接入 Nextra 4 App Router 文档站。
-- [Next.js MDX content collections for AI-readable docs](https://nextaiready.com/en/docs/guides/mdx-content): Configure a local MDX content collection in Next.js, map files to routes, add useful frontmatter, and generate llms.txt, page Markdown, and JSON-LD.
-- [用 Next.js MDX 内容集合生成 AI 可读文档](https://nextaiready.com/zh/docs/guides/mdx-content): 在 Next.js 中配置本地 MDX 内容集合、映射路由、补充有效 frontmatter，并生成 llms.txt、逐页 Markdown 与 JSON-LD。
 - [Configure robots.txt for AI search and training crawlers in Next.js](https://nextaiready.com/en/docs/guides/robots-txt): Keep ChatGPT and Claude search discovery available while making a separate robots.txt decision for training and user-triggered AI access.
 - [在 Next.js 中分别配置 AI 搜索与训练爬虫](https://nextaiready.com/zh/docs/guides/robots-txt): 保留 ChatGPT 与 Claude 的搜索发现能力，同时分别决定是否允许训练爬虫和用户触发的 AI 访问。
 - [How to add an MCP server to Next.js App Router](https://nextaiready.com/en/docs/guides/mcp-integration): Add local stdio and authenticated Streamable HTTP MCP endpoints to Next.js, then expose page search and explicitly public actions as tools.

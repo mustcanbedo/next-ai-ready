@@ -2360,7 +2360,7 @@ Not necessarily. Keep native Next.js metadata and Next SEO JSON-LD. Check Fumado
 <!-- BEGIN /en/docs/guides/nextra-ai-ready -->
 # Nextra llms.txt and Markdown endpoint setup
 URL: https://nextaiready.com/en/docs/guides/nextra-ai-ready
-Updated: 2026-10-02
+Updated: 2026-11-23
 
 # Nextra llms.txt and Markdown endpoint setup
 
@@ -2374,59 +2374,13 @@ Not using Nextra? Start with the framework-neutral
 This guide supports Nextra's root `content/` and `app/` layouts as well as their `src/` equivalents.
 It does not support Nextra 1-3 sites that still use the Pages Router.
 
-## Executable reference
+**Verified setup.** The [runnable example](#executable-reference) uses Nextra `4.6.1`,
+Next.js `16.2.6`, and React `19.2.4`. You can use this guide with an existing Nextra 4 App Router
+site. If you hit a theme layout error, check the [Zod 4.4 workaround](#nextra-4-6-1-and-zod-4-4-compatibility).
 
-The repository includes an [executable Nextra 4 fixture](https://github.com/mustcanbedo/next-ai-ready/tree/main/examples/nextra-docs)
-validated with Nextra `4.6.1`, Next.js `16.2.6`, and React `19.2.4` in a production build.
-This is a first-party compatibility demonstration using this repository's workspace source. It is not
-an independent installation test of npm latest, external adoption, Nextra endorsement, or evidence
-of increased search traffic.
-
-After cloning the repository, run these commands in order from its root:
-
-```bash
-corepack pnpm install --frozen-lockfile
-corepack pnpm --filter next-ai-ready... build
-corepack pnpm --filter @next-ai-ready/example-nextra-docs build
-corepack pnpm --filter @next-ai-ready/example-nextra-docs test
-```
-
-To view the production UI after the test has finished:
-
-```bash
-corepack pnpm --filter @next-ai-ready/example-nextra-docs start --hostname 127.0.0.1 --port 3321
-```
-
-![Nextra Getting started documentation rendered by the local production build](/guides/nextra/html.jpg)
-
-This screenshot is from the running production server. Visit `http://127.0.0.1:3321/getting-started`
-to inspect it yourself. The same `examples/nextra-docs/content/getting-started.mdx` feeds these outputs:
-
-| Output                                         | Verified contract                                                       |
-| ---------------------------------------------- | ----------------------------------------------------------------------- |
-| HTML `/getting-started`                        | `200`, retaining the Nextra theme and page content                      |
-| `/llms.txt`                                    | `200`, listing the page's canonical URL                                 |
-| `/llms-full.txt`                               | `200`, including the body and frontmatter FAQ                           |
-| `/getting-started.md`                          | `200 text/markdown`, with body and canonical Link header                |
-| AI JSON `/getting-started.ai.json`             | `200 application/json`, with `route: /getting-started`                  |
-| `/getting-started`, `Accept: text/markdown`    | `200`, serving the same page as Markdown                                |
-| Missing `/does-not-exist`, `Accept: text/html` | HTML `404`                                                              |
-| Same missing page, `Accept: text/markdown`     | Markdown `200`, `document_status: "not_found"`, `X-Robots-Tag: noindex` |
-
-The example excludes MCP and callable actions. `nextra-fixture.example` is an example canonical
-domain; replace `site.baseUrl` in `ai-ready.config.mjs` with your production domain and rebuild.
-
-![ai-ready.config.mjs on the public GitHub main branch](/guides/nextra/config.jpg)
-
-This screenshot comes from the [public configuration source](https://github.com/mustcanbedo/next-ai-ready/blob/main/examples/nextra-docs/ai-ready.config.mjs).
-It shows the content glob and example domain, not a terminal test result.
-
-The production smoke passed 10 checks: one shared-content graph check and nine HTTP checks.
-Inspect the assertions in the [production smoke script](https://github.com/mustcanbedo/next-ai-ready/blob/main/examples/nextra-docs/scripts/compatibility-smoke.mjs).
-These passing contracts do not imply a warning-free diagnostic: the fixture's current `doctor`
-reports `0 errors / 5 warnings`, which still need individual review.
-Three concern diagnostic heuristics for Knowledge-only OpenAPI, JavaScript route stubs, and the
-workspace CLI prebuild. The other two flag author metadata and JSON-LD that this fixture does not configure.
+Install and initialize in your Nextra project, point both tools at the same content, and wrap your
+existing Next.js config. After deploying, run `curl -i https://docs.example.com/getting-started.md`
+with a real page on your domain. Look for `200`, `text/markdown`, and the expected page content.
 
 ## 1. Install and initialize
 
@@ -2517,8 +2471,8 @@ After deployment, verify one real page and the discovery files. These paths matc
 use your content's actual route rather than automatically adding a `/docs` prefix:
 
 ```bash
-curl -I https://docs.example.com/llms.txt
-curl -I https://docs.example.com/getting-started.md
+curl -fsS https://docs.example.com/llms.txt
+curl -i https://docs.example.com/getting-started.md
 pnpm exec next-ai-ready audit https://docs.example.com/getting-started --version 3
 ```
 
@@ -2533,6 +2487,60 @@ clean Markdown, and an unknown browser URL must continue to return a real `404`.
 - Plugin composition: retain `withNextra` and existing options; wrap only the final config with `withAiReady`.
 - Rollback: remove the `withAiReady` wrapper, AI route stubs, and the fixture-specific workspace `prebuild`
   wiring. Keep Nextra's plugin, theme, MDX content, navigation, and search intact.
+
+## Executable reference
+
+The repository includes an [executable Nextra 4 fixture](https://github.com/mustcanbedo/next-ai-ready/tree/main/examples/nextra-docs)
+validated with Nextra `4.6.1`, Next.js `16.2.6`, and React `19.2.4` in a production build.
+This is a first-party compatibility demonstration using this repository's workspace source. It is not
+an independent installation test of npm latest, external adoption, Nextra endorsement, or evidence
+of increased search traffic.
+
+After cloning the repository, run these commands in order from its root:
+
+```bash
+corepack pnpm install --frozen-lockfile
+corepack pnpm --filter next-ai-ready... build
+corepack pnpm --filter @next-ai-ready/example-nextra-docs build
+corepack pnpm --filter @next-ai-ready/example-nextra-docs test
+```
+
+To view the production UI after the test has finished:
+
+```bash
+corepack pnpm --filter @next-ai-ready/example-nextra-docs start --hostname 127.0.0.1 --port 3321
+```
+
+![Nextra Getting started documentation rendered by the local production build](/guides/nextra/html.jpg)
+
+This screenshot is from the running production server. Visit `http://127.0.0.1:3321/getting-started`
+to inspect it yourself. The same `examples/nextra-docs/content/getting-started.mdx` feeds these outputs:
+
+| Output                                         | Verified contract                                                       |
+| ---------------------------------------------- | ----------------------------------------------------------------------- |
+| HTML `/getting-started`                        | `200`, retaining the Nextra theme and page content                      |
+| `/llms.txt`                                    | `200`, listing the page's canonical URL                                 |
+| `/llms-full.txt`                               | `200`, including the body and frontmatter FAQ                           |
+| `/getting-started.md`                          | `200 text/markdown`, with body and canonical Link header                |
+| AI JSON `/getting-started.ai.json`             | `200 application/json`, with `route: /getting-started`                  |
+| `/getting-started`, `Accept: text/markdown`    | `200`, serving the same page as Markdown                                |
+| Missing `/does-not-exist`, `Accept: text/html` | HTML `404`                                                              |
+| Same missing page, `Accept: text/markdown`     | Markdown `200`, `document_status: "not_found"`, `X-Robots-Tag: noindex` |
+
+The example excludes MCP and callable actions. `nextra-fixture.example` is an example canonical
+domain; replace `site.baseUrl` in `ai-ready.config.mjs` with your production domain and rebuild.
+
+![ai-ready.config.mjs on the public GitHub main branch](/guides/nextra/config.jpg)
+
+This screenshot comes from the [public configuration source](https://github.com/mustcanbedo/next-ai-ready/blob/main/examples/nextra-docs/ai-ready.config.mjs).
+It shows the content glob and example domain, not a terminal test result.
+
+The production smoke passed 10 checks: one shared-content graph check and nine HTTP checks.
+Inspect the assertions in the [production smoke script](https://github.com/mustcanbedo/next-ai-ready/blob/main/examples/nextra-docs/scripts/compatibility-smoke.mjs).
+These passing contracts do not imply a warning-free diagnostic: the fixture's current `doctor`
+reports `0 errors / 5 warnings`, which still need individual review.
+Three concern diagnostic heuristics for Knowledge-only OpenAPI, JavaScript route stubs, and the
+workspace CLI prebuild. The other two flag author metadata and JSON-LD that this fixture does not configure.
 
 ## Start with the Knowledge plane
 
@@ -3131,7 +3139,7 @@ No. The framework adds AI routes and build artifacts alongside your current App 
 <!-- BEGIN /en/docs/support -->
 # Support and services
 URL: https://nextaiready.com/en/docs/support
-Updated: 2026-09-28
+Updated: 2026-11-23
 
 # Support next-ai-ready
 
@@ -3174,7 +3182,11 @@ The SDK and diagnostic can improve technical accessibility and reveal implementa
 
 ## Contact
 
-Email [Jair from AI Website Audit Lab](mailto:khuangnanyeji0113@gmail.com?subject=Next.js%20search%20and%20AI%20visibility%20diagnostic) with:
+Email Jair from AI Website Audit Lab.
+
+[khuangnanyeji0113@gmail.com](mailto:khuangnanyeji0113@gmail.com?subject=Next.js%20search%20and%20AI%20visibility%20diagnostic)
+
+Include the following in your email:
 
 1. the production URL;
 2. the main indexing, search, or AI-discovery problem;
@@ -5507,7 +5519,7 @@ curl -i http://localhost:3000/tools.json
 <!-- BEGIN /zh/docs/guides/nextra-ai-ready -->
 # 为 Nextra 4 添加 llms.txt 与 Markdown 端点
 URL: https://nextaiready.com/zh/docs/guides/nextra-ai-ready
-Updated: 2026-10-02
+Updated: 2026-11-23
 
 # 为 Nextra 4 添加 llms.txt 与 Markdown 端点
 
@@ -5521,58 +5533,13 @@ Updated: 2026-10-02
 本指南支持 Nextra 的根目录 `content/`、`app/` 以及对应的 `src/` 目录，不支持仍使用 Pages
 Router 的 Nextra 1-3。
 
-## 可执行参考实现
+**已验证的版本组合。** [可执行示例](#可执行参考实现)使用 Nextra `4.6.1`、
+Next.js `16.2.6` 和 React `19.2.4`。已有 Nextra 4 App Router 站点可以直接按下文接入。
+如果遇到主题布局校验错误，请查看 [Zod 4.4 兼容说明](#nextra-4-6-1-与-zod-4-4-兼容说明)。
 
-仓库提供了[可执行 Nextra 4 夹具](https://github.com/mustcanbedo/next-ai-ready/tree/main/examples/nextra-docs)，
-使用 Nextra `4.6.1`、Next.js `16.2.6` 与 React `19.2.4`，已完成生产构建与契约测试。
-这是本仓库 workspace 源码的第一方兼容性演示，不是 npm 最新包的独立安装验证，也不是
-外部采用、Nextra 官方背书或 SEO 流量提升的证据。
-
-克隆仓库后，在根目录按顺序复现：
-
-```bash
-corepack pnpm install --frozen-lockfile
-corepack pnpm --filter next-ai-ready... build
-corepack pnpm --filter @next-ai-ready/example-nextra-docs build
-corepack pnpm --filter @next-ai-ready/example-nextra-docs test
-```
-
-测试完成后，可单独启动生产界面观看：
-
-```bash
-corepack pnpm --filter @next-ai-ready/example-nextra-docs start --hostname 127.0.0.1 --port 3321
-```
-
-![本地生产构建的 Nextra Getting started 文档界面](/guides/nextra/html.jpg)
-
-真实界面截图来自本地生产服务；启动后访问 `http://127.0.0.1:3321/getting-started` 可复核。
-同一份 `examples/nextra-docs/content/getting-started.mdx` 对应以下输出：
-
-| 输出                                         | 实际检查结果                                                                |
-| ------------------------------------------ | --------------------------------------------------------------------- |
-| HTML `/getting-started`                    | `200`，保留 Nextra 主题与页面内容                                               |
-| `/llms.txt`                                | `200`，列出该页的 canonical URL                                             |
-| `/llms-full.txt`                           | `200`，包含正文与 frontmatter FAQ                                           |
-| `/getting-started.md`                      | `200 text/markdown`，包含正文及 canonical Link 头                            |
-| AI JSON `/getting-started.ai.json`         | `200 application/json`，`route` 为 `/getting-started`                   |
-| `/getting-started`，`Accept: text/markdown` | `200`，返回同一页的 Markdown                                                 |
-| 缺页 `/does-not-exist`，`Accept: text/html`   | HTML `404`                                                            |
-| 同一缺页，`Accept: text/markdown`               | Markdown `200`，`document_status: "not_found"`，`X-Robots-Tag: noindex` |
-
-本例排除 MCP 与可调用 actions。`nextra-fixture.example` 只是示例 canonical 域名，部署前必须
-将 `ai-ready.config.mjs` 的 `site.baseUrl` 换成生产域名并重新构建。
-
-![当前 main 分支公开 GitHub 页面中的 ai-ready.config.mjs 配置](/guides/nextra/config.jpg)
-
-这张真实截图来自[当前 main 的公开配置页](https://github.com/mustcanbedo/next-ai-ready/blob/main/examples/nextra-docs/ai-ready.config.mjs)，
-可复核内容扫描范围与示例域名；它不是终端测试截图。
-
-生产 smoke 已通过 10 项检查（1 项共享内容图、9 项 HTTP）；逐项输出与断言可在
-[真实 smoke 脚本](https://github.com/mustcanbedo/next-ai-ready/blob/main/examples/nextra-docs/scripts/compatibility-smoke.mjs)复核。
-
-检查通过不代表初始流程零警告：当前 `doctor` 实际为 `0 errors / 5 warnings`，仍需逐项审阅。
-其中三条涉及 Knowledge-only OpenAPI、JavaScript 路由及 workspace CLI prebuild 的诊断适配；
-另两条对应本例确实未配置的 author 与 JSON-LD。
+先在 Nextra 项目里安装并初始化，再让两套工具读取同一份内容，并包装现有的 Next.js 配置。
+部署后用 `curl -i https://docs.example.com/getting-started.md` 检查你自己域名下的真实页面。
+确认响应状态为 `200`、类型为 `text/markdown`，且正文与原页面一致。
 
 ## 1. 安装并初始化
 
@@ -5660,8 +5627,8 @@ pnpm build
 替换，不要固定添加 `/docs` 前缀：
 
 ```bash
-curl -I https://docs.example.com/llms.txt
-curl -I https://docs.example.com/getting-started.md
+curl -fsS https://docs.example.com/llms.txt
+curl -i https://docs.example.com/getting-started.md
 pnpm exec next-ai-ready audit https://docs.example.com/getting-started --version 3
 ```
 
@@ -5676,6 +5643,59 @@ pnpm exec next-ai-ready audit https://docs.example.com/getting-started --version
 - 插件组合：保留 `withNextra` 及原有配置，只在最终配置外增加 `withAiReady`。
 - 回滚：移除 `withAiReady` 包装、AI 路由 stub 和仅此例使用的 workspace `prebuild` 接线；
   保留 Nextra 插件、主题、MDX 内容、导航与搜索，让 HTML 界面继续工作。
+
+## 可执行参考实现
+
+仓库提供了[可执行 Nextra 4 夹具](https://github.com/mustcanbedo/next-ai-ready/tree/main/examples/nextra-docs)，
+使用 Nextra `4.6.1`、Next.js `16.2.6` 与 React `19.2.4`，已完成生产构建与契约测试。
+这是本仓库 workspace 源码的第一方兼容性演示，不是 npm 最新包的独立安装验证，也不是
+外部采用、Nextra 官方背书或 SEO 流量提升的证据。
+
+克隆仓库后，在根目录按顺序复现：
+
+```bash
+corepack pnpm install --frozen-lockfile
+corepack pnpm --filter next-ai-ready... build
+corepack pnpm --filter @next-ai-ready/example-nextra-docs build
+corepack pnpm --filter @next-ai-ready/example-nextra-docs test
+```
+
+测试完成后，可单独启动生产界面观看：
+
+```bash
+corepack pnpm --filter @next-ai-ready/example-nextra-docs start --hostname 127.0.0.1 --port 3321
+```
+
+![本地生产构建的 Nextra Getting started 文档界面](/guides/nextra/html.jpg)
+
+真实界面截图来自本地生产服务；启动后访问 `http://127.0.0.1:3321/getting-started` 可复核。
+同一份 `examples/nextra-docs/content/getting-started.mdx` 对应以下输出：
+
+| 输出                                         | 实际检查结果                                                                |
+| ------------------------------------------ | --------------------------------------------------------------------- |
+| HTML `/getting-started`                    | `200`，保留 Nextra 主题与页面内容                                               |
+| `/llms.txt`                                | `200`，列出该页的 canonical URL                                             |
+| `/llms-full.txt`                           | `200`，包含正文与 frontmatter FAQ                                           |
+| `/getting-started.md`                      | `200 text/markdown`，包含正文及 canonical Link 头                            |
+| AI JSON `/getting-started.ai.json`         | `200 application/json`，`route` 为 `/getting-started`                   |
+| `/getting-started`，`Accept: text/markdown` | `200`，返回同一页的 Markdown                                                 |
+| 缺页 `/does-not-exist`，`Accept: text/html`   | HTML `404`                                                            |
+| 同一缺页，`Accept: text/markdown`               | Markdown `200`，`document_status: "not_found"`，`X-Robots-Tag: noindex` |
+
+本例排除 MCP 与可调用 actions。`nextra-fixture.example` 只是示例 canonical 域名，部署前必须
+将 `ai-ready.config.mjs` 的 `site.baseUrl` 换成生产域名并重新构建。
+
+![当前 main 分支公开 GitHub 页面中的 ai-ready.config.mjs 配置](/guides/nextra/config.jpg)
+
+这张真实截图来自[当前 main 的公开配置页](https://github.com/mustcanbedo/next-ai-ready/blob/main/examples/nextra-docs/ai-ready.config.mjs)，
+可复核内容扫描范围与示例域名；它不是终端测试截图。
+
+生产 smoke 已通过 10 项检查（1 项共享内容图、9 项 HTTP）；逐项输出与断言可在
+[真实 smoke 脚本](https://github.com/mustcanbedo/next-ai-ready/blob/main/examples/nextra-docs/scripts/compatibility-smoke.mjs)复核。
+
+检查通过不代表初始流程零警告：当前 `doctor` 实际为 `0 errors / 5 warnings`，仍需逐项审阅。
+其中三条涉及 Knowledge-only OpenAPI、JavaScript 路由及 workspace CLI prebuild 的诊断适配；
+另两条对应本例确实未配置的 author 与 JSON-LD。
 
 ## 先从 Knowledge plane 开始
 
@@ -6287,7 +6307,7 @@ SEO 面向浏览器与搜索排名；next-ai-ready 面向 AI 爬虫与 Agent，�
 <!-- BEGIN /zh/docs/support -->
 # 支持与服务
 URL: https://nextaiready.com/zh/docs/support
-Updated: 2026-09-28
+Updated: 2026-11-23
 
 # 支持 next-ai-ready
 
@@ -6330,7 +6350,11 @@ SDK 和诊断可以改善技术可访问性并发现实现问题，但**不保�
 
 ## 联系方式
 
-请发送邮件给 [AI Website Audit Lab 的 Jair](mailto:khuangnanyeji0113@gmail.com?subject=Next.js%20%E6%90%9C%E7%B4%A2%E4%B8%8E%20AI%20%E5%8F%AF%E8%A7%81%E6%80%A7%E8%AF%8A%E6%96%AD)，并附上：
+请发送邮件给 AI Website Audit Lab 的 Jair。
+
+[khuangnanyeji0113@gmail.com](mailto:khuangnanyeji0113@gmail.com?subject=Next.js%20%E6%90%9C%E7%B4%A2%E4%B8%8E%20AI%20%E5%8F%AF%E8%A7%81%E6%80%A7%E8%AF%8A%E6%96%AD)
+
+请在邮件里附上以下信息：
 
 1. 生产网站 URL；
 2. 当前最主要的收录、搜索或 AI 发现问题；

@@ -1,13 +1,13 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ArrowUpRight, Braces, CodeXml, FileText, Menu, Search, X } from "lucide-react";
 import type { Messages } from "@/messages";
 import type { Locale } from "@/lib/i18n";
 import type { DocMeta } from "@/lib/docs";
-import { searchDocs } from "@/lib/doc-search";
+import { searchDocs, type DocSearchIndex } from "@/lib/doc-search";
 import { ThemeSelect } from "./theme-select";
 
 interface HeaderProps {
@@ -20,6 +20,9 @@ export function Header({ locale, messages, docs }: HeaderProps) {
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
   const [query, setQuery] = useState("");
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [loadedIndex, setLoadedIndex] = useState<{ locale: Locale; index: DocSearchIndex }>();
+  const [indexError, setIndexError] = useState(false);
   const dialog = useRef<HTMLDialogElement>(null);
   const searchInput = useRef<HTMLInputElement>(null);
   const menuButton = useRef<HTMLButtonElement>(null);
@@ -27,19 +30,44 @@ export function Header({ locale, messages, docs }: HeaderProps) {
   const searchLabel = chinese ? "搜索文档" : "Search documentation";
   const closeLabel = chinese ? "关闭搜索" : "Close search";
   const switchPath = pathname.replace(/^\/(en|zh)(?=\/|$)/, `/${chinese ? "en" : "zh"}`);
-  const results = searchDocs(docs, query);
+  const index = loadedIndex?.locale === locale ? loadedIndex.index : undefined;
+  const results = searchDocs(docs, query, index);
+  const docsPath = `/${locale}/docs`;
+  const quickstartPath = `${docsPath}/guides/quickstart`;
+  const apiActive = pathname.startsWith(`${docsPath}/api-reference/`);
+  const supportActive = pathname === `${docsPath}/support`;
   const links = [
-    { href: `/${locale}/docs/introduction`, label: messages.docs, active: pathname.includes("/docs") && !/\/docs\/(guides|api-reference|support)/.test(pathname) },
-    { href: `/${locale}/docs/guides/quickstart`, label: messages.quickstart, active: pathname.includes("/docs/guides/") },
-    { href: `/${locale}/docs/api-reference/config`, label: messages.api, active: pathname.includes("/docs/api-reference/") },
-    { href: `/${locale}/docs/support`, label: messages.support, active: pathname.endsWith("/docs/support") },
+    { href: `${docsPath}/introduction`, label: messages.docs, active: pathname.startsWith(`${docsPath}/`) && pathname !== quickstartPath && !apiActive && !supportActive },
+    { href: quickstartPath, label: messages.quickstart, active: pathname === quickstartPath },
+    { href: `${docsPath}/api-reference/config`, label: messages.api, active: apiActive },
+    { href: `${docsPath}/support`, label: messages.support, active: supportActive },
   ];
 
-  function openSearch() {
+  const openSearch = useCallback(() => {
     setMenuOpen(false);
     dialog.current?.showModal();
     searchInput.current?.focus();
-  }
+    setSearchOpen(true);
+  }, []);
+
+  useEffect(() => {
+    if (!searchOpen || index) return;
+    const controller = new AbortController();
+
+    async function loadIndex() {
+      try {
+        const response = await fetch(`/${locale}/search-index.json`, { signal: controller.signal });
+        if (!response.ok) throw new Error(`Search index returned ${response.status}`);
+        const data: DocSearchIndex = await response.json();
+        if (!controller.signal.aborted) setLoadedIndex({ locale, index: data });
+      } catch {
+        if (!controller.signal.aborted) setIndexError(true);
+      }
+    }
+
+    void loadIndex();
+    return () => controller.abort();
+  }, [index, locale, searchOpen]);
 
   useEffect(() => {
     function shortcut(event: KeyboardEvent) {
@@ -50,9 +78,7 @@ export function Header({ locale, messages, docs }: HeaderProps) {
       }
       if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") {
         event.preventDefault();
-        setMenuOpen(false);
-        dialog.current?.showModal();
-        searchInput.current?.focus();
+        openSearch();
       }
       if (event.key === "Escape" && menuOpen) {
         setMenuOpen(false);
@@ -61,7 +87,7 @@ export function Header({ locale, messages, docs }: HeaderProps) {
     }
     document.addEventListener("keydown", shortcut);
     return () => document.removeEventListener("keydown", shortcut);
-  }, [menuOpen]);
+  }, [menuOpen, openSearch]);
 
   useEffect(() => {
     dialog.current?.close();
@@ -69,10 +95,20 @@ export function Header({ locale, messages, docs }: HeaderProps) {
   }, [pathname]);
 
   const navLinks = links.map((link) => (
-    <Link key={link.href} href={link.href} prefetch={false} aria-current={link.active ? "page" : undefined} onClick={() => setMenuOpen(false)}>
+    <Link key={link.href} href={link.href} prefetch={false} aria-current={link.active ? (pathname === link.href ? "page" : "location") : undefined} onClick={() => setMenuOpen(false)}>
       {link.label}
     </Link>
   ));
+
+  const hasQuery = Boolean(query.trim());
+  let searchStatus = hasQuery
+    ? (chinese ? `${results.length} 条结果` : `${results.length} results`)
+    : (chinese ? "开始阅读" : "Start reading");
+  if (hasQuery && !index) {
+    searchStatus = indexError
+      ? (chinese ? "正文索引加载失败，当前仅搜索页面信息。" : "The full search index could not load. Showing page matches.")
+      : (chinese ? "正在加载正文索引…" : "Loading the full search index…");
+  }
 
   return <>
     <a className="skip-link" href="#main-content">{chinese ? "跳到正文" : "Skip to content"}</a>
@@ -100,7 +136,11 @@ export function Header({ locale, messages, docs }: HeaderProps) {
         <a href="https://github.com/mustcanbedo/next-ai-ready">GitHub</a>
       </nav>
     </header>
-    <dialog ref={dialog} className="search-dialog" aria-label={searchLabel} onClose={() => setQuery("")} onClick={(event) => {
+    <dialog ref={dialog} className="search-dialog" aria-label={searchLabel} onClose={() => {
+      setSearchOpen(false);
+      setQuery("");
+      setIndexError(false);
+    }} onClick={(event) => {
       if (event.target === dialog.current) {
         const rect = dialog.current.getBoundingClientRect();
         if (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom) dialog.current.close();
@@ -111,13 +151,14 @@ export function Header({ locale, messages, docs }: HeaderProps) {
         <input ref={searchInput} type="search" aria-label={searchLabel} placeholder={chinese ? "查找指南、配置或 API" : "Find a guide, config or API"} value={query} onChange={(event) => setQuery(event.target.value)} />
         <button type="button" className="icon-button" onClick={() => dialog.current?.close()} aria-label={closeLabel} title={closeLabel}><X aria-hidden="true" /></button>
       </div>
-      <p className="px-5 pt-4 text-xs text-text-tertiary" role="status">{query.trim() ? (chinese ? `${results.length} 条结果` : `${results.length} results`) : (chinese ? "开始阅读" : "Start reading")}</p>
+      <p className="px-5 pt-4 text-xs text-text-tertiary" role="status">{searchStatus}</p>
       <div className="search-results">
-        {results.length ? results.map((doc) => <Link href={`/${locale}/docs/${doc.slug}`} prefetch={false} key={doc.slug} className="search-result" onClick={() => dialog.current?.close()}>
+        {results.map((doc) => <Link href={`${docsPath}/${doc.slug}${doc.heading ? `#${doc.heading.id}` : ""}`} prefetch={false} key={doc.slug} className="search-result" onClick={() => dialog.current?.close()}>
           <FileText size={18} className="shrink-0 text-accent" aria-hidden="true" />
-          <div className="min-w-0 flex-1"><strong>{doc.title}</strong><p>{doc.summary}</p></div>
+          <div className="min-w-0 flex-1"><strong>{doc.heading?.text ?? doc.title}</strong><p>{doc.heading ? doc.title : doc.summary}</p></div>
           <ArrowUpRight size={15} className="shrink-0 text-text-tertiary" aria-hidden="true" />
-        </Link>) : <p className="p-5 text-sm text-text-secondary">{chinese ? "没有找到对应文档。" : "No matching documentation."}</p>}
+        </Link>)}
+        {results.length === 0 && (index || indexError) && <p className="p-5 text-sm text-text-secondary">{chinese ? "没有找到对应文档。" : "No matching documentation."}</p>}
       </div>
     </dialog>
   </>;

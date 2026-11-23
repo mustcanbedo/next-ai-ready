@@ -8,6 +8,28 @@ import { CURATED_FAQ } from "./faq-curated.mjs";
 for (const [locale, title] of [["en", "Quickstart Check"], ["zh", "快速接入检查"]]) {
   const path = new URL(`../content/${locale}/docs/guides/quickstart.mdx`, import.meta.url);
 
+  test(`${locale} entry pages route readers to the verified first run`, async () => {
+    const docs = new URL(`../content/${locale}/docs/`, import.meta.url);
+    const intro = matter(await readFile(new URL("introduction.mdx", docs), "utf8")).content;
+    const choices = intro.split(/\n## /)[1];
+    assert.ok(choices?.startsWith(locale === "en" ? "Choose your next step" : "选择下一步"));
+    for (const href of [
+      "https://nextjs.org/docs/app/getting-started/metadata-and-og-images",
+      "https://www.fumadocs.dev/docs/next/integrations/llms",
+      `/${locale}/docs/guides/quickstart`,
+      `/${locale}/docs/guides/mcp-integration`,
+    ]) assert.ok(choices.includes(`](${href})`), `missing setup option: ${href}`);
+
+    for (const [slug, href] of [
+      ["installation", "./guides/quickstart"],
+      ["guides/nextra-ai-ready", "./quickstart"],
+      ["guides/mdx-content", "./quickstart"],
+    ]) {
+      const { content } = matter(await readFile(new URL(`${slug}.mdx`, docs), "utf8"));
+      assert.ok(content.includes(`](${href})`), `${slug}: missing Quickstart link`);
+    }
+  });
+
   test(`${locale} llms and MDX guides connect the endpoint and content tasks`, async () => {
     for (const [slug, target] of [["nextjs-llms-txt", "mdx-content"], ["mdx-content", "nextjs-llms-txt"]]) {
       const source = new URL(`../content/${locale}/docs/guides/${slug}.mdx`, import.meta.url);
@@ -65,7 +87,7 @@ for (const [locale, title] of [["en", "Quickstart Check"], ["zh", "快速接入�
     assert.doesNotMatch(diagnostics, /curl -I /, "verify the deployed page body");
   });
 
-  for (const slug of ["guides/quickstart", "installation", "getting-started/project-structure"]) {
+  for (const slug of ["introduction", "guides/quickstart", "installation", "getting-started/project-structure"]) {
     test(`${locale} ${slug} FAQ agrees with its curated source`, async () => {
       const source = new URL(`../content/${locale}/docs/${slug}.mdx`, import.meta.url);
       const { data } = matter(await readFile(source, "utf8"));

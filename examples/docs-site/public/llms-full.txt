@@ -1750,7 +1750,7 @@ No. The default search is deterministic local lexical search over the build-time
 <!-- BEGIN /en/docs/guides/mdx-content -->
 # Next.js MDX content collections for AI-readable docs
 URL: https://nextaiready.com/en/docs/guides/mdx-content
-Updated: 2026-10-09
+Updated: 2026-11-23
 
 # Next.js MDX content collections for AI-readable docs
 
@@ -1765,6 +1765,8 @@ The minimal workflow is:
 2. Initialize the integration and match those files with `content` globs in `ai-ready.config.*`.
 3. Add clear frontmatter and direct answers to each page.
 4. Run `next-ai-ready build` and verify the generated routes.
+
+If you are setting up the SDK for the first time, follow the [Quickstart](./quickstart) through a successful Markdown response, then return here to connect your own content collection.
 
 ## Create a local MDX collection
 
@@ -1983,7 +1985,7 @@ too. Setting `site.baseUrl` does not configure a domain, fix a wrong route, or g
 - **Private drafts appear in `llms.txt`.** Exclude drafts from the matched source; generated artifacts are public unless the deployment protects them.
 - **The page ranks for the wrong query.** Make the title, summary, H1, and first paragraph answer the same specific problem instead of adding more tags.
 
-For a complete installation, continue with the [10-minute setup](../installation) and verify the result with `doctor` before deploying.
+For a complete installation, continue with the [installation reference](../installation) and verify the result with `doctor` before deploying.
 
 ## FAQ
 
@@ -2394,6 +2396,8 @@ pnpm exec next-ai-ready init
 `init` adds the AI routes and an `ai-ready.config.mjs` file. It does not replace Nextra's theme,
 catch-all page, search configuration, or MDX components.
 
+For a first end-to-end run with the SDK, use the [Quickstart](./quickstart) to verify a Markdown response. Then apply the content and plugin setup below to your Nextra project.
+
 ## 2. Point both systems at the same content
 
 Nextra supports Markdown and MDX in `content/`, `src/content/`, `app/`, or `src/app/`. The default
@@ -2571,9 +2575,11 @@ Nextra 4.6.1 can currently resolve its private Zod dependency to 4.4.x, which br
 <!-- BEGIN /en/docs/guides/quickstart -->
 # Quickstart
 URL: https://nextaiready.com/en/docs/guides/quickstart
-Updated: 2026-10-04
+Updated: 2026-11-23
 
 # Quickstart
+
+By the end, a GET request to `/docs/quickstart.md` returns your sample page as Markdown and the app still serves its normal HTML homepage.
 
 This guide takes you from install to a verified AI-readable Next.js setup. Allow about ten
 minutes, plus dependency downloads and the production build. Start with readable content;
@@ -2906,7 +2912,7 @@ No. Google-Extended controls certain Gemini training and grounding uses; it does
 <!-- BEGIN /en/docs/installation -->
 # Installation
 URL: https://nextaiready.com/en/docs/installation
-Updated: 2026-10-03
+Updated: 2026-11-23
 
 # Installation
 
@@ -2933,6 +2939,8 @@ pnpm exec next-ai-ready init
 pnpm exec next-ai-ready build
 pnpm exec next-ai-ready doctor --score
 ```
+
+To verify a first page from a running app, follow the [10-minute Quickstart](./guides/quickstart). It includes a sample MDX page and the expected Markdown response.
 
 The basic setup is complete when `doctor` reports **0 errors** and `public/llms.txt` lists your content. The detailed package map and command reference below are optional reading.
 
@@ -3067,11 +3075,18 @@ By default, ai-ready.config and Knowledge Plane routes under app/%5Fai-ready/. P
 <!-- BEGIN /en/docs/introduction -->
 # Introduction
 URL: https://nextaiready.com/en/docs/introduction
-Updated: 2026-08-25
+Updated: 2026-11-23
 
 # Introduction
 
 Traditional websites are built for browsers. `next-ai-ready` makes your Next.js site **readable by AI** and **callable by agents**.
+
+## Choose your next step
+
+- **Use native tools for your task.** Use [Next.js metadata](https://nextjs.org/docs/app/getting-started/metadata-and-og-images) for search titles, canonical URLs, and social cards. If Fumadocs already serves the documentation you want clients to retrieve, start with its [native AI integrations](https://www.fumadocs.dev/docs/next/integrations/llms).
+- **Generate AI-readable content from your Next.js sources.** Follow the [10-minute Quickstart](/en/docs/guides/quickstart) to install and verify a real Markdown response. For endpoint choices, see [Add llms.txt to a Next.js site](/en/docs/guides/nextjs-llms-txt).
+- **Connect an agent to approved tools.** After the content setup, [connect an MCP client](/en/docs/guides/mcp-integration) when you need authenticated retrieval or want agents to call approved tools.
+- **Choose who can crawl your content.** The [AI crawler policy guide](/en/docs/guides/robots-txt) explains separate rules for search, training, and user-initiated fetches.
 
 ## The problem
 
@@ -3102,32 +3117,25 @@ Your existing UI is untouched. The framework adds **new routes** that serve AI-o
 
 ## What you get
 
-| Artifact        | Consumer                      |
-| --------------- | ----------------------------- |
-| `/llms.txt`     | AI search crawlers            |
-| `/sitemap.md`   | Agent-readable page discovery |
-| `/openapi.json` | Agent frameworks              |
-| `/api/mcp`      | Claude Desktop, Cursor        |
-| `/<page>.md`    | RAG pipelines                 |
-| `JSON-LD`       | Search engines                |
-| `/tools.json`   | OpenAI tool format            |
-
-## Choose your next step
-
-- [Complete the 10-minute quickstart](/en/docs/guides/quickstart) to install and verify the generated outputs.
-- [Add llms.txt to a Next.js site](/en/docs/guides/nextjs-llms-txt) to create a clean AI discovery index and per-page Markdown.
-- [Connect an MCP client](/en/docs/guides/mcp-integration) when agents need to search content or call approved tools.
-- [Configure robots.txt for AI crawlers](/en/docs/guides/robots-txt) to publish an explicit crawling policy without weakening normal search discovery.
+| Artifact        | Consumer                                         |
+| --------------- | ------------------------------------------------ |
+| `/llms.txt`     | Clients that use a Markdown discovery index      |
+| `/sitemap.md`   | Agent-readable page discovery                    |
+| `/openapi.json` | Agent frameworks when capabilities are enabled   |
+| `/api/mcp`      | MCP clients after explicit setup                 |
+| `/<page>.md`    | RAG pipelines                                    |
+| `JSON-LD`       | Search engines                                   |
+| `/tools.json`   | OpenAI tool format when capabilities are enabled |
 
 ## FAQ
 
 ### What is next-ai-ready?
 
-An AEO and Agent-API layer for Next.js that adds llms.txt, OpenAPI, MCP, and structured content without changing your UI.
+A Next.js App Router toolkit that generates llms.txt and page Markdown from your content. OpenAPI, MCP, and callable actions are optional.
 
 ### How is next-ai-ready different from SEO?
 
-SEO targets browsers and search rankings; next-ai-ready targets AI crawlers and agents with artifacts like llms.txt, JSON-LD, and callable actions.
+SEO helps search engines discover and understand your pages. next-ai-ready gives compatible clients machine-readable content and can expose approved actions.
 
 ### Do I need to change my existing pages?
 
@@ -4931,7 +4939,7 @@ Next.js 运行时走 /api/mcp HTTP 传输；Claude Desktop/Cursor 可用 npx nex
 <!-- BEGIN /zh/docs/guides/mdx-content -->
 # 用 Next.js MDX 内容集合生成 AI 可读文档
 URL: https://nextaiready.com/zh/docs/guides/mdx-content
-Updated: 2026-10-09
+Updated: 2026-11-23
 
 # 用 Next.js MDX 内容集合生成 AI 可读文档
 
@@ -4946,6 +4954,8 @@ MDX 内容集合是一组遵循固定字段和路由规则的 Markdown 或 MDX �
 2. 初始化接入，并在 `ai-ready.config.*` 中用 `content` glob 匹配这些文件。
 3. 为每一页补充清晰的 frontmatter 与直接答案。
 4. 运行 `next-ai-ready build` 并验证生成路由。
+
+如果你是第一次安装 SDK，请先按 [快速开始](./quickstart) 拿到成功的 Markdown 响应，再回到本页接入你自己的内容集合。
 
 ## 创建本地 MDX 内容集合
 
@@ -5158,7 +5168,7 @@ curl -i https://docs.example.com/docs/installation.md
 - **私有草稿进入 `llms.txt`。** 从匹配源中排除草稿；除非部署层保护，否则生成产物都是公开的。
 - **页面出现在错误搜索词下。** 让 title、summary、H1 与第一段回答同一个具体问题，而不是继续堆标签。
 
-接下来可以完成 [10 分钟安装流程](../installation)，并在部署前使用 `doctor` 验证结果。
+接下来可以完成 [安装参考](../installation)，并在部署前使用 `doctor` 验证结果。
 
 ## FAQ
 
@@ -5553,6 +5563,8 @@ pnpm exec next-ai-ready init
 `init` 会增加 AI 路由和 `ai-ready.config.mjs`，不会替换 Nextra 的主题、catch-all 页面、搜索
 配置或 MDX 组件。
 
+首次使用 SDK 时，可以先按 [快速开始](./quickstart) 验证一条真实 Markdown 响应，再把下面的内容配置和插件组合应用到 Nextra 项目。
+
 ## 2. 让两个系统读取同一份内容
 
 Nextra 支持 `content/`、`src/content/`、`app/` 或 `src/app/` 下的 Markdown 与 MDX。默认
@@ -5726,11 +5738,13 @@ Nextra 4.6.1 当前可能把内部 Zod 解析到 4.4.x，导致主题 layout 校
 <!-- BEGIN /zh/docs/guides/quickstart -->
 # 快速开始
 URL: https://nextaiready.com/zh/docs/guides/quickstart
-Updated: 2026-10-04
+Updated: 2026-11-23
 
 # 快速开始
 
 本指南按约 10 分钟的基础接入流程组织，目标是验证知识平面端点能返回真实内容。依赖下载和生产构建可能需要更长时间，具体取决于网络和项目情况。
+
+完成后，GET 请求 `/docs/quickstart.md` 会返回示例页面的 Markdown，应用首页仍会返回正常 HTML。
 
 ## 前置要求
 
@@ -6075,7 +6089,7 @@ Claude-SearchBot 用于搜索索引，Claude-User 按用户要求读取页面，
 <!-- BEGIN /zh/docs/installation -->
 # 安装
 URL: https://nextaiready.com/zh/docs/installation
-Updated: 2026-10-03
+Updated: 2026-11-23
 
 # 安装
 
@@ -6102,6 +6116,8 @@ pnpm exec next-ai-ready init
 pnpm exec next-ai-ready build
 pnpm exec next-ai-ready doctor --score
 ```
+
+要在运行中的应用里验证第一个页面，请跟随 [10 分钟快速开始](./guides/quickstart)，使用其中的 MDX 示例和预期 Markdown 响应。
 
 当 `doctor` 显示 **0 个错误**，且 `public/llms.txt` 已列出你的内容时，基础接入即完成。下方包结构和命令参考均为可选阅读。
 
@@ -6235,11 +6251,18 @@ Node.js 20+、Next.js 14.2+ App Router，以及用于 action 的 Zod v4；推荐
 <!-- BEGIN /zh/docs/introduction -->
 # 简介
 URL: https://nextaiready.com/zh/docs/introduction
-Updated: 2026-08-25
+Updated: 2026-11-23
 
 # 简介
 
 传统网站为浏览器而生。`next-ai-ready` 让你的 Next.js 站点被 **AI 可读**、被 **Agent 可调用**。
+
+## 选择下一步
+
+- **先使用适合当前任务的原生功能。** 搜索标题、canonical 和分享卡片可用 [Next.js 元数据](https://nextjs.org/docs/app/getting-started/metadata-and-og-images)。Fumadocs 站点如果只需要文档发现和读取，可以先用它的 [原生 AI 集成](https://www.fumadocs.dev/docs/next/integrations/llms)。
+- **从现有 Next.js 内容生成 AI 可读文档。** 按 [10 分钟快速开始](/zh/docs/guides/quickstart) 安装并验证真实 Markdown 响应。需要比较端点方案时，参考 [为 Next.js 站点添加 llms.txt](/zh/docs/guides/nextjs-llms-txt)。
+- **让 Agent 使用经过许可的工具。** 完成内容接入后，在需要经过认证的内容读取或工具调用时，再 [连接 MCP 客户端](/zh/docs/guides/mcp-integration)。
+- **选择允许哪些客户端抓取。** 参考 [AI 爬虫策略指南](/zh/docs/guides/robots-txt)，分别配置搜索、训练和由用户触发的抓取。
 
 ## 问题
 
@@ -6270,32 +6293,25 @@ npx next-ai-ready build
 
 ## 产出物一览
 
-| 产出物             | 消费者                   |
-| --------------- | --------------------- |
-| `/llms.txt`     | AI 搜索爬虫               |
-| `/sitemap.md`   | Agent 可读的页面发现目录       |
-| `/openapi.json` | Agent 框架              |
-| `/api/mcp`      | Claude Desktop、Cursor |
-| `/<page>.md`    | RAG 管道                |
-| `JSON-LD`       | 搜索引擎                  |
-| `/tools.json`   | OpenAI 工具格式           |
-
-## 选择下一步
-
-- [完成 10 分钟快速开始](/zh/docs/guides/quickstart)，安装并验证所有生成产物。
-- [为 Next.js 站点添加 llms.txt](/zh/docs/guides/nextjs-llms-txt)，建立清晰的 AI 内容索引与逐页 Markdown。
-- [连接 MCP 客户端](/zh/docs/guides/mcp-integration)，让 Agent 搜索内容或调用经过许可的工具。
-- [为 AI 爬虫配置 robots.txt](/zh/docs/guides/robots-txt)，在不削弱正常搜索发现的前提下声明明确的抓取策略。
+| 产出物             | 消费者                    |
+| --------------- | ---------------------- |
+| `/llms.txt`     | 使用 Markdown 索引发现文档的客户端 |
+| `/sitemap.md`   | Agent 可读的页面发现目录        |
+| `/openapi.json` | 启用能力后的 Agent 框架        |
+| `/api/mcp`      | 完成配置后的 MCP 客户端         |
+| `/<page>.md`    | RAG 管道                 |
+| `JSON-LD`       | 搜索引擎                   |
+| `/tools.json`   | 启用能力后的 OpenAI 工具格式     |
 
 ## FAQ
 
 ### 什么是 next-ai-ready？
 
-面向 Next.js 的 AEO 与 Agent-API 层，在不改 UI 的前提下提供 llms.txt、OpenAPI、MCP 与结构化内容。
+为 Next.js App Router 从现有内容生成 llms.txt 和逐页 Markdown 的工具。OpenAPI、MCP 和可调用操作按需启用。
 
 ### next-ai-ready 和 SEO 有什么区别？
 
-SEO 面向浏览器与搜索排名；next-ai-ready 面向 AI 爬虫与 Agent，产出 llms.txt、JSON-LD 和可调用 action。
+SEO 帮助搜索引擎发现和理解页面。next-ai-ready 向兼容客户端提供机器可读的内容，并可以开放经过许可的操作。
 
 ### 需要改动现有页面吗？
 

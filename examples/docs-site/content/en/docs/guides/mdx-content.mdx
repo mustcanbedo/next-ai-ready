@@ -18,7 +18,7 @@ tags:
   - frontmatter
   - llms.txt
   - ai-readable-docs
-updatedAt: '2026-10-09'
+updatedAt: '2026-11-23'
 author: next-ai-ready team
 ---
 
@@ -35,6 +35,8 @@ The minimal workflow is:
 2. Initialize the integration and match those files with `content` globs in `ai-ready.config.*`.
 3. Add clear frontmatter and direct answers to each page.
 4. Run `next-ai-ready build` and verify the generated routes.
+
+If you are setting up the SDK for the first time, follow the [Quickstart](./quickstart) through a successful Markdown response, then return here to connect your own content collection.
 
 ## Create a local MDX collection
 
@@ -253,4 +255,4 @@ too. Setting `site.baseUrl` does not configure a domain, fix a wrong route, or g
 - **Private drafts appear in `llms.txt`.** Exclude drafts from the matched source; generated artifacts are public unless the deployment protects them.
 - **The page ranks for the wrong query.** Make the title, summary, H1, and first paragraph answer the same specific problem instead of adding more tags.
 
-For a complete installation, continue with the [10-minute setup](../installation) and verify the result with `doctor` before deploying.
+For a complete installation, continue with the [installation reference](../installation) and verify the result with `doctor` before deploying.

@@ -7,11 +7,11 @@ export const CURATED_FAQ = {
     introduction: [
       {
         q: "What is next-ai-ready?",
-        a: "An AEO and Agent-API layer for Next.js that adds llms.txt, OpenAPI, MCP, and structured content without changing your UI.",
+        a: "A Next.js App Router toolkit that generates llms.txt and page Markdown from your content. OpenAPI, MCP, and callable actions are optional.",
       },
       {
         q: "How is next-ai-ready different from SEO?",
-        a: "SEO targets browsers and search rankings; next-ai-ready targets AI crawlers and agents with artifacts like llms.txt, JSON-LD, and callable actions.",
+        a: "SEO helps search engines discover and understand your pages. next-ai-ready gives compatible clients machine-readable content and can expose approved actions.",
       },
       {
         q: "Do I need to change my existing pages?",
@@ -221,11 +221,11 @@ export const CURATED_FAQ = {
     introduction: [
       {
         q: "什么是 next-ai-ready？",
-        a: "面向 Next.js 的 AEO 与 Agent-API 层，在不改 UI 的前提下提供 llms.txt、OpenAPI、MCP 与结构化内容。",
+        a: "为 Next.js App Router 从现有内容生成 llms.txt 和逐页 Markdown 的工具。OpenAPI、MCP 和可调用操作按需启用。",
       },
       {
         q: "next-ai-ready 和 SEO 有什么区别？",
-        a: "SEO 面向浏览器与搜索排名；next-ai-ready 面向 AI 爬虫与 Agent，产出 llms.txt、JSON-LD 和可调用 action。",
+        a: "SEO 帮助搜索引擎发现和理解页面。next-ai-ready 向兼容客户端提供机器可读的内容，并可以开放经过许可的操作。",
       },
       {
         q: "需要改动现有页面吗？",

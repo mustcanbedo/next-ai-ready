@@ -27,7 +27,7 @@
 - [Quickstart](https://nextaiready.com/en/docs/guides/quickstart): Complete a verified next-ai-ready setup in about 10 minutes.
 - [Configure robots.txt for AI search and training crawlers in Next.js](https://nextaiready.com/en/docs/guides/robots-txt): Keep ChatGPT and Claude search discovery available while making a separate robots.txt decision for training and user-triggered AI access.
 - [Installation](https://nextaiready.com/en/docs/installation): Install next-ai-ready and scaffold your first config.
-- [Introduction](https://nextaiready.com/en/docs/introduction): What next-ai-ready is and why it exists.
+- [Introduction](https://nextaiready.com/en/docs/introduction): Choose a setup for AI-readable Next.js documentation, from native features to generated Markdown and optional agent actions.
 - [Support and services](https://nextaiready.com/en/docs/support): Support the open-source project or request a fixed-scope Next.js search and AI visibility diagnostic.
 - [next-ai-ready](https://nextaiready.com/zh): 约 10 分钟，为 Next.js App Router 站点增加供 AI 工具发现和读取的内容入口。
 - [CLI](https://nextaiready.com/zh/docs/api-reference/cli): 命令行接口——init、build、doctor、audit 和 mcp。
@@ -52,5 +52,5 @@
 - [快速开始](https://nextaiready.com/zh/docs/guides/quickstart): 按约 10 分钟的流程完成 next-ai-ready 基础接入并验证知识平面端点，实际耗时取决于安装与网络。
 - [在 Next.js 中分别配置 AI 搜索与训练爬虫](https://nextaiready.com/zh/docs/guides/robots-txt): 保留 ChatGPT 与 Claude 的搜索发现能力，同时分别决定是否允许训练爬虫和用户触发的 AI 访问。
 - [安装](https://nextaiready.com/zh/docs/installation): 安装 next-ai-ready 并生成首个配置。
-- [简介](https://nextaiready.com/zh/docs/introduction): next-ai-ready 是什么，为什么需要它。
+- [简介](https://nextaiready.com/zh/docs/introduction): 选择适合 Next.js 文档站的接入方式，了解原生功能、逐页 Markdown 和可选 Agent 调用。
 - [支持与服务](https://nextaiready.com/zh/docs/support): 支持开源项目，或申请固定范围的 Next.js 搜索与 AI 可见性诊断。

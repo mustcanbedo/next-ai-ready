@@ -1,17 +1,14 @@
 ---
 title: Introduction
-summary: What next-ai-ready is and why it exists.
+summary: Choose a setup for AI-readable Next.js documentation, from native features to generated Markdown and optional agent actions.
 order: 1
 questions:
   - q: What is next-ai-ready?
     a: >-
-      An AEO and Agent-API layer for Next.js that adds llms.txt, OpenAPI, MCP,
-      and structured content without changing your UI.
+      A Next.js App Router toolkit that generates llms.txt and page Markdown from your content. OpenAPI, MCP, and callable actions are optional.
   - q: How is next-ai-ready different from SEO?
     a: >-
-      SEO targets browsers and search rankings; next-ai-ready targets AI
-      crawlers and agents with artifacts like llms.txt, JSON-LD, and callable
-      actions.
+      SEO helps search engines discover and understand your pages. next-ai-ready gives compatible clients machine-readable content and can expose approved actions.
   - q: Do I need to change my existing pages?
     a: >-
       No. The framework adds AI routes and build artifacts alongside your
@@ -20,13 +17,20 @@ tags:
   - next.js
   - aeo
   - introduction
-updatedAt: '2026-08-25'
+updatedAt: '2026-11-23'
 author: next-ai-ready team
 ---
 
 # Introduction
 
 Traditional websites are built for browsers. `next-ai-ready` makes your Next.js site **readable by AI** and **callable by agents**.
+
+## Choose your next step
+
+- **Use native tools for your task.** Use [Next.js metadata](https://nextjs.org/docs/app/getting-started/metadata-and-og-images) for search titles, canonical URLs, and social cards. If Fumadocs already serves the documentation you want clients to retrieve, start with its [native AI integrations](https://www.fumadocs.dev/docs/next/integrations/llms).
+- **Generate AI-readable content from your Next.js sources.** Follow the [10-minute Quickstart](/en/docs/guides/quickstart) to install and verify a real Markdown response. For endpoint choices, see [Add llms.txt to a Next.js site](/en/docs/guides/nextjs-llms-txt).
+- **Connect an agent to approved tools.** After the content setup, [connect an MCP client](/en/docs/guides/mcp-integration) when you need authenticated retrieval or want agents to call approved tools.
+- **Choose who can crawl your content.** The [AI crawler policy guide](/en/docs/guides/robots-txt) explains separate rules for search, training, and user-initiated fetches.
 
 ## The problem
 
@@ -59,17 +63,10 @@ Your existing UI is untouched. The framework adds **new routes** that serve AI-o
 
 | Artifact | Consumer |
 | --- | --- |
-| `/llms.txt` | AI search crawlers |
+| `/llms.txt` | Clients that use a Markdown discovery index |
 | `/sitemap.md` | Agent-readable page discovery |
-| `/openapi.json` | Agent frameworks |
-| `/api/mcp` | Claude Desktop, Cursor |
+| `/openapi.json` | Agent frameworks when capabilities are enabled |
+| `/api/mcp` | MCP clients after explicit setup |
 | `/<page>.md` | RAG pipelines |
 | `JSON-LD` | Search engines |
-| `/tools.json` | OpenAI tool format |
-
-## Choose your next step
-
-- [Complete the 10-minute quickstart](/en/docs/guides/quickstart) to install and verify the generated outputs.
-- [Add llms.txt to a Next.js site](/en/docs/guides/nextjs-llms-txt) to create a clean AI discovery index and per-page Markdown.
-- [Connect an MCP client](/en/docs/guides/mcp-integration) when agents need to search content or call approved tools.
-- [Configure robots.txt for AI crawlers](/en/docs/guides/robots-txt) to publish an explicit crawling policy without weakening normal search discovery.
+| `/tools.json` | OpenAI tool format when capabilities are enabled |

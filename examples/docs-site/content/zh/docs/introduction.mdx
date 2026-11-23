@@ -1,27 +1,33 @@
 ---
 title: 简介
-summary: next-ai-ready 是什么，为什么需要它。
+summary: 选择适合 Next.js 文档站的接入方式，了解原生功能、逐页 Markdown 和可选 Agent 调用。
 order: 1
 questions:
   - q: 什么是 next-ai-ready？
-    a: 面向 Next.js 的 AEO 与 Agent-API 层，在不改 UI 的前提下提供 llms.txt、OpenAPI、MCP 与结构化内容。
+    a: 为 Next.js App Router 从现有内容生成 llms.txt 和逐页 Markdown 的工具。OpenAPI、MCP 和可调用操作按需启用。
   - q: next-ai-ready 和 SEO 有什么区别？
     a: >-
-      SEO 面向浏览器与搜索排名；next-ai-ready 面向 AI 爬虫与 Agent，产出 llms.txt、JSON-LD 和可调用
-      action。
+      SEO 帮助搜索引擎发现和理解页面。next-ai-ready 向兼容客户端提供机器可读的内容，并可以开放经过许可的操作。
   - q: 需要改动现有页面吗？
     a: 不需要。框架在现有 App Router 之外增加 AI 路由与构建产物。
 tags:
   - next.js
   - aeo
   - introduction
-updatedAt: '2026-08-25'
+updatedAt: '2026-11-23'
 author: next-ai-ready 团队
 ---
 
 # 简介
 
 传统网站为浏览器而生。`next-ai-ready` 让你的 Next.js 站点被 **AI 可读**、被 **Agent 可调用**。
+
+## 选择下一步
+
+- **先使用适合当前任务的原生功能。** 搜索标题、canonical 和分享卡片可用 [Next.js 元数据](https://nextjs.org/docs/app/getting-started/metadata-and-og-images)。Fumadocs 站点如果只需要文档发现和读取，可以先用它的 [原生 AI 集成](https://www.fumadocs.dev/docs/next/integrations/llms)。
+- **从现有 Next.js 内容生成 AI 可读文档。** 按 [10 分钟快速开始](/zh/docs/guides/quickstart) 安装并验证真实 Markdown 响应。需要比较端点方案时，参考 [为 Next.js 站点添加 llms.txt](/zh/docs/guides/nextjs-llms-txt)。
+- **让 Agent 使用经过许可的工具。** 完成内容接入后，在需要经过认证的内容读取或工具调用时，再 [连接 MCP 客户端](/zh/docs/guides/mcp-integration)。
+- **选择允许哪些客户端抓取。** 参考 [AI 爬虫策略指南](/zh/docs/guides/robots-txt)，分别配置搜索、训练和由用户触发的抓取。
 
 ## 问题
 
@@ -54,17 +60,10 @@ npx next-ai-ready build
 
 | 产出物 | 消费者 |
 | --- | --- |
-| `/llms.txt` | AI 搜索爬虫 |
+| `/llms.txt` | 使用 Markdown 索引发现文档的客户端 |
 | `/sitemap.md` | Agent 可读的页面发现目录 |
-| `/openapi.json` | Agent 框架 |
-| `/api/mcp` | Claude Desktop、Cursor |
+| `/openapi.json` | 启用能力后的 Agent 框架 |
+| `/api/mcp` | 完成配置后的 MCP 客户端 |
 | `/<page>.md` | RAG 管道 |
 | `JSON-LD` | 搜索引擎 |
-| `/tools.json` | OpenAI 工具格式 |
-
-## 选择下一步
-
-- [完成 10 分钟快速开始](/zh/docs/guides/quickstart)，安装并验证所有生成产物。
-- [为 Next.js 站点添加 llms.txt](/zh/docs/guides/nextjs-llms-txt)，建立清晰的 AI 内容索引与逐页 Markdown。
-- [连接 MCP 客户端](/zh/docs/guides/mcp-integration)，让 Agent 搜索内容或调用经过许可的工具。
-- [为 AI 爬虫配置 robots.txt](/zh/docs/guides/robots-txt)，在不削弱正常搜索发现的前提下声明明确的抓取策略。
+| `/tools.json` | 启用能力后的 OpenAI 工具格式 |

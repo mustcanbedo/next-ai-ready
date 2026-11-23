@@ -3,6 +3,7 @@ import Image, { type StaticImageData } from "next/image";
 import { codeToHtml } from "shiki";
 import { CopyButton } from "./copy-button";
 import type { Locale } from "@/lib/i18n";
+import type { DocBlock } from "../../../lib/doc-content";
 import nextraHtml from "../../../public/guides/nextra/html.jpg";
 import nextraConfig from "../../../public/guides/nextra/config.jpg";
 
@@ -12,9 +13,10 @@ const guideImages: Record<string, StaticImageData> = {
 };
 
 const orderedListItem = /^(\d{1,9})\. (.+)$/;
+const emailLink = /^\[([^\s\]@]+@[^\s\]]+)\]\((mailto:\1(?:\?[^\s)]*)?)\)$/;
 
 interface MdxContentProps {
-  content: string;
+  blocks: DocBlock[];
   locale?: Locale;
 }
 
@@ -25,29 +27,7 @@ async function highlight(code: string, lang: string): Promise<string> {
   });
 }
 
-export async function MdxContent({ content, locale = "en" }: MdxContentProps) {
-  const lines = content.trim().split("\n");
-  const blocks: { type: string; content: string; lang?: string }[] = [];
-
-  let i = 0;
-  while (i < lines.length) {
-    const line = lines[i];
-    if (line.startsWith("```")) {
-      const lang = line.slice(3).trim();
-      const codeLines: string[] = [];
-      i++;
-      while (i < lines.length && !lines[i].startsWith("```")) {
-        codeLines.push(lines[i]);
-        i++;
-      }
-      i++;
-      blocks.push({ type: "code", content: codeLines.join("\n"), lang });
-    } else {
-      blocks.push({ type: "text", content: line });
-      i++;
-    }
-  }
-
+export async function MdxContent({ blocks, locale = "en" }: MdxContentProps) {
   const rendered: React.ReactNode[] = [];
 
   for (let j = 0; j < blocks.length; j++) {
@@ -67,6 +47,9 @@ export async function MdxContent({ content, locale = "en" }: MdxContentProps) {
             />
         </figure>,
       );
+    } else if (block.type === "heading") {
+      const Heading = block.level === 2 ? "h2" : "h3";
+      rendered.push(<Heading key={j} id={block.id}>{block.content}</Heading>);
     } else {
       const line = block.content;
       if (!line.trim()) continue;
@@ -74,6 +57,7 @@ export async function MdxContent({ content, locale = "en" }: MdxContentProps) {
       const orderedItem = line.match(orderedListItem);
       const imageMatch = line.match(/^!\[([^\]]+)\]\((\/[^\s)]+)\)$/);
       const guideImage = imageMatch && guideImages[imageMatch[2]];
+      const email = line.match(emailLink);
       if (imageMatch && guideImage) {
         rendered.push(
           <figure key={j} className="my-8">
@@ -90,21 +74,13 @@ export async function MdxContent({ content, locale = "en" }: MdxContentProps) {
             </figcaption>
           </figure>,
         );
-      } else if (line.startsWith("### ")) {
-        const text = line.slice(4);
-        const id = text.toLowerCase().replace(/[^a-z0-9\u4e00-\u9fff]+/g, "-").replace(/(^-|-$)/g, "");
+      } else if (email) {
+        const [, address, href] = email;
         rendered.push(
-          <h3 key={j} id={id}>
-            {text}
-          </h3>,
-        );
-      } else if (line.startsWith("## ")) {
-        const text = line.slice(3);
-        const id = text.toLowerCase().replace(/[^a-z0-9\u4e00-\u9fff]+/g, "-").replace(/(^-|-$)/g, "");
-        rendered.push(
-          <h2 key={j} id={id}>
-            {text}
-          </h2>,
+          <div key={j} className="doc-email">
+            <a href={href}>{address}</a>
+            <CopyButton text={address} locale={locale} label={locale === "zh" ? "复制邮箱" : "Copy email"} />
+          </div>,
         );
       } else if (line.startsWith("# ")) {
         // Skip — rendered from page header
@@ -207,6 +183,7 @@ export async function MdxContent({ content, locale = "en" }: MdxContentProps) {
           blocks[j + 1].type === "text" &&
           blocks[j + 1].content.trim() &&
           !/^(#{1,3} |[->] |\||!\[)/.test(blocks[j + 1].content) &&
+          !emailLink.test(blocks[j + 1].content) &&
           !orderedListItem.test(blocks[j + 1].content)
         ) {
           j++;

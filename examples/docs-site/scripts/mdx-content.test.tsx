@@ -1,14 +1,16 @@
 import { describe, expect, it, vi } from "vitest";
 import { renderToStaticMarkup } from "react-dom/server";
 import { MdxContent } from "../app/[locale]/components/mdx-content";
+import { parseDocBlocks } from "../lib/doc-content";
+import type { Locale } from "../lib/i18n";
 
 // Vitest returns asset URLs; Next's static image loader also supplies dimensions.
 vi.mock("../public/guides/nextra/html.jpg", () => ({
   default: { src: "/guides/nextra/html.jpg", width: 1280, height: 720 },
 }));
 
-async function render(content: string) {
-  return renderToStaticMarkup(await MdxContent({ content }));
+async function render(content: string, locale?: Locale) {
+  return renderToStaticMarkup(await MdxContent({ blocks: parseDocBlocks(content), locale }));
 }
 
 describe("documentation tutorial steps", () => {
@@ -71,5 +73,11 @@ describe("documentation tutorial steps", () => {
     const html = await render("1. Verify.\n![Nextra HTML](/guides/nextra/html.jpg)");
     expect(html).toMatch(/<\/ol><figure/);
     expect(html).toContain('alt="Nextra HTML"');
+  });
+
+  it.each([["en", "Copy email"], ["zh", "复制邮箱"]] as const)("renders an address with a localized copy button in %s", async (locale, label) => {
+    const html = await render("[team@example.com](mailto:team@example.com?subject=Hello)", locale);
+    expect(html).toContain('href="mailto:team@example.com?subject=Hello">team@example.com</a>');
+    expect(html).toContain(`aria-label="${label}"`);
   });
 });

@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { getPageJsonLd } from "next-ai-ready/json-ld";
 import { JsonLd } from "../../../components/json-ld";
 import { getDoc, getAllDocs } from "@/lib/docs";
+import { parseDocBlocks } from "@/lib/doc-content";
 import { MdxContent } from "../../components/mdx-content";
 import { TableOfContents } from "../../components/toc";
 import { locales, type Locale } from "@/lib/i18n";
@@ -41,19 +42,6 @@ export async function generateMetadata({ params }: PageProps) {
   });
 }
 
-function extractHeadings(content: string): { id: string; text: string; level: number }[] {
-  const headings: { id: string; text: string; level: number }[] = [];
-  for (const line of content.split("\n")) {
-    const match = line.match(/^(#{2,3})\s+(.+)$/);
-    if (match) {
-      const text = match[2];
-      const id = text.toLowerCase().replace(/[^a-z0-9\u4e00-\u9fff]+/g, "-").replace(/(^-|-$)/g, "");
-      headings.push({ id, text, level: match[1].length });
-    }
-  }
-  return headings;
-}
-
 export default async function DocPage({ params }: PageProps) {
   const { locale, slug } = await params;
   const doc = await getDoc(slug.join("/"), locale as Locale);
@@ -66,7 +54,10 @@ export default async function DocPage({ params }: PageProps) {
   const currentIndex = allDocs.findIndex((d) => d.slug === doc.slug);
   const prev = currentIndex > 0 ? allDocs[currentIndex - 1] : null;
   const next = currentIndex < allDocs.length - 1 ? allDocs[currentIndex + 1] : null;
-  const headings = extractHeadings(doc.content);
+  const blocks = parseDocBlocks(doc.content);
+  const headings = blocks.flatMap((block) => block.type === "heading"
+    ? [{ id: block.id, text: block.content, level: block.level }]
+    : []);
   const sectionLabels = getMessages(locale as Locale).docs.sidebar;
   const sectionLabel = sectionLabels[doc.section as keyof typeof sectionLabels] ?? doc.section;
 
@@ -101,7 +92,7 @@ export default async function DocPage({ params }: PageProps) {
           </div>
         </header>
         {headings.length > 0 && <details className="mobile-toc"><summary>{locale === "zh" ? "本页目录" : "On this page"}</summary><ul>{headings.map((heading) => <li key={heading.id}><a href={`#${heading.id}`}>{heading.text}</a></li>)}</ul></details>}
-        <MdxContent content={doc.content} locale={locale as Locale} />
+        <MdxContent blocks={blocks} locale={locale as Locale} />
         <a className="doc-edit" href={`https://github.com/mustcanbedo/next-ai-ready/edit/main/examples/docs-site/content/${locale}/docs/${doc.slug}.mdx`}><SquarePen size={14} aria-hidden="true" />{locale === "zh" ? "在 GitHub 上编辑此页" : "Edit this page on GitHub"}</a>
 
         {/* Prev / Next */}

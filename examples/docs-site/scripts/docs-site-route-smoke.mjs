@@ -370,20 +370,21 @@ async function main() {
       "Support and services",
       "Fixed-scope diagnostic",
       "USD 299",
-      "khuangnanyeji0113@gmail.com",
+      ">khuangnanyeji0113@gmail.com</a>",
+      'aria-label="Copy email"',
     ],
   });
   await expectResponse("/en/docs/support.md", {
     contentType: "text/markdown",
-    includes: ["# Support next-ai-ready", "## Evidence boundary"],
+    includes: ["# Support next-ai-ready", "## Evidence boundary", "[khuangnanyeji0113@gmail.com](mailto:"],
   });
   await expectResponse("/zh/docs/support", {
     contentType: "text/html",
-    includes: ["支持与服务", "固定范围诊断", "299 美元起"],
+    includes: ["支持与服务", "固定范围诊断", "299 美元起", ">khuangnanyeji0113@gmail.com</a>", 'aria-label="复制邮箱"'],
   });
   await expectResponse("/zh/docs/support.md", {
     contentType: "text/markdown",
-    includes: ["# 支持 next-ai-ready", "## 证据边界"],
+    includes: ["# 支持 next-ai-ready", "## 证据边界", "[khuangnanyeji0113@gmail.com](mailto:"],
   });
   await expectResponse("/en/docs/guides/nextjs-llms-txt", {
     contentType: "text/html",
@@ -450,10 +451,27 @@ async function main() {
     contentType: "text/html",
     includes: "在 Next.js 中分别配置 AI 搜索与训练爬虫",
   });
-  await expectResponse("/en/docs/guides/nextra-ai-ready", {
-    contentType: "text/html",
-    includes: "Nextra llms.txt and Markdown endpoint setup",
-  });
+  for (const [locale, install, fixture, troubleshooting] of [
+    ["en", "1-install-and-initialize", "executable-reference", "nextra-4-6-1-and-zod-4-4-compatibility"],
+    ["zh", "1-安装并初始化", "可执行参考实现", "nextra-4-6-1-与-zod-4-4-兼容说明"],
+  ]) {
+    const installHeading = `<h2 id="${install}">`;
+    const fixtureHeading = `<h2 id="${fixture}">`;
+    const html = await expectResponse(`/${locale}/docs/guides/nextra-ai-ready`, {
+      contentType: "text/html",
+      includes: [installHeading, fixtureHeading, `<h3 id="${troubleshooting}">`],
+    });
+    if (html.indexOf(installHeading) > html.indexOf(fixtureHeading)) {
+      fail(`${locale} Nextra setup must precede the runnable fixture`);
+    }
+    const index = JSON.parse(await expectResponse(`/${locale}/search-index.json`, {
+      contentType: "application/json",
+      headerIncludes: { "x-robots-tag": "noindex" },
+    }));
+    if (!index["guides/nextra-ai-ready"]?.some(({ heading, text }) => heading?.id === troubleshooting && text.includes("4.4.x"))) {
+      fail(`${locale} search index must link to the Nextra troubleshooting heading with its prose`);
+    }
+  }
   await expectNextraScreenshots("/en/docs/guides/nextra-ai-ready");
   await expectNextraScreenshots("/zh/docs/guides/nextra-ai-ready");
   await expectScreenshotAsset("/guides/nextra/html.jpg");

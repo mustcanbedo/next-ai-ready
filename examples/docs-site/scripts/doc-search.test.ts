@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { searchDocs } from "../lib/doc-search";
+import { indexDocSections, searchDocs } from "../lib/doc-search";
+import { parseDocBlocks } from "../lib/doc-content";
 import type { DocMeta } from "../lib/docs";
 
 function doc(overrides: Partial<DocMeta> = {}): DocMeta {
@@ -152,5 +153,32 @@ describe("documentation search", () => {
     expect(searchDocs(zhDocs, "\u5b89\u88c5")).toEqual(zhDocs);
     expect(searchDocs(enDocs, "")).toEqual(enDocs);
     expect(searchDocs(zhDocs, "")).toEqual(zhDocs);
+  });
+
+  it("ranks the named troubleshooting section over an earlier body mention", () => {
+    const match = doc({ title: "Nextra setup", slug: "guides/nextra" });
+    const index = { [match.slug]: indexDocSections(parseDocBlocks(`## Setup
+See the Zod 4.4 notes.
+
+### Nextra and Zod 4.4 compatibility
+The theme may fail layout validation.`)) };
+
+    expect(searchDocs([match], "Zod 4.4", index)).toEqual([{
+      ...match,
+      heading: { id: "nextra-and-zod-4-4-compatibility", text: "Nextra and Zod 4.4 compatibility" },
+    }]);
+    expect(searchDocs([match], "Nextra", index)).toEqual([match]);
+  });
+
+  it("matches Chinese prose and links to the last rendered heading across code fences", () => {
+    const match = doc({ title: "配置指南" });
+    const content = "## 排查渲染问题\r\n```md\r\n### 示例标题\r\n```\r\n如果布局校验失败，检查 Zod 版本。";
+    const index = { [match.slug]: indexDocSections(parseDocBlocks(content)) };
+
+    expect(searchDocs([match], "布局校验失败", index)).toEqual([{
+      ...match,
+      heading: { id: "排查渲染问题", text: "排查渲染问题" },
+    }]);
+    expect(index[match.slug].flatMap(({ heading }) => heading ? [heading.id] : [])).toEqual(["排查渲染问题"]);
   });
 });

@@ -2500,6 +2500,25 @@ This is a first-party compatibility demonstration using this repository's worksp
 an independent installation test of npm latest, external adoption, Nextra endorsement, or evidence
 of increased search traffic.
 
+### Published npm package check
+
+On 2026-11-23, a standalone app installed `next-ai-ready@0.1.0-alpha.22` from the public npm registry
+with Node.js `22.22.1` and pnpm `9.12.0`. It used Nextra and its docs theme `4.6.1`, Next.js
+`16.2.6`, and React `19.2.4`. The check confirmed Zod `4.3.6` for Nextra and the theme, and
+Zod `4.4.3` for the SDK.
+
+From the repository root, run the [public-registry smoke script](https://github.com/mustcanbedo/next-ai-ready/blob/main/examples/nextra-docs/scripts/public-registry-smoke.mjs):
+
+```bash
+node examples/nextra-docs/scripts/public-registry-smoke.mjs 0.1.0-alpha.22
+```
+
+The production build, the shared-content graph check, and all nine HTTP checks passed.
+`doctor` reported **0 errors and 3 warnings** for JavaScript route detection, missing author
+metadata, and missing JSON-LD on the example pages.
+
+### Workspace example
+
 After cloning the repository, run these commands in order from its root:
 
 ```bash
@@ -2541,8 +2560,7 @@ It shows the content glob and example domain, not a terminal test result.
 
 The production smoke passed 10 checks: one shared-content graph check and nine HTTP checks.
 Inspect the assertions in the [production smoke script](https://github.com/mustcanbedo/next-ai-ready/blob/main/examples/nextra-docs/scripts/compatibility-smoke.mjs).
-These passing contracts do not imply a warning-free diagnostic: the fixture's current `doctor`
-reports `0 errors / 5 warnings`, which still need individual review.
+The 2026-10-02 workspace-source run reported `0 errors / 5 warnings` from `doctor`.
 Three concern diagnostic heuristics for Knowledge-only OpenAPI, JavaScript route stubs, and the
 workspace CLI prebuild. The other two flag author metadata and JSON-LD that this fixture does not configure.
 
@@ -5663,6 +5681,24 @@ pnpm exec next-ai-ready audit https://docs.example.com/getting-started --version
 这是本仓库 workspace 源码的第一方兼容性演示，不是 npm 最新包的独立安装验证，也不是
 外部采用、Nextra 官方背书或 SEO 流量提升的证据。
 
+### 公开 npm 包验收
+
+2026-11-23，在独立应用中用 Node.js `22.22.1` 和 pnpm `9.12.0` 从公共 npm 安装
+`next-ai-ready@0.1.0-alpha.22`。测试环境使用 Nextra 及文档主题 `4.6.1`、Next.js
+`16.2.6` 和 React `19.2.4`。检查确认 Nextra 与主题解析到 Zod `4.3.6`，SDK 则解析到
+Zod `4.4.3`。
+
+在仓库根目录运行 [公开 registry 验证脚本](https://github.com/mustcanbedo/next-ai-ready/blob/main/examples/nextra-docs/scripts/public-registry-smoke.mjs)：
+
+```bash
+node examples/nextra-docs/scripts/public-registry-smoke.mjs 0.1.0-alpha.22
+```
+
+生产构建、共享内容图和 9 项 HTTP 检查均通过。`doctor` 报告 **0 个错误、3 个告警**，
+分别涉及 JavaScript 路由检测、缺少作者元数据和示例页面缺少 JSON-LD。
+
+### 仓库示例
+
 克隆仓库后，在根目录按顺序复现：
 
 ```bash
@@ -5705,7 +5741,7 @@ corepack pnpm --filter @next-ai-ready/example-nextra-docs start --hostname 127.0
 生产 smoke 已通过 10 项检查（1 项共享内容图、9 项 HTTP）；逐项输出与断言可在
 [真实 smoke 脚本](https://github.com/mustcanbedo/next-ai-ready/blob/main/examples/nextra-docs/scripts/compatibility-smoke.mjs)复核。
 
-检查通过不代表初始流程零警告：当前 `doctor` 实际为 `0 errors / 5 warnings`，仍需逐项审阅。
+2026-10-02 的 workspace 源码运行中，`doctor` 报告 `0 errors / 5 warnings`。
 其中三条涉及 Knowledge-only OpenAPI、JavaScript 路由及 workspace CLI prebuild 的诊断适配；
 另两条对应本例确实未配置的 author 与 JSON-LD。
 

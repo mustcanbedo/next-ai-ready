@@ -18,7 +18,7 @@ tags:
   - frontmatter
   - llms.txt
   - ai-readable-docs
-updatedAt: '2026-10-09'
+updatedAt: '2026-11-23'
 author: next-ai-ready 团队
 ---
 
@@ -35,6 +35,8 @@ MDX 内容集合是一组遵循固定字段和路由规则的 Markdown 或 MDX �
 2. 初始化接入，并在 `ai-ready.config.*` 中用 `content` glob 匹配这些文件。
 3. 为每一页补充清晰的 frontmatter 与直接答案。
 4. 运行 `next-ai-ready build` 并验证生成路由。
+
+如果你是第一次安装 SDK，请先按 [快速开始](./quickstart) 拿到成功的 Markdown 响应，再回到本页接入你自己的内容集合。
 
 ## 创建本地 MDX 内容集合
 
@@ -247,4 +249,4 @@ curl -i https://docs.example.com/docs/installation.md
 - **私有草稿进入 `llms.txt`。** 从匹配源中排除草稿；除非部署层保护，否则生成产物都是公开的。
 - **页面出现在错误搜索词下。** 让 title、summary、H1 与第一段回答同一个具体问题，而不是继续堆标签。
 
-接下来可以完成 [10 分钟安装流程](../installation)，并在部署前使用 `doctor` 验证结果。
+接下来可以完成 [安装参考](../installation)，并在部署前使用 `doctor` 验证结果。

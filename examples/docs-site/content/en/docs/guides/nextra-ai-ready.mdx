@@ -16,7 +16,7 @@ tags:
   - nextjs
   - llms.txt
   - mdx
-updatedAt: '2026-11-23'
+updatedAt: '2026-11-24'
 author: next-ai-ready team
 ---
 
@@ -37,8 +37,7 @@ Next.js `16.2.6`, and React `19.2.4`. You can use this guide with an existing Ne
 site. If you hit a theme layout error, check the [Zod 4.4 workaround](#nextra-4-6-1-and-zod-4-4-compatibility).
 
 Install and initialize in your Nextra project, point both tools at the same content, and wrap your
-existing Next.js config. After deploying, run `curl -i https://docs.example.com/getting-started.md`
-with a real page on your domain. Look for `200`, `text/markdown`, and the expected page content.
+existing Next.js config. After deploying, [verify both representations of one page](#verify-html-and-markdown-for-the-same-page).
 
 ## 1. Install and initialize
 
@@ -119,6 +118,8 @@ tracked upstream in [Nextra #4989](https://github.com/shuding/nextra/issues/4989
 [#5036](https://github.com/shuding/nextra/issues/5036); remove the override once a fixed Nextra
 release passes the fixture.
 
+After applying the override and rebuilding, [check HTML and Markdown for the same page](#verify-html-and-markdown-for-the-same-page).
+
 ## 4. Build and verify
 
 ```bash
@@ -127,17 +128,25 @@ pnpm exec next-ai-ready doctor --score
 pnpm build
 ```
 
-After deployment, verify one real page and the discovery files. These paths match this fixture;
-use your content's actual route rather than automatically adding a `/docs` prefix:
+### Verify HTML and Markdown for the same page
+
+Use your deployment's origin and an existing Nextra page path. The fixture serves
+`/getting-started`. Append `.md` to the page path to request its Markdown representation.
+To run these commands against the started fixture, use `http://127.0.0.1:3321` as the origin.
 
 ```bash
-curl -fsS https://docs.example.com/llms.txt
-curl -i https://docs.example.com/getting-started.md
-pnpm exec next-ai-ready audit https://docs.example.com/getting-started --version 3
+curl -fsS -i -H 'Accept: text/html' https://docs.example.com/getting-started
+curl -fsS -i https://docs.example.com/getting-started.md
 ```
 
-The Nextra HTML page must remain unchanged for browsers. The corresponding `.md` URL should return
-clean Markdown, and an unknown browser URL must continue to return a real `404`.
+The first response should be `200` with `Content-Type: text/html`, the Nextra layout, and the
+page content. The second should be `200` with `Content-Type: text/markdown`, the heading and
+body of the same page, and a canonical `Link` header pointing to the production HTML URL.
+The local fixture uses `https://nextra-fixture.example` as its configured canonical origin.
+
+Check discovery with `curl -fsS https://docs.example.com/llms.txt` and verify it lists the page.
+Run `pnpm exec next-ai-ready audit https://docs.example.com/getting-started --version 3` for
+the broader audit. A browser request to an unknown page should still return `404`.
 
 ### Troubleshooting and rollback
 

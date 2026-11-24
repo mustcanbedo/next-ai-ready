@@ -16,7 +16,7 @@ tags:
   - nextjs
   - llms.txt
   - mdx
-updatedAt: '2026-11-23'
+updatedAt: '2026-11-24'
 author: next-ai-ready team
 ---
 
@@ -37,8 +37,7 @@ Next.js `16.2.6` 和 React `19.2.4`。已有 Nextra 4 App Router 站点可以直
 如果遇到主题布局校验错误，请查看 [Zod 4.4 兼容说明](#nextra-4-6-1-与-zod-4-4-兼容说明)。
 
 先在 Nextra 项目里安装并初始化，再让两套工具读取同一份内容，并包装现有的 Next.js 配置。
-部署后用 `curl -i https://docs.example.com/getting-started.md` 检查你自己域名下的真实页面。
-确认响应状态为 `200`、类型为 `text/markdown`，且正文与原页面一致。
+部署后，[用同一页面验证 HTML 和 Markdown](#验证同一页面的-html-和-markdown)。
 
 ## 1. 安装并初始化
 
@@ -116,6 +115,8 @@ Nextra `4.6.1` 当前声明的 Zod 依赖范围可能把内部依赖解析到 `4
 [Nextra #4989](https://github.com/shuding/nextra/issues/4989) 与
 [#5036](https://github.com/shuding/nextra/issues/5036)；修复版本通过该夹具后即可移除 override。
 
+应用 override 并重新构建后，[用同一页面验证 HTML 和 Markdown](#验证同一页面的-html-和-markdown)。
+
 ## 4. 构建并验证
 
 ```bash
@@ -124,17 +125,25 @@ pnpm exec next-ai-ready doctor --score
 pnpm build
 ```
 
-部署后验证真实页面与发现文件。以下沿用本例的 `/getting-started`；普通项目应按实际内容路径
-替换，不要固定添加 `/docs` 前缀：
+### 验证同一页面的 HTML 和 Markdown
+
+使用你的部署域名和已有的 Nextra 页面路径。示例项目的页面是 `/getting-started`，
+在页面路径末尾加 `.md` 即可请求 Markdown。若在本地启动示例项目，将域名换为
+`http://127.0.0.1:3321` 即可运行下方命令。
 
 ```bash
-curl -fsS https://docs.example.com/llms.txt
-curl -i https://docs.example.com/getting-started.md
-pnpm exec next-ai-ready audit https://docs.example.com/getting-started --version 3
+curl -fsS -i -H 'Accept: text/html' https://docs.example.com/getting-started
+curl -fsS -i https://docs.example.com/getting-started.md
 ```
 
-浏览器访问的 Nextra HTML 页面应保持不变，对应 `.md` URL 应返回干净 Markdown；不存在的普通
-浏览器页面仍必须返回真实 `404`。
+第一条应返回 `200` 和 `Content-Type: text/html`，并保留 Nextra 布局和页面内容。
+第二条应返回 `200` 和 `Content-Type: text/markdown`，含同一页面的标题与正文，
+并通过 canonical `Link` 响应头指向生产环境的 HTML 网址。示例项目的 canonical 域名
+配置为 `https://nextra-fixture.example`。
+
+用 `curl -fsS https://docs.example.com/llms.txt` 检查索引是否列出该页面，再运行
+`pnpm exec next-ai-ready audit https://docs.example.com/getting-started --version 3` 做完整审计。
+浏览器请求不存在的页面仍应返回 `404`。
 
 ### 常见问题与回滚点
 

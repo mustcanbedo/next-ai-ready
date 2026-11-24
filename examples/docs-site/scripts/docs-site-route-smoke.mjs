@@ -455,15 +455,15 @@ async function main() {
     contentType: "text/html",
     includes: "在 Next.js 中分别配置 AI 搜索与训练爬虫",
   });
-  for (const [locale, install, fixture, troubleshooting] of [
-    ["en", "1-install-and-initialize", "executable-reference", "nextra-4-6-1-and-zod-4-4-compatibility"],
-    ["zh", "1-安装并初始化", "可执行参考实现", "nextra-4-6-1-与-zod-4-4-兼容说明"],
+  for (const [locale, install, fixture, troubleshooting, verification] of [
+    ["en", "1-install-and-initialize", "executable-reference", "nextra-4-6-1-and-zod-4-4-compatibility", "verify-html-and-markdown-for-the-same-page"],
+    ["zh", "1-安装并初始化", "可执行参考实现", "nextra-4-6-1-与-zod-4-4-兼容说明", "验证同一页面的-html-和-markdown"],
   ]) {
     const installHeading = `<h2 id="${install}">`;
     const fixtureHeading = `<h2 id="${fixture}">`;
     const html = await expectResponse(`/${locale}/docs/guides/nextra-ai-ready`, {
       contentType: "text/html",
-      includes: [installHeading, fixtureHeading, `<h3 id="${troubleshooting}">`],
+      includes: [installHeading, fixtureHeading, `<h3 id="${troubleshooting}">`, `<h3 id="${verification}">`],
     });
     if (html.indexOf(installHeading) > html.indexOf(fixtureHeading)) {
       fail(`${locale} Nextra setup must precede the runnable fixture`);
@@ -484,6 +484,8 @@ async function main() {
     contentType: "text/markdown",
     includes: [
       "# Nextra llms.txt and Markdown endpoint setup",
+      "curl -fsS -i -H 'Accept: text/html' https://docs.example.com/getting-started",
+      "curl -fsS -i https://docs.example.com/getting-started.md",
       "[Next.js App Router llms.txt walkthrough](./nextjs-llms-txt)",
       "](/guides/nextra/html.jpg)",
       "](/guides/nextra/config.jpg)",
@@ -493,6 +495,8 @@ async function main() {
     contentType: "text/markdown",
     includes: [
       "# 为 Nextra 4 添加 llms.txt 与 Markdown 端点",
+      "curl -fsS -i -H 'Accept: text/html' https://docs.example.com/getting-started",
+      "curl -fsS -i https://docs.example.com/getting-started.md",
       "](/guides/nextra/html.jpg)",
       "](/guides/nextra/config.jpg)",
     ],

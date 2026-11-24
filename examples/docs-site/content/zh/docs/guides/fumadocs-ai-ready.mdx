@@ -1,6 +1,6 @@
 ---
 title: 为 Fumadocs 添加 llms.txt 与 Markdown 端点
-summary: 选择 Fumadocs 原生 LLM 与 MCP 路由或 next-ai-ready 共享语义图，保留 createMDX，并验证实际内容而不只看 HTTP 状态。
+summary: 复用 Fumadocs 的 MDX 内容集合，生成 llms.txt 与逐页 Markdown。比较原生 AI 路由与 next-ai-ready，再验证页面映射。
 order: 10
 questions:
   - q: 只是需要 Fumadocs llms.txt 或文档 MCP，也必须安装 next-ai-ready 吗？
@@ -16,7 +16,7 @@ tags:
   - nextjs
   - llms.txt
   - mdx
-updatedAt: '2026-10-03'
+updatedAt: '2026-11-24'
 author: next-ai-ready team
 ---
 
@@ -77,7 +77,9 @@ pnpm exec next-ai-ready init
 
 ## 2. 复用 Fumadocs 内容集合
 
-Fumadocs MDX 通常把文档放在 `content/docs`。让 next-ai-ready 指向同一批源文件：
+在现有的 [Fumadocs MDX 集合](https://www.fumadocs.dev/docs/mdx)定义中找到文档目录，
+例如 `source.config.ts` 中的 `dir`。让 next-ai-ready 的 `content` glob 读取该目录下的
+原始 Markdown 和 MDX 文件。如果集合位于 `content/docs`，使用以下配置：
 
 ```js
 import { defineConfig } from "next-ai-ready"
@@ -92,13 +94,15 @@ export default defineConfig({
 })
 ```
 
-如果集合位于 `src/content/docs`，改用对应路径。已有 `title`、`description`、`date` 与
-`author` frontmatter 会被复用；只有在日期真实且持续维护时才增加 `updatedAt`。
+如果集合位于 `src/content/docs`，将 glob 改为 `src/content/docs/**/*.{md,mdx}`。
+已有 `title`、`description`、`date` 与 `author` frontmatter 会被复用。
+持续维护更新时间的页面可以添加 `updatedAt`。
 
 这是文件复用，不是 Fumadocs Source API Adapter；SDK 不会运行 Fumadocs 专有插件，也不会
 复现它处理后的 Markdown。使用自定义 MDX 组件或生成内容时，先检查第二套流水线的结果。
-派生路由必须与实际界面 URL 一致，例如 `content/docs/getting-started.mdx` 对应
-`/docs/getting-started`；自定义 Fumadocs `baseUrl` 或 slug 布局不会自动导入。
+构建后，从 `public/llms.txt` 选一条链接，和 Fumadocs 实际提供的页面地址比对。
+例如，默认配置下 `content/docs/getting-started.mdx` 对应 `/docs/getting-started`。
+如果 Fumadocs 使用其他 `baseUrl` 或自定义 slug，用[内容源 adapter](./mdx-content)对齐路由。
 
 ## 3. 包装 Next.js 配置
 

@@ -1,6 +1,6 @@
 ---
 title: Add llms.txt and Markdown endpoints to Fumadocs
-summary: Choose native Fumadocs LLM and MCP routes or a shared next-ai-ready semantic graph, preserve createMDX, and verify content rather than only HTTP status.
+summary: Reuse a Fumadocs content collection for llms.txt and per-page Markdown. Compare native AI routes with next-ai-ready and verify the page mapping.
 order: 10
 questions:
   - q: Do I need next-ai-ready just for Fumadocs llms.txt or documentation MCP?
@@ -16,7 +16,7 @@ tags:
   - nextjs
   - llms.txt
   - mdx
-updatedAt: '2026-10-03'
+updatedAt: '2026-11-24'
 author: next-ai-ready team
 ---
 
@@ -78,8 +78,10 @@ it does not install MCP or callable actions. Review existing configuration rathe
 
 ## 2. Reuse the Fumadocs content collection
 
-Fumadocs MDX commonly stores documentation under `content/docs`. Point next-ai-ready at the same
-source files:
+Find the directory of your existing [Fumadocs MDX collection](https://www.fumadocs.dev/docs/mdx)
+in its collection definition, such as the `dir` in `source.config.ts`. Point next-ai-ready's
+`content` glob at the original Markdown and MDX files in that directory. For a collection under
+`content/docs`, use the following configuration:
 
 ```js
 import { defineConfig } from "next-ai-ready"
@@ -94,15 +96,16 @@ export default defineConfig({
 })
 ```
 
-If the collection lives under `src/content/docs`, use that path instead. Existing `title`,
-`description`, `date`, and `author` frontmatter are reused. Add `updatedAt` only when the date is
-truthful and maintained.
+If the collection lives under `src/content/docs`, change the glob to
+`src/content/docs/**/*.{md,mdx}`. Existing `title`, `description`, `date`, and `author` frontmatter
+are reused. Add `updatedAt` only when the date is maintained.
 
 This is file-based reuse, not a Fumadocs Source API adapter. The SDK does not run Fumadocs-specific
 plugins or reproduce its processed Markdown. Check custom MDX components and generated content
-before choosing a second pipeline. Its derived routes must match the actual UI URLs: for example,
-`content/docs/getting-started.mdx` maps to `/docs/getting-started`. A custom Fumadocs `baseUrl` or slug
-layout is not automatically imported.
+before choosing a second pipeline. After building, compare a page in `public/llms.txt` to the
+URL Fumadocs serves. For example, `content/docs/getting-started.mdx` maps to `/docs/getting-started`
+with the default setup. If Fumadocs uses a different `baseUrl` or custom slug, use a
+[content source adapter](./mdx-content) to match the routes.
 
 ## 3. Wrap the Next.js config
 

@@ -391,6 +391,7 @@ async function main() {
     includes: [
       "Add llms.txt and Markdown endpoints to Next.js App Router",
       'id="compare-the-tools-before-installing"',
+      'id="see-a-production-example"',
       'href="https://www.fumadocs.dev/docs/integrations/llms"',
       'href="https://github.com/garmeeh/next-seo#readme"',
       'href="./mdx-content"',
@@ -400,6 +401,7 @@ async function main() {
     contentType: "text/html",
     includes: [
       'id="安装前先比较工具职责"',
+      'id="查看生产案例"',
       'href="https://www.fumadocs.dev/docs/integrations/llms"',
       'href="./mdx-content"',
     ],
@@ -409,6 +411,7 @@ async function main() {
     includes: [
       "# Add llms.txt and Markdown endpoints to Next.js App Router",
       "### Inspect the implementation evidence",
+      "page=/en/docs/guides/nextjs-llms-txt",
       "## Compare the tools before installing",
       "### Keep one owner per output",
       "[Fumadocs' native LLM integration](https://www.fumadocs.dev/docs/integrations/llms)",
@@ -424,6 +427,7 @@ async function main() {
     includes: [
       "# 为 Next.js App Router 添加 llms.txt 与 Markdown 端点",
       "### 检查实现证据",
+      "page=/zh/docs/guides/nextjs-llms-txt",
       "## 安装前先比较工具职责",
       "### 每种输出只保留一个负责人",
       "[Fumadocs 自带的 LLM 集成](https://www.fumadocs.dev/docs/integrations/llms)",

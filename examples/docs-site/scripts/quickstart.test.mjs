@@ -16,6 +16,7 @@ for (const [locale, title] of [["en", "Quickstart Check"], ["zh", "快速接入�
     for (const href of [
       "https://nextjs.org/docs/app/getting-started/metadata-and-og-images",
       "https://www.fumadocs.dev/docs/next/integrations/llms",
+      `/${locale}/docs/guides/fumadocs-ai-ready`,
       `/${locale}/docs/guides/quickstart`,
       `/${locale}/docs/guides/mcp-integration`,
     ]) assert.ok(choices.includes(`](${href})`), `missing setup option: ${href}`);
@@ -37,6 +38,10 @@ for (const [locale, title] of [["en", "Quickstart Check"], ["zh", "快速接入�
       assert.ok(content.includes(`](./${target})`), `${slug}: missing contextual guide link`);
       await readFile(new URL(`./${target}.mdx`, source), "utf8");
     }
+
+    const { content } = matter(await readFile(path, "utf8"));
+    const productionAnchor = locale === "en" ? "see-a-production-example" : "查看生产案例";
+    assert.ok(content.includes(`](./nextjs-llms-txt#${productionAnchor})`));
   });
 
   test(`${locale} llms troubleshooting distinguishes HTML fallback from missing-page recovery`, async () => {

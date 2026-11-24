@@ -1,6 +1,6 @@
 ---
 title: Add llms.txt and Markdown endpoints to Next.js App Router
-summary: Compare native Next.js, Next SEO, Fumadocs, and Nextra options before adding AI-readable endpoints, then run and verify a clean Next.js demo.
+summary: Add llms.txt and per-page Markdown to an existing Next.js App Router site. Keep the browser UI and verify all three public responses with curl.
 order: 8
 questions:
   - q: Does Next.js generate llms.txt automatically?
@@ -20,7 +20,7 @@ tags:
   - llms.txt
   - markdown
   - tutorial
-updatedAt: '2026-10-09'
+updatedAt: '2026-11-24'
 author: next-ai-ready team
 ---
 
@@ -30,7 +30,9 @@ The smallest implementation is a hand-written `public/llms.txt`. That is enough 
 rarely changing site. Use a build integration when the file must stay synchronized with many
 pages, page summaries, Markdown representations, structured data, or agent tools.
 
-This guide adds those interfaces to an existing Next.js App Router project without changing its UI.
+Keep your existing App Router pages for browsers. Add an index at `/llms.txt` and serve each
+page's Markdown at a separate `.md` URL. [Try the three HTTP checks](#see-a-production-example)
+on this site before running them against your deployment.
 
 Using a documentation framework? Follow the dedicated [Nextra 4 guide](./nextra-ai-ready) or
 [Fumadocs guide](./fumadocs-ai-ready) for content paths, plugin composition, and deployment limits.
@@ -136,10 +138,23 @@ the repository's clean-install and production-build release checks.
 
 ## See a production example
 
-This documentation site uses the same integration described below:
+Run these commands against this guide's public URLs:
+
+```bash
+origin=https://nextaiready.com
+page=/en/docs/guides/nextjs-llms-txt
+
+curl -fsS -o /dev/null -w '%{http_code} %{content_type}\n' -H 'Accept: text/html' "$origin$page"
+curl -fsS "$origin/llms.txt" | grep -F "$origin$page"
+curl -fsS -i "$origin$page.md" | grep -Ei '^(HTTP/|content-type:|link:|# Add llms\.txt and Markdown endpoints to Next\.js App Router$)'
+```
+
+The page should return `200 text/html`. The index should list the guide's production URL.
+The Markdown request should return `200`, `Content-Type: text/markdown`, the guide heading,
+and a canonical `Link` header pointing to the HTML page.
 
 - [Production llms.txt](https://nextaiready.com/llms.txt)
-- [This installation page as Markdown](https://nextaiready.com/en/docs/installation.md)
+- [This guide as Markdown](https://nextaiready.com/en/docs/guides/nextjs-llms-txt.md)
 - [Production OpenAPI document](https://nextaiready.com/openapi.json)
 - [Production tool manifest](https://nextaiready.com/tools.json)
 - [Source for the deployed documentation site](https://github.com/mustcanbedo/next-ai-ready/tree/main/examples/docs-site)
@@ -243,9 +258,8 @@ After deploying, inspect the real public responses rather than relying only on b
 pnpm exec next-ai-ready audit https://example.com --version 3
 ```
 
-Also open `https://example.com/llms.txt` and one real page such as
-`https://example.com/about.md`. Confirm that canonical URLs point to the production origin and that
-normal browser pages still return HTML.
+Repeat the [public HTTP example](#see-a-production-example) with your production origin, a real page
+path, and the expected Markdown heading.
 
 ## Common mistakes
 

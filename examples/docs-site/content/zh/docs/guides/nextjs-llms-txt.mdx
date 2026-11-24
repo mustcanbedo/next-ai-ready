@@ -1,6 +1,6 @@
 ---
 title: 为 Next.js App Router 添加 llms.txt 与 Markdown 端点
-summary: 先比较 Next.js 原生能力、Next SEO、Fumadocs 与 Nextra 的职责，再添加 AI 可读端点，运行并验证干净的 Next.js 演示。
+summary: 为现有 Next.js App Router 站点添加 llms.txt 和逐页 Markdown，保留原有界面，并用 curl 验证三类公开响应。
 order: 8
 questions:
   - q: Next.js 会自动生成 llms.txt 吗？
@@ -20,7 +20,7 @@ tags:
   - llms.txt
   - markdown
   - tutorial
-updatedAt: '2026-10-09'
+updatedAt: '2026-11-24'
 author: next-ai-ready 团队
 ---
 
@@ -29,7 +29,8 @@ author: next-ai-ready 团队
 最小实现是在 `public/llms.txt` 中手写内容。对于页面少、更新不频繁的网站，这已经足够。
 当文件需要与大量页面、摘要、Markdown、结构化数据或 Agent 工具保持同步时，再使用构建集成。
 
-本指南为现有 Next.js App Router 项目添加这些机器接口，不改动现有 UI。
+保留现有 App Router 页面，在 `/llms.txt` 提供索引，通过独立的 `.md` URL 返回逐页
+Markdown。可以先对本站运行 [三项 HTTP 检查](#查看生产案例)，然后在自己的生产环境复验。
 
 如果项目使用文档框架，请查看专门的 [Nextra 4 指南](./nextra-ai-ready) 或
 [Fumadocs 指南](./fumadocs-ai-ready)，其中包含内容目录、插件组合与部署限制。
@@ -132,10 +133,22 @@ alpha.21 的默认 `init` 仅启用知识平面，不会创建 `/openapi.json` �
 
 ## 查看生产案例
 
-当前文档站正在运行下方同一套集成：
+对本指南的公开 URL 运行以下命令：
+
+```bash
+origin=https://nextaiready.com
+page=/zh/docs/guides/nextjs-llms-txt
+
+curl -fsS -o /dev/null -w '%{http_code} %{content_type}\n' -H 'Accept: text/html' "$origin$page"
+curl -fsS "$origin/llms.txt" | grep -F "$origin$page"
+curl -fsS -i "$origin$page.md" | grep -Ei '^(HTTP/|content-type:|link:|# 为 Next\.js App Router 添加 llms\.txt 与 Markdown 端点$)'
+```
+
+浏览器页面应返回 `200 text/html`，索引应列出指南的生产 URL。Markdown 响应应返回
+`200`、`Content-Type: text/markdown` 和指南标题，canonical `Link` 头应指向 HTML 页面。
 
 - [生产 llms.txt](https://nextaiready.com/llms.txt)
-- [安装页面的 Markdown](https://nextaiready.com/zh/docs/installation.md)
+- [本指南的 Markdown](https://nextaiready.com/zh/docs/guides/nextjs-llms-txt.md)
 - [生产 OpenAPI 文档](https://nextaiready.com/openapi.json)
 - [生产工具清单](https://nextaiready.com/tools.json)
 - [文档站生产源码](https://github.com/mustcanbedo/next-ai-ready/tree/main/examples/docs-site)
@@ -234,8 +247,7 @@ curl -i http://localhost:3000/about.md
 pnpm exec next-ai-ready audit https://example.com --version 3
 ```
 
-同时打开 `https://example.com/llms.txt` 和类似 `https://example.com/about.md` 的真实页面，
-确认 canonical URL 指向生产域名，普通浏览器页面仍返回 HTML。
+按 [生产站 HTTP 示例](#查看生产案例) 复验。将命令中的域名、页面路径和 Markdown 标题换成你站点的实际值。
 
 ## 常见问题
 

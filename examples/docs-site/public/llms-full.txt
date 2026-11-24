@@ -2011,7 +2011,7 @@ No. File scanning, metadata extraction, chunking, and output generation are dete
 <!-- BEGIN /en/docs/guides/nextjs-llms-txt -->
 # Add llms.txt and Markdown endpoints to Next.js App Router
 URL: https://nextaiready.com/en/docs/guides/nextjs-llms-txt
-Updated: 2026-10-09
+Updated: 2026-11-24
 
 # Add llms.txt and Markdown endpoints to Next.js App Router
 
@@ -2019,7 +2019,9 @@ The smallest implementation is a hand-written `public/llms.txt`. That is enough 
 rarely changing site. Use a build integration when the file must stay synchronized with many
 pages, page summaries, Markdown representations, structured data, or agent tools.
 
-This guide adds those interfaces to an existing Next.js App Router project without changing its UI.
+Keep your existing App Router pages for browsers. Add an index at `/llms.txt` and serve each
+page's Markdown at a separate `.md` URL. [Try the three HTTP checks](#see-a-production-example)
+on this site before running them against your deployment.
 
 Using a documentation framework? Follow the dedicated [Nextra 4 guide](./nextra-ai-ready) or
 [Fumadocs guide](./fumadocs-ai-ready) for content paths, plugin composition, and deployment limits.
@@ -2125,10 +2127,23 @@ the repository's clean-install and production-build release checks.
 
 ## See a production example
 
-This documentation site uses the same integration described below:
+Run these commands against this guide's public URLs:
+
+```bash
+origin=https://nextaiready.com
+page=/en/docs/guides/nextjs-llms-txt
+
+curl -fsS -o /dev/null -w '%{http_code} %{content_type}\n' -H 'Accept: text/html' "$origin$page"
+curl -fsS "$origin/llms.txt" | grep -F "$origin$page"
+curl -fsS -i "$origin$page.md" | grep -Ei '^(HTTP/|content-type:|link:|# Add llms\.txt and Markdown endpoints to Next\.js App Router$)'
+```
+
+The page should return `200 text/html`. The index should list the guide's production URL.
+The Markdown request should return `200`, `Content-Type: text/markdown`, the guide heading,
+and a canonical `Link` header pointing to the HTML page.
 
 - [Production llms.txt](https://nextaiready.com/llms.txt)
-- [This installation page as Markdown](https://nextaiready.com/en/docs/installation.md)
+- [This guide as Markdown](https://nextaiready.com/en/docs/guides/nextjs-llms-txt.md)
 - [Production OpenAPI document](https://nextaiready.com/openapi.json)
 - [Production tool manifest](https://nextaiready.com/tools.json)
 - [Source for the deployed documentation site](https://github.com/mustcanbedo/next-ai-ready/tree/main/examples/docs-site)
@@ -2232,9 +2247,8 @@ After deploying, inspect the real public responses rather than relying only on b
 pnpm exec next-ai-ready audit https://example.com --version 3
 ```
 
-Also open `https://example.com/llms.txt` and one real page such as
-`https://example.com/about.md`. Confirm that canonical URLs point to the production origin and that
-normal browser pages still return HTML.
+Repeat the [public HTTP example](#see-a-production-example) with your production origin, a real page
+path, and the expected Markdown heading.
 
 ## Common mistakes
 
@@ -2702,7 +2716,7 @@ The setup is verified when:
 
 If the Markdown page is missing, check its source file, content glob, graph route, handlers, and
 `withAiReady()` wiring. If links use the wrong hostname, correct `site.baseUrl` and rebuild.
-For production checks, continue with [the llms.txt walkthrough](./nextjs-llms-txt#check-the-expected-responses).
+For production checks, run [the public HTTP example](./nextjs-llms-txt#see-a-production-example).
 
 ## Next steps
 
@@ -3101,7 +3115,7 @@ Traditional websites are built for browsers. `next-ai-ready` makes your Next.js 
 
 ## Choose your next step
 
-- **Use native tools for your task.** Use [Next.js metadata](https://nextjs.org/docs/app/getting-started/metadata-and-og-images) for search titles, canonical URLs, and social cards. If Fumadocs already serves the documentation you want clients to retrieve, start with its [native AI integrations](https://www.fumadocs.dev/docs/next/integrations/llms).
+- **Use native tools for your task.** Use [Next.js metadata](https://nextjs.org/docs/app/getting-started/metadata-and-og-images) for search titles, canonical URLs, and social cards. If Fumadocs already serves the documentation you want clients to retrieve, start with its [native AI integrations](https://www.fumadocs.dev/docs/next/integrations/llms). The [Fumadocs guide](/en/docs/guides/fumadocs-ai-ready) explains when a shared content graph or application actions would help.
 - **Generate AI-readable content from your Next.js sources.** Follow the [10-minute Quickstart](/en/docs/guides/quickstart) to install and verify a real Markdown response. For endpoint choices, see [Add llms.txt to a Next.js site](/en/docs/guides/nextjs-llms-txt).
 - **Connect an agent to approved tools.** After the content setup, [connect an MCP client](/en/docs/guides/mcp-integration) when you need authenticated retrieval or want agents to call approved tools.
 - **Choose who can crawl your content.** The [AI crawler policy guide](/en/docs/guides/robots-txt) explains separate rules for search, training, and user-initiated fetches.
@@ -5212,14 +5226,15 @@ curl -i https://docs.example.com/docs/installation.md
 <!-- BEGIN /zh/docs/guides/nextjs-llms-txt -->
 # 为 Next.js App Router 添加 llms.txt 与 Markdown 端点
 URL: https://nextaiready.com/zh/docs/guides/nextjs-llms-txt
-Updated: 2026-10-09
+Updated: 2026-11-24
 
 # 为 Next.js App Router 添加 llms.txt 与 Markdown 端点
 
 最小实现是在 `public/llms.txt` 中手写内容。对于页面少、更新不频繁的网站，这已经足够。
 当文件需要与大量页面、摘要、Markdown、结构化数据或 Agent 工具保持同步时，再使用构建集成。
 
-本指南为现有 Next.js App Router 项目添加这些机器接口，不改动现有 UI。
+保留现有 App Router 页面，在 `/llms.txt` 提供索引，通过独立的 `.md` URL 返回逐页
+Markdown。可以先对本站运行 [三项 HTTP 检查](#查看生产案例)，然后在自己的生产环境复验。
 
 如果项目使用文档框架，请查看专门的 [Nextra 4 指南](./nextra-ai-ready) 或
 [Fumadocs 指南](./fumadocs-ai-ready)，其中包含内容目录、插件组合与部署限制。
@@ -5322,10 +5337,22 @@ alpha.21 的默认 `init` 仅启用知识平面，不会创建 `/openapi.json` �
 
 ## 查看生产案例
 
-当前文档站正在运行下方同一套集成：
+对本指南的公开 URL 运行以下命令：
+
+```bash
+origin=https://nextaiready.com
+page=/zh/docs/guides/nextjs-llms-txt
+
+curl -fsS -o /dev/null -w '%{http_code} %{content_type}\n' -H 'Accept: text/html' "$origin$page"
+curl -fsS "$origin/llms.txt" | grep -F "$origin$page"
+curl -fsS -i "$origin$page.md" | grep -Ei '^(HTTP/|content-type:|link:|# 为 Next\.js App Router 添加 llms\.txt 与 Markdown 端点$)'
+```
+
+浏览器页面应返回 `200 text/html`，索引应列出指南的生产 URL。Markdown 响应应返回
+`200`、`Content-Type: text/markdown` 和指南标题，canonical `Link` 头应指向 HTML 页面。
 
 - [生产 llms.txt](https://nextaiready.com/llms.txt)
-- [安装页面的 Markdown](https://nextaiready.com/zh/docs/installation.md)
+- [本指南的 Markdown](https://nextaiready.com/zh/docs/guides/nextjs-llms-txt.md)
 - [生产 OpenAPI 文档](https://nextaiready.com/openapi.json)
 - [生产工具清单](https://nextaiready.com/tools.json)
 - [文档站生产源码](https://github.com/mustcanbedo/next-ai-ready/tree/main/examples/docs-site)
@@ -5424,8 +5451,7 @@ curl -i http://localhost:3000/about.md
 pnpm exec next-ai-ready audit https://example.com --version 3
 ```
 
-同时打开 `https://example.com/llms.txt` 和类似 `https://example.com/about.md` 的真实页面，
-确认 canonical URL 指向生产域名，普通浏览器页面仍返回 HTML。
+按 [生产站 HTTP 示例](#查看生产案例) 复验。将命令中的域名、页面路径和 Markdown 标题换成你站点的实际值。
 
 ## 常见问题
 
@@ -5896,7 +5922,7 @@ curl -i -H 'Accept: text/html' http://localhost:3000/
 - `/docs/quickstart.md` 返回 `200`、`Content-Type: text/markdown`，正文包含“快速接入检查”和 `pnpm install`，而不是 `not_found` 恢复文档。仅有 `200` 不足以说明找到了内容。
 - 普通首页 `/` 仍返回原有 HTML，`Content-Type` 为 `text/html`。接入不会替换原有浏览器页面。
 
-还可检查 `/llms-full.txt` 是否包含完整内容。部署后，应在真实生产域名下重复检查端点及链接。
+还可检查 `/llms-full.txt` 是否包含完整内容。部署后，参考 [生产站 HTTP 验证示例](./nextjs-llms-txt#查看生产案例)，用你的生产域名重复检查端点及链接。
 
 若响应不符合预期，按以下方向排查：
 
@@ -6295,7 +6321,7 @@ Updated: 2026-11-23
 
 ## 选择下一步
 
-- **先使用适合当前任务的原生功能。** 搜索标题、canonical 和分享卡片可用 [Next.js 元数据](https://nextjs.org/docs/app/getting-started/metadata-and-og-images)。Fumadocs 站点如果只需要文档发现和读取，可以先用它的 [原生 AI 集成](https://www.fumadocs.dev/docs/next/integrations/llms)。
+- **先使用适合当前任务的原生功能。** 搜索标题、canonical 和分享卡片可用 [Next.js 元数据](https://nextjs.org/docs/app/getting-started/metadata-and-og-images)。Fumadocs 站点如果只需要文档发现和读取，可以先用它的 [原生 AI 集成](https://www.fumadocs.dev/docs/next/integrations/llms)。需要共享内容图或应用操作时，参考 [Fumadocs 接入指南](/zh/docs/guides/fumadocs-ai-ready)。
 - **从现有 Next.js 内容生成 AI 可读文档。** 按 [10 分钟快速开始](/zh/docs/guides/quickstart) 安装并验证真实 Markdown 响应。需要比较端点方案时，参考 [为 Next.js 站点添加 llms.txt](/zh/docs/guides/nextjs-llms-txt)。
 - **让 Agent 使用经过许可的工具。** 完成内容接入后，在需要经过认证的内容读取或工具调用时，再 [连接 MCP 客户端](/zh/docs/guides/mcp-integration)。
 - **选择允许哪些客户端抓取。** 参考 [AI 爬虫策略指南](/zh/docs/guides/robots-txt)，分别配置搜索、训练和由用户触发的抓取。

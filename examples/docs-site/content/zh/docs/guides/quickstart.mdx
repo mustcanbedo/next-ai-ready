@@ -137,7 +137,7 @@ curl -i -H 'Accept: text/html' http://localhost:3000/
 - `/docs/quickstart.md` 返回 `200`、`Content-Type: text/markdown`，正文包含“快速接入检查”和 `pnpm install`，而不是 `not_found` 恢复文档。仅有 `200` 不足以说明找到了内容。
 - 普通首页 `/` 仍返回原有 HTML，`Content-Type` 为 `text/html`。接入不会替换原有浏览器页面。
 
-还可检查 `/llms-full.txt` 是否包含完整内容。部署后，应在真实生产域名下重复检查端点及链接。
+还可检查 `/llms-full.txt` 是否包含完整内容。部署后，参考 [生产站 HTTP 验证示例](./nextjs-llms-txt#查看生产案例)，用你的生产域名重复检查端点及链接。
 
 若响应不符合预期，按以下方向排查：
 
